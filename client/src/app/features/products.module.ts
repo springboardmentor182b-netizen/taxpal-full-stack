@@ -1,0 +1,1 @@
+// Products feature module placeholder

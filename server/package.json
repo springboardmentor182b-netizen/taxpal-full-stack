@@ -1,0 +1,5 @@
+{
+  "name": "mean-app-server",
+  "version": "0.0.1",
+  "main": "dist/server.js"
+}
