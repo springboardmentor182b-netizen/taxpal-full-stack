@@ -1,1 +1,0 @@
-// shared/pipes/example.pipe.ts

@@ -1,1 +1,0 @@
-// Shared pipes placeholder
