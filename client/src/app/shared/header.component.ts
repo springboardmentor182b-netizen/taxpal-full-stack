@@ -1,1 +1,0 @@
-// Shared header component placeholder
