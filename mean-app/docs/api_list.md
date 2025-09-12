@@ -216,7 +216,7 @@ Authorization: Bearer <jwt_token>
 
 ---
 
-## 💸 Expense Management APIs
+## 💸 Expenses Management APIs
 
 ### POST /api/transactions/expense
 - **Description:** Add new expense record
