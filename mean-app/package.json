@@ -1,0 +1,9 @@
+{
+  "name": "mean-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "cd client && ng serve",
+    "server": "cd server && npm run dev"
+  }
+}
