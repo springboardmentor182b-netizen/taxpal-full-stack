@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
@@ -9,6 +9,9 @@ import { RouterLink } from '@angular/router';
   template: `
     <nav class="navbar" [ngClass]="{ 'dark': isDarkMode }">
       <div class="navbar-box" [ngClass]="{ 'dark': isDarkMode }">
+        <div class="floating-emoji" *ngFor="let emoji of floatingEmojis" [ngStyle]="emoji.style">
+          {{ emoji.symbol }}
+        </div>
         <div class="navbar-container">
           <div class="logo">
             <a routerLink="/">
@@ -110,6 +113,7 @@ import { RouterLink } from '@angular/router';
       width: 100%;
       border-bottom: 1px solid #e5e7eb;
       position: relative;
+      overflow: hidden;  /* Contain the floating emojis */
     }
     
     .navbar-container {
@@ -588,10 +592,46 @@ import { RouterLink } from '@angular/router';
         margin-right: 0;
       }
     }
+    
+    .floating-emoji {
+      position: absolute;
+      font-size: 1.5rem;
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+      animation: float 8s linear forwards;
+      transform: translateZ(0);
+      will-change: transform, opacity, top, left;
+    }
+    
+    @keyframes float {
+      0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg) scale(0.8);
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) rotate(360deg) scale(1.2);
+      }
+    }
+    
+    .dark .floating-emoji {
+      filter: brightness(1.2);
+    }
   `]
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   isDarkMode = false;
+  floatingEmojis: { symbol: string, style: any }[] = [];
+  private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
+  private maxEmojis = 15;
+  private animationInterval: any;
 
   constructor() {
     // Check for saved preference on component initialization
@@ -600,6 +640,49 @@ export class NavbarComponent {
       this.isDarkMode = true;
       this.applyDarkMode();
     }
+  }
+
+  ngOnInit() {
+    this.startEmojiAnimation();
+  }
+
+  ngOnDestroy() {
+    if (this.animationInterval) {
+      clearInterval(this.animationInterval);
+    }
+  }
+
+  private startEmojiAnimation() {
+    this.animationInterval = setInterval(() => {
+      // Only add new emoji if we haven't reached the max
+      if (this.floatingEmojis.length < this.maxEmojis) {
+        this.addFloatingEmoji();
+      }
+      
+      // Remove completed animations
+      this.floatingEmojis = this.floatingEmojis.filter(emoji => 
+        Date.now() - emoji.style.createdAt < 8000
+      );
+    }, 800);
+  }
+
+  private addFloatingEmoji() {
+    const randomEmoji = this.emojis[Math.floor(Math.random() * this.emojis.length)];
+    const left = Math.random() * 100; // Random horizontal position (0-100%)
+    const rotationStart = Math.random() * 360; // Random initial rotation
+    const scale = 0.8 + Math.random() * 0.4; // Random scale between 0.8 and 1.2
+    const duration = 6 + Math.random() * 4; // Random duration between 6-10s
+    
+    this.floatingEmojis.push({
+      symbol: randomEmoji,
+      style: {
+        left: `${left}%`,
+        bottom: '-20px',
+        transform: `rotate(${rotationStart}deg) scale(${scale})`,
+        animationDuration: `${duration}s`,
+        createdAt: Date.now()
+      }
+    });
   }
 
   toggleDarkMode() {
