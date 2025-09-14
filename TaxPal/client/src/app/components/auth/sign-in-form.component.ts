@@ -534,7 +534,7 @@ export class SignInFormComponent implements OnInit, OnDestroy {
     // Here you would normally handle the sign in logic
     console.log('Signing in with', this.email, this.password);
     
-    // Navigate to user profile instead of dashboard
+    // Navigate to user profile after sign in
     this.closeForm();
     this.router.navigate(['/user-profile']);
   }
