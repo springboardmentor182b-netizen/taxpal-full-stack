@@ -1,11 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { SignInFormComponent } from '../auth/sign-in-form.component';
+import { SignUpFormComponent } from '../auth/sign-up-form.component';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, SignInFormComponent, SignUpFormComponent],
   template: `
     <nav class="navbar" [ngClass]="{ 'dark': isDarkMode }">
       <div class="navbar-box" [ngClass]="{ 'dark': isDarkMode }">
@@ -76,7 +78,7 @@ import { RouterLink } from '@angular/router';
               </svg>
             </button>
             <div class="auth-buttons">
-              <a routerLink="/login" class="login-btn btn">
+              <a class="login-btn btn" (click)="openSignInForm($event)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
                   <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
                   <polyline points="10 17 15 12 10 7"/>
@@ -84,12 +86,24 @@ import { RouterLink } from '@angular/router';
                 </svg>
                 <span>Sign in</span>
               </a>
-              <a routerLink="/register" class="register-btn btn">Get started</a>
+              <a class="register-btn btn" (click)="openSignUpForm($event)">Get started</a>
             </div>
           </div>
         </div>
       </div>
     </nav>
+    
+    <app-sign-in-form 
+      *ngIf="showSignInForm" 
+      (close)="closeAuthForms()"
+      (switchToSignUp)="switchToSignUp()"
+    ></app-sign-in-form>
+    
+    <app-sign-up-form 
+      *ngIf="showSignUpForm" 
+      (close)="closeAuthForms()"
+      (switchToSignIn)="switchToSignIn()"
+    ></app-sign-up-form>
   `,
   styles: [`
     .navbar {
@@ -632,6 +646,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
   private animationInterval: any;
+  showSignInForm = false;
+  showSignUpForm = false;
 
   constructor() {
     // Check for saved preference on component initialization
@@ -701,6 +717,36 @@ export class NavbarComponent implements OnInit, OnDestroy {
     
     // Apply dark mode to HTML element to allow for CSS variable targeting
     document.documentElement.classList.toggle('dark', this.isDarkMode);
+  }
+
+  openSignInForm(event: Event) {
+    event.preventDefault();
+    this.showSignInForm = true;
+    this.showSignUpForm = false;
+    document.body.classList.add('no-scroll');
+  }
+
+  openSignUpForm(event: Event) {
+    event.preventDefault();
+    this.showSignUpForm = true;
+    this.showSignInForm = false;
+    document.body.classList.add('no-scroll');
+  }
+
+  closeAuthForms() {
+    this.showSignInForm = false;
+    this.showSignUpForm = false;
+    document.body.classList.remove('no-scroll');
+  }
+  
+  switchToSignUp() {
+    this.showSignInForm = false;
+    this.showSignUpForm = true;
+  }
+  
+  switchToSignIn() {
+    this.showSignUpForm = false;
+    this.showSignInForm = true;
   }
 }
 
