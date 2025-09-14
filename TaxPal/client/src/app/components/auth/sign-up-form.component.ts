@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sign-up-form',
@@ -89,10 +90,6 @@ import { FormsModule } from '@angular/forms';
                 </svg>
               </button>
             </div>
-            <div class="password-strength" *ngIf="password">
-              <div class="strength-bar" [ngClass]="getPasswordStrengthClass()"></div>
-              <span class="strength-text">{{ getPasswordStrengthText() }}</span>
-            </div>
           </div>
           
           <div class="form-group">
@@ -151,7 +148,7 @@ import { FormsModule } from '@angular/forms';
           </button>
           
           <p class="sign-in-prompt">
-            Already have an account? <a href="#" class="sign-in-link" (click)="switchToSignIn($event)">Sign in instead</a>
+            Already have an account? <a href="#" class="sign-in-link" (click)="onSwitchToSignIn($event)">Sign in instead</a>
           </p>
         </div>
       </div>
@@ -671,8 +668,7 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
   private maxEmojis = 10;
   private animationInterval: any;
   
-  constructor() {
-    // Check if dark mode is enabled
+  constructor(private router: Router) {
     this.isDarkMode = document.documentElement.classList.contains('dark');
   }
   
@@ -731,33 +727,6 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
     this.showPassword = !this.showPassword;
   }
   
-  getPasswordStrengthClass() {
-    if (!this.password) return '';
-    
-    const length = this.password.length;
-    const hasUppercase = /[A-Z]/.test(this.password);
-    const hasLowercase = /[a-z]/.test(this.password);
-    const hasNumbers = /\d/.test(this.password);
-    const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(this.password);
-    
-    const strength = [hasUppercase, hasLowercase, hasNumbers, hasSpecialChars].filter(Boolean).length;
-    
-    if (length < 8 || strength < 2) return 'weak';
-    if (length >= 8 && strength === 2) return 'medium';
-    if (length >= 10 && strength >= 3) return 'strong';
-    return 'medium';
-  }
-  
-  getPasswordStrengthText() {
-    const strengthClass = this.getPasswordStrengthClass();
-    switch (strengthClass) {
-      case 'weak': return 'Weak password';
-      case 'medium': return 'Medium strength';
-      case 'strong': return 'Strong password';
-      default: return '';
-    }
-  }
-  
   isFormValid() {
     return this.firstName && 
            this.lastName && 
@@ -774,17 +743,17 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
       firstName: this.firstName,
       lastName: this.lastName,
       email: this.email,
-      password: this.password,
       country: this.country,
       agreeToTerms: this.agreeToTerms,
       receiveUpdates: this.receiveUpdates
     });
     
-    // For demo, just close the form
+    // Navigate to user profile instead of dashboard
     this.closeForm();
+    this.router.navigate(['/user-profile']);
   }
   
-  switchToSignInForm(event: Event) {
+  onSwitchToSignIn(event: Event) {
     event.preventDefault();
     this.switchToSignIn.emit();
   }

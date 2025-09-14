@@ -1,23 +1,22 @@
 import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
-import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NavbarComponent, CommonModule],
+  imports: [CommonModule, RouterOutlet, NavbarComponent],
   template: `
-    <div class="app-container">
-      <app-navbar></app-navbar>
-      <router-outlet></router-outlet>
-    </div>
+    <app-navbar></app-navbar>
+    <router-outlet></router-outlet>
   `,
   styles: [`
-    .app-container {
-      font-family: 'Inter', sans-serif;
+    :host {
       color: #1a202c;
     }
   `]
 })
-export class App { }
+export class App {
+  title = 'TaxPal';
+}
