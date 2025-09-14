@@ -81,3 +81,22 @@ button {
 .dark-mode input::placeholder, .dark-mode textarea::placeholder {
   color: #9ca3af;
 }
+
+/* Modal related styles */
+body.no-scroll {
+  overflow: hidden;
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.dark button:focus-visible,
+.dark a:focus-visible,
+.dark input:focus-visible {
+  outline-color: #60a5fa;
+}
