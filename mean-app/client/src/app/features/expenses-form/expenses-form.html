@@ -1,0 +1,49 @@
+<!-- src/app/income-card/income-card.component.html -->
+<div class="overlay">
+    <div class="expenses-card">
+      <button class="close-btn" (click)="closeForm()" aria-label="Close">✕</button>
+  
+      <h2 class="form-heading">Record New Expense</h2>
+      <p class="form-subtitle">Add details about your expenses to track your finances better.</p>
+  
+      <form [formGroup]="expensesForm" (ngSubmit)="submitForm()">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Description</label>
+            <input type="text" formControlName="description" placeholder="eg. Web Design Project" />
+          </div>
+  
+          <div class="form-group">
+            <label>Amount</label>
+            <input type="number" formControlName="amount" placeholder="$0.00" />
+          </div>
+        </div>
+  
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category</label>
+            <select formControlName="category">
+              <option value="" disabled>Select a category</option>
+              <option *ngFor="let cat of categories" [value]="cat">{{cat}}</option>
+            </select>
+          </div>
+  
+          <div class="form-group">
+            <label>Date</label>
+            <input type="date" formControlName="date" />
+          </div>
+        </div>
+  
+        <div class="form-group full-width">
+          <label>Notes (Optional)</label>
+          <textarea formControlName="notes" rows="3" placeholder="Any additional details..."></textarea>
+        </div>
+  
+        <div class="action-buttons">
+          <button type="button" class="btn-cancel" (click)="cancelForm()">Cancel</button>
+          <button type="submit" class="btn-save">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
