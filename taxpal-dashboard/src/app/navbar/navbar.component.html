@@ -1,0 +1,28 @@
+<header class="topbar">
+  <div class="brand">
+    <div class="logo-icon">TP</div>
+    <div style="font-weight:700;color:var(--text-light)">TaxPal</div>
+  </div>
+
+  <nav class="main-nav" aria-label="Main navigation">
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Transactions</a>
+    <a href="#">Budget</a>
+    <a href="#">Reports</a>
+    <a href="#">Tax Estimator</a>
+  </nav>
+
+  <div class="top-actions">
+    <div class="icon-wrap">
+      <div id="modeToggle" class="icon-circle" title="Toggle light/dark mode" (click)="toggleMode()">
+        <i class="fa-solid fa-moon"></i>
+      </div>
+      <div class="icon-circle" title="Search"><i class="fa-solid fa-magnifying-glass"></i></div>
+      <div class="icon-circle" title="Notifications">
+        <i class="fa-regular fa-bell"></i>
+        <div class="badge">3</div>
+      </div>
+      <div class="icon-circle" title="Profile">U</div>
+    </div>
+  </div>
+</header>
