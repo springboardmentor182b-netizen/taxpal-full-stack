@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-sign-in-form',
@@ -467,7 +468,7 @@ export class SignInFormComponent implements OnInit, OnDestroy {
   private maxEmojis = 10;
   private animationInterval: any;
   
-  constructor() {
+  constructor(private router: Router) {
     // Check if dark mode is enabled
     this.isDarkMode = document.documentElement.classList.contains('dark');
   }
@@ -532,8 +533,10 @@ export class SignInFormComponent implements OnInit, OnDestroy {
   signIn() {
     // Here you would normally handle the sign in logic
     console.log('Signing in with', this.email, this.password);
-    // For demo, just close the form
+    
+    // Navigate to user profile instead of dashboard
     this.closeForm();
+    this.router.navigate(['/user-profile']);
   }
   
   onSwitchToSignUp(event: Event) {
