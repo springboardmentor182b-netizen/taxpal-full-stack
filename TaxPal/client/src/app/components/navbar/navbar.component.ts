@@ -97,6 +97,7 @@ import { RouterLink } from '@angular/router';
       z-index: 100;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       width: 100%;
+      overflow-x: hidden;
     }
     
     .navbar-box {
@@ -108,6 +109,7 @@ import { RouterLink } from '@angular/router';
       padding: 1.25rem 0;
       width: 100%;
       border-bottom: 1px solid #e5e7eb;
+      position: relative;
     }
     
     .navbar-container {
@@ -116,7 +118,15 @@ import { RouterLink } from '@angular/router';
       align-items: center;
       width: 100%;
       max-width: 1200px;
-      padding: 0 2rem;
+      padding: 0;
+      position: relative;
+      margin: 0 auto;
+    }
+    
+    .logo {
+      flex: 0 0 auto;
+      margin-right: 2rem;
+      margin-left: 2rem;
     }
     
     .logo a {
@@ -149,7 +159,11 @@ import { RouterLink } from '@angular/router';
     .nav-links {
       display: flex;
       gap: 2.5rem;
-      margin: 0 1rem;
+      margin: 0 auto;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      justify-content: center;
     }
     
     .nav-link {
@@ -207,6 +221,9 @@ import { RouterLink } from '@angular/router';
       gap: 1.5rem;
       margin-left: auto;
       padding-left: 1rem;
+      flex: 0 0 auto;
+      position: absolute;
+      right: -1rem;
     }
     
     .auth-buttons {
@@ -216,6 +233,7 @@ import { RouterLink } from '@angular/router';
       flex-shrink: 0;
       border-left: 1px solid #e5e7eb;
       padding-left: 1.5rem;
+      padding-right: 2rem;
     }
     
     .dark .auth-buttons {
@@ -368,6 +386,129 @@ import { RouterLink } from '@angular/router';
       box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
     }
     
+    .dark .register-btn:hover {
+      background-color: #93c5fd;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(96, 165, 250, 0.4);
+    }
+    
+    .dark .register-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+    }
+    
+    .btn {
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1.1rem;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    
+    .login-btn {
+      background-color: #3b82f6;
+      color: #ffffff;
+      border: none;
+      gap: 0.5rem;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .login-icon {
+      stroke: #ffffff;
+      transition: stroke 0.3s ease;
+      width: 16px;
+      height: 16px;
+      margin-right: 0.25rem;
+      position: relative;
+      top: 0;
+      flex-shrink: 0;
+    }
+    
+    .login-btn:hover {
+      background-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+    }
+    
+    .login-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .register-btn {
+      background-color: #3b82f6;
+      color: #ffffff;
+      font-weight: 600;
+      position: relative;
+      overflow: hidden;
+      border: none;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .register-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0) 0%,
+        rgba(255, 255, 255, 0.3) 50%,
+        rgba(255, 255, 255, 0) 100%
+      );
+      transition: left 0.8s ease;
+    }
+    
+    .register-btn:hover {
+      background-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
+    }
+    
+    .register-btn:active {
+      transform: translateY(1px);
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .register-btn:hover::before {
+      left: 100%;
+    }
+    
+    @media (max-width: 1024px) {
+      .nav-links {
+        position: static;
+        transform: none;
+        margin: 0 auto;
+        justify-content: center;
+        gap: 2rem;
+      }
+      
+      .navbar-container {
+        justify-content: space-between;
+      }
+      
+      .right-container {
+        position: static;
+        right: auto;
+      }
+      
+      .auth-buttons {
+        padding-right: 1rem;
+      }
+      
+      .logo {
+        margin-left: 1rem;
+      }
+    }
+    
     @media (max-width: 768px) {
       .navbar-container {
         padding: 0 1rem;
@@ -386,7 +527,7 @@ import { RouterLink } from '@angular/router';
       }
       
       .auth-buttons {
-        padding-left: 1rem;
+        padding-right: 1rem;
       }
       
       .btn {
@@ -432,7 +573,19 @@ import { RouterLink } from '@angular/router';
       }
       
       .auth-buttons {
-        padding-left: 0.75rem;
+        padding-right: 0.5rem;
+      }
+      
+      .login-btn span {
+        display: none; /* Hide text on smaller screens */
+      }
+      
+      .login-btn {
+        padding: 0.45rem;
+      }
+      
+      .login-icon {
+        margin-right: 0;
       }
     }
   `]
