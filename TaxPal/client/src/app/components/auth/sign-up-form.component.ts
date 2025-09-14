@@ -748,7 +748,7 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
       receiveUpdates: this.receiveUpdates
     });
     
-    // Navigate to user profile instead of dashboard
+    // Navigate to user profile after account creation
     this.closeForm();
     this.router.navigate(['/user-profile']);
   }

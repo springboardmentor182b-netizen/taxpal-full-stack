@@ -1,13 +1,11 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router, NavigationEnd } from '@angular/router';
-import { SignInFormComponent } from '../auth/sign-in-form.component';
-import { SignUpFormComponent } from '../auth/sign-up-form.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
-  selector: 'app-navbar',
+  selector: 'app-profile-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, SignInFormComponent, SignUpFormComponent],
+  imports: [CommonModule, RouterLink],
   template: `
     <nav class="navbar" [ngClass]="{ 'dark': isDarkMode }">
       <div class="navbar-box" [ngClass]="{ 'dark': isDarkMode }">
@@ -28,36 +26,52 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
             </a>
           </div>
           <div class="nav-links">
-            <a routerLink="/features" class="nav-link">
+            <a routerLink="/user-profile" class="nav-link" [class.active]="isActiveRoute('/user-profile')">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                <rect x="3" y="3" width="7" height="9"/>
+                <rect x="14" y="3" width="7" height="5"/>
+                <rect x="14" y="12" width="7" height="9"/>
+                <rect x="3" y="16" width="7" height="5"/>
               </svg>
-              <span>Features</span>
+              <span>Dashboard</span>
             </a>
-            <a routerLink="/plan" class="nav-link">
+            <a routerLink="/transactions" class="nav-link" [class.active]="isActiveRoute('/transactions')">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <rect x="2" y="3" width="20" height="18" rx="2"/>
+                <path d="M7 8h10"/>
+                <path d="M7 13h10"/>
+                <path d="M7 18h4"/>
               </svg>
-              <span>Plan</span>
+              <span>Transactions</span>
             </a>
-            <a routerLink="/support" class="nav-link">
+            <a routerLink="/budget" class="nav-link" [class.active]="isActiveRoute('/budget')">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-                <circle cx="12" cy="12" r="10"></circle>
-                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M16 12h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+                <path d="M12 6v2"/>
+                <path d="M12 16v2"/>
               </svg>
-              <span>Support</span>
+              <span>Budget</span>
             </a>
-            <a routerLink="/about" class="nav-link">
+            <a routerLink="/reports" class="nav-link" [class.active]="isActiveRoute('/reports')">
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="16"></line>
-                <line x1="8" y1="12" x2="16" y2="12"></line>
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <path d="M14 2v6h6"/>
+                <path d="M16 13H8"/>
+                <path d="M16 17H8"/>
+                <path d="M10 9H8"/>
               </svg>
-              <span>About</span>
+              <span>Reports</span>
+            </a>
+            <a routerLink="/tax-estimator" class="nav-link" [class.active]="isActiveRoute('/tax-estimator')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <rect x="2" y="4" width="20" height="16" rx="2"/>
+                <path d="M7 15h0"/>
+                <path d="M12 15h0"/>
+                <path d="M17 15h0"/>
+                <path d="M7 8h10"/>
+              </svg>
+              <span>Tax Estimator</span>
             </a>
           </div>
           <div class="right-container">
@@ -77,18 +91,7 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
             </button>
-            <div class="auth-buttons" *ngIf="!isProfilePage">
-              <a class="login-btn btn" (click)="openSignInForm($event)">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
-                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                  <polyline points="10 17 15 12 10 7"/>
-                  <line x1="15" y1="12" x2="3" y2="12"/>
-                </svg>
-                <span>Sign in</span>
-              </a>
-              <a class="register-btn btn" (click)="openSignUpForm($event)">Get started</a>
-            </div>
-            <div class="user-profile-indicator" *ngIf="isProfilePage">
+            <div class="user-profile-indicator">
               <div class="user-avatar">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -101,18 +104,6 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
         </div>
       </div>
     </nav>
-    
-    <app-sign-in-form 
-      *ngIf="showSignInForm" 
-      (close)="closeAuthForms()"
-      (switchToSignUp)="switchToSignUp()"
-    ></app-sign-in-form>
-    
-    <app-sign-up-form 
-      *ngIf="showSignUpForm" 
-      (close)="closeAuthForms()"
-      (switchToSignIn)="switchToSignIn()"
-    ></app-sign-up-form>
   `,
   styles: [`
     .navbar {
@@ -199,7 +190,7 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
       text-decoration: none;
       font-weight: 500;
       padding: 0.75rem 0;
-      font-size: 0.95rem;  /* Reduced from 1.05rem */
+      font-size: 0.95rem;
       transition: color 0.3s ease;
       display: flex;
       align-items: center;
@@ -209,8 +200,8 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
     .nav-icon {
       stroke: #4b5563;
       transition: stroke 0.3s ease;
-      width: 16px;  /* Reduced from 18px */
-      height: 16px;  /* Reduced from 18px */
+      width: 16px;
+      height: 16px;
     }
     
     .nav-link:hover .nav-icon {
@@ -242,6 +233,18 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
       width: 100%;
     }
     
+    .nav-link.active {
+      color: #3b82f6;
+    }
+    
+    .nav-link.active .nav-icon {
+      stroke: #3b82f6;
+    }
+    
+    .nav-link.active::before {
+      width: 100%;
+    }
+    
     .right-container {
       display: flex;
       align-items: center;
@@ -251,20 +254,6 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
       flex: 0 0 auto;
       position: absolute;
       right: -1rem;
-    }
-    
-    .auth-buttons {
-      display: flex;
-      gap: 1rem;
-      align-items: center;
-      flex-shrink: 0;
-      border-left: 1px solid #e5e7eb;
-      padding-left: 1.5rem;
-      padding-right: 2rem;
-    }
-    
-    .dark .auth-buttons {
-      border-left-color: #374151;
     }
     
     .theme-toggle-btn {
@@ -366,6 +355,14 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
       background-color: #60a5fa;
     }
     
+    .dark .nav-link.active {
+      color: #60a5fa;
+    }
+    
+    .dark .nav-link.active .nav-icon {
+      stroke: #60a5fa;
+    }
+    
     .dark .theme-toggle-btn {
       background-color: transparent;
     }
@@ -392,262 +389,7 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
       transform: rotate(30deg) scale(0);
     }
     
-    .dark .login-btn {
-      background-color: #60a5fa;
-      color: #111827;
-      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
-    }
-    
-    .dark .login-icon {
-      stroke: #111827;
-    }
-    
-    .dark .login-btn:hover {
-      background-color: #93c5fd;
-      box-shadow: 0 4px 8px rgba(96, 165, 250, 0.4);
-    }
-    
-    .dark .register-btn {
-      background-color: #60a5fa;
-      color: #111827;
-      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
-    }
-    
-    .dark .register-btn:hover {
-      background-color: #93c5fd;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(96, 165, 250, 0.4);
-    }
-    
-    .dark .register-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
-    }
-    
-    .btn {
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      padding: 0.5rem 1.1rem;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.95rem;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
-    
-    .login-btn {
-      background-color: #3b82f6;
-      color: #ffffff;
-      border: none;
-      gap: 0.5rem;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    
-    .login-icon {
-      stroke: #ffffff;
-      transition: stroke 0.3s ease;
-      width: 16px;
-      height: 16px;
-      margin-right: 0.25rem;
-      position: relative;
-      top: 0;
-      flex-shrink: 0;
-    }
-    
-    .login-btn:hover {
-      background-color: #2563eb;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
-    }
-    
-    .login-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    
-    .register-btn {
-      background-color: #3b82f6;
-      color: #ffffff;
-      font-weight: 600;
-      position: relative;
-      overflow: hidden;
-      border: none;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    
-    .register-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0) 100%
-      );
-      transition: left 0.8s ease;
-    }
-    
-    .register-btn:hover {
-      background-color: #2563eb;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
-    }
-    
-    .register-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    
-    .register-btn:hover::before {
-      left: 100%;
-    }
-    
-    @media (max-width: 1024px) {
-      .nav-links {
-        position: static;
-        transform: none;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 2rem;
-      }
-      
-      .navbar-container {
-        justify-content: space-between;
-      }
-      
-      .right-container {
-        position: static;
-        right: auto;
-      }
-      
-      .auth-buttons {
-        padding-right: 1rem;
-      }
-      
-      .logo {
-        margin-left: 1rem;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .navbar-container {
-        padding: 0 1rem;
-      }
-      
-      .navbar-box {
-        padding: 1rem 1.5rem;
-      }
-      
-      .nav-links {
-        gap: 1.5rem;
-      }
-      
-      .right-container {
-        gap: 1rem;
-      }
-      
-      .auth-buttons {
-        padding-right: 1rem;
-      }
-      
-      .btn {
-        padding: 0.45rem 0.9rem;
-        font-size: 0.9rem;
-      }
-      
-      .login-btn {
-        padding: 0.45rem 0.9rem;
-      }
-      
-      .login-btn span {
-        display: inline; /* Show text on medium screens */
-      }
-    }
-    
-    @media (max-width: 640px) {
-      .nav-links {
-        display: none;
-      }
-      
-      .logo a {
-        font-size: 1.4rem;
-      }
-      
-      .navbar-box {
-        padding: 0.75rem 0;
-      }
-      
-      .theme-toggle-btn {
-        width: 32px;
-        height: 32px;
-        padding: 0.4rem;
-      }
-      
-      .register-btn {
-        font-size: 0.85rem;
-        padding: 0.4rem 0.8rem;
-      }
-      
-      .right-container {
-        gap: 0.75rem;
-      }
-      
-      .auth-buttons {
-        padding-right: 0.5rem;
-      }
-      
-      .login-btn span {
-        display: none; /* Hide text on smaller screens */
-      }
-      
-      .login-btn {
-        padding: 0.45rem;
-      }
-      
-      .login-icon {
-        margin-right: 0;
-      }
-    }
-    
-    .floating-emoji {
-      position: absolute;
-      font-size: 1.5rem;
-      opacity: 0;
-      z-index: 1;
-      pointer-events: none;
-      animation: float 8s linear forwards;
-      transform: translateZ(0);
-      will-change: transform, opacity, top, left;
-    }
-    
-    @keyframes float {
-      0% {
-        opacity: 0;
-        transform: translateY(0) rotate(0deg) scale(0.8);
-      }
-      10% {
-        opacity: 1;
-      }
-      90% {
-        opacity: 1;
-      }
-      100% {
-        opacity: 0;
-        transform: translateY(-100px) rotate(360deg) scale(1.2);
-      }
-    }
-    
-    .dark .floating-emoji {
-      filter: brightness(1.2);
-    }
-    
+    /* User profile indicator styles */
     .user-profile-indicator {
       display: flex;
       align-items: center;
@@ -689,15 +431,110 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
       color: #e5e7eb;
     }
     
-    @media (max-width: 640px) {
-      .user-profile-indicator {
-        margin-right: 0.5rem;
-        padding: 0.4rem 0.6rem;
+    /* Floating emoji animation */
+    .floating-emoji {
+      position: absolute;
+      font-size: 1.5rem;
+      opacity: 0;
+      z-index: 1;
+      pointer-events: none;
+      animation: float 8s linear forwards;
+      transform: translateZ(0);
+      will-change: transform, opacity, top, left;
+    }
+    
+    @keyframes float {
+      0% {
+        opacity: 0;
+        transform: translateY(0) rotate(0deg) scale(0.8);
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateY(-100px) rotate(360deg) scale(1.2);
+      }
+    }
+    
+    .dark .floating-emoji {
+      filter: brightness(1.2);
+    }
+    
+    /* Media queries */
+    @media (max-width: 1024px) {
+      .nav-links {
+        position: static;
+        transform: none;
+        margin: 0 auto;
+        justify-content: center;
+        gap: 2rem;
       }
       
-      .user-avatar {
-        width: 28px;
-        height: 28px;
+      .navbar-container {
+        justify-content: space-between;
+      }
+      
+      .right-container {
+        position: static;
+        right: auto;
+      }
+      
+      .user-profile-indicator {
+        margin-right: 1rem;
+      }
+      
+      .logo {
+        margin-left: 1rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .navbar-container {
+        padding: 0 1rem;
+      }
+      
+      .navbar-box {
+        padding: 1rem 1.5rem;
+      }
+      
+      .nav-links {
+        gap: 1.5rem;
+      }
+      
+      .right-container {
+        gap: 1rem;
+      }
+      
+      .user-profile-indicator {
+        padding: 0.4rem 0.6rem;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+      }
+      
+      .logo a {
+        font-size: 1.4rem;
+      }
+      
+      .navbar-box {
+        padding: 0.75rem 0;
+      }
+      
+      .theme-toggle-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0.4rem;
+      }
+      
+      .user-profile-indicator {
+        margin-right: 0.5rem;
       }
       
       .user-name {
@@ -706,17 +543,14 @@ import { SignUpFormComponent } from '../auth/sign-up-form.component';
     }
   `]
 })
-export class NavbarComponent implements OnInit, OnDestroy {
+export class ProfileNavbarComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   floatingEmojis: { symbol: string, style: any }[] = [];
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
   private animationInterval: any;
-  showSignInForm = false;
-  showSignUpForm = false;
-  isProfilePage = false;
 
-  constructor(private router: Router) {
+  constructor() {
     // Check for saved preference on component initialization
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'true') {
@@ -727,26 +561,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.startEmojiAnimation();
-    
-    // Subscribe to router events to detect when we're on a profile page
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        const url = event.url;
-        this.isProfilePage = url.includes('/user-profile') || 
-                            url.includes('/transactions') || 
-                            url.includes('/budget') || 
-                            url.includes('/reports') || 
-                            url.includes('/tax-estimator');
-      }
-    });
-    
-    // Check initial URL
-    const currentUrl = this.router.url;
-    this.isProfilePage = currentUrl.includes('/user-profile') || 
-                        currentUrl.includes('/transactions') || 
-                        currentUrl.includes('/budget') || 
-                        currentUrl.includes('/reports') || 
-                        currentUrl.includes('/tax-estimator');
   }
 
   ngOnDestroy() {
@@ -805,35 +619,8 @@ export class NavbarComponent implements OnInit, OnDestroy {
     // Apply dark mode to HTML element to allow for CSS variable targeting
     document.documentElement.classList.toggle('dark', this.isDarkMode);
   }
-
-  openSignInForm(event: Event) {
-    event.preventDefault();
-    this.showSignInForm = true;
-    this.showSignUpForm = false;
-    document.body.classList.add('no-scroll');
-  }
-
-  openSignUpForm(event: Event) {
-    event.preventDefault();
-    this.showSignUpForm = true;
-    this.showSignInForm = false;
-    document.body.classList.add('no-scroll');
-  }
-
-  closeAuthForms() {
-    this.showSignInForm = false;
-    this.showSignUpForm = false;
-    document.body.classList.remove('no-scroll');
-  }
   
-  switchToSignUp() {
-    this.showSignInForm = false;
-    this.showSignUpForm = true;
-  }
-  
-  switchToSignIn() {
-    this.showSignUpForm = false;
-    this.showSignInForm = true;
+  isActiveRoute(route: string): boolean {
+    return window.location.pathname === route;
   }
 }
-

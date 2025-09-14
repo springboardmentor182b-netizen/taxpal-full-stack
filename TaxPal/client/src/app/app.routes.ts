@@ -1,11 +1,17 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './pages/home/home.component';
-import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 
 export const routes: Routes = [
-  { path: '', component: HomeComponent },
-  { path: 'dashboard', component: DashboardComponent },
+  // Root route goes to home, not directly to user-profile
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
+
+  // Home page route (we'll create this component)
+  { path: 'home', loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent) },
+
+  // User dashboard routes
   { path: 'user-profile', component: UserProfileComponent },
-  { path: '**', redirectTo: '' }
+  { path: 'transactions', component: UserProfileComponent },
+  { path: 'budget', component: UserProfileComponent },
+  { path: 'reports', component: UserProfileComponent },
+  { path: 'tax-estimator', component: UserProfileComponent }
 ];
