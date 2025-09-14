@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, Renderer2, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 
 @Component({
   selector: 'app-profile-navbar',
@@ -71,7 +71,7 @@ import { RouterLink } from '@angular/router';
                 <path d="M17 15h0"/>
                 <path d="M7 8h10"/>
               </svg>
-              <span>Tax Estimator</span>
+              <span style="white-space: nowrap;">Tax Estimator</span>
             </a>
           </div>
           <div class="right-container">
@@ -91,14 +91,28 @@ import { RouterLink } from '@angular/router';
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
             </button>
-            <div class="user-profile-indicator">
-              <div class="user-avatar">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                  <circle cx="12" cy="7" r="4"></circle>
-                </svg>
+            <div class="profile-dropdown">
+              <button #avatarButton type="button" class="profile-avatar" (click)="toggleProfileMenu($event)">
+                <span>S</span>
+              </button>
+              <div class="dropdown-menu" [class.show-dropdown]="showProfileMenu" [ngClass]="{'dark': isDarkMode}">
+                <a routerLink="/profile-settings" class="dropdown-item">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="3"></circle>
+                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                  </svg>
+                  <span>Profile Settings</span>
+                </a>
+                <div class="dropdown-divider"></div>
+                <a href="#" class="dropdown-item" (click)="logout($event)">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
+                  <span>Logout</span>
+                </a>
               </div>
-              <span class="user-name">User Account</span>
             </div>
           </div>
         </div>
@@ -209,6 +223,7 @@ import { RouterLink } from '@angular/router';
     }
     
     .nav-link span {
+      white-space: nowrap;
       position: relative;
       z-index: 1;
     }
@@ -541,16 +556,165 @@ import { RouterLink } from '@angular/router';
         display: none;
       }
     }
+    
+    /* Fix for Tax Estimator text */
+    .nav-link span {
+      white-space: nowrap;
+      position: relative;
+      z-index: 1;
+    }
+    
+    /* Profile dropdown styles */
+    .profile-dropdown {
+      position: relative;
+      margin-right: 2rem;
+      z-index: 9999;
+    }
+    
+    .profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background-color: #3b82f6;
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    }
+    
+    .profile-avatar:hover {
+      background-color: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
+    }
+    
+    .dark .profile-avatar {
+      background-color: #60a5fa;
+      color: #111827;
+      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+    }
+    
+    .dark .profile-avatar:hover {
+      background-color: #93c5fd;
+      box-shadow: 0 4px 6px rgba(96, 165, 250, 0.4);
+    }
+    
+    .dropdown-menu {
+      position: absolute;
+      top: calc(100% + 8px);
+      right: 0;
+      width: 220px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      z-index: 9999;
+      animation: dropdown-appear 0.2s ease;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+    }
+    
+    .dropdown-menu.show-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    @keyframes dropdown-appear {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .dark .dropdown-menu {
+      background-color: #1f2937;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dropdown-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      color: #4b5563;
+      text-decoration: none;
+      transition: background-color 0.2s;
+    }
+    
+    .dropdown-item:hover {
+      background-color: #f3f4f6;
+      color: #1f2937;
+    }
+    
+    .dark .dropdown-item {
+      color: #e5e7eb;
+    }
+    
+    .dark .dropdown-item:hover {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+    
+    .dropdown-item svg {
+      color: #6b7280;
+    }
+    
+    .dropdown-item:hover svg {
+      color: #3b82f6;
+    }
+    
+    .dark .dropdown-item svg {
+      color: #9ca3af;
+    }
+    
+    .dark .dropdown-item:hover svg {
+      color: #60a5fa;
+    }
+    
+    .dropdown-divider {
+      height: 1px;
+      background-color: #e5e7eb;
+      margin: 0.25rem 0;
+    }
+    
+    .dark .dropdown-divider {
+      background-color: #374151;
+    }
+    
+    @media (max-width: 640px) {
+      .profile-dropdown {
+        margin-right: 0.5rem;
+      }
+      
+      .profile-avatar {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+      }
+      
+      .dropdown-menu {
+        width: 180px;
+      }
+    }
   `]
 })
-export class ProfileNavbarComponent implements OnInit, OnDestroy {
+export class ProfileNavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   isDarkMode = false;
   floatingEmojis: { symbol: string, style: any }[] = [];
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
   private animationInterval: any;
+  showProfileMenu = false;
+  @ViewChild('avatarButton') avatarButton!: ElementRef;
 
-  constructor() {
+  constructor(private router: Router, private renderer: Renderer2, private elementRef: ElementRef) {
     // Check for saved preference on component initialization
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'true') {
@@ -559,14 +723,50 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
     }
   }
 
+  ngAfterViewInit() {
+    // Add a manual click handler that will be triggered directly
+    this.renderer.listen(this.avatarButton.nativeElement, 'click', (event) => {
+      this.manualToggleDropdown(event);
+    });
+  }
+
   ngOnInit() {
     this.startEmojiAnimation();
+    
+    // Close dropdown when clicking outside - using document.addEventListener
+    this.renderer.listen('document', 'click', (event) => {
+      const isClickInside = this.elementRef.nativeElement.contains(event.target);
+      if (!isClickInside && this.showProfileMenu) {
+        this.showProfileMenu = false;
+      }
+    });
   }
 
   ngOnDestroy() {
     if (this.animationInterval) {
       clearInterval(this.animationInterval);
     }
+    
+    // Remove event listener
+  }
+
+  toggleProfileMenu(event: Event) {
+    // Keep this method but just log that it was called
+    console.log('Original toggleProfileMenu called');
+  }
+
+  manualToggleDropdown(event: Event) {
+    event.stopPropagation();
+    this.showProfileMenu = !this.showProfileMenu;
+    console.log('Profile menu manually toggled:', this.showProfileMenu);
+  }
+
+  logout(event: Event) {
+    event.preventDefault();
+    // Add any logout logic here (clear tokens, user data, etc.)
+    
+    // Navigate back to home
+    this.router.navigate(['/']);
   }
 
   private startEmojiAnimation() {
