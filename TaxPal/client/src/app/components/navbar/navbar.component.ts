@@ -7,64 +7,115 @@ import { RouterLink } from '@angular/router';
   standalone: true,
   imports: [CommonModule, RouterLink],
   template: `
-    <nav class="navbar">
-      <div class="navbar-container">
-        <div class="logo">
-          <a routerLink="/">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="calculator-icon">
-              <rect x="4" y="2" width="16" height="20" rx="2" />
-              <line x1="8" x2="16" y1="6" y2="6" />
-              <line x1="8" x2="16" y1="10" y2="10" />
-              <line x1="8" x2="16" y1="14" y2="14" />
-              <line x1="8" x2="16" y1="18" y2="18" />
-            </svg>
-            <span>TaxPal</span>
-          </a>
-        </div>
-        <div class="nav-links">
-          <a routerLink="/features" class="nav-link">
-            <span>Features</span>
-          </a>
-          <a routerLink="/plan" class="nav-link">
-            <span>Plan</span>
-          </a>
-          <a routerLink="/pricing" class="nav-link">
-            <span>Pricing</span>
-          </a>
-          <a routerLink="/about" class="nav-link">
-            <span>About</span>
-          </a>
-        </div>
-        <div class="auth-buttons">
-          <a routerLink="/login" class="login-btn">Log in</a>
-          <a routerLink="/register" class="register-btn">Get started</a>
+    <nav class="navbar" [ngClass]="{ 'dark': isDarkMode }">
+      <div class="navbar-box" [ngClass]="{ 'dark': isDarkMode }">
+        <div class="navbar-container">
+          <div class="logo">
+            <a routerLink="/">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="calculator-icon">
+                <rect x="4" y="2" width="16" height="20" rx="2" />
+                <line x1="8" x2="16" y1="6" y2="6" />
+                <line x1="8" x2="16" y1="10" y2="10" />
+                <line x1="8" x2="16" y1="14" y2="14" />
+                <line x1="8" x2="16" y1="18" y2="18" />
+              </svg>
+              <span>TaxPal</span>
+            </a>
+          </div>
+          <div class="nav-links">
+            <a routerLink="/features" class="nav-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <path d="m7 10 5 5 5-5"/>
+                <path d="M12 15V3"/>
+                <path d="M19 14v5a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-5"/>
+              </svg>
+              <span>Features</span>
+            </a>
+            <a routerLink="/plan" class="nav-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <rect width="18" height="18" x="3" y="3" rx="2" />
+                <path d="M7 7h10"/>
+                <path d="M7 12h10"/>
+                <path d="M7 17h5"/>
+              </svg>
+              <span>Plan</span>
+            </a>
+            <a routerLink="/support" class="nav-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/>
+              </svg>
+              <span>Support</span>
+            </a>
+            <a routerLink="/about" class="nav-link">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+              </svg>
+              <span>About</span>
+            </a>
+          </div>
+          <div class="right-container">
+            <button class="theme-toggle-btn" [ngClass]="{ 'dark': isDarkMode }" aria-label="Toggle dark mode" (click)="toggleDarkMode()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon sun-icon">
+                <circle cx="12" cy="12" r="5"/>
+                <line x1="12" y1="1" x2="12" y2="3"/>
+                <line x1="12" y1="21" x2="12" y2="23"/>
+                <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+                <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+                <line x1="1" y1="12" x2="3" y2="12"/>
+                <line x1="21" y1="12" x2="23" y2="12"/>
+                <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+                <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon moon-icon">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </svg>
+            </button>
+            <div class="auth-buttons">
+              <a routerLink="/login" class="login-btn btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
+                  <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                  <polyline points="10 17 15 12 10 7"/>
+                  <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+                <span>Sign in</span>
+              </a>
+              <a routerLink="/register" class="register-btn btn">Get started</a>
+            </div>
+          </div>
         </div>
       </div>
     </nav>
   `,
   styles: [`
     .navbar {
-      background-color: rgba(255, 255, 255, 0.95);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      padding: 1rem 0;
+      background-color: #ffffff;
+      padding: 0;
       position: sticky;
       top: 0;
       z-index: 100;
-      border-bottom: 1px solid rgba(229, 231, 235, 0.8);
-      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      width: 100%;
     }
     
-    .navbar:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    .navbar-box {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #ffffff;
+      color: #000000;
+      padding: 1.25rem 0;
+      width: 100%;
+      border-bottom: 1px solid #e5e7eb;
     }
     
     .navbar-container {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
       max-width: 1200px;
-      margin: 0 auto;
       padding: 0 2rem;
     }
     
@@ -73,7 +124,7 @@ import { RouterLink } from '@angular/router';
       align-items: center;
       font-weight: 700;
       font-size: 1.6rem;
-      color: #3b82f6;
+      color: #000000;
       text-decoration: none;
       transition: all 0.3s ease;
       letter-spacing: -0.5px;
@@ -81,7 +132,7 @@ import { RouterLink } from '@angular/router';
     
     .logo a:hover {
       transform: scale(1.05);
-      color: #2563eb;
+      color: #3b82f6;
     }
     
     .calculator-icon {
@@ -103,12 +154,26 @@ import { RouterLink } from '@angular/router';
     
     .nav-link {
       position: relative;
-      color: #4b5563;
+      color: #1f2937;
       text-decoration: none;
       font-weight: 500;
       padding: 0.75rem 0;
-      font-size: 1.05rem;
+      font-size: 0.95rem;  /* Reduced from 1.05rem */
       transition: color 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .nav-icon {
+      stroke: #4b5563;
+      transition: stroke 0.3s ease;
+      width: 16px;  /* Reduced from 18px */
+      height: 16px;  /* Reduced from 18px */
+    }
+    
+    .nav-link:hover .nav-icon {
+      stroke: #3b82f6;
     }
     
     .nav-link span {
@@ -136,69 +201,171 @@ import { RouterLink } from '@angular/router';
       width: 100%;
     }
     
+    .right-container {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      margin-left: auto;
+      padding-left: 1rem;
+    }
+    
     .auth-buttons {
       display: flex;
-      gap: 1.25rem;
+      gap: 1rem;
       align-items: center;
+      flex-shrink: 0;
+      border-left: 1px solid #e5e7eb;
+      padding-left: 1.5rem;
     }
     
-    .login-btn {
-      color: #4b5563;
-      text-decoration: none;
-      font-weight: 500;
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.375rem;
-      transition: all 0.3s ease;
+    .dark .auth-buttons {
+      border-left-color: #374151;
     }
     
-    .login-btn:hover {
-      color: #3b82f6;
-      background-color: rgba(59, 130, 246, 0.05);
-    }
-    
-    .register-btn {
-      background-color: #3b82f6;
-      color: white;
-      padding: 0.6rem 1.25rem;
-      border-radius: 0.375rem;
-      text-decoration: none;
-      font-weight: 500;
-      transition: all 0.3s ease;
+    .theme-toggle-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: background-color 0.3s ease;
       position: relative;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-      border: 1px solid rgba(59, 130, 246, 0.1);
+      width: 36px;
+      height: 36px;
+      flex-shrink: 0; /* Prevent shrinking */
     }
     
-    .register-btn::before {
-      content: '';
+    .theme-toggle-btn:hover {
+      background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .theme-icon {
+      stroke: #4b5563;
+      transition: stroke 0.3s ease, transform 0.5s ease;
+    }
+    
+    .theme-toggle-btn:hover .theme-icon {
+      stroke: #3b82f6;
+    }
+    
+    .moon-icon {
       position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        rgba(255, 255, 255, 0) 0%,
-        rgba(255, 255, 255, 0.3) 50%,
-        rgba(255, 255, 255, 0) 100%
-      );
-      transition: left 0.8s ease;
+      opacity: 0;
+      transform: rotate(-30deg) scale(0);
     }
     
-    .register-btn:hover {
-      background-color: #2563eb;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    .sun-icon {
+      opacity: 1;
+      transform: rotate(0) scale(1);
     }
     
-    .register-btn:active {
-      transform: translateY(1px);
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+    /* When the dark mode is active */
+    .dark-mode .moon-icon {
+      opacity: 1;
+      transform: rotate(0) scale(1);
     }
     
-    .register-btn:hover::before {
-      left: 100%;
+    .dark-mode .sun-icon {
+      opacity: 0;
+      transform: rotate(30deg) scale(0);
+    }
+    
+    /* Dark mode styles */
+    .navbar.dark {
+      background-color: #111827;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+    
+    .navbar-box.dark {
+      background-color: #111827;
+      color: #f9fafb;
+      border-bottom: 1px solid #1f2937;
+    }
+    
+    .dark .logo a {
+      color: #f9fafb;
+    }
+    
+    .dark .calculator-icon {
+      stroke: #60a5fa;
+    }
+    
+    .dark .logo a:hover {
+      color: #60a5fa;
+    }
+    
+    .dark .logo a:hover .calculator-icon {
+      stroke: #93c5fd;
+    }
+    
+    .dark .nav-link {
+      color: #e5e7eb;
+    }
+    
+    .dark .nav-icon {
+      stroke: #9ca3af;
+    }
+    
+    .dark .nav-link:hover {
+      color: #60a5fa;
+    }
+    
+    .dark .nav-link:hover .nav-icon {
+      stroke: #60a5fa;
+    }
+    
+    .dark .nav-link::before {
+      background-color: #60a5fa;
+    }
+    
+    .dark .theme-toggle-btn {
+      background-color: transparent;
+    }
+    
+    .dark .theme-toggle-btn:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark .theme-icon {
+      stroke: #9ca3af;
+    }
+    
+    .dark .theme-toggle-btn:hover .theme-icon {
+      stroke: #60a5fa;
+    }
+    
+    .dark .moon-icon {
+      opacity: 1;
+      transform: rotate(0) scale(1);
+    }
+    
+    .dark .sun-icon {
+      opacity: 0;
+      transform: rotate(30deg) scale(0);
+    }
+    
+    .dark .login-btn {
+      background-color: #60a5fa;
+      color: #111827;
+      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+    }
+    
+    .dark .login-icon {
+      stroke: #111827;
+    }
+    
+    .dark .login-btn:hover {
+      background-color: #93c5fd;
+      box-shadow: 0 4px 8px rgba(96, 165, 250, 0.4);
+    }
+    
+    .dark .register-btn {
+      background-color: #60a5fa;
+      color: #111827;
+      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
     }
     
     @media (max-width: 768px) {
@@ -206,12 +373,33 @@ import { RouterLink } from '@angular/router';
         padding: 0 1rem;
       }
       
+      .navbar-box {
+        padding: 1rem 1.5rem;
+      }
+      
       .nav-links {
         gap: 1.5rem;
       }
       
+      .right-container {
+        gap: 1rem;
+      }
+      
       .auth-buttons {
-        gap: 0.75rem;
+        padding-left: 1rem;
+      }
+      
+      .btn {
+        padding: 0.45rem 0.9rem;
+        font-size: 0.9rem;
+      }
+      
+      .login-btn {
+        padding: 0.45rem 0.9rem;
+      }
+      
+      .login-btn span {
+        display: inline; /* Show text on medium screens */
       }
     }
     
@@ -223,7 +411,60 @@ import { RouterLink } from '@angular/router';
       .logo a {
         font-size: 1.4rem;
       }
+      
+      .navbar-box {
+        padding: 0.75rem 0;
+      }
+      
+      .theme-toggle-btn {
+        width: 32px;
+        height: 32px;
+        padding: 0.4rem;
+      }
+      
+      .register-btn {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+      }
+      
+      .right-container {
+        gap: 0.75rem;
+      }
+      
+      .auth-buttons {
+        padding-left: 0.75rem;
+      }
     }
   `]
 })
-export class NavbarComponent { }
+export class NavbarComponent {
+  isDarkMode = false;
+
+  constructor() {
+    // Check for saved preference on component initialization
+    const savedDarkMode = localStorage.getItem('darkMode');
+    if (savedDarkMode === 'true') {
+      this.isDarkMode = true;
+      this.applyDarkMode();
+    }
+  }
+
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    this.applyDarkMode();
+    
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', this.isDarkMode.toString());
+  }
+
+  private applyDarkMode() {
+    // Apply dark mode to document body for global styling
+    if (document.body) {
+      document.body.classList.toggle('dark-mode', this.isDarkMode);
+    }
+    
+    // Apply dark mode to HTML element to allow for CSS variable targeting
+    document.documentElement.classList.toggle('dark', this.isDarkMode);
+  }
+}
+
