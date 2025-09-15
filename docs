@@ -1,0 +1,72 @@
+📌 Initial API List for Milestone 1
+------------------------------------
+
+++++Overview++++++
+
+Features covered:
+
+. Register/Login system
+
+. Manual income/expense entry
+
+. Basic dashboard
+
+*********🔑 Authentication APIs************
+
+1. User Registration
+ . POST /api/auth/register
+
+. Body: { name, email, password }
+
+. Response: { success, userId, token }
+
+2.User Login
+
+. POST /api/auth/login
+
+. Body: { email, password }
+
+. Response: { success, token, userId }
+
+3. Get User Profile (after login)
+
+. GET /api/auth/me
+
+. Headers: Authorization: Bearer <token>
+
+. Response: { userId, name, email }
+
+***********💰 Income & Expense APIs***************
+
+4. Add Transaction (income/expense)
+
+. POST /api/transactions
+
+$. Body: { type: "income" | "expense", amount, category, date, note }
+
+$. Response: { success, transactionId }
+
+5. Fetch Transactions (list view)
+
+$. GET /api/transactions?from=YYYY-MM-DD&to=YYYY-MM-DD
+
+$. Response: [ { transactionId, type, amount, category, date, note } ]
+
+***************📊 Dashboard APIs*******************
+6. Fetch Dashboard Summary
+
+GET /api/dashboard/summary
+
+Response:
+
+{
+  "totalIncome": 12000,
+  "totalExpense": 8000,
+  "balance": 4000,
+  "recentTransactions": [
+    { "id": 1, "type": "income", "amount": 5000, "date": "2025-09-01" },
+    { "id": 2, "type": "expense", "amount": 2000, "date": "2025-09-02" }
+  ]
+}
+
+
