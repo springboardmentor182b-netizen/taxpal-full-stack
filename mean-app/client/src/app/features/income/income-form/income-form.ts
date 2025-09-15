@@ -1,26 +1,36 @@
+// src/app/features/income-form/income-form.ts
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { Component } from '@angular/core';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { theme } from '../../shared/theme/theme';
-import { ElementRef } from '@angular/core';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+
 @Component({
   selector: 'app-income-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatInputModule,
+    MatFormFieldModule,
+    MatSelectModule
+  ],
   templateUrl: './income-form.html',
   styleUrls: ['./income-form.scss']
 })
 export class IncomeForm {
   incomeForm: FormGroup;
-
-  // ✅ Add categories list
   categories = ['Salary', 'Freelance', 'Business', 'Investments', 'Other'];
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private dialogRef: MatDialogRef<IncomeForm>   // ✅ inject DialogRef
+  ) {
     this.incomeForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
       amount: [null, [Validators.required, Validators.min(1)]],
@@ -31,19 +41,18 @@ export class IncomeForm {
   }
 
   closeForm() {
-    console.log('Form closed');
+    this.dialogRef.close();   // ✅ actually closes dialog
   }
 
   cancelForm() {
     this.incomeForm.reset();
+    this.closeForm();         // ✅ close after cancel
   }
 
   submitForm() {
     if (this.incomeForm.valid) {
       console.log('Income data:', this.incomeForm.value);
+      this.dialogRef.close(this.incomeForm.value); // ✅ return form data to parent
     }
   }
 }
-
-
-

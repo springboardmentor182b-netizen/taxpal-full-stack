@@ -1,7 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { ThemeService } from './shared/theme/theme.service';
-
 @Component({
   selector: 'app-root',
   standalone: true,  // ✅ needed if you're not using NgModule
