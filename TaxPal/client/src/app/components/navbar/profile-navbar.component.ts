@@ -846,6 +846,151 @@ import { RouterLink, Router } from '@angular/router';
       z-index: 999999;
       animation: dropdown-appear 0.2s ease;
     }
+    
+    /* Global Dark Mode Variables */
+    :host {
+      --text-color: #1f2937;
+      --bg-color: #ffffff;
+      --border-color: #e5e7eb;
+      --highlight-color: #3b82f6;
+      --highlight-hover: #2563eb;
+      --muted-color: #6b7280;
+      --bg-muted: #f3f4f6;
+    }
+    
+    :host-context(.dark-mode) {
+      --text-color: #f9fafb;
+      --bg-color: #111827;
+      --border-color: #1f2937;
+      --highlight-color: #60a5fa;
+      --highlight-hover: #93c5fd;
+      --muted-color: #9ca3af;
+      --bg-muted: #374151;
+    }
+    
+    /* Additional Dark Mode Styles for Global Application */
+    :root.dark-mode {
+      color-scheme: dark;
+    }
+    
+    :root.dark {
+      color-scheme: dark;
+    }
+    
+    body.dark-mode {
+      background-color: #111827;
+      color: #f9fafb;
+    }
+    
+    body.dark {
+      background-color: #111827;
+      color: #f9fafb;
+    }
+    
+    /* Dark mode hero section */
+    body.dark-mode .hero-section,
+    body.dark .hero-section {
+      background-color: #111827;
+      color: #f9fafb;
+    }
+    
+    /* Dark mode card styles */
+    body.dark-mode .card,
+    body.dark .card {
+      background-color: #1f2937;
+      border-color: #374151;
+    }
+    
+    /* Dark mode footer */
+    body.dark-mode footer,
+    body.dark footer {
+      background-color: #111827;
+      color: #f9fafb;
+      border-top-color: #1f2937;
+    }
+    
+    /* Dark mode for buttons */
+    body.dark-mode .btn-primary,
+    body.dark .btn-primary {
+      background-color: #3b82f6;
+      color: white;
+    }
+    
+    body.dark-mode .btn-secondary,
+    body.dark .btn-secondary {
+      background-color: #1f2937;
+      color: #e5e7eb;
+      border-color: #374151;
+    }
+    
+    /* Dark mode for inputs */
+    body.dark-mode input, 
+    body.dark-mode select, 
+    body.dark-mode textarea,
+    body.dark input, 
+    body.dark select, 
+    body.dark textarea {
+      background-color: #1f2937;
+      color: #f9fafb;
+      border-color: #374151;
+    }
+    
+    /* Ensure all text is properly colored in dark mode */
+    body.dark-mode h1, 
+    body.dark-mode h2, 
+    body.dark-mode h3, 
+    body.dark-mode h4, 
+    body.dark-mode h5, 
+    body.dark-mode h6,
+    body.dark-mode p,
+    body.dark h1, 
+    body.dark h2, 
+    body.dark h3, 
+    body.dark h4, 
+    body.dark h5, 
+    body.dark h6,
+    body.dark p {
+      color: #f9fafb;
+    }
+    
+    /* Add dark mode compatible links */
+    body.dark-mode a:not(.nav-link):not(.profile-menu-item),
+    body.dark a:not(.nav-link):not(.profile-menu-item) {
+      color: #60a5fa;
+    }
+    
+    body.dark-mode a:not(.nav-link):not(.profile-menu-item):hover,
+    body.dark a:not(.nav-link):not(.profile-menu-item):hover {
+      color: #93c5fd;
+    }
+    
+    /* Centered profile info without avatar duplication */
+    .centered-profile {
+      text-align: center;
+      padding: 1.25rem 1rem;
+      width: 100%;
+    }
+    
+    .centered-profile h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .centered-profile p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    
+    .dark .centered-profile h3 {
+      color: #f9fafb;
+    }
+    
+    .dark .centered-profile p {
+      color: #9ca3af;
+    }
   `]
 })
 export class ProfileNavbarComponent implements OnInit, OnDestroy {
@@ -876,6 +1021,15 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
         this.closeMenu();
       }
     });
+    
+    // Apply dark mode if needed on component init
+    if (this.isDarkMode) {
+      console.log('Component initialized with dark mode enabled');
+      // Delay to ensure the DOM is ready
+      setTimeout(() => {
+        this.applyDarkMode();
+      }, 100);
+    }
   }
 
   ngOnDestroy() {
@@ -892,12 +1046,12 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
     }
     
     this.showProfileMenu = true;
-    document.body.style.overflow = 'auto';
+    console.log('Menu opened cleanly');
   }
 
   closeMenu() {
     this.showProfileMenu = false;
-    document.body.style.overflow = '';
+    console.log('Menu closed cleanly');
   }
 
   logoutAndClose(event: Event) {
@@ -951,20 +1105,156 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
 
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
-    this.applyDarkMode();
     
-    // Save preference to localStorage
+    // Apply dark mode with delay to ensure proper application
+    setTimeout(() => {
+      this.applyDarkMode();
+    }, 0);
+    
     localStorage.setItem('darkMode', this.isDarkMode.toString());
+    console.log(`Dark mode toggled to: ${this.isDarkMode ? 'enabled' : 'disabled'}`);
   }
 
   private applyDarkMode() {
-    // Apply dark mode to document body for global styling
-    if (document.body) {
-      document.body.classList.toggle('dark-mode', this.isDarkMode);
+    console.log('Applying dark mode:', this.isDarkMode);
+    
+    // Create a style element with CSS rules to force dark mode
+    if (this.isDarkMode) {
+      // Remove any existing dark mode style
+      const existingStyle = document.getElementById('dark-mode-global');
+      if (existingStyle) existingStyle.remove();
+      
+      // Create new style element
+      const styleEl = document.createElement('style');
+      styleEl.id = 'dark-mode-global';
+      styleEl.textContent = `
+        body, html { 
+          background-color: #111827 !important; 
+          color: #f9fafb !important; 
+        }
+        
+        .hero-section {
+          background-color: #111827 !important;
+        }
+        
+        .hero-section h1 {
+          color: #f9fafb !important;
+        }
+        
+        .hero-section p {
+          color: #d1d5db !important;
+        }
+        
+        .hero-section .demo-btn {
+          border-color: #4b5563 !important;
+          color: #e5e7eb !important;
+        }
+        
+        .hero-section .image-placeholder {
+          background-color: #1f2937 !important;
+          color: #9ca3af !important;
+        }
+        
+        footer, section, .container, main {
+          background-color: #111827 !important;
+          color: #f9fafb !important;
+        }
+        
+        h1, h2, h3, h4, h5, h6, p {
+          color: #f9fafb !important;
+        }
+        
+        .card, .box {
+          background-color: #1f2937 !important;
+          border-color: #374151 !important;
+        }
+      `;
+      
+      // Add the style to head
+      document.head.appendChild(styleEl);
+      
+      // Add classes to body and html
+      document.body.classList.add('dark-mode');
+      document.documentElement.classList.add('dark-mode');
+      document.body.classList.add('dark');
+      document.documentElement.classList.add('dark');
+      
+      // Force a repaint by temporarily changing display
+      document.body.style.display = 'none';
+      // Trigger reflow
+      void document.body.offsetHeight;
+      document.body.style.display = '';
+      
+    } else {
+      // Remove dark mode style if it exists
+      const darkModeStyle = document.getElementById('dark-mode-global');
+      if (darkModeStyle) darkModeStyle.remove();
+      
+      // Remove classes
+      document.body.classList.remove('dark-mode');
+      document.documentElement.classList.remove('dark-mode');
+      document.body.classList.remove('dark');
+      document.documentElement.classList.remove('dark');
     }
     
-    // Apply dark mode to HTML element to allow for CSS variable targeting
-    document.documentElement.classList.toggle('dark', this.isDarkMode);
+    // Ensure hero section is updated by dispatching a custom event
+    window.dispatchEvent(new CustomEvent('darkModeChanged', { 
+      detail: { isDarkMode: this.isDarkMode } 
+    }));
+  }
+  
+  private injectGlobalStyles() {
+    // Remove any existing injected style
+    this.removeInjectedStyles();
+    
+    // Create a new style element
+    const style = document.createElement('style');
+    style.id = 'dark-mode-styles';
+    style.textContent = `
+      body, html { background-color: #111827 !important; color: #f9fafb !important; }
+      .hero-section, section, .container, .content-area, main, .main-content { 
+        background-color: #111827 !important; 
+        color: #f9fafb !important; 
+      }
+      .card, .box, .panel { 
+        background-color: #1f2937 !important; 
+        color: #f9fafb !important; 
+        border-color: #374151 !important; 
+      }
+      h1, h2, h3, h4, h5, h6, p, span:not(.icon):not(.material-icons) { 
+        color: #f9fafb !important; 
+      }
+      a:not(.nav-link):not(.profile-menu-item) { 
+        color: #60a5fa !important; 
+      }
+      a:not(.nav-link):not(.profile-menu-item):hover { 
+        color: #93c5fd !important; 
+      }
+    `;
+    
+    // Append to document head
+    document.head.appendChild(style);
+    console.log('Injected global dark mode styles');
+  }
+  
+  private removeInjectedStyles() {
+    const style = document.getElementById('dark-mode-styles');
+    if (style) {
+      style.remove();
+      console.log('Removed injected dark mode styles');
+    }
+  }
+  
+  private updateMetaThemeColor(color: string) {
+    // Update meta theme-color for browser UI
+    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement('meta');
+      metaThemeColor.setAttribute('name', 'theme-color');
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute('content', color);
+    console.log('Updated meta theme color to:', color);
   }
   
   isActiveRoute(route: string): boolean {
