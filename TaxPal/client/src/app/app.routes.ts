@@ -13,5 +13,12 @@ export const routes: Routes = [
   { path: 'transactions', component: UserProfileComponent },
   { path: 'budget', component: UserProfileComponent },
   { path: 'reports', component: UserProfileComponent },
-  { path: 'tax-estimator', component: UserProfileComponent }
+  { path: 'tax-estimator', component: UserProfileComponent },
+
+  // Add the profile settings route
+  {
+    path: 'profile-settings',
+    loadComponent: () => import('./pages/profile-settings/profile-settings.component').then(m => m.ProfileSettingsComponent),
+    title: 'Profile Settings - TaxPal'
+  },
 ];
