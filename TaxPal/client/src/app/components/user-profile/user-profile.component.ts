@@ -9,48 +9,56 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
   template: `
     <div class="profile-container" [ngClass]="{'dark': isDarkMode}">
       <div class="profile-content">
+        <!-- Welcome Section -->
         <div class="welcome-section">
-          <h1>Welcome to your TaxPal {{ pageTitle }}</h1>
-          <p class="subtitle">You're now logged in to your account. Here you can manage your taxes and finances.</p>
+          <h1>Welcome back, Sam</h1>
+          <p class="subtitle">Here's an overview of your tax and financial status</p>
         </div>
-        
-        <div class="profile-placeholder">
-          <div class="placeholder-icon">
-            <svg *ngIf="currentRoute === 'user-profile'" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="7" height="9"/>
-              <rect x="14" y="3" width="7" height="5"/>
-              <rect x="14" y="12" width="7" height="9"/>
-              <rect x="3" y="16" width="7" height="5"/>
-            </svg>
-            <svg *ngIf="currentRoute === 'transactions'" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="3" width="20" height="18" rx="2"/>
-              <path d="M7 8h10"/>
-              <path d="M7 13h10"/>
-              <path d="M7 18h4"/>
-            </svg>
-            <svg *ngIf="currentRoute === 'budget'" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="10"/>
-              <path d="M16 12h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
-              <path d="M12 6v2"/>
-              <path d="M12 16v2"/>
-            </svg>
-            <svg *ngIf="currentRoute === 'reports'" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <path d="M14 2v6h6"/>
-              <path d="M16 13H8"/>
-              <path d="M16 17H8"/>
-              <path d="M10 9H8"/>
-            </svg>
-            <svg *ngIf="currentRoute === 'tax-estimator'" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="2" y="4" width="20" height="16" rx="2"/>
-              <path d="M7 15h0"/>
-              <path d="M12 15h0"/>
-              <path d="M17 15h0"/>
-              <path d="M7 8h10"/>
-            </svg>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <h2>Quick Actions</h2>
+          <div class="action-buttons">
+            <button class="action-btn income-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              Add Income
+            </button>
+            <button class="action-btn expense-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              Add Expense
+            </button>
+            <button class="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Transaction
+            </button>
+            <button class="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Schedule Payment
+            </button>
+            <button class="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Export Report
+            </button>
           </div>
-          <h2>Your {{ pageTitle }} is being set up</h2>
-          <p>We're preparing your personalized tax {{ currentRoute === 'user-profile' ? 'dashboard' : currentRoute }}. Check back soon for updates.</p>
         </div>
       </div>
     </div>
@@ -87,75 +95,135 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       margin: 0 auto;
     }
     
-    .profile-placeholder {
+    /* Quick Actions */
+    .quick-actions {
       background-color: white;
       border-radius: 0.75rem;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-      padding: 4rem 2rem;
-      text-align: center;
-      max-width: 800px;
-      margin: 0 auto;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-    
-    .placeholder-icon {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 2rem;
-      color: #3b82f6;
-    }
-    
-    h2 {
-      font-size: 1.5rem;
-      font-weight: 600;
-      color: #1f2937;
+
+    .quick-actions h2 {
+      font-size: 1.25rem;
       margin-bottom: 1rem;
+      color: #111827;
     }
-    
-    .profile-placeholder p {
-      color: #6b7280;
-      max-width: 500px;
-      margin: 0 auto;
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
     }
-    
-    /* Dark mode styles */
-    .profile-container.dark {
-      background-color: #111827;
+
+    .action-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      background-color: white;
+      color: #374151;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
     }
-    
-    .dark h1 {
+
+    .action-btn:hover {
+      background-color: #f3f4f6;
+      border-color: #d1d5db;
+    }
+
+    /* New Income and Expense Buttons */
+    .income-btn {
+      background-color: #10b981;
+      border-color: #059669;
+      color: white;
+    }
+
+    .income-btn:hover {
+      background-color: #059669;
+      border-color: #047857;
+    }
+
+    .expense-btn {
+      background-color: #ef4444;
+      border-color: #dc2626;
+      color: white;
+    }
+
+    .expense-btn:hover {
+      background-color: #dc2626;
+      border-color: #b91c1c;
+    }
+
+    /* Dark mode adjustments for new buttons */
+    .dark .income-btn {
+      background-color: #059669;
+      border-color: #047857;
+    }
+
+    .dark .income-btn:hover {
+      background-color: #047857;
+      border-color: #065f46;
+    }
+
+    .dark .expense-btn {
+      background-color: #dc2626;
+      border-color: #b91c1c;
+    }
+
+    .dark .expense-btn:hover {
+      background-color: #b91c1c;
+      border-color: #991b1b;
+    }
+
+    /* Dark Mode Styles */
+    .dark .metric-card {
+      background-color: #1f2937;
+    }
+
+    .dark .metric-content h3 {
+      color: #9ca3af;
+    }
+
+    .dark .metric-value {
       color: #f9fafb;
     }
-    
-    .dark .subtitle {
-      color: #9ca3af;
-    }
-    
-    .dark .profile-placeholder {
+
+    .dark .quick-actions {
       background-color: #1f2937;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
     }
-    
-    .dark .placeholder-icon {
-      color: #60a5fa;
+
+    .dark .quick-actions h2 {
+      color: #f9fafb;
     }
-    
-    .dark h2 {
+
+    .dark .action-btn {
+      background-color: #1f2937;
+      border-color: #374151;
       color: #e5e7eb;
     }
-    
-    .dark .profile-placeholder p {
-      color: #9ca3af;
+
+    .dark .action-btn:hover {
+      background-color: #374151;
+      border-color: #4b5563;
     }
-    
+
+    /* Responsive Adjustments */
     @media (max-width: 768px) {
-      .profile-content {
-        padding: 2.5rem 1.5rem;
+      .metrics-grid {
+        grid-template-columns: 1fr;
       }
-    }
-    
-    @media (max-width: 640px) {
-      .profile-content {
-        padding: 2rem 1rem;
+      
+      .action-buttons {
+        flex-direction: column;
+      }
+      
+      .action-btn {
+        width: 100%;
+        justify-content: center;
       }
     }
   `]
@@ -168,26 +236,15 @@ export class UserProfileComponent implements OnInit {
   constructor(private router: Router, private route: ActivatedRoute) {}
 
   ngOnInit() {
-    // Determine current route
+    // Get the current route
     const path = this.router.url.split('/')[1] || 'user-profile';
     this.currentRoute = path;
     
-    // Set page title based on route
-    switch (this.currentRoute) {
-      case 'transactions':
-        this.pageTitle = 'Transactions';
-        break;
-      case 'budget':
-        this.pageTitle = 'Budget';
-        break;
-      case 'reports':
-        this.pageTitle = 'Reports';
-        break;
-      case 'tax-estimator':
-        this.pageTitle = 'Tax Estimator';
-        break;
-      default:
-        this.pageTitle = 'Dashboard';
-    }
+    // Set page title
+    this.pageTitle = 'Dashboard';
+    
+    // Check for dark mode
+    this.isDarkMode = document.documentElement.classList.contains('dark') || 
+                      document.body.classList.contains('dark-mode');
   }
 }
