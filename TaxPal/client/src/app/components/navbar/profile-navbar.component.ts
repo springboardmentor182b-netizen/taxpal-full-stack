@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef, Renderer2, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, Renderer2 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 
@@ -92,32 +92,61 @@ import { RouterLink, Router } from '@angular/router';
               </svg>
             </button>
             <div class="profile-dropdown">
-              <button #avatarButton type="button" class="profile-avatar" (click)="toggleProfileMenu($event)">
+              <button type="button" class="profile-avatar" (click)="openMenu($event)">
                 <span>S</span>
               </button>
-              <div class="dropdown-menu" [class.show-dropdown]="showProfileMenu" [ngClass]="{'dark': isDarkMode}">
-                <a routerLink="/profile-settings" class="dropdown-item">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="3"></circle>
-                    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                  </svg>
-                  <span>Profile Settings</span>
-                </a>
-                <div class="dropdown-divider"></div>
-                <a href="#" class="dropdown-item" (click)="logout($event)">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                    <polyline points="16 17 21 12 16 7"></polyline>
-                    <line x1="21" y1="12" x2="9" y2="12"></line>
-                  </svg>
-                  <span>Logout</span>
-                </a>
+              
+              <!-- Profile menu dropdown positioned near avatar -->
+              <div class="profile-menu-dropdown" *ngIf="showProfileMenu" (click)="$event.stopPropagation()">
+                <div class="profile-section">
+                  <div class="profile-header">
+                    <div class="profile-avatar-large">
+                      <span>S</span>
+                    </div>
+                    <div class="profile-info">
+                      <h3>Sam Johnson</h3>
+                      <p>sam.johnson@example.com</p>
+                    </div>
+                  </div>
+                  <div class="account-type">
+                    <span class="badge">Premium Account</span>
+                  </div>
+                </div>
+                <div class="profile-menu-divider"></div>
+                <div class="profile-menu-items">
+                  <a routerLink="/profile-settings" class="profile-menu-item" (click)="closeMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="3"></circle>
+                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    <span>Profile Settings</span>
+                  </a>
+                  <a routerLink="/billing" class="profile-menu-item" (click)="closeMenu()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
+                      <line x1="1" y1="10" x2="23" y2="10"></line>
+                    </svg>
+                    <span>Billing & Subscription</span>
+                  </a>
+                  <div class="profile-menu-divider"></div>
+                  <a href="#" class="profile-menu-item" (click)="logoutAndClose($event)">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                      <polyline points="16 17 21 12 16 7"></polyline>
+                      <line x1="21" y1="12" x2="9" y2="12"></line>
+                    </svg>
+                    <span>Logout</span>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     </nav>
+    
+    <!-- Backdrop overlay when menu is open -->
+    <div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeMenu()"></div>
   `,
   styles: [`
     .navbar {
@@ -564,24 +593,120 @@ import { RouterLink, Router } from '@angular/router';
       z-index: 1;
     }
     
-    /* Profile dropdown styles */
-    .profile-dropdown {
-      position: relative;
-      margin-right: 2rem;
-      z-index: 9999;
+    /* Simple Profile Menu Overlay */
+    .profile-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999999;
     }
     
+    .profile-menu-container {
+      width: 280px;
+      background-color: white;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    .dark .profile-menu-container {
+      background-color: #1f2937;
+    }
+    
+    .profile-menu-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .dark .profile-menu-header {
+      border-bottom-color: #374151;
+    }
+    
+    .profile-menu-header span {
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .dark .profile-menu-header span {
+      color: #f9fafb;
+    }
+    
+    .close-menu-btn {
+      background: none;
+      border: none;
+      font-size: 24px;
+      line-height: 1;
+      color: #6b7280;
+      cursor: pointer;
+    }
+    
+    .close-menu-btn:hover {
+      color: #111827;
+    }
+    
+    .dark .close-menu-btn:hover {
+      color: #f9fafb;
+    }
+    
+    .profile-menu-items {
+      padding: 10px 0;
+    }
+    
+    .profile-menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: #4b5563;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    
+    .profile-menu-item:hover {
+      background-color: #f3f4f6;
+      color: #1f2937;
+    }
+    
+    .dark .profile-menu-item {
+      color: #e5e7eb;
+    }
+    
+    .dark .profile-menu-item:hover {
+      background-color: #374151;
+      color: #f9fafb;
+    }
+    
+    .profile-menu-divider {
+      height: 1px;
+      background-color: #e5e7eb;
+      margin: 5px 0;
+    }
+    
+    .dark .profile-menu-divider {
+      background-color: #374151;
+    }
+    
+    /* Profile Avatar Styles */
     .profile-avatar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 36px;
       height: 36px;
       border-radius: 50%;
       background-color: #3b82f6;
-      color: white;
+      color: #ffffff;
       font-weight: 600;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      font-size: 0.9rem;
       border: none;
       cursor: pointer;
       transition: all 0.3s ease;
@@ -589,12 +714,6 @@ import { RouterLink, Router } from '@angular/router';
     }
     
     .profile-avatar:hover {
-      background-color: #2563eb;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(59, 130, 246, 0.4);
-    }
-    
-    .dark .profile-avatar {
       background-color: #60a5fa;
       color: #111827;
       box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
@@ -605,114 +724,78 @@ import { RouterLink, Router } from '@angular/router';
       box-shadow: 0 4px 6px rgba(96, 165, 250, 0.4);
     }
     
-    .dropdown-menu {
-      position: absolute;
-      top: calc(100% + 8px);
-      right: 0;
-      width: 220px;
+    /* Profile dropdown positioning */
+    .profile-dropdown {
+      position: relative;
+      margin-right: 2rem;
+      z-index: 99999; /* Increased z-index */
+    }
+    
+    /* Repositioned menu dropdown near avatar with improved visibility */
+    .profile-menu-dropdown {
+      position: fixed; /* Changed from absolute to fixed */
+      top: 75px; /* Position below navbar */
+      right: 2rem; /* Maintain right alignment */
+      width: 300px;
       background-color: white;
       border-radius: 8px;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
       overflow: hidden;
-      z-index: 9999;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      z-index: 999999; /* Super high z-index to overcome any hero section */
       animation: dropdown-appear 0.2s ease;
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(-10px);
-      transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s ease;
+      transform-origin: top right;
     }
     
-    .dropdown-menu.show-dropdown {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
+    /* Ensure backdrop is above hero section */
+    .menu-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 99998; /* Just below dropdown but above everything else */
+      background-color: rgba(0, 0, 0, 0.2); /* Slight darkening */
     }
     
-    @keyframes dropdown-appear {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
+    /* Additional style to ensure menu appearance */
+    .profile-menu-dropdown::before {
+      content: '';
+      position: absolute;
+      top: -8px;
+      right: 12px;
+      width: 16px;
+      height: 16px;
+      background-color: white;
+      transform: rotate(45deg);
+      border-top: 1px solid rgba(0, 0, 0, 0.05);
+      border-left: 1px solid rgba(0, 0, 0, 0.05);
+      z-index: -1;
     }
     
-    .dark .dropdown-menu {
+    .dark .profile-menu-dropdown::before {
       background-color: #1f2937;
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 255, 255, 0.1);
     }
     
-    .dropdown-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      color: #4b5563;
-      text-decoration: none;
-      transition: background-color 0.2s;
+    /* Make all other elements work with the dropdown */
+    body {
+      position: relative;
     }
     
-    .dropdown-item:hover {
-      background-color: #f3f4f6;
-      color: #1f2937;
-    }
-    
-    .dark .dropdown-item {
-      color: #e5e7eb;
-    }
-    
-    .dark .dropdown-item:hover {
-      background-color: #374151;
-      color: #f9fafb;
-    }
-    
-    .dropdown-item svg {
-      color: #6b7280;
-    }
-    
-    .dropdown-item:hover svg {
-      color: #3b82f6;
-    }
-    
-    .dark .dropdown-item svg {
-      color: #9ca3af;
-    }
-    
-    .dark .dropdown-item:hover svg {
-      color: #60a5fa;
-    }
-    
-    .dropdown-divider {
-      height: 1px;
-      background-color: #e5e7eb;
-      margin: 0.25rem 0;
-    }
-    
-    .dark .dropdown-divider {
-      background-color: #374151;
-    }
-    
-    @media (max-width: 640px) {
-      .profile-dropdown {
-        margin-right: 0.5rem;
-      }
-      
-      .profile-avatar {
-        width: 32px;
-        height: 32px;
-        font-size: 1rem;
-      }
-      
-      .dropdown-menu {
-        width: 180px;
-      }
+    /* Updated animation for better appearance */
+    @keyframes dropdown-appear {
+      from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
     }
   `]
 })
-export class ProfileNavbarComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ProfileNavbarComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   floatingEmojis: { symbol: string, style: any }[] = [];
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
   private animationInterval: any;
   showProfileMenu = false;
-  @ViewChild('avatarButton') avatarButton!: ElementRef;
 
   constructor(private router: Router, private renderer: Renderer2, private elementRef: ElementRef) {
     // Check for saved preference on component initialization
@@ -723,21 +806,14 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy, AfterViewInit 
     }
   }
 
-  ngAfterViewInit() {
-    // Add a manual click handler that will be triggered directly
-    this.renderer.listen(this.avatarButton.nativeElement, 'click', (event) => {
-      this.manualToggleDropdown(event);
-    });
-  }
-
   ngOnInit() {
     this.startEmojiAnimation();
     
-    // Close dropdown when clicking outside - using document.addEventListener
+    // Add global click handler to close menu when clicking outside
     this.renderer.listen('document', 'click', (event) => {
-      const isClickInside = this.elementRef.nativeElement.contains(event.target);
-      if (!isClickInside && this.showProfileMenu) {
-        this.showProfileMenu = false;
+      if (this.showProfileMenu && !this.elementRef.nativeElement.querySelector('.profile-menu-container')?.contains(event.target) &&
+          !this.elementRef.nativeElement.querySelector('.profile-avatar')?.contains(event.target)) {
+        this.closeMenu();
       }
     });
   }
@@ -746,27 +822,42 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy, AfterViewInit 
     if (this.animationInterval) {
       clearInterval(this.animationInterval);
     }
-    
-    // Remove event listener
   }
 
-  toggleProfileMenu(event: Event) {
-    // Keep this method but just log that it was called
-    console.log('Original toggleProfileMenu called');
-  }
-
-  manualToggleDropdown(event: Event) {
+  // Remove all other toggle methods and keep only these clean, simple methods
+  openMenu(event: Event) {
+    // Prevent event bubbling
     event.stopPropagation();
-    this.showProfileMenu = !this.showProfileMenu;
-    console.log('Profile menu manually toggled:', this.showProfileMenu);
+    
+    this.showProfileMenu = true;
+    
+    // Force global styles to ensure dropdown visibility
+    document.body.style.overflow = 'auto';
+    document.documentElement.style.position = 'relative';
+    
+    // Force browser repaint to ensure visibility
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 10);
+    
+    console.log('Menu opened with enhanced visibility');
   }
 
-  logout(event: Event) {
-    event.preventDefault();
-    // Add any logout logic here (clear tokens, user data, etc.)
+  closeMenu() {
+    this.showProfileMenu = false;
     
-    // Navigate back to home
+    // Restore original body styles
+    document.body.style.overflow = '';
+    
+    console.log('Menu closed');
+  }
+
+  logoutAndClose(event: Event) {
+    event.preventDefault();
+    this.closeMenu();
+    // Add any logout logic here (clear tokens, user data, etc.)
     this.router.navigate(['/']);
+    console.log('Logging out and redirecting to home');
   }
 
   private startEmojiAnimation() {
