@@ -96,20 +96,12 @@ import { RouterLink, Router } from '@angular/router';
                 <span>S</span>
               </button>
               
-              <!-- Profile menu dropdown positioned near avatar -->
+              <!-- Simplified profile menu dropdown -->
               <div class="profile-menu-dropdown" *ngIf="showProfileMenu" (click)="$event.stopPropagation()">
                 <div class="profile-section">
-                  <div class="profile-header">
-                    <div class="profile-avatar-large">
-                      <span>S</span>
-                    </div>
-                    <div class="profile-info">
-                      <h3>Sam Johnson</h3>
-                      <p>sam.johnson@example.com</p>
-                    </div>
-                  </div>
-                  <div class="account-type">
-                    <span class="badge">Premium Account</span>
+                  <div class="profile-info centered-profile">
+                    <h3>Sam Johnson</h3>
+                    <p>sam.johnson@example.com</p>
                   </div>
                 </div>
                 <div class="profile-menu-divider"></div>
@@ -121,15 +113,8 @@ import { RouterLink, Router } from '@angular/router';
                     </svg>
                     <span>Profile Settings</span>
                   </a>
-                  <a routerLink="/billing" class="profile-menu-item" (click)="closeMenu()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                      <line x1="1" y1="10" x2="23" y2="10"></line>
-                    </svg>
-                    <span>Billing & Subscription</span>
-                  </a>
                   <div class="profile-menu-divider"></div>
-                  <a href="#" class="profile-menu-item" (click)="logoutAndClose($event)">
+                  <a routerLink="/" class="profile-menu-item logout-item" (click)="logoutAndClose($event)">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
                       <polyline points="16 17 21 12 16 7"></polyline>
@@ -731,18 +716,18 @@ import { RouterLink, Router } from '@angular/router';
       z-index: 99999; /* Increased z-index */
     }
     
-    /* Repositioned menu dropdown near avatar with improved visibility */
+    /* Repositioned menu dropdown with better alignment */
     .profile-menu-dropdown {
-      position: fixed; /* Changed from absolute to fixed */
-      top: 75px; /* Position below navbar */
-      right: 2rem; /* Maintain right alignment */
+      position: fixed;
+      top: 70px; /* Slightly higher for better positioning */
+      right: 2rem;
       width: 300px;
       background-color: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-      z-index: 999999; /* Super high z-index to overcome any hero section */
-      animation: dropdown-appear 0.2s ease;
+      border-radius: 10px;
+      overflow: visible;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 999999;
+      animation: dropdown-appear 0.25s cubic-bezier(0.23, 1, 0.32, 1);
       transform-origin: top right;
     }
     
@@ -784,8 +769,82 @@ import { RouterLink, Router } from '@angular/router';
     
     /* Updated animation for better appearance */
     @keyframes dropdown-appear {
-      from { opacity: 0; transform: translateY(-12px) scale(0.95); }
+      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
       to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    
+    /* Centered profile info without avatar duplication */
+    .centered-profile {
+      text-align: center;
+      padding: 1.25rem 1rem;
+      width: 100%;
+    }
+    
+    .centered-profile h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+    }
+    
+    .centered-profile p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: #6b7280;
+    }
+    
+    .dark .centered-profile h3 {
+      color: #f9fafb;
+    }
+    
+    .dark .centered-profile p {
+      color: #9ca3af;
+    }
+    
+    /* Enhanced logout item */
+    .logout-item {
+      color: #ef4444 !important; /* Red color for logout */
+    }
+    
+    .logout-item svg {
+      color: #ef4444 !important;
+      stroke: #ef4444 !important;
+    }
+    
+    .dark .logout-item {
+      color: #f87171 !important;
+    }
+    
+    .dark .logout-item svg {
+      color: #f87171 !important;
+      stroke: #f87171 !important;
+    }
+    
+    .logout-item:hover {
+      background-color: rgba(239, 68, 68, 0.1) !important;
+    }
+    
+    .dark .logout-item:hover {
+      background-color: rgba(248, 113, 113, 0.1) !important;
+    }
+    
+    /* Fix for dropdown alignment and top section */
+    .profile-section {
+      padding: 0; /* Remove default padding */
+    }
+    
+    /* Improved dropdown menu */
+    .profile-menu-dropdown {
+      position: fixed;
+      top: 70px;
+      right: 2rem;
+      width: 270px; /* Smaller width for better proportions */
+      background-color: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
+      z-index: 999999;
+      animation: dropdown-appear 0.2s ease;
     }
   `]
 })
@@ -811,7 +870,8 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
     
     // Add global click handler to close menu when clicking outside
     this.renderer.listen('document', 'click', (event) => {
-      if (this.showProfileMenu && !this.elementRef.nativeElement.querySelector('.profile-menu-container')?.contains(event.target) &&
+      if (this.showProfileMenu && 
+          !this.elementRef.nativeElement.querySelector('.profile-menu-dropdown')?.contains(event.target) &&
           !this.elementRef.nativeElement.querySelector('.profile-avatar')?.contains(event.target)) {
         this.closeMenu();
       }
@@ -826,38 +886,34 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
 
   // Remove all other toggle methods and keep only these clean, simple methods
   openMenu(event: Event) {
-    // Prevent event bubbling
-    event.stopPropagation();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     
     this.showProfileMenu = true;
-    
-    // Force global styles to ensure dropdown visibility
     document.body.style.overflow = 'auto';
-    document.documentElement.style.position = 'relative';
-    
-    // Force browser repaint to ensure visibility
-    setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-    }, 10);
-    
-    console.log('Menu opened with enhanced visibility');
   }
 
   closeMenu() {
     this.showProfileMenu = false;
-    
-    // Restore original body styles
     document.body.style.overflow = '';
-    
-    console.log('Menu closed');
   }
 
   logoutAndClose(event: Event) {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    
     this.closeMenu();
-    // Add any logout logic here (clear tokens, user data, etc.)
-    this.router.navigate(['/']);
-    console.log('Logging out and redirecting to home');
+    
+    // Clear all storage
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    // Navigate to home with force reload to ensure complete reset
+    window.location.href = '/';
   }
 
   private startEmojiAnimation() {
