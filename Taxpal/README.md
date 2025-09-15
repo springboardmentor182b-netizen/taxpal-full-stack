@@ -1,59 +1,91 @@
-# Taxpal
+# MEAN Stack Application
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.6.
+A full-stack web application built with the MEAN stack (MongoDB, Express.js, Angular, Node.js).
 
-## Development server
+## Project Structure
 
-To start a local development server, run:
-
-```bash
-ng serve
+```
+mean-app/
+├── client/                 # Angular Frontend
+├── server/                 # Node + Express Backend
+├── config/                 # Global configs (env, DB, etc.)
+├── scripts/                # Deployment or automation scripts
+├── docs/                   # Documentation, API specs
+├── env.example             # Environment variables template
+├── package.json            # Root-level scripts for convenience
+└── README.md
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+## Prerequisites
 
-## Code scaffolding
+- Node.js (>= 18.0.0)
+- npm (>= 8.0.0)
+- MongoDB (>= 4.4)
+- Angular CLI (>= 17.0.0)
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Installation
 
+1. Clone the repository
+2. Install dependencies for all projects:
+   ```bash
+   npm run install:all
+   ```
+
+3. Copy environment variables:
+   ```bash
+   cp env.example .env
+   ```
+
+4. Update the `.env` file with your configuration
+
+## Development
+
+### Start both client and server:
 ```bash
-ng generate component component-name
+npm start
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
+### Start individually:
 ```bash
-ng generate --help
+# Start server only
+npm run server:dev
+
+# Start client only
+npm run client:start
 ```
 
 ## Building
 
-To build the project run:
-
 ```bash
-ng build
+# Build client for production
+npm run build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Testing
 
 ```bash
-ng test
+# Run all tests
+npm test
+
+# Run client tests only
+npm run client:test
+
+# Run server tests only
+npm run server:test
 ```
 
-## Running end-to-end tests
+## API Documentation
 
-For end-to-end (e2e) testing, run:
+API documentation is available in the `docs/` folder.
 
-```bash
-ng e2e
-```
+## Contributing
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit a pull request
 
-## Additional Resources
+## License
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+MIT

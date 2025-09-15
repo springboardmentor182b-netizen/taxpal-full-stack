@@ -1,44 +1,37 @@
 {
-  "name": "taxpal",
-  "version": "0.0.0",
+  "name": "mean-app",
+  "version": "1.0.0",
+  "description": "MEAN Stack Application with Angular Frontend and Node.js/Express Backend",
+  "main": "server/src/server.ts",
   "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build": "ng build",
-    "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:Taxpal": "node dist/taxpal/server/server.mjs"
+    "start": "concurrently \"npm run server:start\" \"npm run client:start\"",
+    "server:start": "cd server && npm start",
+    "server:dev": "cd server && npm run dev",
+    "client:start": "cd client && npm start",
+    "client:build": "cd client && npm run build",
+    "client:test": "cd client && npm test",
+    "server:test": "cd server && npm test",
+    "test": "npm run client:test && npm run server:test",
+    "build": "npm run client:build",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "clean": "rimraf node_modules client/node_modules server/node_modules client/dist server/dist"
   },
-  "private": true,
-  "dependencies": {
-    "@angular/animations": "^19.1.0",
-    "@angular/common": "^19.1.0",
-    "@angular/compiler": "^19.1.0",
-    "@angular/core": "^19.1.0",
-    "@angular/forms": "^19.1.0",
-    "@angular/platform-browser": "^19.1.0",
-    "@angular/platform-browser-dynamic": "^19.1.0",
-    "@angular/platform-server": "^19.1.0",
-    "@angular/router": "^19.1.0",
-    "@angular/ssr": "^19.1.6",
-    "express": "^4.18.2",
-    "rxjs": "~7.8.0",
-    "tslib": "^2.3.0",
-    "zone.js": "~0.15.0"
-  },
+  "keywords": [
+    "mean",
+    "angular",
+    "nodejs",
+    "express",
+    "mongodb",
+    "typescript"
+  ],
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "@angular-devkit/build-angular": "^19.1.6",
-    "@angular/cli": "^19.1.6",
-    "@angular/compiler-cli": "^19.1.0",
-    "@types/express": "^4.17.17",
-    "@types/jasmine": "~5.1.0",
-    "@types/node": "^18.18.0",
-    "jasmine-core": "~5.5.0",
-    "karma": "~6.4.0",
-    "karma-chrome-launcher": "~3.2.0",
-    "karma-coverage": "~2.2.0",
-    "karma-jasmine": "~5.1.0",
-    "karma-jasmine-html-reporter": "~2.1.0",
-    "typescript": "~5.7.2"
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
   }
 }
