@@ -1124,49 +1124,158 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
       const existingStyle = document.getElementById('dark-mode-global');
       if (existingStyle) existingStyle.remove();
       
-      // Create new style element
+      // Create new style element with improved color palette
       const styleEl = document.createElement('style');
       styleEl.id = 'dark-mode-global';
       styleEl.textContent = `
         body, html { 
-          background-color: #111827 !important; 
-          color: #f9fafb !important; 
+          background-color: #0f172a !important; 
+          color: #e2e8f0 !important; 
         }
         
         .hero-section {
-          background-color: #111827 !important;
+          background-color: #0f172a !important;
         }
         
         .hero-section h1 {
-          color: #f9fafb !important;
+          color: #f1f5f9 !important;
         }
         
         .hero-section p {
-          color: #d1d5db !important;
+          color: #cbd5e1 !important;
         }
         
         .hero-section .demo-btn {
-          border-color: #4b5563 !important;
-          color: #e5e7eb !important;
+          border-color: #475569 !important;
+          color: #e2e8f0 !important;
+          background-color: #1e293b !important;
+        }
+        
+        .hero-section .demo-btn:hover {
+          background-color: #334155 !important;
+          border-color: #64748b !important;
         }
         
         .hero-section .image-placeholder {
-          background-color: #1f2937 !important;
-          color: #9ca3af !important;
+          background-color: #1e293b !important;
+          color: #94a3b8 !important;
+        }
+        
+        /* Dashboard specific styles */
+        .profile-container {
+          background-color: #0f172a !important;
+        }
+        
+        .dashboard-section, .metric-card, .balance-card, .quick-actions {
+          background-color: #1e293b !important;
+          border-color: #334155 !important;
+        }
+        
+        .dashboard-header h1 {
+          color: #f1f5f9 !important;
+        }
+        
+        .dashboard-subtitle {
+          color: #94a3b8 !important;
+        }
+        
+        .metric-header h3, .balance-header h3 {
+          color: #94a3b8 !important;
+        }
+        
+        .metric-value, .balance-value {
+          color: #f1f5f9 !important;
+        }
+        
+        .metric-subtitle, .balance-goal, .progress-text {
+          color: #64748b !important;
+        }
+        
+        .section-header h3, .transaction-info h4, .budget-info h4 {
+          color: #f1f5f9 !important;
+        }
+        
+        .transaction-meta, .budget-amounts, .progress-stats {
+          color: #94a3b8 !important;
+        }
+        
+        .breakdown-label span {
+          color: #e2e8f0 !important;
+        }
+        
+        .breakdown-percentage {
+          color: #f1f5f9 !important;
+        }
+        
+        .progress-bar {
+          background-color: #334155 !important;
+        }
+        
+        .action-btn {
+          background-color: #1e293b !important;
+          border-color: #334155 !important;
+          color: #e2e8f0 !important;
+        }
+        
+        .action-btn:hover {
+          background-color: #334155 !important;
+          border-color: #475569 !important;
+        }
+        
+        .chart-btn {
+          background-color: #1e293b !important;
+          border-color: #334155 !important;
+          color: #94a3b8 !important;
+        }
+        
+        .welcome-section h2 {
+          color: #f1f5f9 !important;
+        }
+        
+        .quick-actions h2 {
+          color: #f1f5f9 !important;
+        }
+        
+        .subtitle {
+          color: #94a3b8 !important;
         }
         
         footer, section, .container, main {
-          background-color: #111827 !important;
-          color: #f9fafb !important;
+          background-color: #0f172a !important;
+          color: #e2e8f0 !important;
         }
         
         h1, h2, h3, h4, h5, h6, p {
-          color: #f9fafb !important;
+          color: #e2e8f0 !important;
         }
         
         .card, .box {
-          background-color: #1f2937 !important;
-          border-color: #374151 !important;
+          background-color: #1e293b !important;
+          border-color: #334155 !important;
+        }
+        
+        /* Better text contrast for readability */
+        input, select, textarea {
+          background-color: #1e293b !important;
+          color: #e2e8f0 !important;
+          border-color: #334155 !important;
+        }
+        
+        /* Link colors */
+        a:not(.nav-link):not(.profile-menu-item):not(.action-btn) {
+          color: #38bdf8 !important;
+        }
+        
+        a:not(.nav-link):not(.profile-menu-item):not(.action-btn):hover {
+          color: #0ea5e9 !important;
+        }
+        
+        .view-all-link {
+          color: #38bdf8 !important;
+        }
+        
+        .view-all-link:hover {
+          color: #0ea5e9 !important;
         }
       `;
       

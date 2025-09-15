@@ -78,26 +78,39 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
           </div>
         </div>
 
-        <!-- Total Balance Card -->
-        <div class="balance-card">
-          <div class="balance-header">
-            <h3>Total Balance</h3>
-            <span class="metric-change positive">+12.5% this month</span>
-          </div>
-          <div class="balance-content">
-            <div class="balance-value">$52,430</div>
-            <div class="balance-goal">of $60,000</div>
-          </div>
-          <div class="balance-progress">
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: 87.4%"></div>
+        <!-- Total Balance and Recent Transactions Row -->
+        <div class="balance-transactions-row">
+          <!-- Total Balance Card -->
+          <div class="balance-card">
+            <div class="balance-header">
+              <h3>Total Balance</h3>
+              <span class="metric-change positive">+12.5% this month</span>
             </div>
-            <span class="progress-text">87.4% of annual goal</span>
+            <div class="balance-content">
+              <div class="balance-value">$52,430</div>
+              <div class="balance-goal">of $60,000</div>
+            </div>
+            <div class="balance-progress">
+              <div class="circular-progress">
+                <svg class="circular-chart" viewBox="0 0 36 36">
+                  <path class="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path class="circle"
+                    stroke-dasharray="87.4, 100"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <text x="18" y="20.35" class="percentage">87.4%</text>
+                </svg>
+              </div>
+              <span class="progress-text">87.4% of annual goal</span>
+            </div>
           </div>
-        </div>
 
-        <!-- Dashboard Grid -->
-        <div class="dashboard-grid">
           <!-- Recent Transactions -->
           <div class="dashboard-section">
             <div class="section-header">
@@ -166,7 +179,10 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
               </div>
             </div>
           </div>
+        </div>
 
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
           <!-- Budget Progress -->
           <div class="dashboard-section">
             <div class="section-header">
@@ -467,13 +483,20 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       color: #9ca3af;
     }
 
-    /* Balance Card */
+    /* Balance and Transactions Row */
+    .balance-transactions-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Updated Balance Card */
     .balance-card {
       background-color: white;
       border-radius: 0.75rem;
       padding: 2rem;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      margin-bottom: 2rem;
     }
 
     .balance-header {
@@ -494,7 +517,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       display: flex;
       align-items: baseline;
       gap: 0.5rem;
-      margin-bottom: 1rem;
+      margin-bottom: 2rem;
     }
 
     .balance-value {
@@ -510,34 +533,62 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 
     .balance-progress {
       display: flex;
+      flex-direction: column;
       align-items: center;
       gap: 1rem;
     }
 
-    .progress-bar {
-      flex: 1;
-      height: 8px;
-      background-color: #e5e7eb;
-      border-radius: 4px;
-      overflow: hidden;
+    /* Circular Progress Styles */
+    .circular-progress {
+      width: 120px;
+      height: 120px;
     }
 
-    .progress-fill {
-      height: 100%;
-      background-color: #10b981;
-      transition: width 0.3s ease;
+    .circular-chart {
+      display: block;
+      margin: 0 auto;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .circle-bg {
+      fill: none;
+      stroke: #e5e7eb;
+      stroke-width: 2.8;
+    }
+
+    .circle {
+      fill: none;
+      stroke-width: 2.8;
+      stroke-linecap: round;
+      animation: progress 1s ease-in-out forwards;
+      stroke: #10b981;
+    }
+
+    .percentage {
+      fill: #111827;
+      font-family: sans-serif;
+      font-size: 0.5em;
+      text-anchor: middle;
+      font-weight: 600;
+    }
+
+    @keyframes progress {
+      0% {
+        stroke-dasharray: 0 100;
+      }
     }
 
     .progress-text {
       font-size: 0.875rem;
       color: #6b7280;
-      white-space: nowrap;
+      text-align: center;
     }
 
-    /* Dashboard Grid Layout */
+    /* Updated Dashboard Grid - Single Column for Budget Progress */
     .dashboard-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 2rem;
       margin-bottom: 2rem;
     }
@@ -785,76 +836,6 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       margin-top: 2rem;
     }
 
-    /* Dark Mode Styles */
-    .dark .dashboard-section {
-      background-color: #1f2937;
-    }
-
-    .dark .section-header h3,
-    .dark .transaction-info h4,
-    .dark .budget-info h4,
-    .dark .breakdown-percentage {
-      color: #f9fafb;
-    }
-
-    .dark .breakdown-label span {
-      color: #e5e7eb;
-    }
-
-    .dark .chart-btn {
-      background-color: #1f2937;
-      border-color: #374151;
-      color: #9ca3af;
-    }
-
-    .dark .chart-btn.active,
-    .dark .chart-btn:hover {
-      background-color: #3b82f6;
-      border-color: #3b82f6;
-      color: white;
-    }
-
-    /* Responsive Design */
-    @media (max-width: 1024px) {
-      .dashboard-grid,
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 768px) {
-      .metrics-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .action-buttons {
-        flex-direction: column;
-      }
-      
-      .action-btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
-
-    @media (max-width: 640px) {
-      .metrics-row {
-        grid-template-columns: 1fr;
-      }
-      
-      .balance-content {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0.25rem;
-      }
-      
-      .balance-progress {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-      }
-    }
-
     .welcome-section {
       margin-bottom: 3rem;
       text-align: center;
@@ -937,7 +918,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       border-color: #b91c1c !important;
     }
 
-    /* Dark Mode Styles for Quick Actions */
+    /* Dark Mode Styles */
     .dark .profile-container {
       background-color: #111827;
     }
@@ -951,13 +932,18 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
     }
 
     .dark .metric-card,
-    .dark .balance-card {
+    .dark .balance-card,
+    .dark .dashboard-section,
+    .dark .quick-actions {
       background-color: #1f2937;
     }
 
     .dark .metric-header h3,
-    .dark .balance-header h3 {
-      color: #9ca3af;
+    .dark .balance-header h3,
+    .dark .section-header h3,
+    .dark .welcome-section h2,
+    .dark .quick-actions h2 {
+      color: #f9fafb;
     }
 
     .dark .metric-value,
@@ -967,28 +953,44 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 
     .dark .metric-subtitle,
     .dark .balance-goal,
-    .dark .progress-text {
-      color: #6b7280;
+    .dark .progress-text,
+    .dark .subtitle {
+      color: #9ca3af;
+    }
+
+    .dark .circle-bg {
+      stroke: #334155;
+    }
+
+    .dark .percentage {
+      fill: #f9fafb;
+    }
+
+    .dark .transaction-info h4,
+    .dark .budget-info h4,
+    .dark .breakdown-percentage {
+      color: #f9fafb;
+    }
+
+    .dark .breakdown-label span {
+      color: #e5e7eb;
     }
 
     .dark .progress-bar {
       background-color: #374151;
     }
 
-    .dark .welcome-section h2 {
-      color: #f9fafb;
-    }
-
-    .dark .subtitle {
+    .dark .chart-btn {
+      background-color: #1f2937;
+      border-color: #374151;
       color: #9ca3af;
     }
 
-    .dark .quick-actions {
-      background-color: #1f2937;
-    }
-
-    .dark .quick-actions h2 {
-      color: #f9fafb;
+    .dark .chart-btn.active,
+    .dark .chart-btn:hover {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+      color: white;
     }
 
     .dark .action-btn {
@@ -1024,7 +1026,28 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       border-color: #991b1b !important;
     }
 
-    /* Responsive Adjustments */
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+      .balance-transactions-row,
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .metrics-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .balance-progress {
+        flex-direction: row;
+        justify-content: center;
+      }
+      
+      .circular-progress {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
     @media (max-width: 768px) {
       .action-buttons {
         flex-direction: column;
@@ -1033,6 +1056,29 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       .action-btn {
         width: 100%;
         justify-content: center;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .metrics-row {
+        grid-template-columns: 1fr;
+      }
+      
+      .balance-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+      
+      .balance-progress {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+      }
+      
+      .circular-progress {
+        width: 80px;
+        height: 80px;
       }
     }
   `]
