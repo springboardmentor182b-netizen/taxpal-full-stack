@@ -96,3 +96,19 @@
     font-size: 1.5rem;
   }
 }
+
+/* existing styles above... */
+
+.add-buttons {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center; /* looks nice under the title */
+  flex-wrap: wrap;
+}
+
+.action-button.income { background: #059669; }
+.action-button.income:hover { background: #047857; }
+
+.action-button.expense { background: #dc2626; }
+.action-button.expense:hover { background: #b91c1c; }

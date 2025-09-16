@@ -1,9 +1,15 @@
 <div class="dashboard-container">
   <div class="dashboard-header">
-    <h1>Dashboard</h1>
+    <h1>{{ getGreeting() }}, {{ user()?.name || 'User' }}</h1>
     <p>Welcome to your TaxPal dashboard!</p>
+
+    <!-- New action buttons right under the header -->
+    <div class="add-buttons">
+      <button class="action-button income" (click)="incomeOpen.set(true)">+ Add Income</button>
+      <button class="action-button expense" (click)="expenseOpen.set(true)">+ Add Expense</button>
+    </div>
   </div>
-  
+
   <div class="dashboard-content">
     <div class="dashboard-stats">
       <div class="stat-card">
@@ -19,7 +25,7 @@
         <p class="stat-value net">$0.00</p>
       </div>
     </div>
-    
+
     <div class="dashboard-actions">
       <a routerLink="/transactions" class="action-button">View Transactions</a>
       <a routerLink="/budgets" class="action-button">Manage Budgets</a>
@@ -28,3 +34,16 @@
     </div>
   </div>
 </div>
+
+<!-- Mount modals at root so they can overlay the page -->
+<app-income-modal
+  [isOpen]="incomeOpen()"
+  (close)="incomeOpen.set(false)"
+  (save)="onIncomeSave($event)">
+</app-income-modal>
+
+<app-expense-modal
+  [isOpen]="expenseOpen()"
+  (close)="expenseOpen.set(false)"
+  (save)="onExpenseSave($event)">
+</app-expense-modal>
