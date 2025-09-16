@@ -199,71 +199,81 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
           </div>
         </div>
 
-        <!-- Dashboard Grid -->
+        <!-- Dashboard Grid - Budget and Expense Breakdown -->
         <div class="dashboard-grid">
-          <!-- Budget Progress -->
+          <!-- Budget Progress with Pie Chart -->
           <div class="dashboard-section">
             <div class="section-header">
               <h3>Budget Progress</h3>
             </div>
-            <div class="budget-list">
-              <div class="budget-item">
-                <div class="budget-info">
-                  <h4>Office Expenses</h4>
-                  <span class="budget-amounts">$1200 / $2000</span>
-                </div>
-                <div class="budget-progress">
-                  <div class="progress-bar">
-                    <div class="progress-fill" style="width: 60%"></div>
-                  </div>
-                  <span class="progress-stats">60.0% used • $800 remaining</span>
-                </div>
+            <div class="budget-pie-container">
+              <div class="pie-chart-container">
+                <svg class="pie-chart" viewBox="-10 -10 120 120">
+                  <!-- Pie Chart Segments -->
+                  <circle class="pie-chart-bg" cx="50" cy="50" r="45" />
+                  
+                  <!-- Office Expenses: 60% - 216 degrees -->
+                  <path class="pie-segment segment-1" d="M50,50 L50,5 A45,45 0 0,1 93.3,71.9 z" />
+                  
+                  <!-- Software & Tools: 18.75% - 67.5 degrees -->
+                  <path class="pie-segment segment-2" d="M50,50 L93.3,71.9 A45,45 0 0,1 69.6,93.1 z" />
+                  
+                  <!-- Marketing: 14.1% - 50.76 degrees -->
+                  <path class="pie-segment segment-3" d="M50,50 L69.6,93.1 A45,45 0 0,1 31.7,93.9 z" />
+                  
+                  <!-- Travel: 7.15% - 25.74 degrees -->
+                  <path class="pie-segment segment-4" d="M50,50 L31.7,93.9 A45,45 0 0,1 50,5 z" />
+                  
+                  <circle class="pie-chart-center" cx="50" cy="50" r="30" />
+                  <text class="pie-total" x="50" y="45" text-anchor="middle">$2,750</text>
+                  <text class="pie-total-label" x="50" y="60" text-anchor="middle">Total Spent</text>
+                </svg>
               </div>
-              
-              <div class="budget-item">
-                <div class="budget-info">
-                  <h4>Software & Tools</h4>
-                  <span class="budget-amounts">$450 / $800</span>
-                </div>
-                <div class="budget-progress">
-                  <div class="progress-bar">
-                    <div class="progress-fill" style="width: 56.3%"></div>
+              <div class="budget-legend">
+                <div class="budget-legend-item">
+                  <div class="legend-color" style="background-color: #3b82f6;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Office Expenses</span>
+                    <div class="legend-details">
+                      <span class="legend-value">$1,200</span>
+                      <span class="legend-percentage">60%</span>
+                    </div>
                   </div>
-                  <span class="progress-stats">56.3% used • $350 remaining</span>
                 </div>
-              </div>
-              
-              <div class="budget-item">
-                <div class="budget-info">
-                  <h4>Marketing</h4>
-                  <span class="budget-amounts">$800 / $1500</span>
-                </div>
-                <div class="budget-progress">
-                  <div class="progress-bar">
-                    <div class="progress-fill" style="width: 53.3%"></div>
+                <div class="budget-legend-item">
+                  <div class="legend-color" style="background-color: #10b981;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Software & Tools</span>
+                    <div class="legend-details">
+                      <span class="legend-value">$450</span>
+                      <span class="legend-percentage">18.8%</span>
+                    </div>
                   </div>
-                  <span class="progress-stats">53.3% used • $700 remaining</span>
                 </div>
-              </div>
-              
-              <div class="budget-item">
-                <div class="budget-info">
-                  <h4>Travel</h4>
-                  <span class="budget-amounts">$300 / $1000</span>
-                </div>
-                <div class="budget-progress">
-                  <div class="progress-bar">
-                    <div class="progress-fill" style="width: 30%"></div>
+                <div class="budget-legend-item">
+                  <div class="legend-color" style="background-color: #f59e0b;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Marketing</span>
+                    <div class="legend-details">
+                      <span class="legend-value">$800</span>
+                      <span class="legend-percentage">14.1%</span>
+                    </div>
                   </div>
-                  <span class="progress-stats">30.0% used • $700 remaining</span>
+                </div>
+                <div class="budget-legend-item">
+                  <div class="legend-color" style="background-color: #ef4444;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Travel</span>
+                    <div class="legend-details">
+                      <span class="legend-value">$300</span>
+                      <span class="legend-percentage">7.1%</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Charts Section -->
-        <div class="charts-grid">
           <!-- Expense Breakdown -->
           <div class="dashboard-section">
             <div class="section-header">
@@ -307,7 +317,10 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
               </div>
             </div>
           </div>
+        </div>
 
+        <!-- Charts Section -->
+        <div class="charts-grid">
           <!-- Income vs Expenses Chart -->
           <div class="dashboard-section">
             <div class="section-header">
@@ -318,7 +331,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
                 <button class="chart-btn">Year</button>
               </div>
             </div>
-            <div class="chart-placeholder">
+            <div class="chart-container">
               <div class="chart-legend">
                 <div class="legend-item">
                   <div class="legend-color income"></div>
@@ -329,8 +342,79 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
                   <span>Expenses</span>
                 </div>
               </div>
-              <div class="chart-months">
-                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+              
+              <div class="bar-chart">
+                <div class="month-group">
+                  <div class="bar-container">
+                    <div class="bar income-bar" style="height: 80%;" title="$8,500">
+                      <span class="bar-value">$8.5k</span>
+                    </div>
+                    <div class="bar expense-bar" style="height: 60%;" title="$5,100">
+                      <span class="bar-value">$5.1k</span>
+                    </div>
+                  </div>
+                  <div class="month-label">Jan</div>
+                </div>
+                
+                <div class="month-group">
+                  <div class="bar-container">
+                    <div class="bar income-bar" style="height: 65%;" title="$6,900">
+                      <span class="bar-value">$6.9k</span>
+                    </div>
+                    <div class="bar expense-bar" style="height: 50%;" title="$4,200">
+                      <span class="bar-value">$4.2k</span>
+                    </div>
+                  </div>
+                  <div class="month-label">Feb</div>
+                </div>
+                
+                <div class="month-group">
+                  <div class="bar-container">
+                    <div class="bar income-bar" style="height: 90%;" title="$9,600">
+                      <span class="bar-value">$9.6k</span>
+                    </div>
+                    <div class="bar expense-bar" style="height: 62%;" title="$5,300">
+                      <span class="bar-value">$5.3k</span>
+                    </div>
+                  </div>
+                  <div class="month-label">Mar</div>
+                </div>
+                
+                <div class="month-group">
+                  <div class="bar-container">
+                    <div class="bar income-bar" style="height: 75%;" title="$8,000">
+                      <span class="bar-value">$8.0k</span>
+                    </div>
+                    <div class="bar expense-bar" style="height: 55%;" title="$4,700">
+                      <span class="bar-value">$4.7k</span>
+                    </div>
+                  </div>
+                  <div class="month-label">Apr</div>
+                </div>
+                
+                <div class="month-group">
+                  <div class="bar-container">
+                    <div class="bar income-bar" style="height: 85%;" title="$9,100">
+                      <span class="bar-value">$9.1k</span>
+                    </div>
+                    <div class="bar expense-bar" style="height: 58%;" title="$4,950">
+                      <span class="bar-value">$5.0k</span>
+                    </div>
+                  </div>
+                  <div class="month-label">May</div>
+                </div>
+                
+                <div class="month-group">
+                  <div class="bar-container">
+                    <div class="bar income-bar" style="height: 95%;" title="$10,200">
+                      <span class="bar-value">$10.2k</span>
+                    </div>
+                    <div class="bar expense-bar" style="height: 65%;" title="$5,500">
+                      <span class="bar-value">$5.5k</span>
+                    </div>
+                  </div>
+                  <div class="month-label">Jun</div>
+                </div>
               </div>
             </div>
           </div>
@@ -391,6 +475,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
     </div>
   `,
   styles: [`
+    /* Base Styles */
     .profile-container {
       min-height: calc(100vh - 80px);
       background-color: #f9fafb;
@@ -509,7 +594,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       margin-bottom: 2rem;
     }
 
-    /* Updated Balance Card */
+    /* Balance Card */
     .balance-card {
       background-color: white;
       border-radius: 0.75rem;
@@ -603,21 +688,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       text-align: center;
     }
 
-    /* Updated Dashboard Grid - Single Column for Budget Progress */
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-bottom: 2rem;
-    }
-
+    /* Dashboard Section */
     .dashboard-section {
       background-color: white;
       border-radius: 0.75rem;
@@ -678,10 +749,6 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       border-bottom: none;
     }
 
-    .dark .transaction-item:hover {
-      background-color: #252f3f;
-    }
-
     .transaction-info h4 {
       font-size: 0.875rem;
       font-weight: 500;
@@ -714,55 +781,123 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       color: #ef4444;
     }
 
-    /* Budget Progress */
-    .budget-list {
+    /* Dashboard Grid - Two Column Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    /* Budget Pie Chart Styles */
+    .budget-pie-container {
       display: flex;
       flex-direction: column;
+      align-items: center;
       gap: 1.5rem;
+      padding: 1rem 0;
     }
 
-    .budget-item {
+    .pie-chart-container {
+      width: 220px;
+      height: 220px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    .pie-chart {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .pie-chart-bg {
+      fill: #f3f4f6;
+    }
+
+    .pie-segment {
+      transition: transform 0.2s ease;
+      transform-origin: 50px 50px;
+    }
+
+    .pie-segment:hover {
+      transform: translateX(3px) translateY(3px);
+    }
+
+    .segment-1 {
+      fill: #3b82f6;
+    }
+
+    .segment-2 {
+      fill: #10b981;
+    }
+
+    .segment-3 {
+      fill: #f59e0b;
+    }
+
+    .segment-4 {
+      fill: #ef4444;
+    }
+
+    .pie-chart-center {
+      fill: white;
+    }
+
+    .pie-total {
+      font-size: 14px;
+      font-weight: bold;
+      fill: #111827;
+    }
+
+    .pie-total-label {
+      font-size: 10px;
+      fill: #6b7280;
+    }
+
+    .budget-legend {
       display: flex;
       flex-direction: column;
-      gap: 0.5rem;
+      width: 100%;
+      gap: 0.75rem;
     }
 
-    .budget-info {
+    .budget-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .legend-info {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .legend-label {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+
+    .legend-details {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      font-size: 0.75rem;
     }
 
-    .budget-info h4 {
-      font-size: 0.875rem;
-      font-weight: 500;
+    .legend-value {
+      color: #6b7280;
+    }
+
+    .legend-percentage {
+      font-weight: 600;
       color: #111827;
-      margin: 0;
-    }
-
-    .budget-amounts {
-      font-size: 0.75rem;
-      color: #6b7280;
-      font-weight: 500;
-    }
-
-    .budget-progress .progress-bar {
-      height: 6px;
-      background-color: #e5e7eb;
-      border-radius: 3px;
-      overflow: hidden;
-      margin-bottom: 0.25rem;
-    }
-
-    .budget-progress .progress-fill {
-      height: 100%;
-      background-color: #3b82f6;
-      transition: width 0.3s ease;
-    }
-
-    .progress-stats {
-      font-size: 0.75rem;
-      color: #6b7280;
     }
 
     /* Expense Breakdown */
@@ -770,12 +905,14 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      padding-top: 1rem;
     }
 
     .breakdown-item {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      padding: 0.5rem 0;
     }
 
     .breakdown-label {
@@ -799,6 +936,14 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       font-weight: 600;
       font-size: 0.875rem;
       color: #111827;
+    }
+
+    /* Charts Grid */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-bottom: 2rem;
     }
 
     /* Chart Controls */
@@ -825,30 +970,24 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       color: white;
     }
 
-    /* Chart Placeholder */
-    .chart-placeholder {
-      padding: 2rem 0;
+    /* Chart Container */
+    .chart-container {
+      padding: 1.5rem 0.5rem;
     }
 
     .chart-legend {
       display: flex;
       justify-content: center;
-      gap: 1rem;
-      margin-bottom: 1rem;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .legend-item {
       display: flex;
       align-items: center;
       gap: 0.5rem;
-      font-size: 0.75rem;
+      font-size: 0.875rem;
       color: #6b7280;
-    }
-
-    .legend-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 2px;
     }
 
     .legend-color.income {
@@ -859,14 +998,78 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       background-color: #ef4444;
     }
 
-    .chart-months {
+    /* Bar Chart Styles */
+    .bar-chart {
       display: flex;
       justify-content: space-between;
-      font-size: 0.75rem;
-      color: #6b7280;
-      margin-top: 2rem;
+      align-items: flex-end;
+      height: 250px;
+      padding-top: 1rem;
     }
 
+    .month-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+    }
+
+    .bar-container {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      height: 200px;
+      align-items: flex-end;
+    }
+
+    .bar {
+      width: 24px;
+      min-height: 4px;
+      border-radius: 4px 4px 0 0;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .bar:hover {
+      opacity: 0.8;
+      transform: translateY(-3px);
+    }
+
+    .income-bar {
+      background-color: #10b981;
+    }
+
+    .expense-bar {
+      background-color: #ef4444;
+    }
+
+    .bar-value {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      color: #6b7280;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      margin-bottom: 4px;
+    }
+
+    .bar:hover .bar-value {
+      opacity: 1;
+    }
+
+    .month-label {
+      margin-top: 0.75rem;
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-align: center;
+    }
+
+    /* Welcome Section */
     .welcome-section {
       margin-bottom: 3rem;
       text-align: center;
@@ -947,6 +1150,31 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
     .expense-btn:hover {
       background-color: #dc2626 !important;
       border-color: #b91c1c !important;
+    }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      background-color: white;
+      color: #1f2937;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
 
     /* Dark Mode Styles */
@@ -1057,15 +1285,63 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       border-color: #991b1b !important;
     }
 
+    .dark .theme-toggle {
+      background-color: #1f2937;
+      color: #f9fafb;
+      border-color: #374151;
+    }
+
+    .dark .pie-chart-bg {
+      fill: #374151;
+    }
+
+    .dark .pie-chart-center {
+      fill: #1f2937;
+    }
+
+    .dark .pie-total {
+      fill: #f9fafb;
+    }
+
+    .dark .pie-total-label {
+      fill: #9ca3af;
+    }
+
+    .dark .legend-label {
+      color: #e5e7eb;
+    }
+
+    .dark .legend-value {
+      color: #9ca3af;
+    }
+
+    .dark .legend-percentage {
+      color: #f9fafb;
+    }
+
+    .dark .transaction-item:hover {
+      background-color: #252f3f;
+    }
+
+    .dark .legend-item,
+    .dark .month-label {
+      color: #9ca3af;
+    }
+
+    .dark .bar-value {
+      color: #d1d5db;
+    }
+
     /* Responsive Design */
     @media (max-width: 1024px) {
-      .balance-transactions-row,
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-      
       .metrics-row {
         grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .balance-transactions-row,
+      .dashboard-grid,
+      .charts-grid {
+        grid-template-columns: 1fr;
       }
       
       .balance-progress {
@@ -1077,6 +1353,15 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
         width: 100px;
         height: 100px;
       }
+      
+      .pie-chart-container {
+        width: 200px;
+        height: 200px;
+      }
+      
+      .bar {
+        width: 20px;
+      }
     }
 
     @media (max-width: 768px) {
@@ -1087,6 +1372,14 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       .action-btn {
         width: 100%;
         justify-content: center;
+      }
+      
+      .bar {
+        width: 18px;
+      }
+      
+      .bar-value {
+        font-size: 0.65rem;
       }
     }
 
@@ -1111,37 +1404,39 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
         width: 80px;
         height: 80px;
       }
-    }
-
-    /* Theme Toggle Button */
-    .theme-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 9999px;
-      background-color: white;
-      color: #1f2937;
-      border: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-      transition: all 0.2s ease;
-    }
-    
-    .theme-toggle:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    
-    .dark .theme-toggle {
-      background-color: #1f2937;
-      color: #f9fafb;
-      border-color: #374151;
+      
+      .pie-chart-container {
+        width: 180px;
+        height: 180px;
+      }
+      
+      .budget-legend {
+        padding: 0 1rem;
+      }
+      
+      .bar-chart {
+        height: 200px;
+      }
+      
+      .bar-container {
+        height: 150px;
+      }
+      
+      .bar {
+        width: 12px;
+      }
+      
+      .bar-value {
+        display: none;
+      }
+      
+      .bar:hover .bar-value {
+        display: block;
+      }
+      
+      .chart-legend {
+        margin-bottom: 1rem;
+      }
     }
   `]
 })
