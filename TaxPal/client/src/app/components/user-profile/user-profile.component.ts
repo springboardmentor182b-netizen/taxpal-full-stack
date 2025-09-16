@@ -8,6 +8,24 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
   imports: [CommonModule, RouterLink],
   template: `
     <div class="profile-container" [ngClass]="{'dark': isDarkMode}">
+      <!-- Theme Toggle Button -->
+      <button class="theme-toggle" (click)="toggleDarkMode()">
+        <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+      
       <div class="profile-content">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
@@ -643,12 +661,25 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 0.75rem 0;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
       border-bottom: 1px solid #f3f4f6;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .transaction-item:hover {
+      background-color: #f9fafb;
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     }
 
     .transaction-item:last-child {
       border-bottom: none;
+    }
+
+    .dark .transaction-item:hover {
+      background-color: #252f3f;
     }
 
     .transaction-info h4 {
@@ -1081,6 +1112,37 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
         height: 80px;
       }
     }
+
+    /* Theme Toggle Button */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 9999px;
+      background-color: white;
+      color: #1f2937;
+      border: 1px solid #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 10;
+      transition: all 0.2s ease;
+    }
+    
+    .theme-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .dark .theme-toggle {
+      background-color: #1f2937;
+      color: #f9fafb;
+      border-color: #374151;
+    }
   `]
 })
 export class UserProfileComponent implements OnInit {
@@ -1101,5 +1163,21 @@ export class UserProfileComponent implements OnInit {
     // Check for dark mode
     this.isDarkMode = document.documentElement.classList.contains('dark') || 
                       document.body.classList.contains('dark-mode');
+  }
+  
+  toggleDarkMode() {
+    this.isDarkMode = !this.isDarkMode;
+    
+    // Update document classes
+    if (this.isDarkMode) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark-mode');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark-mode');
+    }
+    
+    // Save preference to localStorage
+    localStorage.setItem('darkMode', this.isDarkMode.toString());
   }
 }
