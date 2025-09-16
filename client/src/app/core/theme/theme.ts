@@ -1,4 +1,5 @@
 import { createTheme, PaletteOptions } from '@angular/material/core';
+
 const primary: PaletteOptions = {
   50: '#E6F7F6',
   100: '#B3E6E2',
