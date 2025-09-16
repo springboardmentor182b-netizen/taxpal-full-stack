@@ -1,28 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  estimatedTaxDue: number;
-  savingsRate: number;
-  transactions: mongoose.Types.ObjectId[];
-}
-
-const UserSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  monthlyIncome: { type: Number, default: 0 },
-  monthlyExpenses: { type: Number, default: 0 },
-  estimatedTaxDue: { type: Number, default: 0 },
-  savingsRate: { type: Number, default: 0 },
-  transactions: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Transaction' }]
-});
-
-
+// Transaction interface
 export interface ITransaction extends Document {
-  userId: mongoose.Types.ObjectId;
   date: Date;
   description: string;
   category: string;
@@ -30,8 +9,8 @@ export interface ITransaction extends Document {
   type: 'Income' | 'Expense';
 }
 
-const TransactionSchema = new Schema({
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+// Transaction schema
+const TransactionSchema = new Schema<ITransaction>({
   date: { type: Date, default: Date.now },
   description: { type: String, required: true },
   category: { type: String, required: true },
@@ -39,6 +18,22 @@ const TransactionSchema = new Schema({
   type: { type: String, enum: ['Income', 'Expense'], required: true }
 });
 
-export const TransactionModel = mongoose.model<ITransaction>('Transaction', TransactionSchema);
+// Dashboard interface
+export interface IDashboard extends Document {
+  monthlyIncome: number;
+  monthlyExpenses: number;
+  estimatedTaxDue: number;
+  savingsRate: number;
+  transactions: ITransaction[];
+}
 
-export const UserModel = mongoose.model<IUser>('User', UserSchema);
+// Dashboard schema
+const DashboardSchema = new Schema<IDashboard>({
+  monthlyIncome: { type: Number, default: 0 },
+  monthlyExpenses: { type: Number, default: 0 },
+  estimatedTaxDue: { type: Number, default: 0 },
+  savingsRate: { type: Number, default: 0 },
+  transactions: [TransactionSchema]
+});
+
+export const DashboardModel = mongoose.model<IDashboard>('Dashboard', DashboardSchema);
