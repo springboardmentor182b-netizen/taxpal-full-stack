@@ -1,12 +1,43 @@
-import { DashboardModel } from './dashboard.model';
+import { DashboardModel, IDashboard, ITransaction } from "./dashboard.model";
 
-// Fetch dashboard by ID
-export const getDashboardData = async (id: string) => {
-  return await DashboardModel.findById(id);
+export const getDashboard = async (dashboardId: string) => {
+  const dashboard = await DashboardModel.findById(dashboardId);
+  if (!dashboard) return null;
+
+  return dashboard;
 };
 
-// Create new dashboard
-export const createDashboard = async (data: any) => {
-  const dashboard = new DashboardModel(data);
-  return await dashboard.save();
+// Add, update, delete transactions and compute stats
+export const addTransaction = async (dashboardId: string, txData: Partial<ITransaction>) => {
+  const dashboard = await DashboardModel.findById(dashboardId);
+  if (!dashboard) return null;
+
+  dashboard.transactions.push(txData as ITransaction);
+  await dashboard.save();
+  return dashboard;
+};
+
+export const updateTransaction = async (dashboardId: string, txId: string, txData: Partial<ITransaction>) => {
+  const dashboard = await DashboardModel.findById(dashboardId);
+  if (!dashboard) return null;
+
+  const tx = dashboard.transactions.id(txId);
+  if (!tx) return null;
+
+  tx.set(txData);
+  await dashboard.save();
+  return dashboard;
+};
+
+export const deleteTransaction = async (dashboardId: string, txId: string) => {
+  const dashboard = await DashboardModel.findById(dashboardId);
+  if (!dashboard) return null;
+
+  const tx = dashboard.transactions.id(txId);
+  if (!tx) return null;
+
+ await tx.deleteOne();
+await dashboard.save();
+
+  return dashboard;
 };

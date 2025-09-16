@@ -1,25 +1,31 @@
-import { Request, Response } from 'express';
-import { getDashboardData, createDashboard } from './dashboard.service';
+import { Request, Response } from "express";
+import * as DashboardService from "./dashboard.service";
 
-// GET /api/v1/dashboard/:id
-export const getDashboard = async (req: Request, res: Response) => {
-  try {
-    const dashboard = await getDashboardData(req.params.id);
-    if (!dashboard) {
-      return res.status(404).json({ error: 'Dashboard not found' });
-    }
-    res.status(200).json(dashboard);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch dashboard' });
-  }
+export const getDashboardController = async (req: Request, res: Response) => {
+  const dashboard = await DashboardService.getDashboard(req.params.id);
+  if (!dashboard) return res.status(404).json({ message: "Dashboard not found" });
+  return res.json(dashboard);
 };
 
-// POST /api/v1/dashboard
-export const addDashboard = async (req: Request, res: Response) => {
-  try {
-    const dashboard = await createDashboard(req.body);
-    res.status(201).json(dashboard);
-  } catch (err) {
-    res.status(400).json({ error: 'Failed to create dashboard' });
-  }
+export const addTransactionController = async (req: Request, res: Response) => {
+  const { dashboardId } = req.params;
+  const txData = req.body;
+  const dashboard = await DashboardService.addTransaction(dashboardId, txData);
+  if (!dashboard) return res.status(404).json({ message: "Dashboard not found" });
+  return res.json(dashboard);
+};
+
+export const updateTransactionController = async (req: Request, res: Response) => {
+  const { dashboardId, txId } = req.params;
+  const txData = req.body;
+  const dashboard = await DashboardService.updateTransaction(dashboardId, txId, txData);
+  if (!dashboard) return res.status(404).json({ message: "Dashboard or transaction not found" });
+  return res.json(dashboard);
+};
+
+export const deleteTransactionController = async (req: Request, res: Response) => {
+  const { dashboardId, txId } = req.params;
+  const dashboard = await DashboardService.deleteTransaction(dashboardId, txId);
+  if (!dashboard) return res.status(404).json({ message: "Dashboard or transaction not found" });
+  return res.json(dashboard);
 };
