@@ -1,12 +1,16 @@
-import { Router } from 'express';
-import { getDashboard, addDashboard } from './dashboard.controller';
+import { Router } from "express";
+import {
+  getDashboardController,
+  addTransactionController,
+  updateTransactionController,
+  deleteTransactionController
+} from "./dashboard.controller";
 
 const router = Router();
 
-// RESTful versioned endpoints
-router.get('/:id', getDashboard);   // GET /api/v1/dashboard/:id
-router.post('/', addDashboard);     // POST /api/v1/dashboard
+router.get("/:id", getDashboardController);
+router.post("/:dashboardId/transaction", addTransactionController);
+router.put("/:dashboardId/transaction/:txId", updateTransactionController);
+router.delete("/:dashboardId/transaction/:txId", deleteTransactionController);
 
 export default router;
-
-
