@@ -8,23 +8,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
   imports: [CommonModule, RouterLink],
   template: `
     <div class="profile-container" [ngClass]="{'dark': isDarkMode}">
-      <!-- Theme Toggle Button -->
-      <button class="theme-toggle" (click)="toggleDarkMode()">
-        <svg *ngIf="!isDarkMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-        <svg *ngIf="isDarkMode" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-      </button>
+      <!-- Theme Toggle Button - Removed duplicate -->
       
       <div class="profile-content">
         <!-- Dashboard Header -->
@@ -93,6 +77,51 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
             </div>
             <div class="metric-value">23.8%</div>
             <div class="metric-subtitle">from last month</div>
+          </div>
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions top-actions">
+          <div class="action-buttons">
+            <button class="action-btn income-btn" (click)="showAddIncomeModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="16"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              Add Income
+            </button>
+            <button class="action-btn expense-btn" (click)="showAddExpenseModal()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="8" y1="12" x2="16" y2="12"/>
+              </svg>
+              Add Expense
+            </button>
+            <button class="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Transaction
+            </button>
+            <button class="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+              </svg>
+              Schedule Payment
+            </button>
+            <button class="action-btn">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="17 8 12 3 7 8"></polyline>
+                <line x1="12" y1="3" x2="12" y2="15"></line>
+              </svg>
+              Export Report
+            </button>
           </div>
         </div>
 
@@ -201,7 +230,78 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 
         <!-- Dashboard Grid - Budget and Expense Breakdown -->
         <div class="dashboard-grid">
-          <!-- Budget Progress with Progress Bars -->
+          <!-- Expense Breakdown as Pie Chart (on the left) -->
+          <div class="dashboard-section">
+            <div class="section-header">
+              <h3>Expense Breakdown</h3>
+            </div>
+            <div class="expense-pie-container">
+              <div class="pie-chart-container">
+                <svg class="pie-chart" viewBox="-10 -10 120 120">
+                  <!-- Pie Chart Segments -->
+                  <circle class="pie-chart-bg" cx="50" cy="50" r="45" />
+                  
+                  <!-- Rent/Mortgage: 32% -->
+                  <path class="pie-segment segment-rent" d="M50,50 L50,5 A45,45 0 0,1 88.2,27.3 z" />
+                  
+                  <!-- Business Expenses: 26% -->
+                  <path class="pie-segment segment-business" d="M50,50 L88.2,27.3 A45,45 0 0,1 93.7,74.7 z" />
+                  
+                  <!-- Utilities: 15% -->
+                  <path class="pie-segment segment-utilities" d="M50,50 L93.7,74.7 A45,45 0 0,1 62.1,91.9 z" />
+                  
+                  <!-- Food: 14% -->
+                  <path class="pie-segment segment-food" d="M50,50 L62.1,91.9 A45,45 0 0,1 21.7,85.2 z" />
+                  
+                  <!-- Other: 13% -->
+                  <path class="pie-segment segment-other" d="M50,50 L21.7,85.2 A45,45 0 0,1 50,5 z" />
+                  
+                  <circle class="pie-chart-center" cx="50" cy="50" r="30" />
+                  <text class="pie-total" x="50" y="45" text-anchor="middle">100%</text>
+                  <text class="pie-total-label" x="50" y="60" text-anchor="middle">Total Expenses</text>
+                </svg>
+              </div>
+              <div class="expense-legend">
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #3b82f6;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Rent/Mortgage</span>
+                    <span class="legend-percentage">32%</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #10b981;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Business Expenses</span>
+                    <span class="legend-percentage">26%</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #f59e0b;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Utilities</span>
+                    <span class="legend-percentage">15%</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #ef4444;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Food</span>
+                    <span class="legend-percentage">14%</span>
+                  </div>
+                </div>
+                <div class="legend-item">
+                  <div class="legend-color" style="background-color: #8b5cf6;"></div>
+                  <div class="legend-info">
+                    <span class="legend-label">Other</span>
+                    <span class="legend-percentage">13%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Budget Progress with Progress Bars (on the right) -->
           <div class="dashboard-section">
             <div class="section-header">
               <h3>Budget Progress</h3>
@@ -257,50 +357,6 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
                   </div>
                   <span class="progress-stats">30.0% used • $700 remaining</span>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Expense Breakdown -->
-          <div class="dashboard-section">
-            <div class="section-header">
-              <h3>Expense Breakdown</h3>
-            </div>
-            <div class="expense-breakdown">
-              <div class="breakdown-item">
-                <div class="breakdown-label">
-                  <div class="color-dot" style="background-color: #3b82f6;"></div>
-                  <span>Rent/Mortgage</span>
-                </div>
-                <span class="breakdown-percentage">32%</span>
-              </div>
-              <div class="breakdown-item">
-                <div class="breakdown-label">
-                  <div class="color-dot" style="background-color: #10b981;"></div>
-                  <span>Business Expenses</span>
-                </div>
-                <span class="breakdown-percentage">26%</span>
-              </div>
-              <div class="breakdown-item">
-                <div class="breakdown-label">
-                  <div class="color-dot" style="background-color: #f59e0b;"></div>
-                  <span>Utilities</span>
-                </div>
-                <span class="breakdown-percentage">15%</span>
-              </div>
-              <div class="breakdown-item">
-                <div class="breakdown-label">
-                  <div class="color-dot" style="background-color: #ef4444;"></div>
-                  <span>Food</span>
-                </div>
-                <span class="breakdown-percentage">14%</span>
-              </div>
-              <div class="breakdown-item">
-                <div class="breakdown-label">
-                  <div class="color-dot" style="background-color: #8b5cf6;"></div>
-                  <span>Other</span>
-                </div>
-                <span class="breakdown-percentage">13%</span>
               </div>
             </div>
           </div>
@@ -412,50 +468,128 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
           <h2>Welcome back, Sam</h2>
           <p class="subtitle">Here's an overview of your tax and financial status</p>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="quick-actions">
-          <h2>Quick Actions</h2>
-          <div class="action-buttons">
-            <button class="action-btn income-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="12" y1="8" x2="12" y2="16"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-              Add Income
-            </button>
-            <button class="action-btn expense-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <line x1="8" y1="12" x2="16" y2="12"/>
-              </svg>
-              Add Expense
-            </button>
-            <button class="action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="12" y1="5" x2="12" y2="19"></line>
-                <line x1="5" y1="12" x2="19" y2="12"></line>
-              </svg>
-              Add Transaction
-            </button>
-            <button class="action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                <line x1="16" y1="2" x2="16" y2="6"></line>
-                <line x1="8" y1="2" x2="8" y2="6"></line>
-                <line x1="3" y1="10" x2="21" y2="10"></line>
-              </svg>
-              Schedule Payment
-            </button>
-            <button class="action-btn">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                <polyline points="17 8 12 3 7 8"></polyline>
-                <line x1="12" y1="3" x2="12" y2="15"></line>
-              </svg>
-              Export Report
-            </button>
+      </div>
+      
+      <!-- Add Income Modal -->
+      <div class="modal-overlay" *ngIf="isAddIncomeModalVisible" (click)="hideAddIncomeModal($event)">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h2>Add New Income</h2>
+            <p class="modal-subtitle">Track your earnings to better manage your finances</p>
+          </div>
+          
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="income-title">Title</label>
+              <input type="text" id="income-title" placeholder="Freelance project">
+            </div>
+            
+            <div class="form-group">
+              <label for="income-amount">Amount</label>
+              <div class="amount-input">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="income-amount" placeholder="0.00" step="0.01">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="income-category">Category</label>
+              <select id="income-category">
+                <option value="" disabled selected>Select category</option>
+                <option value="freelance">Freelance Work</option>
+                <option value="consulting">Consulting</option>
+                <option value="contract">Contract Work</option>
+                <option value="services">Services</option>
+                <option value="sale">Product Sale</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="income-date">Date</label>
+                <input type="date" id="income-date" [value]="getCurrentDate()">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="income-notes">Notes</label>
+              <textarea id="income-notes" placeholder="Add any additional details..."></textarea>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button class="btn-cancel" (click)="hideAddIncomeModal()">Cancel</button>
+            <button class="btn-submit">Add Income</button>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Add Expense Modal -->
+      <div class="modal-overlay" *ngIf="isAddExpenseModalVisible" (click)="hideAddExpenseModal($event)">
+        <div class="modal-container">
+          <div class="modal-header">
+            <h2>Add New Expense</h2>
+            <p class="modal-subtitle">Track your expenses to better manage your finances</p>
+          </div>
+          
+          <div class="modal-body">
+            <div class="form-group">
+              <label for="expense-title">Title</label>
+              <input type="text" id="expense-title" placeholder="Office supplies">
+            </div>
+            
+            <div class="form-group">
+              <label for="expense-amount">Amount</label>
+              <div class="amount-input">
+                <span class="currency-symbol">$</span>
+                <input type="number" id="expense-amount" placeholder="0.00" step="0.01">
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="expense-category">Category</label>
+              <select id="expense-category">
+                <option value="" disabled selected>Select category</option>
+                <option value="rent">Rent/Mortgage</option>
+                <option value="utilities">Utilities</option>
+                <option value="business">Business Expenses</option>
+                <option value="food">Food</option>
+                <option value="transportation">Transportation</option>
+                <option value="insurance">Insurance</option>
+                <option value="marketing">Marketing</option>
+                <option value="office">Office Supplies</option>
+                <option value="software">Software & Subscriptions</option>
+                <option value="travel">Travel</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label for="expense-date">Date</label>
+                <input type="date" id="expense-date" [value]="getCurrentDate()">
+              </div>
+              
+              <div class="form-group">
+                <label for="expense-tax-deductible">Tax Deductible</label>
+                <select id="expense-tax-deductible">
+                  <option value="yes">Yes</option>
+                  <option value="no">No</option>
+                  <option value="partial">Partially</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="expense-notes">Notes</label>
+              <textarea id="expense-notes" placeholder="Add any additional details..."></textarea>
+            </div>
+          </div>
+          
+          <div class="modal-footer">
+            <button class="btn-cancel" (click)="hideAddExpenseModal()">Cancel</button>
+            <button class="btn-submit expense-submit">Add Expense</button>
           </div>
         </div>
       </div>
@@ -829,20 +963,6 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       justify-content: space-between;
     }
 
-    /* Dark Mode for Budget Progress */
-    .dark .budget-info h4 {
-      color: #f9fafb;
-    }
-
-    .dark .budget-amounts,
-    .dark .progress-stats {
-      color: #9ca3af;
-    }
-
-    .dark .budget-progress .progress-bar {
-      background-color: #374151;
-    }
-
     /* Expense Breakdown */
     .expense-breakdown {
       display: flex;
@@ -876,6 +996,113 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
     }
 
     .breakdown-percentage {
+      font-weight: 600;
+      font-size: 0.875rem;
+      color: #111827;
+    }
+
+    /* Expense Pie Chart Styles */
+    .expense-pie-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+      padding: 1rem 0;
+    }
+
+    .pie-chart-container {
+      width: 220px;
+      height: 220px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+
+    .pie-chart {
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    .pie-chart-bg {
+      fill: #f3f4f6;
+    }
+
+    .pie-segment {
+      transition: transform 0.2s ease;
+      transform-origin: 50px 50px;
+    }
+
+    .pie-segment:hover {
+      transform: translateX(3px) translateY(3px);
+    }
+
+    .segment-rent {
+      fill: #3b82f6;
+    }
+
+    .segment-business {
+      fill: #10b981;
+    }
+
+    .segment-utilities {
+      fill: #f59e0b;
+    }
+
+    .segment-food {
+      fill: #ef4444;
+    }
+
+    .segment-other {
+      fill: #8b5cf6;
+    }
+
+    .pie-chart-center {
+      fill: white;
+    }
+
+    .pie-total {
+      font-size: 14px;
+      font-weight: bold;
+      fill: #111827;
+    }
+
+    .pie-total-label {
+      font-size: 10px;
+      fill: #6b7280;
+    }
+
+    .expense-legend {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      gap: 0.75rem;
+    }
+
+    .expense-legend .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .expense-legend .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+
+    .expense-legend .legend-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex: 1;
+    }
+
+    .expense-legend .legend-label {
+      font-size: 0.875rem;
+      color: #374151;
+    }
+
+    .expense-legend .legend-percentage {
       font-weight: 600;
       font-size: 0.875rem;
       color: #111827;
@@ -931,6 +1158,12 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       gap: 0.5rem;
       font-size: 0.875rem;
       color: #6b7280;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
     }
 
     .legend-color.income {
@@ -1039,11 +1272,15 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       padding: 1.5rem;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
-
-    .quick-actions h2 {
-      font-size: 1.25rem;
-      margin-bottom: 1rem;
-      color: #111827;
+    
+    /* Top Actions Specific Styles */
+    .top-actions {
+      margin-bottom: 2rem;
+      padding: 1rem 1.5rem;
+    }
+    
+    .top-actions .action-buttons {
+      justify-content: center;
     }
 
     .action-buttons {
@@ -1094,32 +1331,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       background-color: #dc2626 !important;
       border-color: #b91c1c !important;
     }
-
-    /* Theme Toggle Button */
-    .theme-toggle {
-      position: fixed;
-      top: 1rem;
-      right: 1rem;
-      width: 2.5rem;
-      height: 2.5rem;
-      border-radius: 9999px;
-      background-color: white;
-      color: #1f2937;
-      border: 1px solid #e5e7eb;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      z-index: 10;
-      transition: all 0.2s ease;
-    }
     
-    .theme-toggle:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
     /* Dark Mode Styles */
     .dark .profile-container {
       background-color: #111827;
@@ -1178,7 +1390,7 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       color: #e5e7eb;
     }
 
-    .dark .progress-bar {
+    .dark .budget-progress .progress-bar {
       background-color: #374151;
     }
 
@@ -1250,20 +1462,12 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       fill: #9ca3af;
     }
 
-    .dark .legend-label {
+    .dark .expense-legend .legend-label {
       color: #e5e7eb;
     }
 
-    .dark .legend-value {
-      color: #9ca3af;
-    }
-
-    .dark .legend-percentage {
+    .dark .expense-legend .legend-percentage {
       color: #f9fafb;
-    }
-
-    .dark .transaction-item:hover {
-      background-color: #252f3f;
     }
 
     .dark .legend-item,
@@ -1273,6 +1477,235 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 
     .dark .bar-value {
       color: #d1d5db;
+    }
+
+    .dark .transaction-item:hover {
+      background-color: #252f3f;
+    }
+
+    /* Modal Styles - Updated for more compact size */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+    }
+    
+    .modal-container {
+      background-color: white;
+      border-radius: 0.75rem;
+      width: 90%;
+      max-width: 450px; /* Reduced from 500px */
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+      animation: modalFadeIn 0.3s ease-out;
+    }
+    
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .modal-header {
+      padding: 1.25rem 1.5rem; /* Reduced vertical padding */
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .modal-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+      margin: 0 0 0.25rem 0; /* Reduced bottom margin */
+    }
+    
+    .modal-subtitle {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin: 0;
+    }
+    
+    .modal-body {
+      padding: 1.25rem 1.5rem; /* Reduced vertical padding */
+      max-height: 65vh; /* Maximum height to prevent overflow on small screens */
+      overflow-y: auto; /* Add scrolling if needed */
+    }
+    
+    .form-group {
+      margin-bottom: 1rem; /* Reduced from 1.25rem */
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 1rem;
+    }
+    
+    .form-group label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 0.375rem; /* Reduced from 0.5rem */
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.625rem 0.75rem; /* Reduced padding */
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      color: #111827;
+      background-color: white;
+      transition: border-color 0.2s ease;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .amount-input {
+      position: relative;
+    }
+    
+    .currency-symbol {
+      position: absolute;
+      left: 0.75rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .amount-input input {
+      padding-left: 1.75rem;
+    }
+    
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px; /* Reduced from 100px */
+      max-height: 150px;
+    }
+    
+    .modal-footer {
+      padding: 1rem 1.5rem; /* Reduced padding */
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem; /* Reduced gap */
+      border-top: 1px solid #e5e7eb;
+    }
+    
+    .btn-cancel {
+      padding: 0.5rem 1rem; /* More compact button */
+      background-color: white;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-cancel:hover {
+      background-color: #f3f4f6;
+    }
+    
+    .btn-submit {
+      padding: 0.5rem 1rem; /* More compact button */
+      background-color: #10b981;
+      border: 1px solid #059669;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .btn-submit:hover {
+      background-color: #059669;
+    }
+    
+    /* Modal Submit Button Variations */
+    .btn-submit.expense-submit {
+      background-color: #ef4444;
+      border-color: #dc2626;
+    }
+    
+    .btn-submit.expense-submit:hover {
+      background-color: #dc2626;
+    }
+    
+    /* Dark Mode for Modal */
+    .dark .modal-container {
+      background-color: #1f2937;
+      border-color: #374151;
+    }
+    
+    .dark .modal-header {
+      border-bottom-color: #374151;
+    }
+    
+    .dark .modal-header h2 {
+      color: #f9fafb;
+    }
+    
+    .dark .modal-subtitle {
+      color: #9ca3af;
+    }
+    
+    .dark .form-group label {
+      color: #e5e7eb;
+    }
+    
+    .dark .form-group input,
+    .dark .form-group select,
+    .dark .form-group textarea {
+      background-color: #374151;
+      border-color: #4b5563;
+      color: #f9fafb;
+    }
+    
+    .dark .form-group input::placeholder,
+    .dark .form-group textarea::placeholder {
+      color: #9ca3af;
+    }
+    
+    .dark .form-group input:focus,
+    .dark .form-group select:focus,
+    .dark .form-group textarea:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+    
+    .dark .currency-symbol {
+      color: #9ca3af;
+    }
+    
+    .dark .modal-footer {
+      border-top-color: #374151;
+    }
+    
+    .dark .btn-cancel {
+      background-color: #374151;
+      border-color: #4b5563;
+      color: #e5e7eb;
+    }
+    
+    .dark .btn-cancel:hover {
+      background-color: #4b5563;
     }
 
     /* Responsive Design */
@@ -1308,6 +1741,16 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
     }
 
     @media (max-width: 768px) {
+      .top-actions .action-buttons {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      
+      .top-actions .action-btn {
+        width: auto;
+      }
+      
       .action-buttons {
         flex-direction: column;
       }
@@ -1327,6 +1770,14 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
     }
 
     @media (max-width: 640px) {
+      .top-actions .action-buttons {
+        flex-direction: column;
+      }
+      
+      .top-actions .action-btn {
+        width: 100%;
+      }
+      
       .metrics-row {
         grid-template-columns: 1fr;
       }
@@ -1384,9 +1835,11 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
   `]
 })
 export class UserProfileComponent implements OnInit {
-  isDarkMode = document.documentElement.classList.contains('dark');
+  isDarkMode: boolean = false;
   currentRoute: string = 'user-profile';
   pageTitle: string = 'Dashboard';
+  isAddIncomeModalVisible: boolean = false;
+  isAddExpenseModalVisible: boolean = false;
 
   constructor(private router: Router, private route: ActivatedRoute) {}
 
@@ -1417,5 +1870,49 @@ export class UserProfileComponent implements OnInit {
     
     // Save preference to localStorage
     localStorage.setItem('darkMode', this.isDarkMode.toString());
+  }
+  
+  showAddIncomeModal() {
+    this.isAddIncomeModalVisible = true;
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+  }
+  
+  hideAddIncomeModal(event?: Event) {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('modal-overlay')) {
+        this.isAddIncomeModalVisible = false;
+        document.body.style.overflow = ''; // Restore scrolling
+      }
+    } else {
+      this.isAddIncomeModalVisible = false;
+      document.body.style.overflow = ''; // Restore scrolling
+    }
+  }
+  
+  showAddExpenseModal() {
+    this.isAddExpenseModalVisible = true;
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+  }
+  
+  hideAddExpenseModal(event?: Event) {
+    if (event) {
+      const target = event.target as HTMLElement;
+      if (target.classList.contains('modal-overlay')) {
+        this.isAddExpenseModalVisible = false;
+        document.body.style.overflow = ''; // Restore scrolling
+      }
+    } else {
+      this.isAddExpenseModalVisible = false;
+      document.body.style.overflow = ''; // Restore scrolling
+    }
+  }
+  
+  getCurrentDate(): string {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 }
