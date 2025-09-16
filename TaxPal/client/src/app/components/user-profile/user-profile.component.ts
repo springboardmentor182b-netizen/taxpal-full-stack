@@ -201,74 +201,61 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 
         <!-- Dashboard Grid - Budget and Expense Breakdown -->
         <div class="dashboard-grid">
-          <!-- Budget Progress with Pie Chart -->
+          <!-- Budget Progress with Progress Bars -->
           <div class="dashboard-section">
             <div class="section-header">
               <h3>Budget Progress</h3>
             </div>
-            <div class="budget-pie-container">
-              <div class="pie-chart-container">
-                <svg class="pie-chart" viewBox="-10 -10 120 120">
-                  <!-- Pie Chart Segments -->
-                  <circle class="pie-chart-bg" cx="50" cy="50" r="45" />
-                  
-                  <!-- Office Expenses: 60% - 216 degrees -->
-                  <path class="pie-segment segment-1" d="M50,50 L50,5 A45,45 0 0,1 93.3,71.9 z" />
-                  
-                  <!-- Software & Tools: 18.75% - 67.5 degrees -->
-                  <path class="pie-segment segment-2" d="M50,50 L93.3,71.9 A45,45 0 0,1 69.6,93.1 z" />
-                  
-                  <!-- Marketing: 14.1% - 50.76 degrees -->
-                  <path class="pie-segment segment-3" d="M50,50 L69.6,93.1 A45,45 0 0,1 31.7,93.9 z" />
-                  
-                  <!-- Travel: 7.15% - 25.74 degrees -->
-                  <path class="pie-segment segment-4" d="M50,50 L31.7,93.9 A45,45 0 0,1 50,5 z" />
-                  
-                  <circle class="pie-chart-center" cx="50" cy="50" r="30" />
-                  <text class="pie-total" x="50" y="45" text-anchor="middle">$2,750</text>
-                  <text class="pie-total-label" x="50" y="60" text-anchor="middle">Total Spent</text>
-                </svg>
+            <div class="budget-list">
+              <div class="budget-item">
+                <div class="budget-info">
+                  <h4>Office Expenses</h4>
+                  <span class="budget-amounts">$1,200 / $2,000</span>
+                </div>
+                <div class="budget-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 60%; background-color: #3b82f6;"></div>
+                  </div>
+                  <span class="progress-stats">60.0% used • $800 remaining</span>
+                </div>
               </div>
-              <div class="budget-legend">
-                <div class="budget-legend-item">
-                  <div class="legend-color" style="background-color: #3b82f6;"></div>
-                  <div class="legend-info">
-                    <span class="legend-label">Office Expenses</span>
-                    <div class="legend-details">
-                      <span class="legend-value">$1,200</span>
-                      <span class="legend-percentage">60%</span>
-                    </div>
-                  </div>
+              
+              <div class="budget-item">
+                <div class="budget-info">
+                  <h4>Software & Tools</h4>
+                  <span class="budget-amounts">$450 / $800</span>
                 </div>
-                <div class="budget-legend-item">
-                  <div class="legend-color" style="background-color: #10b981;"></div>
-                  <div class="legend-info">
-                    <span class="legend-label">Software & Tools</span>
-                    <div class="legend-details">
-                      <span class="legend-value">$450</span>
-                      <span class="legend-percentage">18.8%</span>
-                    </div>
+                <div class="budget-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 56.3%; background-color: #10b981;"></div>
                   </div>
+                  <span class="progress-stats">56.3% used • $350 remaining</span>
                 </div>
-                <div class="budget-legend-item">
-                  <div class="legend-color" style="background-color: #f59e0b;"></div>
-                  <div class="legend-info">
-                    <span class="legend-label">Marketing</span>
-                    <div class="legend-details">
-                      <span class="legend-value">$800</span>
-                      <span class="legend-percentage">14.1%</span>
-                    </div>
-                  </div>
+              </div>
+              
+              <div class="budget-item">
+                <div class="budget-info">
+                  <h4>Marketing</h4>
+                  <span class="budget-amounts">$800 / $1,500</span>
                 </div>
-                <div class="budget-legend-item">
-                  <div class="legend-color" style="background-color: #ef4444;"></div>
-                  <div class="legend-info">
-                    <span class="legend-label">Travel</span>
-                    <div class="legend-details">
-                      <span class="legend-value">$300</span>
-                      <span class="legend-percentage">7.1%</span>
-                    </div>
+                <div class="budget-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 53.3%; background-color: #f59e0b;"></div>
                   </div>
+                  <span class="progress-stats">53.3% used • $700 remaining</span>
+                </div>
+              </div>
+              
+              <div class="budget-item">
+                <div class="budget-info">
+                  <h4>Travel</h4>
+                  <span class="budget-amounts">$300 / $1,000</span>
+                </div>
+                <div class="budget-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width: 30%; background-color: #ef4444;"></div>
+                  </div>
+                  <span class="progress-stats">30.0% used • $700 remaining</span>
                 </div>
               </div>
             </div>
@@ -789,115 +776,71 @@ import { RouterLink, Router, ActivatedRoute } from '@angular/router';
       margin-bottom: 2rem;
     }
 
-    /* Budget Pie Chart Styles */
-    .budget-pie-container {
+    /* Budget Progress Bar Styles */
+    .budget-list {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-      padding: 1rem 0;
+      gap: 1.25rem;
+      padding: 0.5rem 0;
     }
 
-    .pie-chart-container {
-      width: 220px;
-      height: 220px;
-      margin: 0 auto;
-      overflow: visible;
-    }
-
-    .pie-chart {
-      width: 100%;
-      height: 100%;
-      overflow: visible;
-    }
-
-    .pie-chart-bg {
-      fill: #f3f4f6;
-    }
-
-    .pie-segment {
-      transition: transform 0.2s ease;
-      transform-origin: 50px 50px;
-    }
-
-    .pie-segment:hover {
-      transform: translateX(3px) translateY(3px);
-    }
-
-    .segment-1 {
-      fill: #3b82f6;
-    }
-
-    .segment-2 {
-      fill: #10b981;
-    }
-
-    .segment-3 {
-      fill: #f59e0b;
-    }
-
-    .segment-4 {
-      fill: #ef4444;
-    }
-
-    .pie-chart-center {
-      fill: white;
-    }
-
-    .pie-total {
-      font-size: 14px;
-      font-weight: bold;
-      fill: #111827;
-    }
-
-    .pie-total-label {
-      font-size: 10px;
-      fill: #6b7280;
-    }
-
-    .budget-legend {
+    .budget-item {
       display: flex;
       flex-direction: column;
-      width: 100%;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
 
-    .budget-legend-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-    }
-
-    .legend-color {
-      width: 12px;
-      height: 12px;
-      border-radius: 3px;
-    }
-
-    .legend-info {
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .legend-label {
-      font-size: 0.875rem;
-      color: #374151;
-    }
-
-    .legend-details {
+    .budget-info {
       display: flex;
       justify-content: space-between;
-      font-size: 0.75rem;
+      align-items: center;
     }
 
-    .legend-value {
-      color: #6b7280;
-    }
-
-    .legend-percentage {
-      font-weight: 600;
+    .budget-info h4 {
+      font-size: 0.875rem;
+      font-weight: 500;
       color: #111827;
+      margin: 0;
+    }
+
+    .budget-amounts {
+      font-size: 0.75rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+
+    .budget-progress .progress-bar {
+      height: 8px;
+      background-color: #e5e7eb;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.35rem;
+    }
+
+    .budget-progress .progress-fill {
+      height: 100%;
+      transition: width 0.5s ease;
+    }
+
+    .progress-stats {
+      font-size: 0.75rem;
+      color: #6b7280;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* Dark Mode for Budget Progress */
+    .dark .budget-info h4 {
+      color: #f9fafb;
+    }
+
+    .dark .budget-amounts,
+    .dark .progress-stats {
+      color: #9ca3af;
+    }
+
+    .dark .budget-progress .progress-bar {
+      background-color: #374151;
     }
 
     /* Expense Breakdown */
