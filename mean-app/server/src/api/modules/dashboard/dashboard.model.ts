@@ -71,31 +71,5 @@ const ReportSchema = new Schema<IReport>(
   { timestamps: true }
 );
 
-//
-// User Interface & Schema
-//
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  dashboards: mongoose.Types.ObjectId[];
-  createdAt?: Date;
-  updatedAt?: Date;
-}
-
-const UserSchema = new Schema<IUser>(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    dashboards: [{ type: Schema.Types.ObjectId, ref: "Dashboard" }]
-  },
-  { timestamps: true }
-);
-
-//
-// Export Models
-//
-export const UserModel = mongoose.model<IUser>("User", UserSchema);
 export const DashboardModel = mongoose.model<IDashboard>("Dashboard", DashboardSchema);
 export const ReportModel = mongoose.model<IReport>("Report", ReportSchema);
