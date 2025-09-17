@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { DashboardComponent } from './dashboard.component';
 
 @NgModule({
-  declarations: [DashboardComponent],
-  imports: [CommonModule],
+  imports: [CommonModule, DashboardComponent], // Import the standalone component here
   exports: [DashboardComponent]
 })
 export class DashboardModule {}
