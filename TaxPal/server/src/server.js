@@ -1,0 +1,41 @@
+const express = require("express");
+const dotenv = require("dotenv");
+
+// Always use absolute path for .env!
+dotenv.config({ path: __dirname + "/.env" });
+console.log("MONGO_URI:", process.env.MONGO_URI); // For debugging
+
+const cors = require("cors");
+const connectDB = require("./config/db");
+const app = express();
+
+// Quick request logger for debugging
+app.use((req, res, next) => {
+  console.log(new Date().toISOString(), req.method, req.originalUrl);
+  next();
+});
+
+// Middleware
+app.use(express.json()); // Parse JSON requests
+app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+
+// Connect to MongoDB
+connectDB();
+
+// Routes
+const authRoutes = require("./routes/auth");
+const transactionRoutes = require("./routes/transactions");
+
+app.use("/api/auth", authRoutes);
+app.use("/api/transactions", transactionRoutes);
+
+// Test route
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
+});
