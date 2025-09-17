@@ -47,7 +47,7 @@ export const forgotPassword = async (email: string) => {
   const user = await User.findOne({ email });
   if (!user) throw new Error("Email not found");
 
-  return { message: "Password reset link sent to email" };
+  return { message: "enter your email id" };
 };
 
 // REQUEST RESET (send email to user)

@@ -1,316 +1,43 @@
-# Initial API List - Milestone 1
+# 📑 API List
 
-**Project:** TaxPal
-**Date:** September 12, 2025  
----
+This document lists all available API endpoints for your backend.
 
-## 📋 Overview
-This document outlines the initial API endpoints required for Milestone 1 of the TaxPal financial management application.
+## 👤 User Routes
 
----
+**Base URL:** `/api/user`
 
-## 👤 Authentication APIs
+| Method | Endpoint | Auth Required | Description | Request Body Example |
+|--------|----------|---------------|-------------|---------------------|
+| POST | `/register` | ❌ | Register a new user | ```json<br>{ <br>  "fullName": "John Doe", <br>  "email": "john@example.com", <br>  "username": "john123", <br>  "password": "mypassword", <br>  "confirmPassword": "mypassword", <br>  "country": "India" <br>}<br>``` |
+| POST | `/login` | ❌ | Login existing user | ```json<br>{ <br>  "email": "john@example.com", <br>  "password": "mypassword" <br>}<br>``` |
+| POST | `/forgot-password` | ❌ | Request password reset link | ```json<br>{ <br>  "email": "john@example.com" <br>}<br>``` |
+| POST | `/request-reset` | ❌ | Send password reset email | ```json<br>{ <br>  "email": "john@example.com" <br>}<br>``` |
+| POST | `/reset-password/:token` | ❌ | Reset password using token | ```json<br>{ <br>  "newPassword": "NewPassword123", <br>  "confirmPassword": "NewPassword123" <br>}<br>``` |
 
-### POST /api/auth/register
-- **Description:** Create new TaxPal account
-- **Authentication Required:** No
-- **Request Body:**
-```json
-{
-  "fullName": "string",
-  "email": "string", 
-  "username": "string",
-  "password": "string",
-  "confirmPassword": "string",
-  "country": "string"
-}
-```
-- **Success Response (201):**
-```json
-{
-  "message": "Account created successfully",
-  "user": {
-    "id": "string",
-    "fullName": "string",
-    "email": "string",
-    "username": "string"
-  },
-  "token": "jwt_token_string"
-}
-```
-- **Error Response (400):**
-```json
-{
-  "error": "Email already exists"
-}
-```
+## 📊 Dashboard Routes
 
-### POST /api/auth/login
-- **Description:** Sign in to TaxPal account
-- **Authentication Required:** No
-- **Request Body:**
-```json
-{
-  "username": "string",
-  "password": "string"
-}
-```
-- **Success Response (200):**
-```json
-{
-  "message": "Login successful",
-  "token": "jwt_token_string",
-  "user": {
-    "id": "string",
-    "fullName": "string",
-    "email": "string",
-    "username": "string"
-  }
-}
-```
-- **Error Response (401):**
-```json
-{
-  "error": "Invalid username or password"
-}
-```
+**Base URL:** `/api/v1/dashboard`
 
-### POST /api/auth/forgot-password
-- **Description:** Request password reset
-- **Authentication Required:** No
-- **Request Body:**
-```json
-{
-  "email": "string"
-}
-```
-- **Success Response (200):**
-```json
-{
-  "message": "Password reset email sent"
-}
-```
+| Method | Endpoint | Auth Required | Description | Request Body Example |
+|--------|----------|---------------|-------------|---------------------|
+| GET | `/:id` | ✅ (Bearer Token) | Get dashboard details by user ID | No body required |
+| POST | `/` | ✅ (Bearer Token) | Create a new dashboard entry | ```json<br>{ <br>  "monthlyIncome": 5000, <br>  "monthlyExpenses": 2000, <br>  "estimatedTaxDue": 300, <br>  "savingsRate": 60 <br>}<br>``` |
+
+## 💰 Income Routes
+
+**Base URL:** `/api/income`
+
+| Method | Endpoint | Auth Required | Description | Request Body Example |
+|--------|----------|---------------|-------------|---------------------|
+| POST | `/` | ✅ (Bearer Token) | Create new income entry | ```json<br>{ <br>  "description": "Freelance project", <br>  "amount": 5000, <br>  "category": "Work", <br>  "date": "2025-09-16", <br>  "notes": "Payment received" <br>}<br>``` |
+
+## 💸 Expense Routes
+
+**Base URL:** `/api/expense`
+
+| Method | Endpoint | Auth Required | Description | Request Body Example |
+|--------|----------|---------------|-------------|---------------------|
+| POST | `/` | ✅ (Bearer Token) | Create new expense entry | ```json<br>{ <br>  "description": "Groceries", <br>  "amount": 1200, <br>  "category": "Food", <br>  "date": "2025-09-16", <br>  "notes": "Bought veggies and fruits" <br>}<br>``` |
 
 ---
 
-## 📊 Dashboard APIs
-
-### GET /api/dashboard/summary
-- **Description:** Get complete dashboard data for TaxPal
-- **Authentication Required:** Yes
-- **Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-- **Success Response (200):**
-```json
-{
-  "monthlyIncome": 420.00,
-  "monthlyExpenses": 0.00,
-  "estimatedTaxDue": 0.00,
-  "savingsRate": 100.0,
-  "incomeGrowth": 17,
-  "expenseGrowth": 0,
-  "taxStatus": "No amount due",
-  "savingsGoalProgress": 111,
-  "chartData": {
-    "incomeVsExpenses": [
-      {
-        "month": "Jan",
-        "income": 5000,
-        "expenses": 3000
-      },
-      {
-        "month": "Feb", 
-        "income": 4500,
-        "expenses": 3200
-      }
-    ]
-  },
-  "expenseBreakdown": {
-    "rentMortgage": 32,
-    "businessExpenses": 28,
-    "utilities": 17,
-    "food": 12,
-    "other": 11
-  },
-  "recentTransactions": [
-    {
-      "id": "string",
-      "date": "May 9, 2025",
-      "description": "Design Project",
-      "category": "Consulting",
-      "amount": 129.00,
-      "type": "income"
-    }
-  ]
-}
-```
-
----
-
-## 💰 Income Management APIs
-
-### POST /api/transactions/income
-- **Description:** Add new income record
-- **Authentication Required:** Yes
-- **Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-- **Request Body:**
-```json
-{
-  "description": "string",
-  "amount": 0.00,
-  "category": "string",
-  "date": "YYYY-MM-DD",
-  "notes": "string (optional)"
-}
-```
-- **Success Response (201):**
-```json
-{
-  "message": "Income recorded successfully",
-  "income": {
-    "id": "string",
-    "description": "Design Project",
-    "amount": 5000,
-    "category": "Consulting",
-    "date": "2025-09-12",
-    "notes": "Web design project for client",
-    "userId": "string",
-    "createdAt": "2025-09-12T10:30:00Z"
-  }
-}
-```
-
-### GET /api/transactions/income
-- **Description:** Get all income entries for authenticated user
-- **Authentication Required:** Yes
-- **Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-- **Query Parameters:**
-```
-?limit=10&offset=0&month=2025-09
-```
-- **Success Response (200):**
-```json
-{
-  "incomes": [
-    {
-      "id": "string",
-      "description": "Design Project",
-      "amount": 5000,
-      "category": "Consulting",
-      "date": "2025-09-12",
-      "notes": "Web design project for client"
-    }
-  ],
-  "total": 1,
-  "totalAmount": 5000
-}
-```
-
----
-
-## 💸 Expenses Management APIs
-
-### POST /api/transactions/expense
-- **Description:** Add new expense record
-- **Authentication Required:** Yes
-- **Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-- **Request Body:**
-```json
-{
-  "description": "string",
-  "amount": 0.00,
-  "category": "string", 
-  "date": "YYYY-MM-DD",
-  "notes": "string (optional)"
-}
-```
-- **Success Response (201):**
-```json
-{
-  "message": "Expense recorded successfully",
-  "expense": {
-    "id": "string",
-    "description": "Office supplies",
-    "amount": 1200,
-    "category": "Business Expenses",
-    "date": "2025-09-12",
-    "notes": "Monthly office supplies purchase",
-    "userId": "string",
-    "createdAt": "2025-09-12T10:30:00Z"
-  }
-}
-```
-
-### GET /api/transactions/expense
-- **Description:** Get all expense entries for authenticated user
-- **Authentication Required:** Yes
-- **Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-- **Query Parameters:**
-```
-?limit=10&offset=0&month=2025-09
-```
-- **Success Response (200):**
-```json
-{
-  "expenses": [
-    {
-      "id": "string",
-      "description": "Office supplies",
-      "amount": 1200,
-      "category": "Business Expenses",
-      "date": "2025-09-12",
-      "notes": "Monthly office supplies purchase"
-    }
-  ],
-  "total": 1,
-  "totalAmount": 1200
-}
-```
-
----
-
-## 📂 Categories APIs
-
-### GET /api/categories
-- **Description:** Get predefined categories for income and expenses
-- **Authentication Required:** Yes
-- **Headers:**
-```
-Authorization: Bearer <jwt_token>
-```
-- **Success Response (200):**
-```json
-{
-  "incomeCategories": [
-    "Salary",
-    "Freelance", 
-    "Consulting",
-    "Business Revenue",
-    "Investments",
-    "Other"
-  ],
-  "expenseCategories": [
-    "Rent Mortgage",
-    "Business Expenses", 
-    "Utilities",
-    "Food",
-    "Transportation",
-    "Healthcare",
-    "Entertainment",
-    "Other"
-  ]
-}
