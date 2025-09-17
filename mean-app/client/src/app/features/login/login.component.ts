@@ -52,8 +52,8 @@ export class LoginComponent implements OnInit, OnDestroy {
           next: (user) => {
             console.log('Login successful:', user);
             alert('Login successful! Welcome ' + user.fullName);
-            // In a real app, navigate to dashboard or home page
-            // this.router.navigate(['/dashboard']);
+            
+          
           },
           error: (error) => {
             this.errorMessage = error.message || 'Login failed. Please try again.';

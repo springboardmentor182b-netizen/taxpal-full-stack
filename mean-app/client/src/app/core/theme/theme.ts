@@ -1,4 +1,4 @@
-// src/app/core/theme/theme.ts
+
 
 export interface Palette {
   50: string;

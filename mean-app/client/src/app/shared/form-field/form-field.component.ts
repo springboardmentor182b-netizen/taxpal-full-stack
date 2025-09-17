@@ -1,4 +1,4 @@
-// src/app/shared/form-field/form-field.component.ts
+
 import { Component, Input, forwardRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
@@ -69,7 +69,7 @@ export class FormFieldComponent implements ControlValueAccessor {
   }
 
   onFocus(): void {
-    // Handle focus if needed
+    
   }
 
   togglePasswordVisibility(): void {

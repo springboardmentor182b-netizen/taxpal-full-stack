@@ -1,4 +1,4 @@
-// src/app/app.component.ts
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
@@ -14,9 +14,9 @@ import { ThemeService } from './core/service/theme.service';
 export class AppComponent implements OnInit {
   title = 'TaxPal Auth';
 
-  constructor(private themeService: ThemeService) {}
+   constructor(private themeService: ThemeService) {}
 
   ngOnInit(): void {
-    // Theme service will automatically apply theme on initialization
+  
   }
 }

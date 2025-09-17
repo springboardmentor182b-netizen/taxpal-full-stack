@@ -1,4 +1,4 @@
-// src/app/auth/auth.service.ts
+
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
@@ -33,7 +33,7 @@ export class AuthService {
   public isLoading$ = this.isLoadingSubject.asObservable();
 
   constructor() {
-    // Check for existing user in localStorage
+    
     const savedUser = localStorage.getItem('currentUser');
     if (savedUser) {
       this.currentUserSubject.next(JSON.parse(savedUser));
@@ -46,7 +46,7 @@ export class AuthService {
     return new Observable(observer => {
       // Simulate API call
       setTimeout(() => {
-        // Simple validation - in real app, this would be an HTTP request
+        
         if (credentials.username && credentials.password) {
           const user: User = {
             id: '1',
