@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Transaction = require("../models/Transaction");
+const Transaction = require("./transactionController");
 const auth =  require("../auth/authMiddleware"); // JWT auth middleware
 
 // Add new transaction (income or expense)
@@ -24,4 +24,5 @@ router.post("/", auth, async (req, res) => {
 });
 
 module.exports = router;
+
 
