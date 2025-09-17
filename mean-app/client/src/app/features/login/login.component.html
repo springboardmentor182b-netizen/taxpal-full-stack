@@ -27,11 +27,11 @@
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
           <!-- Username Field -->
           <div class="form-field">
-            <label class="form-field__label" for="username">Username</label>
+            <label class="form-field__label" for="username">Email</label>
             <input
               id="username"
               type="text"
-              class="form-field__input"
+               class="form-field__input"
               [class.form-field__input--error]="getFieldError('username')"
               placeholder="pavi.com"
               formControlName="username"

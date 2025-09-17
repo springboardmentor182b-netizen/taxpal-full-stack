@@ -21,8 +21,13 @@ yarn-error.log
 *.sublime-workspace
 
 # Visual Studio Code
+<<<<<<< HEAD
 .vscode/*
 .history/*
+=======
+.vscode/
+
+>>>>>>> 1e222d6879b4876819cae21ebbe6a053238e14f2
 
 # Miscellaneous
 /.angular/cache

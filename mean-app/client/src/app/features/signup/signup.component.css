@@ -1,5 +1,3 @@
-
- 
 .auth-container {
   min-height: 100vh;
   display: flex;
@@ -167,7 +165,8 @@
   text-decoration: underline;
 }
 
-.form-field__input {
+.form-field__input,
+.form-field__select {
   width: 100%;
   padding: 0.875rem 1rem;
   border: 2px solid #e5e7eb;
@@ -180,31 +179,59 @@
   box-sizing: border-box;
 }
 
-.form-field__input:focus {
+.form-field__input:focus,
+.form-field__select:focus {
   outline: none;
   border-color: var(--primary-500);
   background-color: white;
   box-shadow: 0 0 0 3px rgba(44, 164, 157, 0.1);
 }
 
-.form-field__input--error {
+.form-field__input--error,
+.form-field__select--error {
   border-color: var(--accent-500);
   background-color: #fef2f2;
 }
 
-.form-field__input--error:focus {
+.form-field__input--error:focus,
+.form-field__select--error:focus {
   border-color: var(--accent-500);
   box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
-.form-field__input::placeholder {
+.form-field__input::placeholder,
+.form-field__select option:first-child {
   color: var(--text-secondary);
 }
 
-.form-field__input:disabled {
+.form-field__input:disabled,
+.form-field__select:disabled {
   background-color: #f3f4f6;
   color: var(--text-secondary);
   cursor: not-allowed;
+}
+
+/* Special styling for select dropdown */
+.form-field__select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 16px;
+  padding-right: 3rem;
+  cursor: pointer;
+}
+
+.form-field__select:focus {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232ca49d' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+}
+
+.form-field__select option {
+  background-color: white;
+  color: var(--text-primary);
+  padding: 0.5rem;
 }
 
 .form-field__error {
@@ -303,7 +330,7 @@
   .auth-card__form {
     padding: 2rem 1rem;
   }
-  
+   
   .form-title {
     font-size: 1.5rem;
   }
@@ -312,7 +339,7 @@
 @media (max-width: 480px) {
   .auth-container {
     padding: 0;
-  }
+   }
   
   .auth-card {
     border-radius: 0;

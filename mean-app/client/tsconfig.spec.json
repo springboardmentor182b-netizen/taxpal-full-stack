@@ -9,6 +9,8 @@
     ]
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/theme-for-tailwind.js",
+    "src/app/shared/theme/theme.ts"
   ]
-}
+}              
