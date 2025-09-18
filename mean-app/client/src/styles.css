@@ -1,0 +1,87 @@
+/* src/styles.css - Remove any @import lines like this: */
+/* @import 'src/custom-theme.scss'; <- DELETE THIS LINE */
+
+/* Keep only the CSS content from the global styles I provided earlier */
+
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family, 'Inter', 'Roboto', sans-serif);
+  font-size: var(--font-size, 14px);
+  line-height: 1.5;
+  color: var(--text-primary, #000000);
+  background-color: var(--background-default, #FFFFFF);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* CSS Custom Properties - Default fallback values */
+:root {
+  /* Primary Colors */
+  --primary-50: #E6F7F6;
+  --primary-100: #B3E6E2;
+  --primary-200: #80D6CE;
+  --primary-300: #4DC6BA;
+  --primary-400: #2FB6A8;
+  --primary-500: #2CA49D;
+  --primary-600: #239088;
+  --primary-700: #1C7B74;
+  --primary-800: #166660;
+  --primary-900: #0E4A44;
+
+  /* Accent Colors */
+  --accent-50: #FEEFEF;
+  --accent-100: #FDCBCB;
+  --accent-200: #FA9B9B;
+  --accent-300: #F86B6B;
+  --accent-400: #F54747;
+  --accent-500: #EF4444;
+  --accent-600: #D63E3E;
+  --accent-700: #B83434;
+  --accent-800: #992B2B;
+  --accent-900: #6B1F1F;
+
+  /* Warning Colors */
+  --warn-50: #FFF9E6;
+  --warn-100: #FEEFB3;
+  --warn-200: #FDE580;
+  --warn-300: #FDD94D;
+  --warn-400: #FCCC2F;
+  --warn-500: #F59E0B;
+  --warn-600: #DB8B0A;
+  --warn-700: #B97308;
+  --warn-800: #975C07;
+  --warn-900: #643E05;
+
+  /* Background Colors */
+  --background-default: #FFFFFF;
+  --background-paper: #F3F4F6;
+
+  /* Text Colors */
+  --text-primary: #000000;
+  --text-secondary: #6B7280;
+
+  /* Typography */
+  --font-family: 'Inter', 'Roboto', sans-serif;
+  --font-size: 14px;
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* Shape */
+  --border-radius: 12px;
+
+  /* Shadows */
+  --shadow-none: none;
+  --shadow-sm: 0px 2px 6px rgba(0,0,0,0.15);
+  --shadow-md: 0px 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Rest of the CSS styles... */
