@@ -8,11 +8,11 @@ import { IncomeModalComponent } from '../auth/components/income/income';
 import { ExpenseModalComponent } from '../auth/components/expense/expense';
 
 // SERVICE
-import { TransactionService } from '../auth/services/transaction.service';
+import { TransactionService } from '../../core/services/transaction.service';
 
 // TYPES (interfaces)
-import type { Income } from '../auth/models/income.model';
-import type { Expense } from '../auth/models/expense.model';
+import type { Income } from '../../core/models/income.model';
+import type { Expense } from '../../core/models/expense.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -50,6 +50,7 @@ export class DashboardComponent implements OnInit {
     return 'Good evening';
   }
 
+  // Income save handler
   onIncomeSave(formData: any) {
     const payload: Income = {
       description: formData.description,
@@ -60,10 +61,11 @@ export class DashboardComponent implements OnInit {
     };
     this.tx.createIncome(payload).subscribe({
       next: () => this.incomeOpen.set(false),
-      error: () => { /* show toast */ }
+      error: () => { /* TODO: show error toast */ }
     });
   }
 
+  // Expense save handler
   onExpenseSave(formData: any) {
     const payload: Expense = {
       description: formData.description,
@@ -74,7 +76,7 @@ export class DashboardComponent implements OnInit {
     };
     this.tx.createExpense(payload).subscribe({
       next: () => this.expenseOpen.set(false),
-      error: () => { /* show toast */ }
+      error: () => { /* TODO: show error toast */ }
     });
   }
 }
