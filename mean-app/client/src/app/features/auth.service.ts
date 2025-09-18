@@ -264,18 +264,30 @@ export class AuthService {
   /**
    * Check if token is expired
    */
-  private isTokenExpired(): boolean {
-    const token = this.getToken();
-    if (!token) return true;
-    
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 < Date.now();
-    } catch (error) {
-      console.error('Error parsing token:', error);
-      return true;
-    }
+ private isTokenExpired(): boolean {
+  const token = this.getToken();
+  if (!token) return true;
+
+  // Remove accidental whitespace
+  const cleanToken = token.trim();
+
+  // Check if token looks like a JWT
+  const parts = cleanToken.split('.');
+  if (parts.length !== 3) {
+    console.warn('Token is not a valid JWT:', token);
+    return true;
   }
+
+  try {
+    const payload = JSON.parse(atob(parts[1]));
+    if (!payload.exp) return true; // no expiration field
+    return payload.exp * 1000 < Date.now();
+  } catch (error) {
+    console.error('Error parsing token:', error);
+    return true;
+  }
+}
+
 
   /**
    * Update user profile
