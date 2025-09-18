@@ -83,7 +83,7 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<User> {
     this.isLoadingSubject.next(true);
     
-    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, credentials)
+    return this.http.post<LoginResponse>(`${this.API_URL}/user/login`, credentials)
       .pipe(
         retry({
           count: 2,
@@ -121,7 +121,7 @@ export class AuthService {
   signup(userData: SignupRequest): Observable<User> {
     this.isLoadingSubject.next(true);
     
-    return this.http.post<SignupResponse>(`${this.API_URL}/auth/signup`, userData)
+    return this.http.post<SignupResponse>(`${this.API_URL}/user/register`, userData)
       .pipe(
         retry({
           count: 2,
@@ -232,14 +232,12 @@ export class AuthService {
       catchError(this.handleError.bind(this))
     );
   }
-
   /**
    * Get current user
    */
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
-
   /**
    * Check if user is authenticated
    */

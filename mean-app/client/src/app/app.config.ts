@@ -16,7 +16,6 @@ export const appConfig: ApplicationConfig = {
      provideHttpClient(),
     // Traditional modules (if needed for your existing components)
     provideHttpClient(withInterceptorsFromDi()),
-    
     importProvidersFrom(
       BrowserModule,
       CommonModule,
