@@ -3,10 +3,16 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService, User } from '../../core/services/auth.service';
 
-// NEW imports:
-import { IncomeModalComponent } from '../auth/components/income/income.model';
-import { ExpenseModalComponent } from '../auth/components/expense/expense.model';
+// COMPONENTS (standalone)
+import { IncomeModalComponent } from '../auth/components/income/income';
+import { ExpenseModalComponent } from '../auth/components/expense/expense';
+
+// SERVICE
 import { TransactionService } from '../../core/services/transaction.service';
+
+// TYPES (interfaces)
+import type { Income } from '../../core/models/income.model';
+import type { Expense } from '../../core/models/expense.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -25,7 +31,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private tx: TransactionService         // inject service
+    private tx: TransactionService
   ) {}
 
   ngOnInit(): void {
@@ -44,10 +50,9 @@ export class DashboardComponent implements OnInit {
     return 'Good evening';
   }
 
-  // called when Income modal emits (save)
+  // Income save handler
   onIncomeSave(formData: any) {
-    // match your Income interface
-    const payload = {
+    const payload: Income = {
       description: formData.description,
       amount: +formData.amount,
       category: formData.category,
@@ -55,14 +60,14 @@ export class DashboardComponent implements OnInit {
       notes: formData.notes
     };
     this.tx.createIncome(payload).subscribe({
-      next: () => { this.incomeOpen.set(false); /* TODO: refresh stats, toast */ },
-      error: () => { /* TODO: toast error */ }
+      next: () => this.incomeOpen.set(false),
+      error: () => { /* TODO: show error toast */ }
     });
   }
 
-  // called when Expense modal emits (save)
+  // Expense save handler
   onExpenseSave(formData: any) {
-    const payload = {
+    const payload: Expense = {
       description: formData.description,
       amount: +formData.amount,
       category: formData.category,
@@ -70,8 +75,8 @@ export class DashboardComponent implements OnInit {
       notes: formData.notes
     };
     this.tx.createExpense(payload).subscribe({
-      next: () => { this.expenseOpen.set(false); /* TODO: refresh stats, toast */ },
-      error: () => { /* TODO: toast error */ }
+      next: () => this.expenseOpen.set(false),
+      error: () => { /* TODO: show error toast */ }
     });
   }
 }
