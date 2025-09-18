@@ -40,16 +40,13 @@ export class IncomeForm {
       notes: [''],
     });
   }
-
   closeForm() {
     this.dialogRef.close();   // ✅ actually closes dialog
   }
-
   cancelForm() {
     this.incomeForm.reset();
     this.closeForm();         // ✅ close after cancel
   }
-
   submitForm() {
     if (this.incomeForm.valid) {
       this.incomeService.addIncome(this.incomeForm.value).subscribe({

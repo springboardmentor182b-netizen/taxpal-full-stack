@@ -53,8 +53,7 @@ export class AuthService {
             fullName: 'John Doe',
             email: 'john@example.com',
             username: credentials.username
-          };
-          
+          } 
           // In a real app, don't store in localStorage for security
           // This is just for demo purposes
           localStorage.setItem('currentUser', JSON.stringify(user));

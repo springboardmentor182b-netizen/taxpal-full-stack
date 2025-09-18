@@ -20,8 +20,7 @@ export const appConfig: ApplicationConfig = {
       CommonModule,
       FormsModule,
       ReactiveFormsModule
-    ),
-    
+    ),  
     // Your custom services
     AuthService,
     ThemeService

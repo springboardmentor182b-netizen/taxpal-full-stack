@@ -10,7 +10,6 @@ export class IncomeService {
   addIncome(data: any) {
     return this.http.post(`${this.baseUrl}/income`, data);
   }
-
   getIncomes() {
     return this.http.get(`${this.baseUrl}/income`);
   }

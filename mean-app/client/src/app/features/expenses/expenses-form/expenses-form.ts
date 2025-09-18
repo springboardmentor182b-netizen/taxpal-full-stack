@@ -38,7 +38,6 @@ export class ExpensesForm {
       notes: [''],
     });
   }
-
   closeForm() {
     this.dialogRef.close();   // ✅ actually closes dialog
   }
@@ -47,7 +46,6 @@ export class ExpensesForm {
     this.expensesForm.reset();
     this.closeForm();         // ✅ close after cancel
   }
-
   submitForm() {
     if (this.expensesForm.valid) {
       this.expenseService.addExpense(this.expensesForm.value).subscribe({
@@ -62,6 +60,4 @@ export class ExpensesForm {
     }
   }
 }
-
-
 
