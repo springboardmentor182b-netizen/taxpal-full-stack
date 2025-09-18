@@ -7,13 +7,13 @@ import { CommonModule } from '@angular/common';
 import { routes } from './app.routes';
 import { AuthService } from './features/auth.service';
 import { ThemeService } from './core/service/theme.service';
-
+import { provideHttpClient } from '@angular/common/http';
 export const appConfig: ApplicationConfig = {
   providers: [
     // Modern Angular providers
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
-    
+     provideHttpClient(),
     // Traditional modules (if needed for your existing components)
     importProvidersFrom(
       BrowserModule,

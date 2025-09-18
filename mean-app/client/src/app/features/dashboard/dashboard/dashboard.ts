@@ -26,7 +26,6 @@ export class Dashboard {
       }
     });
   }
-  
   openExpenses() {
     const dialogRef = this.dialog.open(ExpensesForm, { width: '500px' });
   

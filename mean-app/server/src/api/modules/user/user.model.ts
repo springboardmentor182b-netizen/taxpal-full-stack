@@ -11,7 +11,6 @@ export interface IUser extends Document {
   resetToken?: string;
   resetTokenExpiry?: Date;
 }
-
 const userSchema = new Schema<IUser>({
   fullName: { type: String, required: true },
   email: { type: String, required: true, unique: true },

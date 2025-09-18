@@ -4,6 +4,6 @@ import { auth } from '../../middlewares/auth';  // <- named import
 
 const router = Router();
 
-router.post('/', auth, createIncome);
+router.post('/',auth, createIncome);
 
 export default router;
