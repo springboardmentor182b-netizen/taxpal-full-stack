@@ -3,10 +3,21 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService, User } from '../../core/services/auth.service';
 
+// COMPONENTS (standalone)
+import { IncomeModalComponent } from '../auth/components/income/income';
+import { ExpenseModalComponent } from '../auth/components/expense/expense';
+
+// SERVICE
+import { TransactionService } from '../auth/services/transaction.service';
+
+// TYPES (interfaces)
+import type { Income } from '../auth/models/income.model';
+import type { Expense } from '../auth/models/expense.model';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, IncomeModalComponent, ExpenseModalComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -14,7 +25,14 @@ export class DashboardComponent implements OnInit {
   user = signal<User | null>(null);
   isLoading = signal(true);
 
-  constructor(private authService: AuthService) {}
+  // modal flags (signals)
+  incomeOpen = signal(false);
+  expenseOpen = signal(false);
+
+  constructor(
+    private authService: AuthService,
+    private tx: TransactionService
+  ) {}
 
   ngOnInit(): void {
     this.user.set(this.authService.getCurrentUser());
@@ -30,5 +48,33 @@ export class DashboardComponent implements OnInit {
     if (hour < 12) return 'Good morning';
     if (hour < 18) return 'Good afternoon';
     return 'Good evening';
+  }
+
+  onIncomeSave(formData: any) {
+    const payload: Income = {
+      description: formData.description,
+      amount: +formData.amount,
+      category: formData.category,
+      date: formData.date,
+      notes: formData.notes
+    };
+    this.tx.createIncome(payload).subscribe({
+      next: () => this.incomeOpen.set(false),
+      error: () => { /* show toast */ }
+    });
+  }
+
+  onExpenseSave(formData: any) {
+    const payload: Expense = {
+      description: formData.description,
+      amount: +formData.amount,
+      category: formData.category,
+      date: formData.date,
+      notes: formData.notes
+    };
+    this.tx.createExpense(payload).subscribe({
+      next: () => this.expenseOpen.set(false),
+      error: () => { /* show toast */ }
+    });
   }
 }

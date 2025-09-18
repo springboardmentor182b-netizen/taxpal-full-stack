@@ -1,0 +1,10 @@
+import { Router } from 'express';
+import { requireAuth } from '../middleware/auth';
+import { createIncome, deleteIncome, listIncomes, updateIncome } from '../controllers/income.controller';
+const r = Router();
+r.use(requireAuth);
+r.post('/', createIncome);
+r.get('/', listIncomes);
+r.put('/:id', updateIncome);
+r.delete('/:id', deleteIncome);
+export default r;
