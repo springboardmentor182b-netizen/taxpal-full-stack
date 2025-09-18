@@ -7,7 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-
+import { IncomeService } from '../../../services/income.service';
 @Component({
   selector: 'app-income-form',
   standalone: true,
@@ -29,7 +29,8 @@ export class IncomeForm {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<IncomeForm>   // ✅ inject DialogRef
+    private dialogRef: MatDialogRef<IncomeForm>,  // ✅ inject DialogRef
+    private incomeService: IncomeService
   ) {
     this.incomeForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
@@ -51,8 +52,15 @@ export class IncomeForm {
 
   submitForm() {
     if (this.incomeForm.valid) {
-      console.log('Income data:', this.incomeForm.value);
-      this.dialogRef.close(this.incomeForm.value); // ✅ return form data to parent
+      this.incomeService.addIncome(this.incomeForm.value).subscribe({
+        next: (res) => {
+          console.log('✅ Income saved:', res);
+          this.dialogRef.close(res.income); // send saved data back
+        },
+        error: (err) => {
+          console.error('❌ Error saving income:', err);
+        }
+      });
     }
   }
 }
