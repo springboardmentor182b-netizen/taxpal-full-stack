@@ -170,8 +170,18 @@
 }
 .chart-card.big { flex: 2; min-height: 320px; }
 .chart-card.small { flex: 1; min-height: 320px; display:flex; flex-direction:column; justify-content:flex-start; }
-.chart-wrap { position: relative; flex: 1; min-height: 260px; }
-.small-pie { min-height: 220px; }
+.chart-wrap {
+  position: relative;
+  flex: 1;
+  height: 280px;  /* ✅ fixed height */
+  max-height: 320px;
+}
+
+.small-pie {
+  height: 220px;
+  max-height: 250px;
+}
+
 
 /* legend */
 .legend { list-style:none; padding:0; margin-top:12px; display:flex; flex-direction:column; gap:8px; font-size:14px; color:#111827; }
@@ -182,6 +192,24 @@
 .tx-table thead th { text-align:left; color:#6b7280; font-weight:600; padding-bottom:10px; }
 .tx-table tbody td { padding: 14px 0; border-top:1px solid #f1f3f5; color:#111827; }
 .tx-table td.negative { color:#ef4444; }
+
+.chart-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+
+  label {
+    font-weight: 600;
+  }
+
+  select {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+}
 
 /* ------------------ */
 /* Responsive behavior */
@@ -231,4 +259,13 @@
 .button-group button:last-child {
   background: #05e2a0;
   color: white;
+}
+@media (max-width: 1100px) {
+  .charts-row {
+    flex-direction: column;
+  }
+  .chart-card.big, .chart-card.small {
+    width: 100%;
+    height: 320px; /* ✅ fixed responsive height */
+  }
 }

@@ -10,7 +10,6 @@
       <rect y="12" width="18" height="2" rx="1" fill="#fff"/>
     </svg>
   </button>
-
   <!-- Sidebar -->
   <aside
     class="sidebar"
@@ -113,7 +112,7 @@
           <span class="action-label">Settings</span>
         </button>
 
-        <button class="action logout">
+        <button class="action logout" (click)="logout()">
           <span class="action-icon">
             <!-- logout svg -->
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4">
@@ -163,14 +162,23 @@
     <section class="charts-row">
       <div class="card chart-card big">
         <h3>Income vs Expenses</h3>
+        <div class="chart-filter">
+          <label for="period">View by:</label>
+          <select id="period" [(ngModel)]="selectedPeriod" (change)="onPeriodChange(selectedPeriod)">
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+            <option value="year">This Year</option>
+          </select>
+        </div>
+        
         <div class="chart-wrap">
-          <canvas
-            baseChart
+          <canvas baseChart
             [data]="barChartData"
             [options]="barChartOptions"
-            [type]="'bar'">
+            chartType="bar">
           </canvas>
         </div>
+        
       </div>
 
       <div class="card chart-card small">

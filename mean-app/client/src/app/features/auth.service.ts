@@ -18,7 +18,7 @@ export interface User {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
   rememberMe?: boolean;
 }
@@ -80,40 +80,41 @@ export class AuthService {
   /**
    * Login user with credentials
    */
-  login(credentials: LoginRequest): Observable<User> {
-    this.isLoadingSubject.next(true);
-    
-    return this.http.post<LoginResponse>(`${this.API_URL}/user/login`, credentials)
-      .pipe(
-        retry({
-          count: 2,
-          delay: (error) => {
-            if (error.status === 500 || error.status === 0) {
-              return timer(1000); // Retry after 1 second for server errors
+    login(credentials: LoginRequest): Observable<LoginResponse>
+   {
+      this.isLoadingSubject.next(true);
+      
+      return this.http.post<{ user: User; token: string; message: string; refreshToken?: string; expiresIn?: number }>(`${this.API_URL}/user/login`, credentials)
+        .pipe(
+          retry({
+            count: 2,
+            delay: (error) => {
+              if (error.status === 500 || error.status === 0) {
+                return timer(1000); // Retry after 1 second for server errors
+              }
+              return throwError(() => error);
             }
-            return throwError(() => error);
-          }
-        }),
-        map(response => {
-          const user = { ...response.user, token: response.token };
-          this.setAuthData(user, response.token, response.refreshToken);
-          
-          // Set up auto token refresh if expires_in is provided
-          if (response.expiresIn) {
-            this.setupTokenRefresh(response.expiresIn);
-          }
+          }),
+          map(response => {
+            const user = { ...response.user, token: response.token };
+            this.setAuthData(user, response.token, response.refreshToken);
+            
+            // Set up auto token refresh if expires_in is provided
+            if (response.expiresIn) {
+              this.setupTokenRefresh(response.expiresIn);
+            }
 
-          // Store remember me preference
-          if (credentials.rememberMe) {
-            localStorage.setItem(this.REMEMBER_ME_KEY, 'true');
-          }
-          
-          return user;
-        }),
-        catchError(this.handleError.bind(this)),
-        finalize(() => this.isLoadingSubject.next(false))
-      );
-  }
+            // Store remember me preference
+            if (credentials.rememberMe) {
+              localStorage.setItem(this.REMEMBER_ME_KEY, 'true');
+            }
+            
+            return { user, token: response.token, refreshToken: response.refreshToken, message: response.message, expiresIn: response.expiresIn };
+          }),
+          catchError(this.handleError.bind(this)),
+          finalize(() => this.isLoadingSubject.next(false))
+        );
+    }
 
   /**
    * Register new user
@@ -134,7 +135,7 @@ export class AuthService {
         }),
         map(response => {
           const user = { ...response.user, token: response.token };
-          this.setAuthData(user, response.token, response.refreshToken);
+          // this.setAuthData(user, response.token, response.refreshToken);
           return user;
         }),
         catchError(this.handleError.bind(this)),

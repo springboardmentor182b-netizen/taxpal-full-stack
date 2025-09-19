@@ -11,16 +11,13 @@ export const getDashboard = async (dashboardId: string) => {
 export const addTransaction = async (dashboardId: string, txData: Partial<ITransaction>) => {
   const dashboard = await DashboardModel.findById(dashboardId);
   if (!dashboard) return null;
-
   dashboard.transactions.push(txData as ITransaction);
   await dashboard.save();
   return dashboard;
 };
-
 export const updateTransaction = async (dashboardId: string, txId: string, txData: Partial<ITransaction>) => {
   const dashboard = await DashboardModel.findById(dashboardId);
   if (!dashboard) return null;
-
   const tx = dashboard.transactions.id(txId);
   if (!tx) return null;
   tx.set(txData);

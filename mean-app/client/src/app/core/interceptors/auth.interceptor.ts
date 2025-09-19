@@ -51,8 +51,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
   private isPublicRoute(url: string): boolean {
     const publicRoutes = [
-      '/auth/login',
-      '/auth/signup',
+      '/user/login',
+      '/user/register',
       '/auth/forgot-password',
       '/auth/reset-password',
       '/auth/verify-email'
