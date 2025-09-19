@@ -1,46 +1,26 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose from 'mongoose';
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  password: string;
-  country: string;
-  income_bracket: 'low' | 'middle' | 'high';
-  createdAt: Date;
-  updatedAt: Date;
-}
+const userSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true, trim: true },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      match: [/^\S+@\S+\.\S+$/, 'Invalid email format'],
+    },
+    password: { type: String, required: true, minlength: 6 },
 
-const UserSchema = new Schema<IUser>({
-  name: {
-    type: String,
-    required: true,
-    trim: true
+    country: { type: String, default: 'US' },
+    income_bracket: { type: String, enum: ['low', 'middle', 'high'], default: 'middle' },
+    resetPasswordToken: { type: String, default: undefined },
+    resetPasswordExpires: { type: Date, default: undefined },
   },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    lowercase: true,
-    trim: true
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  country: {
-    type: String,
-    required: true,
-    default: 'US'
-  },
-  income_bracket: {
-    type: String,
-    enum: ['low', 'middle', 'high'],
-    required: true,
-    default: 'middle'
-  }
-}, {
-  timestamps: true
-});
+  { timestamps: true }
+);
 
-export default mongoose.model<IUser>('User', UserSchema);
+userSchema.index({ email: 1 }, { unique: true });
+
+export default mongoose.model('User', userSchema);
