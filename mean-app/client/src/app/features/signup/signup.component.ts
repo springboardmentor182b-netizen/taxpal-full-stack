@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
@@ -105,8 +104,8 @@ export class SignupComponent implements OnInit, OnDestroy {
         this.passwordStrengthValidator
       ]],
       confirmPassword: ['', [Validators.required]],
-      country: ['', [Validators.required]],
-      termsAccepted: [false, [Validators.requiredTrue]]
+      country: ['', [Validators.required]]
+      // Removed termsAccepted field
     }, { 
       validators: [this.passwordMatchValidator] 
     });
@@ -137,9 +136,8 @@ export class SignupComponent implements OnInit, OnDestroy {
     if (this.signupForm.valid) {
       this.clearMessages();
       
-      // Extract form data and remove confirmPassword and termsAccepted
-      const formData = { ...this.signupForm.value };
-      const { termsAccepted, ...userData } = formData;
+      // Extract form data (no need to remove termsAccepted since it's not in the form anymore)
+      const userData = { ...this.signupForm.value };
       
       // Trim string fields
       Object.keys(userData).forEach(key => {
@@ -226,9 +224,7 @@ export class SignupComponent implements OnInit, OnDestroy {
       if (errors?.['weakPassword']) {
         return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
       }
-      if (errors?.['requiredTrue']) {
-        return 'You must accept the terms and conditions to continue';
-      }
+      // Removed termsAccepted error handling
     }
     
     // Check for password mismatch
@@ -246,8 +242,8 @@ export class SignupComponent implements OnInit, OnDestroy {
       'username': 'Username',
       'password': 'Password',
       'confirmPassword': 'Confirm password',
-      'country': 'Country',
-      'termsAccepted': 'Terms and conditions'
+      'country': 'Country'
+      // Removed termsAccepted label
     };
     return labels[fieldName] || this.capitalizeFirst(fieldName);
   }
