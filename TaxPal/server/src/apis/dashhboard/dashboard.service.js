@@ -1,19 +1,20 @@
 const mongoose = require('mongoose');
-const Transaction = require('../../../../../../../routes/transactions');
+const Transaction = require('../../../../../../../models/transaction.model');
 
 class DashboardService {
     async getSummary(userId) {
-        const objectId = mongoose.Types.ObjectId(userId);
+        const objectId =new mongoose.Types.ObjectId(userId);
 
         const income = await Transaction.aggregate([
-            { $match: { user_id: objectId, type: 'income' } },
-            { $group: { _id: null, total: { $sum: "$amount" } } }
-        ]);
+    { $match: { user_id: objectId, type: 'income' } },
+    { $group: { _id: null, total: { $sum: "$amount" } } }
+]);
 
-        const expense = await Transaction.aggregate([
-            { $match: { user_id: objectId, type: 'expense' } },
-            { $group: { _id: null, total: { $sum: "$amount" } } }
-        ]);
+const expense = await Transaction.aggregate([
+    { $match: { user_id: objectId, type: 'expense' } },
+    { $group: { _id: null, total: { $sum: "$amount" } } }
+]);
+
 
         return {
             income: income.length ? income[0].total : 0,
