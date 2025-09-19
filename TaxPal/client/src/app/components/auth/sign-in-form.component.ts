@@ -2,11 +2,12 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-sign-in-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   template: `
     <div class="modal-backdrop" (click)="closeModal($event)">
       <div class="modal-container" [ngClass]="{'dark': isDarkMode}">
@@ -84,6 +85,13 @@ import { Router } from '@angular/router';
           <p class="sign-up-prompt">
             Don't have an account? <a href="#" class="sign-up-link" (click)="onSwitchToSignUp($event)">Create one Now</a>
           </p>
+          
+          <div class="error-message" *ngIf="errorMsg">
+            {{ errorMsg }}
+          </div>
+          <div class="success-message" *ngIf="successMsg">
+            {{ successMsg }}
+          </div>
         </div>
       </div>
     </div>
@@ -333,6 +341,20 @@ import { Router } from '@angular/router';
       text-decoration: underline;
     }
     
+    .error-message {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    
+    .success-message {
+      color: #15803d;
+      font-size: 0.875rem;
+      margin-top: 1rem;
+      text-align: center;
+    }
+    
     /* Floating emoji animation */
     .floating-emoji {
       position: absolute;
@@ -462,13 +484,16 @@ export class SignInFormComponent implements OnInit, OnDestroy {
   rememberMe: boolean = false;
   showPassword: boolean = false;
   isDarkMode: boolean = false;
+  loading = false;
+  errorMsg = '';
+  successMsg = '';
   
   floatingEmojis: { symbol: string, style: any }[] = [];
   private emojis = ['💰', '💵', '💸', '💲', '💹', '💳'];
   private maxEmojis = 10;
   private animationInterval: any;
   
-  constructor(private router: Router) {
+  constructor(private router: Router, private http: HttpClient) {
     // Check if dark mode is enabled
     this.isDarkMode = document.documentElement.classList.contains('dark');
   }
@@ -530,13 +555,28 @@ export class SignInFormComponent implements OnInit, OnDestroy {
     this.showPassword = !this.showPassword;
   }
   
-  signIn() {
-    // Here you would normally handle the sign in logic
-    console.log('Signing in with', this.email, this.password);
-    
-    // Navigate to user profile after sign in
-    this.closeForm();
-    this.router.navigate(['/user-profile']);
+  async signIn() {
+    if (!this.email || !this.password || this.loading) return;
+    this.loading = true;
+    this.errorMsg = '';
+    this.successMsg = '';
+
+    try {
+      const res: any = await this.http.post('/api/users/signin', {
+        email: this.email,
+        password: this.password // only if you want to check password
+      }).toPromise();
+      this.successMsg = 'Signed in! Redirecting...';
+      setTimeout(() => {
+        // ...close modal and navigate as needed...
+        this.closeForm();
+        this.router.navigate(['/user-profile']);
+      }, 1200);
+    } catch (err: any) {
+      this.errorMsg = err?.error?.error || 'No account found';
+    } finally {
+      this.loading = false;
+    }
   }
   
   onSwitchToSignUp(event: Event) {
