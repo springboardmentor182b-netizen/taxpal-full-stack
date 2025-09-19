@@ -24,7 +24,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   
   // For redirect after login
   private returnUrl: string = '/dashboard';
-
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -190,9 +189,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  
+  } 
   getFormControl(fieldName: string) {
     return this.loginForm.get(fieldName);
   }

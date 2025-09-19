@@ -83,7 +83,7 @@ export class AuthService {
   login(credentials: LoginRequest): Observable<User> {
     this.isLoadingSubject.next(true);
     
-    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, credentials)
+    return this.http.post<LoginResponse>(`${this.API_URL}/user/login`, credentials)
       .pipe(
         retry({
           count: 2,
@@ -121,7 +121,7 @@ export class AuthService {
   signup(userData: SignupRequest): Observable<User> {
     this.isLoadingSubject.next(true);
     
-    return this.http.post<SignupResponse>(`${this.API_URL}/auth/signup`, userData)
+    return this.http.post<SignupResponse>(`${this.API_URL}/user/register`, userData)
       .pipe(
         retry({
           count: 2,
@@ -141,7 +141,6 @@ export class AuthService {
         finalize(() => this.isLoadingSubject.next(false))
       );
   }
-
   /**
    * Logout user and clear session
    */
@@ -233,14 +232,12 @@ export class AuthService {
       catchError(this.handleError.bind(this))
     );
   }
-
   /**
    * Get current user
    */
   getCurrentUser(): User | null {
     return this.currentUserSubject.value;
   }
-
   /**
    * Check if user is authenticated
    */
@@ -267,18 +264,30 @@ export class AuthService {
   /**
    * Check if token is expired
    */
-  private isTokenExpired(): boolean {
-    const token = this.getToken();
-    if (!token) return true;
-    
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp * 1000 < Date.now();
-    } catch (error) {
-      console.error('Error parsing token:', error);
-      return true;
-    }
+ private isTokenExpired(): boolean {
+  const token = this.getToken();
+  if (!token) return true;
+
+  // Remove accidental whitespace
+  const cleanToken = token.trim();
+
+  // Check if token looks like a JWT
+  const parts = cleanToken.split('.');
+  if (parts.length !== 3) {
+    console.warn('Token is not a valid JWT:', token);
+    return true;
   }
+
+  try {
+    const payload = JSON.parse(atob(parts[1]));
+    if (!payload.exp) return true; // no expiration field
+    return payload.exp * 1000 < Date.now();
+  } catch (error) {
+    console.error('Error parsing token:', error);
+    return true;
+  }
+}
+
 
   /**
    * Update user profile

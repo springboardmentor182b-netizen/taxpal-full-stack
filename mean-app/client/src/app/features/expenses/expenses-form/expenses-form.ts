@@ -6,7 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-
+import { ExpenseService } from '../../../services/expense.service';
 @Component({
   selector: 'app-expense-form',
   standalone: true,
@@ -27,7 +27,8 @@ export class ExpensesForm {
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<ExpensesForm>   // ✅ inject DialogRef
+    private dialogRef: MatDialogRef<ExpensesForm>,// ✅ inject DialogRef
+    private expenseService:ExpenseService
   ) {
     this.expensesForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
@@ -37,7 +38,6 @@ export class ExpensesForm {
       notes: [''],
     });
   }
-
   closeForm() {
     this.dialogRef.close();   // ✅ actually closes dialog
   }
@@ -46,14 +46,18 @@ export class ExpensesForm {
     this.expensesForm.reset();
     this.closeForm();         // ✅ close after cancel
   }
-
   submitForm() {
     if (this.expensesForm.valid) {
-      console.log('Expenses data:', this.expensesForm.value);
-      this.dialogRef.close(this.expensesForm.value); // ✅ return form data to parent
+      this.expenseService.addExpense(this.expensesForm.value).subscribe({
+        next: (res: any) => { // Change type to any
+          console.log('✅ Expense saved:', res);
+          this.dialogRef.close(res.expense);
+        },
+        error: (err) => {
+          console.error('❌ Error saving income:', err);
+        }
+      });
     }
   }
 }
-
-
 

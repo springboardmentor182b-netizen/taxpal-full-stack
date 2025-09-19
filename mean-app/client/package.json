@@ -32,6 +32,7 @@
     "@angular/platform-browser-dynamic": "^20.2.0",
     "@angular/router": "^20.2.0",
     "@tailwindcss/postcss": "^4.1.13",
+    "@types/chart.js": "^2.9.41",
     "body-parser": "^2.2.0",
     "chart.js": "^4.5.0",
     "cors": "^2.8.5",

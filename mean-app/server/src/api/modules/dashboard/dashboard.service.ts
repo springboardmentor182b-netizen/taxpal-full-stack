@@ -23,21 +23,17 @@ export const updateTransaction = async (dashboardId: string, txId: string, txDat
 
   const tx = dashboard.transactions.id(txId);
   if (!tx) return null;
-
   tx.set(txData);
   await dashboard.save();
   return dashboard;
 };
-
 export const deleteTransaction = async (dashboardId: string, txId: string) => {
   const dashboard = await DashboardModel.findById(dashboardId);
   if (!dashboard) return null;
 
   const tx = dashboard.transactions.id(txId);
   if (!tx) return null;
-
  await tx.deleteOne();
 await dashboard.save();
-
   return dashboard;
 };
