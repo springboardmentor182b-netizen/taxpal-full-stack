@@ -1,4 +1,3 @@
-
 <div class="auth-container">
   <div class="auth-card">
     <!-- Left Section - Form -->
@@ -110,23 +109,6 @@
               {{ getFieldError('country') }}
             </div>
           </div>
-
-          <!-- Error Message -->
-         <!-- Terms and Conditions -->
-<div class="form-field terms-field">
-  <label class="terms-label">
-    <input 
-      type="checkbox" 
-      formControlName="termsAccepted"
-      class="terms-checkbox"
-    />
-    I accept the <a href="/terms" target="_blank">terms and conditions</a>
-  </label>
-  <div *ngIf="getFieldError('termsAccepted')" class="form-field__error">
-    {{ getFieldError('termsAccepted') }}
-  </div>
-</div>
-
 
           <!-- Submit Button -->
           <button 
