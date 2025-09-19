@@ -2,11 +2,12 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-sign-up-form',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   template: `
     <div class="modal-backdrop" (click)="closeModal($event)">
       <div class="modal-container" [ngClass]="{'dark': isDarkMode}">
@@ -28,6 +29,9 @@ import { Router } from '@angular/router';
         </div>
         
         <div class="modal-body">
+          <div *ngIf="errorMsg" class="form-error">{{ errorMsg }}</div>
+          <div *ngIf="successMsg" class="form-success">{{ successMsg }}</div>
+          
           <div class="form-row">
             <div class="form-group">
               <label for="firstName">First name</label>
@@ -141,10 +145,11 @@ import { Router } from '@angular/router';
           <button 
             type="button" 
             class="sign-up-btn" 
-            [disabled]="!isFormValid()" 
+            [disabled]="!isFormValid() || loading" 
             (click)="createAccount()"
           >
-            Create Free Account
+            <span *ngIf="loading" class="loader"></span>
+            <span *ngIf="!loading">Create Free Account</span>
           </button>
           
           <p class="sign-in-prompt">
@@ -469,6 +474,8 @@ import { Router } from '@angular/router';
       cursor: pointer;
       transition: background-color 0.2s, transform 0.2s;
       margin-bottom: 1.5rem;
+      position: relative;
+      overflow: hidden;
     }
     
     .sign-up-btn:hover:not(:disabled) {
@@ -483,6 +490,24 @@ import { Router } from '@angular/router';
     .sign-up-btn:disabled {
       background-color: #9ca3af;
       cursor: not-allowed;
+    }
+    
+    .loader {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 1.5rem;
+      height: 1.5rem;
+      border: 3px solid rgba(255, 255, 255, 0.6);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+      transform: translate(-50%, -50%);
+    }
+    
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
     }
     
     .sign-in-prompt {
@@ -633,6 +658,26 @@ import { Router } from '@angular/router';
       filter: brightness(1.2);
     }
     
+    .form-error {
+      color: #ef4444;
+      background: #fee2e2;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    
+    .form-success {
+      color: #10b981;
+      background: #d1fae5;
+      border-radius: 6px;
+      padding: 0.5rem 1rem;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    
     @media (max-width: 640px) {
       .modal-header {
         padding: 1.25rem 1.5rem;
@@ -668,7 +713,11 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
   private maxEmojis = 10;
   private animationInterval: any;
   
-  constructor(private router: Router) {
+  loading = false;
+  errorMsg = '';
+  successMsg = '';
+
+  constructor(private router: Router, private http: HttpClient) {
     this.isDarkMode = document.documentElement.classList.contains('dark');
   }
   
@@ -736,21 +785,34 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
            this.agreeToTerms;
   }
   
-  createAccount() {
-    if (!this.isFormValid()) return;
-    
-    console.log('Creating account with', {
-      firstName: this.firstName,
-      lastName: this.lastName,
+  async createAccount() {
+    if (!this.isFormValid() || this.loading) return;
+    this.loading = true;
+    this.errorMsg = '';
+    this.successMsg = '';
+
+    const payload = {
       email: this.email,
-      country: this.country,
-      agreeToTerms: this.agreeToTerms,
-      receiveUpdates: this.receiveUpdates
-    });
-    
-    // Navigate to user profile after account creation
-    this.closeForm();
-    this.router.navigate(['/user-profile']);
+      name: `${this.firstName} ${this.lastName}`.trim(),
+      country: this.country
+      // password: this.password, // Uncomment if backend supports password
+    };
+
+    try {
+      const res: any = await this.http.post('/api/users/register', payload).toPromise();
+      this.successMsg = 'Account created! Redirecting...';
+      setTimeout(() => {
+        this.closeForm();
+        this.router.navigate(['/user-profile']);
+      }, 1200);
+    } catch (err: any) {
+      // Log the error for debugging
+      console.error('Registration error:', err);
+      // Show more details if available
+      this.errorMsg = err?.error?.error || err?.message || 'Registration failed. Please try again.';
+    } finally {
+      this.loading = false;
+    }
   }
   
   onSwitchToSignIn(event: Event) {
