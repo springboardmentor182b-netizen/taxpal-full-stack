@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
@@ -81,6 +80,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     private router: Router,
     private route: ActivatedRoute
   ) {
+    // Form definition WITHOUT termsAccepted field
     this.signupForm = this.fb.group({
       fullName: ['', [
         Validators.required, 
@@ -101,12 +101,11 @@ export class SignupComponent implements OnInit, OnDestroy {
       ]],
       password: ['', [
         Validators.required, 
-        Validators.minLength(8),
+        Validators.minLength(6), // Changed from 8 to 6 to match backend
         this.passwordStrengthValidator
       ]],
       confirmPassword: ['', [Validators.required]],
-      country: ['', [Validators.required]],
-      termsAccepted: [false, [Validators.requiredTrue]]
+      country: ['', [Validators.required]]
     }, { 
       validators: [this.passwordMatchValidator] 
     });
@@ -124,8 +123,8 @@ export class SignupComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => this.isLoading = loading);
 
-    // Set default country based on user location (if available)
-    this.setDefaultCountry();
+    // Set default country to India
+    this.signupForm.patchValue({ country: 'in' });
   }
 
   ngOnDestroy(): void {
@@ -134,12 +133,18 @@ export class SignupComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    this.clearMessages();
+    
+    // Mark all fields as touched to show validation errors
+    this.markFormGroupTouched();
+    
+    console.log('Form valid:', this.signupForm.valid);
+    console.log('Form values:', { ...this.signupForm.value, password: '[HIDDEN]', confirmPassword: '[HIDDEN]' });
+    
     if (this.signupForm.valid) {
-      this.clearMessages();
-      
-      // Extract form data and remove confirmPassword and termsAccepted
+      // Extract form data and remove confirmPassword
       const formData = { ...this.signupForm.value };
-      const { termsAccepted, ...userData } = formData;
+      const { confirmPassword, ...userData } = formData;
       
       // Trim string fields
       Object.keys(userData).forEach(key => {
@@ -147,6 +152,8 @@ export class SignupComponent implements OnInit, OnDestroy {
           userData[key] = userData[key].trim();
         }
       });
+      
+      console.log('Sending signup data:', { ...userData, password: '[HIDDEN]' });
       
       this.authService.signup(userData)
         .pipe(takeUntil(this.destroy$))
@@ -170,19 +177,44 @@ export class SignupComponent implements OnInit, OnDestroy {
           }
         });
     } else {
-      this.markFormGroupTouched();
-      this.errorMessage = 'Please fill in all required fields correctly.';
+      // Show specific validation errors
+      const invalidFields = this.getInvalidFields();
+      if (invalidFields.length > 0) {
+        this.errorMessage = `Please correct the following: ${invalidFields.join(', ')}`;
+      } else {
+        this.errorMessage = 'Please fill in all required fields correctly.';
+      }
       this.scrollToFirstError();
     }
+  }
+
+  private getInvalidFields(): string[] {
+    const invalidFields: string[] = [];
+    
+    Object.keys(this.signupForm.controls).forEach(key => {
+      const control = this.signupForm.get(key);
+      if (control && control.invalid) {
+        invalidFields.push(this.getFieldLabel(key));
+      }
+    });
+    
+    // Check for form-level errors (password mismatch)
+    if (this.signupForm.errors?.['passwordMismatch']) {
+      if (!invalidFields.includes('Password confirmation')) {
+        invalidFields.push('Password confirmation');
+      }
+    }
+    
+    return invalidFields;
   }
 
   private handleSignupError(error: any): void {
     this.successMessage = '';
     
     if (error.status === 409) {
-      if (error.message.toLowerCase().includes('email')) {
+      if (error.message && error.message.toLowerCase().includes('email')) {
         this.errorMessage = 'This email address is already registered. Please use a different email or try logging in.';
-      } else if (error.message.toLowerCase().includes('username')) {
+      } else if (error.message && error.message.toLowerCase().includes('username')) {
         this.errorMessage = 'This username is already taken. Please choose a different username.';
       } else {
         this.errorMessage = 'Account already exists. Please try logging in instead.';
@@ -192,7 +224,9 @@ export class SignupComponent implements OnInit, OnDestroy {
     } else if (error.status === 400) {
       this.errorMessage = error.message || 'Invalid information provided. Please check your input.';
     } else if (error.status === 0) {
-      this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      this.errorMessage = 'Unable to connect to server. Please check your internet connection and ensure the backend server is running.';
+    } else if (error.status >= 500) {
+      this.errorMessage = 'Server error. Please try again later.';
     } else {
       this.errorMessage = error.message || 'Registration failed. Please try again.';
     }
@@ -226,9 +260,6 @@ export class SignupComponent implements OnInit, OnDestroy {
       if (errors?.['weakPassword']) {
         return 'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character';
       }
-      if (errors?.['requiredTrue']) {
-        return 'You must accept the terms and conditions to continue';
-      }
     }
     
     // Check for password mismatch
@@ -246,8 +277,7 @@ export class SignupComponent implements OnInit, OnDestroy {
       'username': 'Username',
       'password': 'Password',
       'confirmPassword': 'Confirm password',
-      'country': 'Country',
-      'termsAccepted': 'Terms and conditions'
+      'country': 'Country'
     };
     return labels[fieldName] || this.capitalizeFirst(fieldName);
   }
@@ -256,6 +286,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     Object.keys(this.signupForm.controls).forEach(key => {
       const control = this.signupForm.get(key);
       control?.markAsTouched();
+      control?.markAsDirty();
     });
   }
 
@@ -270,15 +301,11 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   private scrollToFirstError(): void {
     setTimeout(() => {
-      const firstError = document.querySelector('.error-message');
+      const firstError = document.querySelector('.form-field__error, .error-message');
       if (firstError) {
         firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }, 100);
-  }
-
-  private setDefaultCountry(): void {
-   
   }
 
   togglePasswordVisibility(): void {
@@ -316,6 +343,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     const password = group.get('password')?.value;
     const confirmPassword = group.get('confirmPassword')?.value;
     
+    // Only validate if both fields have values
     if (password && confirmPassword && password !== confirmPassword) {
       return { passwordMismatch: true };
     }
@@ -325,10 +353,13 @@ export class SignupComponent implements OnInit, OnDestroy {
   private nameValidator(control: AbstractControl): { [key: string]: any } | null {
     if (!control.value) return null;
     
+    const value = control.value.toString().trim();
+    if (!value) return { required: true };
+    
     // Allow letters, spaces, hyphens, apostrophes, and some international characters
     const namePattern = /^[a-zA-ZÀ-ÿĀ-žА-я\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF\s'-]+$/;
     
-    if (!namePattern.test(control.value)) {
+    if (!namePattern.test(value)) {
       return { invalidName: true };
     }
     return null;
@@ -337,10 +368,13 @@ export class SignupComponent implements OnInit, OnDestroy {
   private usernameValidator(control: AbstractControl): { [key: string]: any } | null {
     if (!control.value) return null;
     
+    const value = control.value.toString().trim();
+    if (!value) return { required: true };
+    
     // Allow letters, numbers, underscores, and hyphens
     const usernamePattern = /^[a-zA-Z0-9_-]+$/;
     
-    if (!usernamePattern.test(control.value)) {
+    if (!usernamePattern.test(value)) {
       return { invalidUsername: true };
     }
     return null;
@@ -349,7 +383,15 @@ export class SignupComponent implements OnInit, OnDestroy {
   private passwordStrengthValidator(control: AbstractControl): { [key: string]: any } | null {
     if (!control.value) return null;
     
-    const password = control.value;
+    const password = control.value.toString().trim();
+    if (!password) return { required: true };
+    
+    // For now, just check minimum length - you can enhance this later
+    if (password.length < 6) {
+      return { minlength: { requiredLength: 6, actualLength: password.length } };
+    }
+    
+    // Optional: Add strength requirements
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumeric = /[0-9]/.test(password);
@@ -358,6 +400,7 @@ export class SignupComponent implements OnInit, OnDestroy {
     if (!hasUpperCase || !hasLowerCase || !hasNumeric || !hasSpecialChar) {
       return { weakPassword: true };
     }
+    
     return null;
   }
 }

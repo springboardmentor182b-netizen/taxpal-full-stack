@@ -1,4 +1,5 @@
 
+
 <div class="auth-container">
   <div class="auth-card">
     <!-- Left Section - Welcome -->
@@ -30,14 +31,14 @@
             <label class="form-field__label" for="username">Email</label>
             <input
               id="username"
-              type="text"
+              type="email"
                class="form-field__input"
-              [class.form-field__input--error]="getFieldError('username')"
-              placeholder="pavi.com"
-              formControlName="username"
+              [class.form-field__input--error]="getFieldError('email')"
+              placeholder="your.email@example.com"
+              formControlName="email"
             />
-            <div *ngIf="getFieldError('username')" class="form-field__error">
-              {{ getFieldError('username') }}
+            <div *ngIf="getFieldError('email')" class="form-field__error">
+              {{ getFieldError('email') }}
             </div>
           </div>
 
@@ -79,4 +80,4 @@
       </div>
     </div>
   </div>
-</div>
+</div> 

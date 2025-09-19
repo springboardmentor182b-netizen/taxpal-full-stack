@@ -1,8 +1,7 @@
-
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
-import { catchError, map, finalize, retry, retryWhen, delayWhen } from 'rxjs/operators';
+import { catchError, map, finalize, retry } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface User {
@@ -18,7 +17,7 @@ export interface User {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;        // Direct email field
   password: string;
   rememberMe?: boolean;
 }
@@ -36,7 +35,6 @@ export interface SignupRequest {
   email: string;
   username: string;
   password: string;
-  confirmPassword: string;
   country: string;
 }
 
@@ -73,36 +71,62 @@ export class AuthService {
   private tokenRefreshTimer: any;
 
   constructor(private http: HttpClient) {
+    console.log('AuthService initialized with API URL:', this.API_URL);
     this.loadUserFromStorage();
-    this.setupTokenRefresh();
+  }
+
+  /**
+   * Test API connection
+   */
+  testConnection(): Observable<any> {
+    console.log('Testing connection to:', `${this.API_URL}/auth/health`);
+    return this.http.get(`${this.API_URL}/auth/health`).pipe(
+      map(response => {
+        console.log('Connection test successful:', response);
+        return response;
+      }),
+      catchError(error => {
+        console.error('Connection test failed:', error);
+        return this.handleError(error);
+      })
+    );
   }
 
   /**
    * Login user with credentials
    */
   login(credentials: LoginRequest): Observable<User> {
+    console.log('Login attempt with:', { ...credentials, password: '[HIDDEN]' });
+    console.log('API URL:', `${this.API_URL}/auth/login`);
+    
     this.isLoadingSubject.next(true);
     
-    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, credentials)
+    // Send email directly to backend
+    const requestData = {
+      email: credentials.email,
+      password: credentials.password,
+      rememberMe: credentials.rememberMe
+    };
+    
+    console.log('Sending to backend:', { ...requestData, password: '[HIDDEN]' });
+    
+    return this.http.post<LoginResponse>(`${this.API_URL}/auth/login`, requestData)
       .pipe(
         retry({
           count: 2,
           delay: (error) => {
+            console.log('Login retry for error:', error.status);
             if (error.status === 500 || error.status === 0) {
-              return timer(1000); // Retry after 1 second for server errors
+              return timer(1000);
             }
             return throwError(() => error);
           }
         }),
         map(response => {
+          console.log('Login successful:', response);
           const user = { ...response.user, token: response.token };
           this.setAuthData(user, response.token, response.refreshToken);
           
-          // Set up auto token refresh if expires_in is provided
-          if (response.expiresIn) {
-            this.setupTokenRefresh(response.expiresIn);
-          }
-
           // Store remember me preference
           if (credentials.rememberMe) {
             localStorage.setItem(this.REMEMBER_ME_KEY, 'true');
@@ -119,6 +143,9 @@ export class AuthService {
    * Register new user
    */
   signup(userData: SignupRequest): Observable<User> {
+    console.log('Signup attempt with:', { ...userData, password: '[HIDDEN]' });
+    console.log('API URL:', `${this.API_URL}/auth/signup`);
+    
     this.isLoadingSubject.next(true);
     
     return this.http.post<SignupResponse>(`${this.API_URL}/auth/signup`, userData)
@@ -126,6 +153,7 @@ export class AuthService {
         retry({
           count: 2,
           delay: (error) => {
+            console.log('Signup retry for error:', error.status);
             if (error.status === 500 || error.status === 0) {
               return timer(1000);
             }
@@ -133,8 +161,9 @@ export class AuthService {
           }
         }),
         map(response => {
+          console.log('Signup successful:', response);
           const user = { ...response.user, token: response.token };
-          this.setAuthData(user, response.token, response.refreshToken);
+          // Don't auto-login after signup, just return user data
           return user;
         }),
         catchError(this.handleError.bind(this)),
@@ -168,48 +197,6 @@ export class AuthService {
   }
 
   /**
-   * Refresh authentication token
-   */
-  refreshToken(): Observable<string> {
-    const refreshToken = this.getRefreshToken();
-    if (!refreshToken) {
-      this.logout();
-      return throwError(() => new Error('No refresh token available'));
-    }
-
-    return this.http.post<{token: string, expiresIn?: number}>(`${this.API_URL}/auth/refresh`, {
-      refreshToken
-    }).pipe(
-      map(response => {
-        localStorage.setItem(this.TOKEN_KEY, response.token);
-        
-        // Setup next refresh
-        if (response.expiresIn) {
-          this.setupTokenRefresh(response.expiresIn);
-        }
-        
-        return response.token;
-      }),
-      catchError(error => {
-        // If refresh fails, logout user
-        this.logout();
-        return this.handleError(error);
-      })
-    );
-  }
-
-  /**
-   * Verify email address
-   */
-  verifyEmail(token: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/verify-email`, { token })
-      .pipe(
-        retry(2),
-        catchError(this.handleError.bind(this))
-      );
-  }
-
-  /**
    * Request password reset
    */
   forgotPassword(email: string): Observable<any> {
@@ -224,10 +211,9 @@ export class AuthService {
    * Reset password with token
    */
   resetPassword(token: string, password: string, confirmPassword: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/reset-password`, {
-      token,
-      password,
-      confirmPassword
+    return this.http.post(`${this.API_URL}/auth/reset-password/${token}`, {
+      newPassword: password,
+      confirmPassword: confirmPassword
     }).pipe(
       retry(2),
       catchError(this.handleError.bind(this))
@@ -281,42 +267,27 @@ export class AuthService {
   }
 
   /**
-   * Update user profile
+   * Refresh authentication token (if your backend supports it)
    */
-  updateProfile(userData: Partial<User>): Observable<User> {
-    this.isLoadingSubject.next(true);
-    
-    const token = this.getToken();
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    
-    return this.http.put<{user: User}>(`${this.API_URL}/auth/profile`, userData, { headers })
-      .pipe(
-        map(response => {
-          const updatedUser = response.user;
-          this.updateStoredUser(updatedUser);
-          return updatedUser;
-        }),
-        catchError(this.handleError.bind(this)),
-        finalize(() => this.isLoadingSubject.next(false))
-      );
-  }
+  refreshToken(): Observable<string> {
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken) {
+      this.logout();
+      return throwError(() => new Error('No refresh token available'));
+    }
 
-  /**
-   * Change password
-   */
-  changePassword(currentPassword: string, newPassword: string, confirmPassword: string): Observable<any> {
-    this.isLoadingSubject.next(true);
-    
-    const token = this.getToken();
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
-    
-    return this.http.post(`${this.API_URL}/auth/change-password`, {
-      currentPassword,
-      newPassword,
-      confirmPassword
-    }, { headers }).pipe(
-      catchError(this.handleError.bind(this)),
-      finalize(() => this.isLoadingSubject.next(false))
+    return this.http.post<{token: string, expiresIn?: number}>(`${this.API_URL}/refresh`, {
+      refreshToken
+    }).pipe(
+      map(response => {
+        localStorage.setItem(this.TOKEN_KEY, response.token);
+        return response.token;
+      }),
+      catchError(error => {
+        // If refresh fails, logout user
+        this.logout();
+        return this.handleError(error);
+      })
     );
   }
 
@@ -348,12 +319,6 @@ export class AuthService {
     this.currentUserSubject.next(null);
   }
 
-  private updateStoredUser(user: User): void {
-    const storage = localStorage.getItem(this.USER_KEY) ? localStorage : sessionStorage;
-    storage.setItem(this.USER_KEY, JSON.stringify(user));
-    this.currentUserSubject.next(user);
-  }
-
   private loadUserFromStorage(): void {
     // Check localStorage first, then sessionStorage
     let token = localStorage.getItem(this.TOKEN_KEY);
@@ -377,38 +342,6 @@ export class AuthService {
     }
   }
 
-  private setupTokenRefresh(expiresIn?: number): void {
-    this.clearTokenRefreshTimer();
-    
-    if (!expiresIn) {
-      // Default to refresh 5 minutes before expiration if not provided
-      const token = this.getToken();
-      if (token) {
-        try {
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          expiresIn = payload.exp * 1000 - Date.now();
-        } catch (error) {
-          console.error('Error parsing token for refresh setup:', error);
-          return;
-        }
-      }
-    }
-
-    if (expiresIn && expiresIn > 300000) { // Only setup if more than 5 minutes
-      // Refresh 5 minutes before expiration
-      const refreshTime = expiresIn - 300000;
-      
-      this.tokenRefreshTimer = setTimeout(() => {
-        this.refreshToken().subscribe({
-          error: (error) => {
-            console.error('Auto token refresh failed:', error);
-            this.logout();
-          }
-        });
-      }, refreshTime);
-    }
-  }
-
   private clearTokenRefreshTimer(): void {
     if (this.tokenRefreshTimer) {
       clearTimeout(this.tokenRefreshTimer);
@@ -418,59 +351,61 @@ export class AuthService {
 
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred. Please try again.';
-    let errorCode = '';
+    
+    console.error('Full HTTP Error Object:', error);
+    console.error('Error Status:', error.status);
+    console.error('Error URL:', error.url);
+    console.error('Error Message:', error.message);
     
     if (error.error instanceof ErrorEvent) {
       // Client-side error
+      console.error('Client-side error:', error.error.message);
       errorMessage = error.error.message;
     } else {
       // Server-side error
+      console.error('Server-side error. Status:', error.status);
+      console.error('Error body:', error.error);
+      
       switch (error.status) {
         case 400:
-          errorMessage = error.error?.message || 'Bad request. Please check your input.';
+          errorMessage = error.error?.error || error.error?.message || 'Bad request. Please check your input.';
           break;
         case 401:
-          errorMessage = error.error?.message || 'Invalid credentials. Please try again.';
-          errorCode = 'INVALID_CREDENTIALS';
-          // Don't clear auth data here for login failures
+          errorMessage = error.error?.error || error.error?.message || 'Invalid credentials. Please try again.';
           break;
         case 403:
-          errorMessage = error.error?.message || 'Access forbidden. You do not have permission.';
-          errorCode = 'ACCESS_FORBIDDEN';
+          errorMessage = error.error?.error || error.error?.message || 'Access forbidden.';
           break;
         case 404:
-          errorMessage = 'Service not found. Please try again later.';
+          errorMessage = 'Service not found. Please verify your server is running.';
           break;
         case 409:
-          errorMessage = error.error?.message || 'Conflict. User may already exist.';
-          errorCode = 'USER_EXISTS';
+          errorMessage = error.error?.error || error.error?.message || 'User may already exist.';
           break;
         case 422:
-          errorMessage = error.error?.message || 'Validation error. Please check your input.';
-          errorCode = 'VALIDATION_ERROR';
+          errorMessage = error.error?.error || error.error?.message || 'Validation error.';
           break;
         case 429:
           errorMessage = 'Too many requests. Please try again later.';
-          errorCode = 'RATE_LIMIT';
           break;
         case 500:
           errorMessage = 'Server error. Please try again later.';
-          errorCode = 'SERVER_ERROR';
           break;
         case 0:
-          errorMessage = 'Network error. Please check your connection.';
-          errorCode = 'NETWORK_ERROR';
+          errorMessage = `Unable to connect to server at ${this.API_URL}. Please check:
+1. Your backend server is running
+2. Your internet connection
+3. CORS configuration`;
           break;
         default:
-          errorMessage = error.error?.message || `Error ${error.status}: ${error.statusText}`;
+          errorMessage = error.error?.error || error.error?.message || `Error ${error.status}: ${error.statusText}`;
       }
     }
 
-    console.error('Auth Service Error:', error);
+    console.error('Processed error message:', errorMessage);
     return throwError(() => ({ 
       message: errorMessage, 
       status: error.status,
-      code: errorCode,
       errors: error.error?.errors 
     }));
   }

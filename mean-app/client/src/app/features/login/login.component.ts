@@ -19,11 +19,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   errorMessage: string = '';
   successMessage: string = '';
   showPassword: boolean = false;
-  rememberMe: boolean = false;
   private destroy$ = new Subject<void>();
-  
-  // For redirect after login
-  private returnUrl: string = '/dashboard';
 
   constructor(
     private fb: FormBuilder,
@@ -32,8 +28,15 @@ export class LoginComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      email: ['', [
+        Validators.required,
+        Validators.email,
+        Validators.maxLength(100)
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(6)
+      ]],
       rememberMe: [false]
     });
   }
@@ -41,22 +44,29 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Check if user is already logged in
     if (this.authService.isAuthenticated()) {
-      this.router.navigate([this.returnUrl]);
+      this.router.navigate(['/dashboard']);
       return;
-    }
-
-    // Get return URL from route parameters or default to dashboard
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-    
-    const message = this.route.snapshot.queryParams['message'];
-    if (message) {
-      this.successMessage = decodeURIComponent(message);
     }
 
     // Subscribe to loading state
     this.authService.isLoading$
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => this.isLoading = loading);
+
+    // Check for success message from signup
+    this.route.queryParams
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(params => {
+        if (params['message']) {
+          this.successMessage = decodeURIComponent(params['message']);
+          // Clear the query parameter
+          this.router.navigate([], {
+            relativeTo: this.route,
+            queryParams: {},
+            replaceUrl: true
+          });
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -65,23 +75,42 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   onSubmit(): void {
+    this.clearMessages();
+    
+    // Mark all fields as touched to show validation errors
+    this.markFormGroupTouched();
+    
+    // Debug: Log form status (remove in production)
+    console.log('Form valid:', this.loginForm.valid);
+    console.log('Form values:', { ...this.loginForm.value, password: '[HIDDEN]' });
+    
     if (this.loginForm.valid) {
-      this.clearMessages();
-      const credentials = {
-        username: this.loginForm.get('username')?.value.trim(),
-        password: this.loginForm.get('password')?.value
-      };
+      // Extract form data - Choose the format your backend expects
       
-      this.authService.login(credentials)
+      // Option 1: If backend expects 'email' field
+      const loginData = {
+        email: this.loginForm.value.email.trim(),
+        password: this.loginForm.value.password,
+        rememberMe: this.loginForm.value.rememberMe || false
+      };
+
+      // Option 2: If backend expects 'username' field (uncomment this and comment above)
+      // const loginData = {
+      //   username: this.loginForm.value.email.trim(), // Send email as username
+      //   password: this.loginForm.value.password,
+      //   rememberMe: this.loginForm.value.rememberMe || false
+      // };
+      
+      this.authService.login(loginData)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (user) => {
             console.log('Login successful:', user);
             this.successMessage = `Welcome back, ${user.fullName}!`;
             
-            // Small delay to show success message before redirecting
+            // Navigate to dashboard after short delay
             setTimeout(() => {
-              this.router.navigate([this.returnUrl]);
+              this.router.navigate(['/dashboard']);
             }, 1000);
           },
           error: (error) => {
@@ -90,51 +119,78 @@ export class LoginComponent implements OnInit, OnDestroy {
           }
         });
     } else {
-      this.markFormGroupTouched();
-      this.errorMessage = 'Please fill in all required fields correctly.';
+      // Show specific validation errors
+      const invalidFields = this.getInvalidFields();
+      if (invalidFields.length > 0) {
+        this.errorMessage = `Please correct the following: ${invalidFields.join(', ')}`;
+      } else {
+        this.errorMessage = 'Please fill in all required fields correctly.';
+      }
+      this.scrollToFirstError();
     }
   }
 
   private handleLoginError(error: any): void {
-    // Clear any existing success messages
     this.successMessage = '';
     
-    // Handle different types of errors
+    // Handle specific error cases
     if (error.status === 401) {
-      this.errorMessage = 'Invalid username or password. Please try again.';
-    } else if (error.status === 403) {
-      this.errorMessage = 'Account is locked or not verified. Please contact support.';
+      this.errorMessage = 'Invalid email or password. Please try again.';
+    } else if (error.status === 404) {
+      this.errorMessage = 'Account not found. Please check your email or sign up.';
     } else if (error.status === 429) {
-      this.errorMessage = 'Too many login attempts. Please try again in a few minutes.';
+      this.errorMessage = 'Too many login attempts. Please try again later.';
     } else if (error.status === 0) {
-      this.errorMessage = 'Unable to connect to server. Please check your internet connection.';
+      this.errorMessage = 'Unable to connect to server. Please check your internet connection and ensure the backend server is running.';
+    } else if (error.status >= 500) {
+      this.errorMessage = 'Server error. Please try again later.';
     } else {
       this.errorMessage = error.message || 'Login failed. Please try again.';
     }
   }
 
+  private getInvalidFields(): string[] {
+    const invalidFields: string[] = [];
+    
+    Object.keys(this.loginForm.controls).forEach(key => {
+      const control = this.loginForm.get(key);
+      if (control && control.invalid) {
+        invalidFields.push(this.getFieldLabel(key));
+      }
+    });
+    
+    return invalidFields;
+  }
+
   getFieldError(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (field && field.invalid && (field.dirty || field.touched)) {
-      if (field.errors?.['required']) {
+      const errors = field.errors;
+      
+      if (errors?.['required']) {
         return `${this.getFieldLabel(fieldName)} is required`;
       }
-      if (field.errors?.['minlength']) {
-        const requiredLength = field.errors?.['minlength'].requiredLength;
-        return `${this.getFieldLabel(fieldName)} must be at least ${requiredLength} characters`;
-      }
-      if (field.errors?.['email']) {
+      if (errors?.['email']) {
         return 'Please enter a valid email address';
       }
+      if (errors?.['minlength']) {
+        const requiredLength = errors['minlength'].requiredLength;
+        return `${this.getFieldLabel(fieldName)} must be at least ${requiredLength} characters`;
+      }
+      if (errors?.['maxlength']) {
+        const maxLength = errors['maxlength'].requiredLength;
+        return `${this.getFieldLabel(fieldName)} cannot exceed ${maxLength} characters`;
+      }
     }
+    
     return '';
   }
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      'username': 'Username',
+      'email': 'Email',
       'password': 'Password',
-      'email': 'Email'
+      'rememberMe': 'Remember me'
     };
     return labels[fieldName] || this.capitalizeFirst(fieldName);
   }
@@ -143,6 +199,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     Object.keys(this.loginForm.controls).forEach(key => {
       const control = this.loginForm.get(key);
       control?.markAsTouched();
+      control?.markAsDirty();
     });
   }
 
@@ -155,45 +212,58 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.successMessage = '';
   }
 
+  private scrollToFirstError(): void {
+    setTimeout(() => {
+      const firstError = document.querySelector('.form-field__error, .error-message');
+      if (firstError) {
+        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }, 100);
+  }
+
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   navigateToSignup(): void {
     console.log('Navigating to signup...');
-    
-    const queryParams = this.returnUrl !== '/dashboard' ? { returnUrl: this.returnUrl } : {};
-    
-    this.router.navigate(['/features/signup'], { queryParams }).then(
+    this.router.navigate(['/features/signup']).then(
       (success) => {
-        console.log('Navigation to signup success:', success);
+        console.log('Navigation success:', success);
       },
       (error) => {
-        console.error('Navigation to signup error:', error);
+        console.error('Navigation error:', error);
       }
     );
   }
 
-  navigateToForgotPassword(): void {
-    console.log('Navigating to forgot password...');
-    this.router.navigate(['/features/forgot-password']).then(
-      (success) => {
-        console.log('Navigation to forgot password success:', success);
-      },
-      (error) => {
-        console.error('Navigation to forgot password error:', error);
-      }
-    );
+  forgotPassword(): void {
+    // Navigate to forgot password page
+    this.router.navigate(['/features/forgot-password']);
   }
 
-
+  // Utility methods for template
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   }
 
-  
   getFormControl(fieldName: string) {
     return this.loginForm.get(fieldName);
+  }
+
+  // Test connection method (remove in production)
+  testConnection(): void {
+    console.log('Testing API connection...');
+    this.authService.testConnection().subscribe({
+      next: (response) => {
+        console.log('✅ API connection successful:', response);
+        this.successMessage = 'Backend server is running and accessible!';
+      },
+      error: (error) => {
+        console.error('❌ API connection failed:', error);
+        this.errorMessage = `API connection failed: ${error.message}`;
+      }
+    });
   }
 }
