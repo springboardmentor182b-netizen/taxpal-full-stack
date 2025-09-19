@@ -213,7 +213,7 @@ export class AuthService {
    * Request password reset
    */
   forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/forgot-password`, { email })
+    return this.http.post(`${this.API_URL}/user/forgot-password`, { email })
       .pipe(
         retry(2),
         catchError(this.handleError.bind(this))
@@ -224,7 +224,7 @@ export class AuthService {
    * Reset password with token
    */
   resetPassword(token: string, password: string, confirmPassword: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/auth/reset-password`, {
+    return this.http.post(`${this.API_URL}/user/request-reset`, {
       token,
       password,
       confirmPassword
@@ -295,7 +295,6 @@ export class AuthService {
    */
   updateProfile(userData: Partial<User>): Observable<User> {
     this.isLoadingSubject.next(true);
-    
     const token = this.getToken();
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     

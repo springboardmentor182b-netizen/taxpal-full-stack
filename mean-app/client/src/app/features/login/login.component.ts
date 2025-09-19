@@ -118,7 +118,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.errorMessage = error.message || 'Login failed. Please try again.';
     }
   }
-
   getFieldError(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (field && field.invalid && (field.dirty || field.touched)) {

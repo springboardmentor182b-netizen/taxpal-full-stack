@@ -22,7 +22,9 @@ import { ExpensesForm } from '../../expenses/expenses-form/expenses-form';
   styleUrls: ['./dashboard.scss']
 })
 export class Dashboard {
-  
+  // Inside your Dashboard component
+dashboardLetters: string[] = 'Dashboard'.split('');
+
   sidebarActive = false;
   collapsed = false;
   monthlyIncome = 4200;
@@ -64,14 +66,37 @@ export class Dashboard {
     maintainAspectRatio: false, // ✅ prevents expansion
     plugins: { legend: { display: false } }
   };
+  
   constructor(private dialog: MatDialog, private router: Router) {}
+    // Current user info
+  currentUser: { fullName: string, email: string } | null = null;
+  userInitials: string = '';
+  ngOnInit(): void {
+    // Get current user from sessionStorage or localStorage
+    const userData = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
+    if (userData) {
+      this.currentUser = JSON.parse(userData);
+      if (this.currentUser) {
+        this.setUserInitials(this.currentUser.fullName);
+      }
+    }
+  }
 
+  // Generate initials from full name
+   // Declare the userInitials property
 
+  private setUserInitials(fullName: string) {
+    const names = fullName.trim().split(' ');
+    if (names.length === 1) {
+      this.userInitials = names[0].charAt(0).toUpperCase();
+    } else {
+      this.userInitials = names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+    }
+  }
   // Sidebar toggles
   toggleSidebar() { this.sidebarActive = !this.sidebarActive; }
   closeSidebarOverlay() { this.sidebarActive = false; }
   toggleCollapse() { this.collapsed = !this.collapsed; }
-
   // Open Income dialog
   openIncomeForm() {
     const dialogRef = this.dialog.open(IncomeForm, { width: '400px' });
@@ -80,7 +105,7 @@ export class Dashboard {
       if (res) {
         console.log('Income added:', res);
         this.transactions.push({
-          date: res.date,
+          date: new Date(res.date).toISOString(),
           description: res.description,
           category: res.category,
           amount: res.amount,
@@ -94,12 +119,11 @@ export class Dashboard {
   // Open Expense dialog
   openExpenseForm() {
     const dialogRef = this.dialog.open(ExpensesForm, { width: '400px' });
-
     dialogRef.afterClosed().subscribe((res) => {
       if (res) {
         console.log('Expense added:', res);
         this.transactions.push({
-          date: res.date,
+          date: new Date(res.date).toISOString(),
           description: res.description,
           category: res.category,
           amount: -res.amount,
