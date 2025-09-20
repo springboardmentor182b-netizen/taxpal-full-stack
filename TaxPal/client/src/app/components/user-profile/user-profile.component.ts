@@ -161,6 +161,36 @@ import { FormsModule } from '@angular/forms';
           </div>
         </div>
 
+        <!-- Expense Table -->
+        <div class="income-table-section">
+          <h3 class="income-table-title" style="color:#ef4444">Your Expense Records</h3>
+          <table class="income-table" *ngIf="expenseList.length > 0">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Tax Deductible</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let expense of expenseList">
+                <td>{{ expense.title }}</td>
+                <td class="expense-amount">{{ expense.amount | currency:'USD':'symbol':'1.2-2' }}</td>
+                <td>{{ expense.category || '-' }}</td>
+                <td>{{ expense.date | date:'mediumDate' }}</td>
+                <td>{{ expense.taxDeductible || '-' }}</td>
+                <td>{{ expense.notes || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="expenseList.length === 0" class="no-income-msg">
+            No expense records yet.
+          </div>
+        </div>
+
         <!-- Total Balance and Recent Transactions Row -->
         <div class="balance-transactions-row">
           <!-- Total Balance Card -->
@@ -1956,6 +1986,15 @@ import { FormsModule } from '@angular/forms';
     .dark .no-income-msg {
       color: #9ca3af;
     }
+
+    /* Expense Table Styles */
+    .expense-amount {
+      color: #ef4444;
+      font-weight: 600;
+    }
+    .dark .expense-amount {
+      color: #f87171;
+    }
   `]
 })
 export class UserProfileComponent implements OnInit {
@@ -1989,6 +2028,7 @@ export class UserProfileComponent implements OnInit {
   userInitial: string = '';
   userEmail: string = '';
   incomeList: any[] = [];
+  expenseList: any[] = [];
 
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
@@ -2006,6 +2046,7 @@ export class UserProfileComponent implements OnInit {
 
     this.fetchUserProfile();
     this.fetchIncomeList();
+    this.fetchExpenseList();
   }
   
   toggleDarkMode() {
@@ -2106,6 +2147,7 @@ export class UserProfileComponent implements OnInit {
     this.http.post('/api/users/add-expense', payload).subscribe({
       next: (res: any) => {
         this.expenseSuccessMsg = 'Expense added!';
+        this.fetchExpenseList(); // Refresh table after adding
         setTimeout(() => {
           this.hideAddExpenseModal();
           this.expenseForm = { title: '', amount: null, category: '', date: '', notes: '', taxDeductible: '' };
@@ -2128,10 +2170,36 @@ export class UserProfileComponent implements OnInit {
     }
     this.http.get<any[]>(`/api/users/income-list?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
       next: (list) => {
-        this.incomeList = Array.isArray(list) ? list : [];
+        // Ensure dates are parsed as Date objects for correct display
+        this.incomeList = Array.isArray(list)
+          ? list.map(item => ({
+              ...item,
+              date: item.date ? new Date(item.date) : null
+            }))
+          : [];
       },
       error: () => {
         this.incomeList = [];
+      }
+    });
+  }
+
+  fetchExpenseList() {
+    if (!this.userEmail) {
+      this.expenseList = [];
+      return;
+    }
+    this.http.get<any[]>(`/api/users/expense-list?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
+      next: (list) => {
+        this.expenseList = Array.isArray(list)
+          ? list.map(item => ({
+              ...item,
+              date: item.date ? new Date(item.date) : null
+            }))
+          : [];
+      },
+      error: () => {
+        this.expenseList = [];
       }
     });
   }
@@ -2143,13 +2211,15 @@ export class UserProfileComponent implements OnInit {
         this.userName = user?.name || '';
         this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : '';
         this.userEmail = user?.email || '';
-        this.fetchIncomeList(); // Fetch income after getting userEmail
+        this.fetchIncomeList();
+        this.fetchExpenseList();
       },
-      error: () => {
+           error: () => {
         this.userName = '';
         this.userInitial = '';
         this.userEmail = '';
         this.incomeList = [];
+        this.expenseList = [];
       }
     });
   }
