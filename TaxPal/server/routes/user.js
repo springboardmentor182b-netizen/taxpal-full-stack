@@ -37,6 +37,7 @@ router.post('/signin', async (req, res) => {
 
     console.log('Sign-in attempt for:', email);
 
+    // Explicitly search in the default database's users collection
     const user = await User.findOne({ email });
     if (!user) {
       console.log('Sign-in failed: No account found for', email);
