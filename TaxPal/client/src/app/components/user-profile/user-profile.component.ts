@@ -1,15 +1,23 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, HttpClientModule, FormsModule],
   template: `
     <div class="profile-container" [ngClass]="{'dark': isDarkMode}">
-      <!-- Theme Toggle Button - Removed duplicate -->
-      
+      <!-- User Profile Avatar -->
+      <div class="user-profile-avatar">
+        <div class="avatar-circle">
+          {{ userInitial }}
+        </div>
+        <span class="user-full-name">{{ userName }}</span>
+      </div>
+
       <div class="profile-content">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
@@ -477,24 +485,23 @@ import { Router, ActivatedRoute } from '@angular/router';
             <h2>Add New Income</h2>
             <p class="modal-subtitle">Track your earnings to better manage your finances</p>
           </div>
-          
           <div class="modal-body">
+            <div *ngIf="incomeErrorMsg" class="form-error">{{ incomeErrorMsg }}</div>
+            <div *ngIf="incomeSuccessMsg" class="form-success">{{ incomeSuccessMsg }}</div>
             <div class="form-group">
               <label for="income-title">Title</label>
-              <input type="text" id="income-title" placeholder="Freelance project">
+              <input type="text" id="income-title" placeholder="Freelance project" [(ngModel)]="incomeForm.title">
             </div>
-            
             <div class="form-group">
               <label for="income-amount">Amount</label>
               <div class="amount-input">
                 <span class="currency-symbol">$</span>
-                <input type="number" id="income-amount" placeholder="0.00" step="0.01">
+                <input type="number" id="income-amount" placeholder="0.00" step="0.01" [(ngModel)]="incomeForm.amount">
               </div>
             </div>
-            
             <div class="form-group">
               <label for="income-category">Category</label>
-              <select id="income-category">
+              <select id="income-category" [(ngModel)]="incomeForm.category">
                 <option value="" disabled selected>Select category</option>
                 <option value="freelance">Freelance Work</option>
                 <option value="consulting">Consulting</option>
@@ -504,23 +511,23 @@ import { Router, ActivatedRoute } from '@angular/router';
                 <option value="other">Other</option>
               </select>
             </div>
-            
             <div class="form-row">
               <div class="form-group">
                 <label for="income-date">Date</label>
-                <input type="date" id="income-date" [value]="getCurrentDate()">
+                <input type="date" id="income-date" [(ngModel)]="incomeForm.date">
               </div>
             </div>
-            
             <div class="form-group">
               <label for="income-notes">Notes</label>
-              <textarea id="income-notes" placeholder="Add any additional details..."></textarea>
+              <textarea id="income-notes" placeholder="Add any additional details..." [(ngModel)]="incomeForm.notes"></textarea>
             </div>
           </div>
-          
           <div class="modal-footer">
             <button class="btn-cancel" (click)="hideAddIncomeModal()">Cancel</button>
-            <button class="btn-submit">Add Income</button>
+            <button class="btn-submit" (click)="submitIncome()" [disabled]="incomeLoading">
+              <span *ngIf="incomeLoading" class="loader"></span>
+              <span *ngIf="!incomeLoading">Add Income</span>
+            </button>
           </div>
         </div>
       </div>
@@ -532,24 +539,23 @@ import { Router, ActivatedRoute } from '@angular/router';
             <h2>Add New Expense</h2>
             <p class="modal-subtitle">Track your expenses to better manage your finances</p>
           </div>
-          
           <div class="modal-body">
+            <div *ngIf="expenseErrorMsg" class="form-error">{{ expenseErrorMsg }}</div>
+            <div *ngIf="expenseSuccessMsg" class="form-success">{{ expenseSuccessMsg }}</div>
             <div class="form-group">
               <label for="expense-title">Title</label>
-              <input type="text" id="expense-title" placeholder="Office supplies">
+              <input type="text" id="expense-title" placeholder="Office supplies" [(ngModel)]="expenseForm.title">
             </div>
-            
             <div class="form-group">
               <label for="expense-amount">Amount</label>
               <div class="amount-input">
                 <span class="currency-symbol">$</span>
-                <input type="number" id="expense-amount" placeholder="0.00" step="0.01">
+                <input type="number" id="expense-amount" placeholder="0.00" step="0.01" [(ngModel)]="expenseForm.amount">
               </div>
             </div>
-            
             <div class="form-group">
               <label for="expense-category">Category</label>
-              <select id="expense-category">
+              <select id="expense-category" [(ngModel)]="expenseForm.category">
                 <option value="" disabled selected>Select category</option>
                 <option value="rent">Rent/Mortgage</option>
                 <option value="utilities">Utilities</option>
@@ -564,32 +570,32 @@ import { Router, ActivatedRoute } from '@angular/router';
                 <option value="other">Other</option>
               </select>
             </div>
-            
             <div class="form-row">
               <div class="form-group">
                 <label for="expense-date">Date</label>
-                <input type="date" id="expense-date" [value]="getCurrentDate()">
+                <input type="date" id="expense-date" [(ngModel)]="expenseForm.date">
               </div>
-              
               <div class="form-group">
                 <label for="expense-tax-deductible">Tax Deductible</label>
-                <select id="expense-tax-deductible">
+                <select id="expense-tax-deductible" [(ngModel)]="expenseForm.taxDeductible">
+                  <option value="" disabled selected>Select</option>
                   <option value="yes">Yes</option>
                   <option value="no">No</option>
                   <option value="partial">Partially</option>
                 </select>
               </div>
             </div>
-            
             <div class="form-group">
               <label for="expense-notes">Notes</label>
-              <textarea id="expense-notes" placeholder="Add any additional details..."></textarea>
+              <textarea id="expense-notes" placeholder="Add any additional details..." [(ngModel)]="expenseForm.notes"></textarea>
             </div>
           </div>
-          
           <div class="modal-footer">
             <button class="btn-cancel" (click)="hideAddExpenseModal()">Cancel</button>
-            <button class="btn-submit expense-submit">Add Expense</button>
+            <button class="btn-submit expense-submit" (click)="submitExpense()" [disabled]="expenseLoading">
+              <span *ngIf="expenseLoading" class="loader"></span>
+              <span *ngIf="!expenseLoading">Add Expense</span>
+            </button>
           </div>
         </div>
       </div>
@@ -1840,8 +1846,32 @@ export class UserProfileComponent implements OnInit {
   pageTitle: string = 'Dashboard';
   isAddIncomeModalVisible: boolean = false;
   isAddExpenseModalVisible: boolean = false;
+  incomeForm = {
+    title: '',
+    amount: null,
+    category: '',
+    date: '',
+    notes: ''
+  };
+  expenseForm = {
+    title: '',
+    amount: null,
+    category: '',
+    date: '',
+    notes: '',
+    taxDeductible: ''
+  };
+  incomeLoading = false;
+  expenseLoading = false;
+  incomeErrorMsg = '';
+  expenseErrorMsg = '';
+  incomeSuccessMsg = '';
+  expenseSuccessMsg = '';
+  userName: string = '';
+  userInitial: string = '';
+  userEmail: string = '';
 
-  constructor(private router: Router, private route: ActivatedRoute) {}
+  constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
     // Get the current route
@@ -1854,6 +1884,8 @@ export class UserProfileComponent implements OnInit {
     // Check for dark mode
     this.isDarkMode = document.documentElement.classList.contains('dark') || 
                       document.body.classList.contains('dark-mode');
+
+    this.fetchUserProfile();
   }
   
   toggleDarkMode() {
@@ -1906,6 +1938,82 @@ export class UserProfileComponent implements OnInit {
       this.isAddExpenseModalVisible = false;
       document.body.style.overflow = ''; // Restore scrolling
     }
+  }
+  
+  fetchUserProfile() {
+    // You may want to get the user from a token or API; here we assume a GET endpoint exists
+    this.http.get<any>('/api/users/me').subscribe({
+      next: (user) => {
+        this.userName = user?.name || '';
+        this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : '';
+        this.userEmail = user?.email || '';
+      },
+      error: () => {
+        this.userName = '';
+        this.userInitial = '';
+        this.userEmail = '';
+      }
+    });
+  }
+
+  submitIncome() {
+    if (!this.incomeForm.title || !this.incomeForm.amount || !this.incomeForm.date || !this.userEmail) {
+      this.incomeErrorMsg = 'Please fill all required fields.';
+      return;
+    }
+    this.incomeLoading = true;
+    this.incomeErrorMsg = '';
+    this.incomeSuccessMsg = '';
+    const payload = {
+      ...this.incomeForm,
+      userEmail: this.userEmail
+    };
+    this.http.post('/api/users/add-income', payload).subscribe({
+      next: (res: any) => {
+        this.incomeSuccessMsg = 'Income added!';
+        setTimeout(() => {
+          this.hideAddIncomeModal();
+          this.incomeForm = { title: '', amount: null, category: '', date: '', notes: '' };
+          this.incomeSuccessMsg = '';
+        }, 1200);
+      },
+      error: (err) => {
+        this.incomeErrorMsg = err?.error?.error || 'Failed to add income.';
+      },
+      complete: () => {
+        this.incomeLoading = false;
+      }
+    });
+  }
+
+  submitExpense() {
+    if (!this.expenseForm.title || !this.expenseForm.amount || !this.expenseForm.date || !this.userEmail) {
+      this.expenseErrorMsg = 'Please fill all required fields.';
+      return;
+    }
+    this.expenseLoading = true;
+    this.expenseErrorMsg = '';
+    this.expenseSuccessMsg = '';
+    const payload = {
+      ...this.expenseForm,
+      userEmail: this.userEmail
+    };
+    this.http.post('/api/users/add-expense', payload).subscribe({
+      next: (res: any) => {
+        this.expenseSuccessMsg = 'Expense added!';
+        setTimeout(() => {
+          this.hideAddExpenseModal();
+          this.expenseForm = { title: '', amount: null, category: '', date: '', notes: '', taxDeductible: '' };
+          this.expenseSuccessMsg = '';
+        }, 1200);
+      },
+      error: (err) => {
+        this.expenseErrorMsg = err?.error?.error || 'Failed to add expense.';
+      },
+      complete: () => {
+        this.expenseLoading = false;
+      }
+    });
   }
   
   getCurrentDate(): string {
