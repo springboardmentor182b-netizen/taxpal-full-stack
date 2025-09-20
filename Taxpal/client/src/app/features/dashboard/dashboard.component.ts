@@ -8,11 +8,11 @@ import { IncomeModalComponent } from '../auth/components/income/income';
 import { ExpenseModalComponent } from '../auth/components/expense/expense';
 
 // SERVICE
-import { TransactionService } from '../../core/services/transaction.service';
+import { TransactionService } from '../auth/services/transaction.service';
 
 // TYPES (interfaces)
-import type { Income } from '../../core/models/income.model';
-import type { Expense } from '../../core/models/expense.model';
+import type { Income } from '../auth/models/income.model';
+import type { Expense } from '../auth/models/expense.model';
 
 @Component({
   selector: 'app-dashboard',
