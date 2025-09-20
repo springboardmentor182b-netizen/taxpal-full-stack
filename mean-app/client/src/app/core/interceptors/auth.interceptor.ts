@@ -48,16 +48,14 @@ export class AuthInterceptor implements HttpInterceptor {
       headers: request.headers.set('Authorization', `Bearer ${token}`)
     });
   }
-
   private isPublicRoute(url: string): boolean {
     const publicRoutes = [
-      '/auth/login',
-      '/auth/signup',
-      '/auth/forgot-password',
-      '/auth/reset-password',
-      '/auth/verify-email'
-    ];
-    
+      '/user/login',
+      '/user/register',
+      '/user/forgot-password',
+      '/user/request-reset',
+      '/user/reset-password/:token'
+    ];  
     return publicRoutes.some(route => url.includes(route));
   }
 

@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { IncomeService } from '../../../services/income.services';
 @Component({
   selector: 'app-income-form',
@@ -18,7 +20,8 @@ import { IncomeService } from '../../../services/income.services';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
-    MatSelectModule
+    MatSelectModule,
+    MatSnackBarModule
   ],
   templateUrl: './income-form.html',
   styleUrls: ['./income-form.scss']
@@ -31,6 +34,7 @@ export class IncomeForm {
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<IncomeForm>,   // ✅ inject DialogRef
     private incomeService:IncomeService,
+    private snackBar: MatSnackBar
   ) {
     this.incomeForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
@@ -50,14 +54,31 @@ export class IncomeForm {
   submitForm() {
     if (this.incomeForm.valid) {
       this.incomeService.addIncome(this.incomeForm.value).subscribe({
-        next: (res: any) => { // Change type to any
+        next: (res: any) => {
           console.log('✅ Income saved:', res);
+  
+          this.snackBar.open('✔ Income saved successfully!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['success-snackbar']   // ✅ applies green background
+          });
+  
           this.dialogRef.close(res.income);
         },
         error: (err) => {
           console.error('❌ Error saving income:', err);
+  
+          this.snackBar.open('✖ Failed to save income!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'right',
+            verticalPosition: 'top',
+            panelClass: ['error-snackbar']    // ✅ applies red background
+          });
         }
       });
     }
   }
+  
+  
 }

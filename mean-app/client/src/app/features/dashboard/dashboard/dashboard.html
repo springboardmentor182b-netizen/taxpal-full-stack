@@ -3,7 +3,6 @@
 
   <!-- Hamburger (visible on tablet/mobile and also on narrow laptop) -->
   <button class="hamburger" aria-label="Open menu" (click)="toggleSidebar()">
-    <!-- simple hamburger svg -->
     <svg width="18" height="14" viewBox="0 0 18 14" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect y="0" width="18" height="2" rx="1" fill="#fff"/>
       <rect y="6" width="18" height="2" rx="1" fill="#fff"/>
@@ -23,8 +22,6 @@
     <div class="sidebar-top">
       <div class="brand-row">
         <div class="brand">TaxPal</div>
-
-        <!-- collapse button (visible at larger widths) -->
         <button class="collapse-btn" title="Collapse sidebar" (click)="toggleCollapse()" aria-label="Collapse sidebar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -37,7 +34,6 @@
     <nav class="nav">
       <a class="nav-item active">
         <span class="icon" aria-hidden="true">
-          <!-- home icon -->
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11.5L12 4l9 7.5"></path>
             <path d="M9 21V12h6v9"></path>
@@ -48,7 +44,6 @@
 
       <a class="nav-item">
         <span class="icon">
-          <!-- transactions / list icon -->
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="3" y="4" width="18" height="16" rx="2"></rect>
             <path d="M7 9h10M7 13h6"></path>
@@ -59,7 +54,6 @@
 
       <a class="nav-item">
         <span class="icon">
-          <!-- budgets / wallet -->
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h11"></path>
             <path d="M16 3v4"></path>
@@ -70,7 +64,6 @@
 
       <a class="nav-item">
         <span class="icon">
-          <!-- calculator / tax -->
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="7" y="3" width="10" height="6" rx="1"></rect>
             <path d="M7 13h10M7 17h10M11 7v4"></path>
@@ -81,7 +74,6 @@
 
       <a class="nav-item">
         <span class="icon">
-          <!-- report / chart -->
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5">
             <path d="M3 3v18h18"></path>
             <path d="M7 13v-6M12 13v-2M17 13v-8"></path>
@@ -94,17 +86,16 @@
     <!-- profile area (bottom) -->
     <div class="sidebar-bottom">
       <div class="profile">
-        <div class="avatar">AM</div>
+        <div class="avatar">{{ userInitials }}</div>
         <div class="meta">
-          <div class="name">Alex Morgan</div>
-          <div class="email">ulas@r.comuple.com</div>
+          <div class="name">{{ currentUser?.fullName }}</div>
+          <div class="email">{{ currentUser?.email }}</div>
         </div>
       </div>
 
       <div class="sidebar-actions">
         <button class="action settings">
           <span class="action-icon" aria-hidden="true">
-            <!-- settings svg -->
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4">
               <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z"/>
               <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.2.2a1 1 0 0 1-1.4 1.4l-.2-.2a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21a1 1 0 0 1-2 0v-.4a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.2.2A1 1 0 0 1 6.7 18.1l.2-.2a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H4a1 1 0 0 1 0-2h.4a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9l-.2-.2A1 1 0 0 1 8.9 4.7l.2.2a1.7 1.7 0 0 0 1.9.3h.1A1.7 1.7 0 0 0 12 4.7V4a1 1 0 0 1 2 0v.4a1.7 1.7 0 0 0 1 1.6h.1a1.7 1.7 0 0 0 1.9-.3l.2-.2A1 1 0 0 1 19.4 5.9l-.2.2a1.7 1.7 0 0 0-.3 1.9v.1a1.7 1.7 0 0 0 1.6 1H20a1 1 0 0 1 0 2h-.4a1.7 1.7 0 0 0-1.6 1z"/>
@@ -113,9 +104,8 @@
           <span class="action-label">Settings</span>
         </button>
 
-        <button class="action logout">
+        <button class="action logout" (click)="logout()">
           <span class="action-icon">
-            <!-- logout svg -->
             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.4">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <path d="M16 17l5-5-5-5M21 12H9"/>
@@ -132,6 +122,20 @@
 
   <!-- Main area -->
   <main class="main-area">
+
+    <!-- Buttons on top of cards -->
+    <!-- Top header row -->
+<div class="dashboard-header">
+  <h1 class="title">
+    <span *ngFor="let letter of dashboardLetters; let i = index" [style.animationDelay]="i*0.1+'s'">{{ letter }}</span>
+  </h1>
+  <div class="button-group-top">
+    <button mat-raised-button color="primary" (click)="openIncomeForm()">Add Income</button>
+    <button mat-raised-button color="warn" (click)="openExpenseForm()">Add Expense</button>
+  </div>
+</div>
+
+
     <!-- Top cards row -->
     <section class="top-cards">
       <article class="info-card">
@@ -163,12 +167,19 @@
     <section class="charts-row">
       <div class="card chart-card big">
         <h3>Income vs Expenses</h3>
+        <div class="chart-filter">
+          <label for="period">View by:</label>
+          <select id="period" [(ngModel)]="selectedPeriod" (change)="onPeriodChange(selectedPeriod)">
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+            <option value="year">This Year</option>
+          </select>
+        </div>
         <div class="chart-wrap">
-          <canvas
-            baseChart
+          <canvas baseChart
             [data]="barChartData"
             [options]="barChartOptions"
-            [type]="'bar'">
+            chartType="bar">
           </canvas>
         </div>
       </div>
@@ -218,11 +229,6 @@
         </tbody>
       </table>
     </section>
-   <!-- Example: Buttons to open income/expense forms -->
-<div class="button-group">
-  <button mat-raised-button color="primary" (click)="openIncomeForm()">Add Income</button>
-  <button mat-raised-button color="warn" (click)="openExpenseForm()">Add Expense</button>
-</div>
+
   </main>
 </div>
-
