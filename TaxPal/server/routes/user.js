@@ -137,4 +137,16 @@ router.post('/add-expense', async (req, res) => {
   }
 });
 
+// GET /api/users/income-list?userEmail=...
+router.get('/income-list', async (req, res) => {
+  try {
+    const userEmail = (req.query.userEmail || '').trim().toLowerCase();
+    if (!userEmail) return res.status(400).json([]);
+    const incomeList = await Income.find({ userEmail }).sort({ date: -1, createdAt: -1 });
+    res.json(incomeList);
+  } catch (err) {
+    res.status(500).json([]);
+  }
+});
+
 module.exports = router;

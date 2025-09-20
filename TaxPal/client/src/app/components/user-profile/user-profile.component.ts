@@ -133,6 +133,34 @@ import { FormsModule } from '@angular/forms';
           </div>
         </div>
 
+        <!-- Income Table -->
+        <div class="income-table-section">
+          <h3 class="income-table-title">Your Income Records</h3>
+          <table class="income-table" *ngIf="incomeList.length > 0">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Amount</th>
+                <th>Category</th>
+                <th>Date</th>
+                <th>Notes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let income of incomeList">
+                <td>{{ income.title }}</td>
+                <td class="income-amount">{{ income.amount | currency:'USD':'symbol':'1.2-2' }}</td>
+                <td>{{ income.category || '-' }}</td>
+                <td>{{ income.date | date:'mediumDate' }}</td>
+                <td>{{ income.notes || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="incomeList.length === 0" class="no-income-msg">
+            No income records yet.
+          </div>
+        </div>
+
         <!-- Total Balance and Recent Transactions Row -->
         <div class="balance-transactions-row">
           <!-- Total Balance Card -->
@@ -1838,6 +1866,96 @@ import { FormsModule } from '@angular/forms';
         margin-bottom: 1rem;
       }
     }
+
+    /* Income Table Styles */
+    .income-table-section {
+      margin: 2.5rem 0 2rem 0;
+      background: #fff;
+      border-radius: 0.75rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      padding: 2rem 1.5rem;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .income-table-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #2563eb;
+      margin-bottom: 1.25rem;
+      letter-spacing: 0.5px;
+    }
+
+    .income-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 0.5rem;
+    }
+
+    .income-table th, .income-table td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      font-size: 1rem;
+    }
+
+    .income-table th {
+      background: #f3f4f6;
+      color: #374151;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .income-table tr:nth-child(even) {
+      background: #f9fafb;
+    }
+
+    .income-table tr:nth-child(odd) {
+      background: #fff;
+    }
+
+    .income-amount {
+      color: #10b981;
+      font-weight: 600;
+    }
+
+    .no-income-msg {
+      color: #6b7280;
+      text-align: center;
+      padding: 1.5rem 0 0.5rem 0;
+      font-size: 1rem;
+    }
+
+    .dark .income-table-section {
+      background: #1f2937;
+      box-shadow: 0 1px 3px rgba(59,130,246,0.08);
+    }
+
+    .dark .income-table-title {
+      color: #60a5fa;
+    }
+
+    .dark .income-table th {
+      background: #374151;
+      color: #f9fafb;
+      border-bottom: 2px solid #374151;
+    }
+
+    .dark .income-table tr:nth-child(even) {
+      background: #111827;
+    }
+
+    .dark .income-table tr:nth-child(odd) {
+      background: #1f2937;
+    }
+
+    .dark .income-amount {
+      color: #34d399;
+    }
+
+    .dark .no-income-msg {
+      color: #9ca3af;
+    }
   `]
 })
 export class UserProfileComponent implements OnInit {
@@ -1870,6 +1988,7 @@ export class UserProfileComponent implements OnInit {
   userName: string = '';
   userInitial: string = '';
   userEmail: string = '';
+  incomeList: any[] = [];
 
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
@@ -1886,6 +2005,7 @@ export class UserProfileComponent implements OnInit {
                       document.body.classList.contains('dark-mode');
 
     this.fetchUserProfile();
+    this.fetchIncomeList();
   }
   
   toggleDarkMode() {
@@ -1940,22 +2060,6 @@ export class UserProfileComponent implements OnInit {
     }
   }
   
-  fetchUserProfile() {
-    // You may want to get the user from a token or API; here we assume a GET endpoint exists
-    this.http.get<any>('/api/users/me').subscribe({
-      next: (user) => {
-        this.userName = user?.name || '';
-        this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : '';
-        this.userEmail = user?.email || '';
-      },
-      error: () => {
-        this.userName = '';
-        this.userInitial = '';
-        this.userEmail = '';
-      }
-    });
-  }
-
   submitIncome() {
     if (!this.incomeForm.title || !this.incomeForm.amount || !this.incomeForm.date || !this.userEmail) {
       this.incomeErrorMsg = 'Please fill all required fields.';
@@ -1971,6 +2075,7 @@ export class UserProfileComponent implements OnInit {
     this.http.post('/api/users/add-income', payload).subscribe({
       next: (res: any) => {
         this.incomeSuccessMsg = 'Income added!';
+        this.fetchIncomeList(); // Refresh table after adding
         setTimeout(() => {
           this.hideAddIncomeModal();
           this.incomeForm = { title: '', amount: null, category: '', date: '', notes: '' };
@@ -2016,6 +2121,39 @@ export class UserProfileComponent implements OnInit {
     });
   }
   
+  fetchIncomeList() {
+    if (!this.userEmail) {
+      this.incomeList = [];
+      return;
+    }
+    this.http.get<any[]>(`/api/users/income-list?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
+      next: (list) => {
+        this.incomeList = Array.isArray(list) ? list : [];
+      },
+      error: () => {
+        this.incomeList = [];
+      }
+    });
+  }
+
+  fetchUserProfile() {
+    // You may want to get the user from a token or API; here we assume a GET endpoint exists
+    this.http.get<any>('/api/users/me').subscribe({
+      next: (user) => {
+        this.userName = user?.name || '';
+        this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : '';
+        this.userEmail = user?.email || '';
+        this.fetchIncomeList(); // Fetch income after getting userEmail
+      },
+      error: () => {
+        this.userName = '';
+        this.userInitial = '';
+        this.userEmail = '';
+        this.incomeList = [];
+      }
+    });
+  }
+
   getCurrentDate(): string {
     const now = new Date();
     const year = now.getFullYear();
