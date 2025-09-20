@@ -149,6 +149,30 @@
     font-size: 12px;
   }
 }
+.success-snackbar {
+  background-color: #43a047 !important;  /* Green */
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+}
+
+/* Error Snackbar */
+.error-snackbar {
+  background-color: #e53935 !important;  /* Red */
+  color: #fff !important;
+  font-weight: 600;
+  border-radius: 8px !important;
+  padding: 8px 16px !important;
+}
+
+/* Optional: style all snackbars */
+.mat-snack-bar-container {
+  font-size: 14px !important;
+  border-radius: 8px !important;
+}
+
+
 
 @media (max-width: 480px) {
   .form-row {

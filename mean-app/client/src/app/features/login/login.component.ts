@@ -1,4 +1,3 @@
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -24,6 +23,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   
   // For redirect after login
   private returnUrl: string = '/dashboard';
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -31,7 +31,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: ['', [Validators.required, Validators.email]],   // ✅ email instead of username
       password: ['', [Validators.required, Validators.minLength(6)]],
       rememberMe: [false]
     });
@@ -67,17 +67,24 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.loginForm.valid) {
       this.clearMessages();
       const credentials = {
-        username: this.loginForm.get('username')?.value.trim(),
+        email: this.loginForm.get('email')?.value.trim(),   // ✅ fixed
         password: this.loginForm.get('password')?.value
       };
       
       this.authService.login(credentials)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (user) => {
-            console.log('Login successful:', user);
-            this.successMessage = `Welcome back, ${user.fullName}!`;
-            
+          next: (res) => {
+            console.log('Login successful:', res);
+            this.successMessage = `Welcome back, ${res.user.fullName}!`;
+
+            // ✅ store token based on rememberMe
+            if (this.loginForm.get('rememberMe')?.value) {
+              localStorage.setItem('token', res.token);
+            } else {
+              sessionStorage.setItem('token', res.token);
+            }
+
             // Small delay to show success message before redirecting
             setTimeout(() => {
               this.router.navigate([this.returnUrl]);
@@ -100,7 +107,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     
     // Handle different types of errors
     if (error.status === 401) {
-      this.errorMessage = 'Invalid username or password. Please try again.';
+      this.errorMessage = 'Invalid email or password. Please try again.';
     } else if (error.status === 403) {
       this.errorMessage = 'Account is locked or not verified. Please contact support.';
     } else if (error.status === 429) {
@@ -111,7 +118,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.errorMessage = error.message || 'Login failed. Please try again.';
     }
   }
-
   getFieldError(fieldName: string): string {
     const field = this.loginForm.get(fieldName);
     if (field && field.invalid && (field.dirty || field.touched)) {
@@ -131,13 +137,12 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      'username': 'Username',
-      'password': 'Password',
-      'email': 'Email'
+      'email': 'Email',
+      'password': 'Password'
     };
     return labels[fieldName] || this.capitalizeFirst(fieldName);
   }
-
+  
   private markFormGroupTouched(): void {
     Object.keys(this.loginForm.controls).forEach(key => {
       const control = this.loginForm.get(key);
@@ -160,36 +165,20 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   navigateToSignup(): void {
     console.log('Navigating to signup...');
-    
     const queryParams = this.returnUrl !== '/dashboard' ? { returnUrl: this.returnUrl } : {};
-    
-    this.router.navigate(['/features/signup'], { queryParams }).then(
-      (success) => {
-        console.log('Navigation to signup success:', success);
-      },
-      (error) => {
-        console.error('Navigation to signup error:', error);
-      }
-    );
+    this.router.navigate(['/features/signup'], { queryParams });
   }
 
   navigateToForgotPassword(): void {
     console.log('Navigating to forgot password...');
-    this.router.navigate(['/features/forgot-password']).then(
-      (success) => {
-        console.log('Navigation to forgot password success:', success);
-      },
-      (error) => {
-        console.error('Navigation to forgot password error:', error);
-      }
-    );
+    this.router.navigate(['/features/forgot-password']);
   }
-
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   } 
+
   getFormControl(fieldName: string) {
     return this.loginForm.get(fieldName);
   }
