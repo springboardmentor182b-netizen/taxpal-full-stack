@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
-import { AuthService, LoginRequest } from '@/app/core/services/auth.service';
+import { AuthService } from '@/app/core/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -19,7 +19,8 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private auth: AuthService
   ) {
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
@@ -32,17 +33,16 @@ export class LoginComponent {
       this.isLoading.set(true);
       this.errorMessage.set(null);
 
-      // Fake API call simulation - replace with real auth API
-      setTimeout(() => {
-        const { email, password } = this.loginForm.value;
-        // Example validation (replace with actual server logic)
-        if (email === 'demo@taxpal.com' && password === '123456') {
+      this.auth.login(this.loginForm.value).subscribe({
+        next: () => {
+          this.isLoading.set(false);
           this.router.navigate(['/dashboard']);
-        } else {
-          this.errorMessage.set('Invalid email or password.');
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err?.error?.message || 'Invalid email or password.');
         }
-        this.isLoading.set(false);
-      }, 1300);
+      });
     } else {
       this.markFormGroupTouched();
     }

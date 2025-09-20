@@ -33,5 +33,9 @@
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
+  },
+  "dependencies": {
+    "express-validator": "^7.2.1",
+    "nodemailer": "^7.0.6"
   }
 }

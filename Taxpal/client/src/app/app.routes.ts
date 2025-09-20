@@ -55,6 +55,17 @@ export const routes: Routes = [
         .then(m => m.ReportsComponent),
     canActivate: [authGuard]
   },
+  // wherever your Routes[] are defined
+{
+  path: 'forgot-password',
+  loadComponent: () => import('./features/auth/components/forgot-password/forgot-password.component')
+    .then(m => m.ForgotPasswordComponent)
+},
+{
+  path: 'reset-password',
+  loadComponent: () => import('./features/auth/components/reset-password/reset-password.component')
+    .then(m => m.ResetPasswordComponent)
+},
 
   // Fallback: if unknown route, go to login
   { path: '**', redirectTo: 'login' }

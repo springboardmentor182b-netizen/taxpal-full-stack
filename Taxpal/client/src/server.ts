@@ -1,3 +1,4 @@
+// client/src/server.ts
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -13,19 +14,7 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
-
-/**
- * Serve static files from /browser
+ * Static files from /browser
  */
 app.use(
   express.static(browserDistFolder, {
@@ -36,7 +25,14 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Optional: tiny health endpoint for SSR
+ */
+app.get('/__client_ssr_health', (_req, res) => {
+  res.json({ ok: true, srv: 'angular-ssr', folder: browserDistFolder });
+});
+
+/**
+ * SSR handler (all others fall through to Angular)
  */
 app.use((req, res, next) => {
   angularApp
@@ -48,21 +44,30 @@ app.use((req, res, next) => {
 });
 
 /**
- * Start the server if this module is the main entry point.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ * Start the SSR server only when this file is the main entry.
+ * Use CLIENT_PORT (defaults to 4000) to avoid colliding with the backend PORT=3000.
  */
 if (isMainModule(import.meta.url)) {
-  const port = process.env['PORT'] || 4000;
-  app.listen(port, (error) => {
-    if (error) {
-      throw error;
-    }
+  // Prefer CLIENT_PORT; do NOT reuse PORT to avoid clashing with the backend
+  const port = Number(process.env['CLIENT_PORT'] || 4000);
 
-    console.log(`Node Express server listening on http://localhost:${port}`);
-  });
+  // Guard against accidental double-starts
+  if (!(global as any).__ng_ssr_started) {
+    const server = app.listen(port, (error?: unknown) => {
+      if (error) throw error;
+      (global as any).__ng_ssr_started = true;
+      console.log(`Angular SSR listening on http://localhost:${port}`);
+    });
+
+    const shutdown = () => server.close(() => process.exit(0));
+    process.on('SIGINT', shutdown);
+    process.on('SIGTERM', shutdown);
+  } else {
+    console.log('[ng-ssr] listen skipped (already started)');
+  }
 }
 
 /**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
+ * Request handler exported for CLI / functions environments
  */
 export const reqHandler = createNodeRequestHandler(app);

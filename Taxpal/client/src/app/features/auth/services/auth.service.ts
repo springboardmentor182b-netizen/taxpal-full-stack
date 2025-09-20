@@ -109,4 +109,22 @@ export class AuthService {
       error: this.errorSubject.value
     };
   }
+
+// client/src/app/core/services/auth.service.ts
+forgotPassword(email: string) {
+  return this.http.post<{ message: string }>(
+    `${this.API_URL}/forgot-password`,
+    { email }
+  );
 }
+
+resetPassword(token: string, password: string) {
+  return this.http.post<{ message: string; token: string; user: any }>(
+    `${this.API_URL}/reset-password`,
+    { token, password }
+  );
+}
+
+
+}
+

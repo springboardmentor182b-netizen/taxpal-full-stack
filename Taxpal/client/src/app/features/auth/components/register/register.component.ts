@@ -26,7 +26,7 @@ export class RegisterComponent {
     this.registerForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(8)]], // 8+ for stronger rule
       confirmPassword: ['', [Validators.required]],
       country: ['US', [Validators.required]],
       income_bracket: ['middle', [Validators.required]]
@@ -36,12 +36,10 @@ export class RegisterComponent {
   passwordMatchValidator(form: FormGroup) {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
-    
     if (password && confirmPassword && password.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     }
-    
     return null;
   }
 
@@ -57,13 +55,11 @@ export class RegisterComponent {
         country: this.registerForm.value.country,
         income_bracket: this.registerForm.value.income_bracket
       };
-      
+
       this.authService.register(registerData).subscribe({
-        next: (response: any) => {
-          if (response) {
-            this.isLoading.set(false);
-            this.router.navigate(['/dashboard']);
-          }
+        next: () => {
+          this.isLoading.set(false);
+          this.router.navigate(['/dashboard']);
         },
         error: (error: any) => {
           this.isLoading.set(false);
@@ -75,39 +71,24 @@ export class RegisterComponent {
     }
   }
 
-  togglePasswordVisibility(): void {
-    this.showPassword.set(!this.showPassword());
-  }
-
-  toggleConfirmPasswordVisibility(): void {
-    this.showConfirmPassword.set(!this.showConfirmPassword());
-  }
+  togglePasswordVisibility(): void { this.showPassword.set(!this.showPassword()); }
+  toggleConfirmPasswordVisibility(): void { this.showConfirmPassword.set(!this.showConfirmPassword()); }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.registerForm.controls).forEach(key => {
-      const control = this.registerForm.get(key);
-      control?.markAsTouched();
-    });
+    Object.keys(this.registerForm.controls).forEach(key => this.registerForm.get(key)?.markAsTouched());
   }
 
   getFieldError(fieldName: string): string | null {
     const field = this.registerForm.get(fieldName);
     if (field?.errors && field.touched) {
-      if (field.errors['required']) {
-        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
-      }
-      if (field.errors['email']) {
-        return 'Please enter a valid email address';
-      }
+      if (field.errors['required']) return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} is required`;
+      if (field.errors['email']) return 'Please enter a valid email address';
       if (field.errors['minlength']) {
-        if (fieldName === 'password') {
-          return 'Password must be at least 6 characters long';
-        }
-        return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least 2 characters long`;
+        return fieldName === 'password'
+          ? 'Password must be at least 8 characters long'
+          : `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} must be at least 2 characters long`;
       }
-      if (field.errors['passwordMismatch']) {
-        return 'Passwords do not match';
-      }
+      if (field.errors['passwordMismatch']) return 'Passwords do not match';
     }
     return null;
   }
