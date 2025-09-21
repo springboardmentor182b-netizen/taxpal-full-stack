@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import Income from '../models/Income';
-import { AuthedRequest } from '../middleware/auth';
+import Income from '../../api/income/Income';
+import { AuthedRequest } from '../../api/auth/auth';
 
 export async function createIncome(req: AuthedRequest, res: Response) {
   const doc = await Income.create({ ...req.body, userId: req.user!.id });

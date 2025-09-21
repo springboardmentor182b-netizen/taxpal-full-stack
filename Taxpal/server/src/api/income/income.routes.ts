@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth';
-import { createIncome, deleteIncome, listIncomes, updateIncome } from '../controllers/income.controller';
+import { requireAuth } from '../../api/auth/auth';
+import { createIncome, deleteIncome, listIncomes, updateIncome } from '../../api/income/income.controller';
 const r = Router();
 r.use(requireAuth);
 r.post('/', createIncome);

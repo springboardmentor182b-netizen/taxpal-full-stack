@@ -33,13 +33,9 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { verifyMailer } from './utils/mailer';
 
-import authRoutes from './routes/auth';
-import transactionRoutes from './routes/transactions';
-import budgetRoutes from './routes/budgets';
-import taxRoutes from './routes/tax';
-import reportRoutes from './routes/reports';
-import incomeRoutes from './routes/income.routes';
-import expenseRoutes from './routes/expense.routes';
+import authRoutes from './api/auth/auth-route';
+import incomeRoutes from './api/income/income.routes';
+import expenseRoutes from './api/expense/expense.routes';
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -69,10 +65,6 @@ mongoose
 
 // ---------- Routes (use ONLY v1 prefix) ----------
 app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/transactions', transactionRoutes);
-app.use('/api/v1/budgets', budgetRoutes);
-app.use('/api/v1/tax', taxRoutes);
-app.use('/api/v1/reports', reportRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 
