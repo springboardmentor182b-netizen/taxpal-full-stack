@@ -11,13 +11,15 @@ import { FormsModule } from '@angular/forms';
   template: `
     <div class="profile-container" [ngClass]="{'dark': isDarkMode}">
       <!-- User Profile Avatar -->
+      <!-- REMOVE this block to stop showing the letter and name below navbar -->
+      <!--
       <div class="user-profile-avatar">
         <div class="avatar-circle">
           {{ userInitial }}
         </div>
         <span class="user-full-name">{{ userName }}</span>
       </div>
-
+      -->
       <div class="profile-content">
         <!-- Dashboard Header -->
         <div class="dashboard-header">
@@ -231,65 +233,24 @@ import { FormsModule } from '@angular/forms';
               <a href="#" class="view-all-link">View All</a>
             </div>
             <div class="transactions-list">
-              <div class="transaction-item income">
-                <div class="transaction-info">
-                  <h4>Freelance Web Development</h4>
-                  <div class="transaction-meta">
-                    <span class="date">2024-01-15</span>
-                    <span class="separator">•</span>
-                    <span class="category">Work</span>
+              <ng-container *ngIf="recentTransactions.length > 0; else noTransactions">
+                <div *ngFor="let tx of recentTransactions" class="transaction-item" [ngClass]="tx.type">
+                  <div class="transaction-info">
+                    <h4>{{ tx.title }}</h4>
+                    <div class="transaction-meta">
+                      <span class="date">{{ tx.date | date:'mediumDate' }}</span>
+                      <span class="separator">•</span>
+                      <span class="category">{{ tx.category || (tx.type === 'income' ? 'Income' : 'Expense') }}</span>
+                    </div>
+                  </div>
+                  <div class="transaction-amount" [ngClass]="tx.type === 'income' ? 'positive' : 'negative'">
+                    {{ tx.type === 'income' ? '+' : '-' }}{{ tx.amount | currency:'USD':'symbol':'1.2-2' }}
                   </div>
                 </div>
-                <div class="transaction-amount positive">+$2,500</div>
-              </div>
-              
-              <div class="transaction-item expense">
-                <div class="transaction-info">
-                  <h4>Office Supplies</h4>
-                  <div class="transaction-meta">
-                    <span class="date">2024-01-14</span>
-                    <span class="separator">•</span>
-                    <span class="category">Office</span>
-                  </div>
-                </div>
-                <div class="transaction-amount negative">$150</div>
-              </div>
-              
-              <div class="transaction-item expense">
-                <div class="transaction-info">
-                  <h4>Software Subscription</h4>
-                  <div class="transaction-meta">
-                    <span class="date">2024-01-13</span>
-                    <span class="separator">•</span>
-                    <span class="category">Tools</span>
-                  </div>
-                </div>
-                <div class="transaction-amount negative">$29</div>
-              </div>
-              
-              <div class="transaction-item income">
-                <div class="transaction-info">
-                  <h4>Client Consultation</h4>
-                  <div class="transaction-meta">
-                    <span class="date">2024-01-12</span>
-                    <span class="separator">•</span>
-                    <span class="category">Consulting</span>
-                  </div>
-                </div>
-                <div class="transaction-amount positive">+$1,200</div>
-              </div>
-              
-              <div class="transaction-item expense">
-                <div class="transaction-info">
-                  <h4>Marketing Campaign</h4>
-                  <div class="transaction-meta">
-                    <span class="date">2024-01-11</span>
-                    <span class="separator">•</span>
-                    <span class="category">Marketing</span>
-                  </div>
-                </div>
-                <div class="transaction-amount negative">$300</div>
-              </div>
+              </ng-container>
+              <ng-template #noTransactions>
+                <div class="no-income-msg">No recent transactions.</div>
+              </ng-template>
             </div>
           </div>
         </div>
@@ -2029,6 +1990,7 @@ export class UserProfileComponent implements OnInit {
   userEmail: string = '';
   incomeList: any[] = [];
   expenseList: any[] = [];
+  recentTransactions: any[] = [];
 
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
@@ -2047,6 +2009,7 @@ export class UserProfileComponent implements OnInit {
     this.fetchUserProfile();
     this.fetchIncomeList();
     this.fetchExpenseList();
+    this.updateRecentTransactions();
   }
   
   toggleDarkMode() {
@@ -2166,20 +2129,22 @@ export class UserProfileComponent implements OnInit {
   fetchIncomeList() {
     if (!this.userEmail) {
       this.incomeList = [];
+      this.updateRecentTransactions();
       return;
     }
     this.http.get<any[]>(`/api/users/income-list?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
       next: (list) => {
-        // Ensure dates are parsed as Date objects for correct display
         this.incomeList = Array.isArray(list)
           ? list.map(item => ({
               ...item,
               date: item.date ? new Date(item.date) : null
             }))
           : [];
+        this.updateRecentTransactions();
       },
       error: () => {
         this.incomeList = [];
+        this.updateRecentTransactions();
       }
     });
   }
@@ -2187,6 +2152,7 @@ export class UserProfileComponent implements OnInit {
   fetchExpenseList() {
     if (!this.userEmail) {
       this.expenseList = [];
+      this.updateRecentTransactions();
       return;
     }
     this.http.get<any[]>(`/api/users/expense-list?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
@@ -2197,15 +2163,16 @@ export class UserProfileComponent implements OnInit {
               date: item.date ? new Date(item.date) : null
             }))
           : [];
+        this.updateRecentTransactions();
       },
       error: () => {
         this.expenseList = [];
+        this.updateRecentTransactions();
       }
     });
   }
 
   fetchUserProfile() {
-    // You may want to get the user from a token or API; here we assume a GET endpoint exists
     this.http.get<any>('/api/users/me').subscribe({
       next: (user) => {
         this.userName = user?.name || '';
@@ -2214,14 +2181,39 @@ export class UserProfileComponent implements OnInit {
         this.fetchIncomeList();
         this.fetchExpenseList();
       },
-           error: () => {
+      error: () => {
         this.userName = '';
         this.userInitial = '';
         this.userEmail = '';
         this.incomeList = [];
         this.expenseList = [];
+        this.updateRecentTransactions();
       }
     });
+  }
+
+  updateRecentTransactions() {
+    // Merge and sort by date descending, take latest 5
+    const txs = [
+      ...this.incomeList.map(i => ({
+        type: 'income',
+        title: i.title,
+        amount: i.amount,
+        category: i.category,
+        date: i.date,
+      })),
+      ...this.expenseList.map(e => ({
+        type: 'expense',
+        title: e.title,
+        amount: e.amount,
+        category: e.category,
+        date: e.date,
+      }))
+    ];
+    this.recentTransactions = txs
+      .filter(tx => !!tx.date)
+      .sort((a, b) => (b.date as any) - (a.date as any))
+      .slice(0, 5);
   }
 
   getCurrentDate(): string {
