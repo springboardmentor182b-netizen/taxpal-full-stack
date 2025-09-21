@@ -60,7 +60,6 @@ export interface IReport extends Document {
   createdAt?: Date;
   updatedAt?: Date;
 }
-
 const ReportSchema = new Schema<IReport>(
   {
     user: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -70,6 +69,5 @@ const ReportSchema = new Schema<IReport>(
   },
   { timestamps: true }
 );
-
 export const DashboardModel = mongoose.model<IDashboard>("Dashboard", DashboardSchema);
 export const ReportModel = mongoose.model<IReport>("Report", ReportSchema);

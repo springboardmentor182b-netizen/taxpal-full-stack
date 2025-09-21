@@ -67,7 +67,6 @@ export const generateResetToken = async (email: string) => {
     <a href="${resetLink}">${resetLink}</a>
     <p>This link will expire in 1 hour.</p>
   `;
-
   await sendEmail(user.email, "Password Reset Request", html);
   return { message: "Password reset link sent to your email" };
 };

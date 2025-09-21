@@ -14,7 +14,6 @@ app.use(bodyParser.json());
 
 // register routes
 app.use('/api/v1/dashboard', dashboardRoutes);
-
 // simple route
 app.get('/', (req, res) => {
   res.send('Hello from Express 🚀');
