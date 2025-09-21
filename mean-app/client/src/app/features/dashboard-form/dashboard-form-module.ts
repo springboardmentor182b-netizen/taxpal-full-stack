@@ -5,13 +5,11 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
-    DashboardForm
+    
   ],
   imports: [
-    CommonModule,
-    ReactiveFormsModule, // ✅ required
-    FormsModule          // ✅ required for ngModel if needed
+            // ✅ required for ngModel if needed
   ],
-  exports: [DashboardForm]
+ 
 })
 export class DashboardFormModule { }

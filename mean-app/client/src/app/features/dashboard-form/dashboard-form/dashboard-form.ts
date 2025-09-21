@@ -4,7 +4,6 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DashboardService } from '../../../services/dashboard.service';
 import { MatDialogRef } from '@angular/material/dialog';
-
 @Component({
   selector: 'app-dashboard-form',
   templateUrl: './dashboard-form.html',

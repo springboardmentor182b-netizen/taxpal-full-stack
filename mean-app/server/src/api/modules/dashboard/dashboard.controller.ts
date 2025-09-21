@@ -29,6 +29,7 @@ export const deleteTransactionController = async (req: Request, res: Response) =
 export const upsertDashboardController = async (req: Request, res: Response) => {
   const { userId } = req.params;
   const data = req.body;
+
   try {
     const dashboard = await DashboardService.upsertDashboard(userId, data);
     res.json(dashboard);

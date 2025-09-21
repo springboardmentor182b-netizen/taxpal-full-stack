@@ -34,15 +34,19 @@ export const deleteTransaction = async (dashboardId: string, txId: string) => {
 await dashboard.save();
   return dashboard;
 };
+
 export const upsertDashboard = async (userId: string, data: any) => {
+  // Find existing dashboard
   let dashboard = await DashboardModel.findOne({ user: userId });
+
   if (!dashboard) {
-    // create new dashboard
+    // If none exists, create new
     dashboard = new DashboardModel({ user: userId, ...data });
   } else {
-    // update existing dashboard
+    // Merge safely: only overwrite fields present in `data`
     Object.assign(dashboard, data);
   }
+
   await dashboard.save();
   return dashboard;
 };
