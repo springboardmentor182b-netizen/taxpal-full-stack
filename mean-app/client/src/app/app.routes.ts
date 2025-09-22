@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+
 import { LoginComponent } from './features/login/login.component';
 import { SignupComponent } from './features/signup/signup.component';
 
@@ -22,6 +23,10 @@ export const routes: Routes = [
   { 
     path: 'dashboard', 
     loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard)
+  },
+  { 
+    path: 'dashboard-form', 
+    loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form').then(m => m.DashboardForm)
   },
   
   { path: 'features/login', redirectTo: '/login' },
