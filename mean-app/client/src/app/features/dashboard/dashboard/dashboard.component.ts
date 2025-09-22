@@ -16,8 +16,8 @@ import { DashboardForm } from '../../dashboard-form/dashboard-form/dashboard-for
   standalone: true,
   imports: [CommonModule, BaseChartDirective, FormsModule, MatDialogModule, MatIconModule],
   providers: [provideCharts(withDefaultRegisterables())],
-  templateUrl: './dashboard.html',
-  styleUrls: ['./dashboard.scss']
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 export class Dashboard implements OnInit {
   dashboardLetters: string[] = 'Dashboard'.split('');

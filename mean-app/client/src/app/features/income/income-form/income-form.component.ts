@@ -23,8 +23,8 @@ import { IncomeService } from '../../../services/income.services';
     MatSelectModule,
     MatSnackBarModule
   ],
-  templateUrl: './income-form.html',
-  styleUrls: ['./income-form.scss']
+  templateUrl: './income-form.component.html',
+  styleUrls: ['./income-form.component.scss']
 })
 export class IncomeForm {
   incomeForm: FormGroup;

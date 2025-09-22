@@ -18,8 +18,8 @@ import { ExpenseService } from '../../../services/expense.service';
     MatInputModule,
     MatFormFieldModule,
     MatSelectModule
-  ],templateUrl: './expenses-form.html',
-  styleUrls: ['./expenses-form.scss']
+  ],templateUrl: './expenses-form.component.html',
+  styleUrls: ['./expenses-form.component.scss']
 })
 export class ExpensesForm {
   expensesForm: FormGroup;
