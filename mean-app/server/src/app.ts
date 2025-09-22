@@ -7,9 +7,17 @@ import userRoutes from "./api/modules/user/user.routes";
 import incomeRoutes from "./api/modules/income/income.routes";
 import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from './api/modules/dashboard/dashboard.routes';
+
 const app = express();
 
-app.use(cors());
+// Updated CORS configuration
+app.use(cors({
+  origin: 'http://localhost:4200',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
+
 app.use(bodyParser.json());
 
 // register routes
@@ -21,4 +29,5 @@ app.get('/', (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
+
 export default app;

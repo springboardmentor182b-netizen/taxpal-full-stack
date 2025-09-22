@@ -9,6 +9,14 @@ export const routes: Routes = [
   // Authentication routes
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
+  { 
+    path: 'forgot-password', 
+    loadComponent: () => import('./features/forgot-password/forgot-password.component').then(m => m.ForgotPasswordComponent)
+  },
+  { 
+    path: 'reset-password/:token', 
+    loadComponent: () => import('./features/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
   
   // Main application routes (lazy loaded for better performance)
   { 
@@ -16,20 +24,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard)
   },
   
-  // Financial management routes (lazy loaded)
-  // TODO: Uncomment when components are created
-  // { 
-  //   path: 'income', 
-  //   loadComponent: () => import('./features/income-form/income-form').then(m => m.IncomeForm)
-  // },
-  // { 
-  //   path: 'expenses', 
-  //   loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesForm)
-  // },
-  
-  // Legacy routes for backward compatibility
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
+  { path: 'features/forgot-password', redirectTo: '/forgot-password' },
+  { path: 'features/reset-password/:token', redirectTo: '/reset-password/:token' },
   
   // Wildcard route - redirect to login for any unknown routes
   { path: '**', redirectTo: '/login' }
