@@ -128,94 +128,119 @@ export class Dashboard implements OnInit {
     const dialogRef = this.dialog.open(IncomeForm, { width: '400px' });
     dialogRef.afterClosed().subscribe(res => {
       if (!res || !this.currentUser?.id) return;
-
-      const newIncome = { ...res, type: 'Income', amount: res.amount };
+  
+      const newIncome = { ...res, type: 'Income', amount: res.amount, date: res.date || new Date() };
       this.transactions.push(newIncome);
-      this.updateCharts();
-
+      this.updateCharts(); // <-- totals updated immediately
+  
+      // Send transactions to backend (optional, async)
       this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe({
-        next: updatedRes => {
-          this.monthlyIncome = updatedRes.monthlyIncome ?? 0;
-          this.monthlyExpenses = updatedRes.monthlyExpenses ?? 0;
-          this.estimatedTax = updatedRes.estimatedTaxDue ?? 0;
-          this.savingsRate = updatedRes.savingsRate ?? 0;
-          this.transactions = updatedRes.transactions ?? [];
-          this.updateCharts();
-        },
+        next: updatedRes => console.log('Income saved'),
         error: err => console.error('Failed to save income:', err)
       });
     });
   }
-
+  
   openExpenseForm() {
     const dialogRef = this.dialog.open(ExpensesForm, { width: '400px' });
     dialogRef.afterClosed().subscribe(res => {
       if (!res || !this.currentUser?.id) return;
-
-      const newExpense = { ...res, type: 'Expense', amount: res.amount };
+  
+      const newExpense = { ...res, type: 'Expense', amount: res.amount, date: res.date || new Date() };
       this.transactions.push(newExpense);
-      this.updateCharts();
-
+      this.updateCharts(); // <-- totals updated immediately
+  
       this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe({
-        next: updatedRes => {
-          this.monthlyIncome = updatedRes.monthlyIncome ?? 0;
-          this.monthlyExpenses = updatedRes.monthlyExpenses ?? 0;
-          this.estimatedTax = updatedRes.estimatedTaxDue ?? 0;
-          this.savingsRate = updatedRes.savingsRate ?? 0;
-          this.transactions = updatedRes.transactions ?? [];
-          this.updateCharts();
-        },
+        next: updatedRes => console.log('Expense saved'),
         error: err => console.error('Failed to save expense:', err)
       });
     });
   }
+  
+  // openExpenseForm() {
+  //   const dialogRef = this.dialog.open(ExpensesForm, { width: '400px' });
+  //   dialogRef.afterClosed().subscribe(res => {
+  //     if (!res || !this.currentUser?.id) return;
+
+  //     const newExpense = { ...res, type: 'Expense', amount: res.amount };
+  //     this.transactions.push(newExpense);
+  //     this.updateCharts();
+
+  //     this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe({
+  //       next: updatedRes => {
+  //         this.monthlyIncome = updatedRes.monthlyIncome ?? 0;
+  //         this.monthlyExpenses = updatedRes.monthlyExpenses ?? 0;
+  //         this.estimatedTax = updatedRes.estimatedTaxDue ?? 0;
+  //         this.savingsRate = updatedRes.savingsRate ?? 0;
+  //         this.transactions = updatedRes.transactions ?? [];
+  //         this.updateCharts();
+  //       },
+  //       error: err => console.error('Failed to save expense:', err)
+  //     });
+  //   });
+  // }
 
   updateCharts() {
     const now = new Date();
+  
+    // Filter transactions for the selected period
     const filteredTransactions = this.transactions.filter(tx => {
       const d = new Date(tx.date);
-      if (this.selectedPeriod === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      if (this.selectedPeriod === 'quarter') return Math.floor(d.getMonth() / 3) === Math.floor(now.getMonth() / 3) && d.getFullYear() === now.getFullYear();
+      if (this.selectedPeriod === 'month')
+        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      if (this.selectedPeriod === 'quarter')
+        return Math.floor(d.getMonth() / 3) === Math.floor(now.getMonth() / 3) && d.getFullYear() === now.getFullYear();
       return d.getFullYear() === now.getFullYear();
     });
-
-    const totalIncome = this.transactions.filter(tx => tx.type === 'Income').reduce((sum, t) => sum + (t.amount || 0), 0);
-    const totalExpenses = this.transactions.filter(tx => tx.type === 'Expense').reduce((sum, t) => sum + (t.amount || 0), 0);
-
+  
+    // Compute totals from filtered transactions
+    this.monthlyIncome = filteredTransactions
+      .filter(tx => tx.type === 'Income')
+      .reduce((sum, t) => sum + (t.amount || 0), 0);
+  
+    this.monthlyExpenses = filteredTransactions
+      .filter(tx => tx.type === 'Expense')
+      .reduce((sum, t) => sum + (t.amount || 0), 0);
+  
+    // Update bar chart
     this.barChartData = {
       ...this.barChartData,
-      datasets: [{ ...this.barChartData.datasets[0], data: [totalIncome, totalExpenses] }]
+      datasets: [{ ...this.barChartData.datasets[0], data: [this.monthlyIncome, this.monthlyExpenses] }]
     };
-
-    // Pie chart
+  
+    // Update pie chart (expense categories)
     const expenseTransactions = filteredTransactions.filter(tx => tx.type === 'Expense');
     const categoryMap: Record<string, number> = {};
     expenseTransactions.forEach(tx => {
       const cat = tx.category?.trim() || 'Other';
       categoryMap[cat] = (categoryMap[cat] || 0) + (tx.amount || 0);
     });
-
+  
     let categories = Object.keys(categoryMap);
     let categoryData = Object.values(categoryMap);
     const totalExpense = categoryData.reduce((a, b) => a + b, 0);
-
+  
     if (categories.length === 0) {
       categories = ['No Expenses'];
       categoryData = [100];
     } else {
       categoryData = categoryData.map(val => (val / totalExpense) * 100); // convert to %
     }
-
+  
     const defaultColors = ['#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0', '#00bcd4', '#ffc107'];
     const bgColors = categories.map((_, i) => defaultColors[i % defaultColors.length]);
-
+  
     this.pieChartData = {
       labels: categories,
       datasets: [{ ...this.pieChartData.datasets[0], data: categoryData, backgroundColor: bgColors }]
     };
-
-    this.savingsRate = totalIncome ? ((totalIncome - totalExpenses) / totalIncome) * 100 : 0;
+  
+    // Update savings rate
+    this.savingsRate = this.monthlyIncome
+      ? ((this.monthlyIncome - this.monthlyExpenses) / this.monthlyIncome) * 100
+      : 0;
   }
+  
 
   onPeriodChange(period: 'month' | 'quarter' | 'year') {
     this.selectedPeriod = period;
