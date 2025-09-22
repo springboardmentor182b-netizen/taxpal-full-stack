@@ -136,33 +136,44 @@
     </section>
 
     <!-- Recent Transactions -->
-    <section class="recent card">
-      <h3>Recent Transactions</h3>
-      <table class="tx-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Type</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngIf="transactions.length === 0">
-            <td colspan="5" class="text-center">No transactions available</td>
-          </tr>
-          <tr *ngFor="let tx of transactions; let i = index; trackBy: trackByIndex">
-            <td>{{ tx.date | date:'mediumDate' }}</td>
-            <td>{{ tx.description }}</td>
-            <td>{{ tx.category }}</td>
-            <td [class.negative]="tx.amount < 0">${{ tx.amount | number:'1.2-2' }}</td>
-            <td>{{ tx.type }}</td>
-          </tr>
-          
-        </tbody>
-      </table>
-    </section>
+    <!-- Recent Transactions -->
+<section class="recent card">
+  <h3>Recent Transactions</h3>
+
+  <table class="tx-table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Description</th>
+        <th>Category</th>
+        <th>Amount</th>
+        <th>Type</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="transactions.length === 0">
+        <td colspan="5" class="text-center">No transactions available</td>
+      </tr>
+
+      <!-- Show only recent transactions (first 5 or all if toggled) -->
+      <tr *ngFor="let tx of recentTransactions; trackBy: trackByIndex">
+        <td>{{ tx.date | date:'mediumDate' }}</td>
+        <td>{{ tx.description }}</td>
+        <td>{{ tx.category }}</td>
+        <td [class.negative]="tx.amount < 0">${{ tx.amount | number:'1.2-2' }}</td>
+        <td>{{ tx.type }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Toggle button -->
+  <div class="view-all-wrapper" *ngIf="transactions.length > 5">
+    <button mat-button color="primary" (click)="toggleShowAllTransactions()">
+      {{ showAllTransactions ? 'Show Less' : 'View All' }}
+    </button>
+  </div>
+</section>
+
 
   </main>
 </div>

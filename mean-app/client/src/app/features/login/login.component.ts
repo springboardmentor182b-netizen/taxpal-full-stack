@@ -178,7 +178,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     const field = this.loginForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
   } 
-
   getFormControl(fieldName: string) {
     return this.loginForm.get(fieldName);
   }
