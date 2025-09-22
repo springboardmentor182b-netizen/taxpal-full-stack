@@ -7,9 +7,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
-import { IncomeForm } from '../../income/income-form/income-form';
-import { ExpensesForm } from '../../expenses/expenses-form/expenses-form';
-import { DashboardForm } from '../../dashboard-form/dashboard-form/dashboard-form';
+import { IncomeForm } from '../../income/income-form/income-form.component';
+import { ExpensesForm } from '../../expenses/expenses-form/expenses-form.component';
+import { DashboardForm } from '../../dashboard-form/dashboard-form/dashboard-form.component';
 
 @Component({
   selector: 'app-dashboard',
