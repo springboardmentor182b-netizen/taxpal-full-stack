@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { requireAuth } from '../middleware/auth';
-import { createExpense, deleteExpense, listExpenses, updateExpense } from '../controllers/expense.controller';
+import { requireAuth } from '../../api/auth/auth';
+import { createExpense, deleteExpense, listExpenses, updateExpense } from '../expense/expense.controller';
 const r = Router();
 r.use(requireAuth);
 r.post('/', createExpense);

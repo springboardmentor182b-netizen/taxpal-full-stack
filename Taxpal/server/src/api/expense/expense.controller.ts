@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import Expense from '../models/Expense';
-import { AuthedRequest } from '../middleware/auth';
+import Expense from '../expense/Expense';
+import { AuthedRequest } from '../../api/auth/auth';
 
 export async function createExpense(req: AuthedRequest, res: Response) {
   const body = req.body;
