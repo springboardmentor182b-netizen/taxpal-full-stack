@@ -2,6 +2,14 @@ import { Component, EventEmitter, Output, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+type IncomePayload = {
+  description: string;
+  amount: number | null;
+  category: string;
+  date: string;   // yyyy-mm-dd
+  notes: string;
+};
+
 @Component({
   selector: 'app-income-modal',
   standalone: true,
@@ -11,10 +19,12 @@ import { FormsModule } from '@angular/forms';
 })
 export class IncomeModalComponent {
   @Input() isOpen = false;
-  @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<any>();
 
-  formData = {
+  // ✅ renamed to match parent usage: (closeModal)="closeIncome()"
+  @Output() closeModal = new EventEmitter<void>();
+  @Output() save = new EventEmitter<IncomePayload>();
+
+  formData: IncomePayload = {
     description: '',
     amount: null,
     category: '',
@@ -22,19 +32,21 @@ export class IncomeModalComponent {
     notes: ''
   };
 
-  closeModal() {
-    this.close.emit();
+  // call this from the X button or backdrop
+  onClose() {
+    this.closeModal.emit();
     this.resetForm();
   }
 
   onSave() {
-    if (this.formData.description && this.formData.amount && this.formData.category && this.formData.date) {
-      this.save.emit({ ...this.formData });
-      this.closeModal();
+    const d = this.formData;
+    if (d.description?.trim() && d.amount != null && d.amount > 0 && d.category && d.date) {
+      this.save.emit({ ...d });
+      this.onClose();
     }
   }
 
-  resetForm() {
+  private resetForm() {
     this.formData = {
       description: '',
       amount: null,

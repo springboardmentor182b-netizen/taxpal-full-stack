@@ -1,82 +1,86 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { AuthService, User } from '../../core/services/auth.service';
+import Chart from 'chart.js/auto';
 
-// COMPONENTS (standalone)
+// ⬇️ Import your standalone modals (paths assume: src/app/features/modals/...)
 import { IncomeModalComponent } from '../auth/components/income/income';
 import { ExpenseModalComponent } from '../auth/components/expense/expense';
-
-// SERVICE
-import { TransactionService } from '../auth/services/transaction.service';
-
-// TYPES (interfaces)
-import type { Income } from '../auth/models/income.model';
-import type { Expense } from '../auth/models/expense.model';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, IncomeModalComponent, ExpenseModalComponent],
+  imports: [CommonModule, IncomeModalComponent, ExpenseModalComponent],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit {
-  user = signal<User | null>(null);
-  isLoading = signal(true);
+export class DashboardComponent implements AfterViewInit {
+  // toggles for your forms
+  showIncome = false;
+  showExpense = false;
 
-  // modal flags (signals)
-  incomeOpen = signal(false);
-  expenseOpen = signal(false);
+  // optional local lists to store what the forms emit
+  incomes: any[] = [];
+  expenses: any[] = [];
 
-  constructor(
-    private authService: AuthService,
-    private tx: TransactionService
-  ) {}
+  // button handlers
+  openIncome()  { this.showIncome = true; }
+  openExpense() { this.showExpense = true; }
+  closeIncome() { this.showIncome = false; }
+  closeExpense(){ this.showExpense = false; }
 
-  ngOnInit(): void {
-    this.user.set(this.authService.getCurrentUser());
-    this.isLoading.set(false);
+  // handlers used by (save)="..." in your template
+  onIncomeSave(data: any) {
+    this.incomes.push(data);
+    this.closeIncome();
   }
 
-  logout(): void {
-    this.authService.logout();
+  onExpenseSave(data: any) {
+    this.expenses.push(data);
+    this.closeExpense();
   }
 
-  getGreeting(): string {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  }
-
-  // Income save handler
-  onIncomeSave(formData: any) {
-    const payload: Income = {
-      description: formData.description,
-      amount: +formData.amount,
-      category: formData.category,
-      date: formData.date,
-      notes: formData.notes
-    };
-    this.tx.createIncome(payload).subscribe({
-      next: () => this.incomeOpen.set(false),
-      error: () => { /* TODO: show error toast */ }
+  ngAfterViewInit(): void {
+  // ----- Bar chart -----
+  const ctx1 = document.getElementById('barChart') as HTMLCanvasElement | null;
+  if (ctx1) {
+    new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar'],
+        datasets: [
+          { label: 'Income',   data: [400, 500, 450], backgroundColor: '#656ED3' },
+          { label: 'Expenses', data: [200, 300, 250], backgroundColor: '#25295A' }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
     });
   }
 
-  // Expense save handler
-  onExpenseSave(formData: any) {
-    const payload: Expense = {
-      description: formData.description,
-      amount: +formData.amount,
-      category: formData.category,
-      date: formData.date,
-      notes: formData.notes
-    };
-    this.tx.createExpense(payload).subscribe({
-      next: () => this.expenseOpen.set(false),
-      error: () => { /* TODO: show error toast */ }
+  // ----- Pie chart -----
+  const ctx2: HTMLCanvasElement | null =
+    document.getElementById('pieChart') as HTMLCanvasElement | null;
+  if (ctx2) {
+    new Chart(ctx2, {
+      type: 'pie',
+      data: {
+        labels: ['Rent', 'Food', 'Transport', 'Other'],
+        datasets: [{
+          data: [500, 200, 150, 100],
+          backgroundColor: ['#656ED3', '#25295A', '#8B95F9', '#A1A6D3']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'top' }
+        }
+      }
     });
   }
+}
+
 }

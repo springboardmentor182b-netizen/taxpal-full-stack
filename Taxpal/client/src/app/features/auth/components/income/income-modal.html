@@ -1,8 +1,9 @@
 <!-- income-modal.component.html -->
-<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()">
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <!-- Close -->
-    <button class="close-btn" (click)="closeModal()" aria-label="Close">
+
+    <!-- Close (X) -->
+    <button type="button" class="close-btn" (click)="onClose()" aria-label="Close">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
         <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
       </svg>
@@ -105,7 +106,7 @@
 
         <!-- Actions -->
         <div class="form-actions">
-          <button type="button" class="btn-cancel" (click)="closeModal()">Cancel</button>
+          <button type="button" class="btn-cancel" (click)="onClose()">Cancel</button>
           <button type="submit" class="btn-save" [disabled]="!incomeForm.form.valid">Save</button>
         </div>
       </form>
