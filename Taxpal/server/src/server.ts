@@ -47,6 +47,7 @@ const PORT = Number(process.env.PORT || 3000);
  */
 const corsOrigins =
   process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || ['http://localhost:4200'];
+const PORT = process.env.PORT || 5000;
 
 app.use(
   cors({
@@ -67,6 +68,7 @@ mongoose
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
+app.use('/api/v1/budgets', budgetRoutes);
 
 // ---------- Health check ----------
 app.get('/api/health', (_req, res) => {
@@ -115,3 +117,4 @@ if (!(global as any).__taxpal_server_started) {
 }
 
 export default app;
+
