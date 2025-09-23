@@ -28,13 +28,13 @@ export const deleteTransactionController = async (req: Request, res: Response) =
 // Upsert dashboard (create if not exists)
 export const upsertDashboardController = async (req: Request, res: Response) => {
   const { userId } = req.params;
-  const data = req.body;
 
   try {
-    const dashboard = await DashboardService.upsertDashboard(userId, data);
+    // No need to pass `data`; service will calculate from Income & Expense collections
+    const dashboard = await DashboardService.upsertDashboard(userId);
     res.json(dashboard);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Server error" });
   }
-};
+}

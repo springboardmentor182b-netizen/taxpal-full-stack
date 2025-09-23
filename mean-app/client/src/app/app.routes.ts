@@ -22,11 +22,11 @@ export const routes: Routes = [
   // Main application routes (lazy loaded for better performance)
   { 
     path: 'dashboard', 
-    loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard)
+    loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard)
   },
   { 
     path: 'dashboard-form', 
-    loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form').then(m => m.DashboardForm)
+    loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
   },
   
   { path: 'features/login', redirectTo: '/login' },

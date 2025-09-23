@@ -6,8 +6,8 @@ import { DashboardService } from '../../../services/dashboard.service';
 import { MatDialogRef } from '@angular/material/dialog';
 @Component({
   selector: 'app-dashboard-form',
-  templateUrl: './dashboard-form.html',
-  styleUrls: ['./dashboard-form.css'],
+  templateUrl: './dashboard-form.component.html',
+  styleUrls: ['./dashboard-form.component.css'],
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule]
 })

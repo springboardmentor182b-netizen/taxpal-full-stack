@@ -7,7 +7,7 @@ import userRoutes from "./api/modules/user/user.routes";
 import incomeRoutes from "./api/modules/income/income.routes";
 import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from './api/modules/dashboard/dashboard.routes';
-
+import categoriesRoutes from './api/modules/categories/category.routes'
 const app = express();
 
 // Updated CORS configuration
@@ -22,6 +22,7 @@ app.use(bodyParser.json());
 
 // register routes
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/categories',categoriesRoutes);
 // simple route
 app.get('/', (req, res) => {
   res.send('Hello from Express 🚀');
