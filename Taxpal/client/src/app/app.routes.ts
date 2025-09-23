@@ -23,7 +23,7 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     loadComponent: () =>
-      import('./features/dashboard/dashboard.component')
+      import('./features/dashboard/component/dashboard.component')
         .then(m => m.DashboardComponent),
     canActivate: [authGuard]
   },
@@ -37,7 +37,7 @@ export const routes: Routes = [
   {
     path: 'budgets',
     loadComponent: () =>
-      import('./features/budgets/budgets.component')
+      import('./features/budgets/component/budgets.component')
         .then(m => m.BudgetsComponent),
     canActivate: [authGuard]
   },

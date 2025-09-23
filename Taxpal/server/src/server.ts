@@ -14,7 +14,6 @@ console.log('[debug] SMTP_HOST=', process.env.SMTP_HOST || '(none)');
 console.log('[debug] SMTP_USER=', process.env.SMTP_USER ? '(set)' : '(none)');
 console.log('[debug] GMAIL_USER=', process.env.GMAIL_USER ? '(set)' : '(none)');
 
-
 let loaded = false;
 for (const p of candidates) {
   if (fs.existsSync(p)) {
@@ -36,6 +35,9 @@ import { verifyMailer } from './utils/mailer';
 import authRoutes from './api/auth/auth-route';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
+
+// ⬇️ NEW: Dashboard routes
+import dashboardRoutes from './api/dashboard/dashboard-routes';
 
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -67,6 +69,11 @@ mongoose
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
+
+// ⬇️ NEW: Mount dashboard APIs
+//    GET /api/v1/dashboard
+//    GET /api/v1/dashboard/income-vs-expenses
+app.use('/api/v1/dashboard', dashboardRoutes);
 
 // ---------- Health check ----------
 app.get('/api/health', (_req, res) => {
