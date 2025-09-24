@@ -10,9 +10,7 @@ import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from './api/modules/dashboard/dashboard.routes';
 const app = express();
 
-<<<<<<< HEAD
 app.use(cors());
-=======
 // Updated CORS configuration
 app.use(cors({
   origin: 'http://localhost:4200',
@@ -20,7 +18,6 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
 }));
->>>>>>> 45e65eac (Swagger Intialized and apis tested)
 app.use(bodyParser.json());
 app.use(express.json());
 setupSwagger(app);
