@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output, OnInit, OnDestroy } from '@angular/cor
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-sign-in-form',
@@ -468,7 +469,7 @@ export class SignInFormComponent implements OnInit, OnDestroy {
   private maxEmojis = 10;
   private animationInterval: any;
   
-  constructor(private router: Router) {
+  constructor(private router: Router, private http: HttpClient) {
     // Check if dark mode is enabled
     this.isDarkMode = document.documentElement.classList.contains('dark');
   }
@@ -531,12 +532,23 @@ export class SignInFormComponent implements OnInit, OnDestroy {
   }
   
   signIn() {
-    // Here you would normally handle the sign in logic
-    console.log('Signing in with', this.email, this.password);
-    
-    // Navigate to user profile after sign in
-    this.closeForm();
-    this.router.navigate(['/user-profile']);
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
+
+    this.http.post('http://localhost:5000/api/user/login', { email: this.email, password: this.password }, { headers })
+      .subscribe({
+        next: (res: any) => {
+          console.log('Login successful:', res);
+          localStorage.setItem('jwt', res.token);
+          this.closeForm();
+          this.router.navigate(['/dashboard']);
+        },
+        error: (err) => {
+          console.error('Login error:', err);
+          alert('Invalid credentials');
+        }
+      });
   }
   
   onSwitchToSignUp(event: Event) {

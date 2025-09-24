@@ -1,73 +1,132 @@
 import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
+import { DashboardService, DashboardSummary, Transaction, ExpenseBreakdown, BudgetProgress, TaxEstimation } from './dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css'],
+  imports: [CommonModule, DecimalPipe, DatePipe]
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private pieChart: any = null;
   private barChart: any = null;
 
-  // summary object bound to template
-  dashboardSummary: any = { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
+  // Dashboard data
+  dashboardSummary: DashboardSummary = { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
+  recentTransactions: Transaction[] = [];
+  expenseBreakdown: ExpenseBreakdown[] = [];
+  budgetProgress: BudgetProgress[] = [];
+  taxEstimation: TaxEstimation | null = null;
 
-  constructor(private http: HttpClient) {}
+  // UI state
+  loading = false;
+  error: string | null = null;
+
+  constructor(private dashboardService: DashboardService) {}
 
   ngOnInit(): void {
-    this.fetchDashboardSummary();
+    this.loadDashboardData();
   }
 
-  // 🔹 GET /api/dashboard/summary
-  fetchDashboardSummary(): void {
-    const token = localStorage.getItem('jwt'); // assume JWT is stored after login
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`
+  loadDashboardData(): void {
+    this.loading = true;
+    this.error = null;
+
+    // Load all dashboard data
+    this.dashboardService.getDashboardSummary().subscribe({
+      next: (summary) => {
+        this.dashboardSummary = summary;
+        this.updateCharts(summary);
+      },
+      error: (err) => {
+        this.error = 'Failed to load dashboard summary';
+        console.error('Error fetching dashboard summary:', err);
+      }
     });
 
-    this.http.get('http://localhost:5000/api/dashboard/summary', { headers })
-      .subscribe({
-        next: (res: any) => {
-          console.log("Dashboard summary:", res);
-          this.dashboardSummary = res;
-          this.updateCharts(res);
-        },
-        error: (err) => {
-          console.error("Error fetching dashboard summary:", err);
-        }
-      });
+    this.dashboardService.getRecentTransactions().subscribe({
+      next: (transactions) => {
+        this.recentTransactions = transactions;
+      },
+      error: (err) => {
+        console.error('Error fetching recent transactions:', err);
+      }
+    });
+
+    this.dashboardService.getExpenseBreakdown().subscribe({
+      next: (breakdown) => {
+        this.expenseBreakdown = breakdown;
+        this.updatePieChart(breakdown);
+      },
+      error: (err) => {
+        console.error('Error fetching expense breakdown:', err);
+      }
+    });
+
+    this.dashboardService.getBudgetProgress().subscribe({
+      next: (budget) => {
+        this.budgetProgress = budget;
+      },
+      error: (err) => {
+        console.error('Error fetching budget progress:', err);
+      }
+    });
+
+    this.dashboardService.getTaxEstimation().subscribe({
+      next: (tax) => {
+        this.taxEstimation = tax;
+      },
+      error: (err) => {
+        console.error('Error fetching tax estimation:', err);
+      }
+    });
+
+    this.loading = false;
   }
 
-  // 🔹 POST /api/transactions (example method)
-  addTransaction(transaction: any): void {
-    const token = localStorage.getItem('jwt');
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-
-    this.http.post('http://localhost:5000/api/transactions', transaction, { headers })
-      .subscribe({
-        next: (res) => console.log("Transaction saved:", res),
-        error: (err) => console.error("Error saving transaction:", err)
-      });
+  refreshData(): void {
+    this.loadDashboardData();
   }
 
   // 🔹 Update charts dynamically
-  updateCharts(data: any): void {
+  updateCharts(data: DashboardSummary): void {
     if (this.barChart) {
       this.barChart.data.datasets[0].data = [data.totalIncome];
       this.barChart.data.datasets[1].data = [data.totalExpenses];
       this.barChart.update();
     }
-    if (this.pieChart) {
-      this.pieChart.data.datasets[0].data = [
-        data.totalExpenses,
-        data.totalIncome - data.totalExpenses
-      ];
+  }
+
+  // 🔹 Update pie chart with expense breakdown
+  updatePieChart(breakdown: ExpenseBreakdown[]): void {
+    if (this.pieChart && breakdown.length > 0) {
+      const labels = breakdown.map(item => item._id);
+      const data = breakdown.map(item => item.total);
+
+      this.pieChart.data.labels = labels;
+      this.pieChart.data.datasets[0].data = data;
       this.pieChart.update();
     }
+  }
+
+  // 🔹 Get color for expense category
+  getExpenseColor(category: string): string {
+    const colors: { [key: string]: string } = {
+      'Office': 'var(--pie-blue)',
+      'Software & Tools': 'var(--pie-light-blue)',
+      'Marketing': 'var(--pie-teal)',
+      'Travel': 'var(--pie-green)',
+      'Meals': 'var(--pie-orange)',
+      'Other': 'var(--pie-gray)'
+    };
+    return colors[category] || 'var(--pie-gray)';
+  }
+
+  // 🔹 Calculate percentage for expense breakdown
+  getExpensePercentage(expense: ExpenseBreakdown): number {
+    const total = this.expenseBreakdown.reduce((sum, e) => sum + e.total, 0);
+    return total > 0 ? (expense.total / total) * 100 : 0;
   }
 
   ngAfterViewInit(): void {
