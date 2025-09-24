@@ -15,6 +15,7 @@ const router = Router();
 /**
  * @swagger
  * /api/v1/categories:
+ *   get:
  *     summary: Get all categories
  *     tags: [Category]
  *     security:
@@ -35,6 +36,7 @@ const router = Router();
  *                     type: string
  */
 router.get("/", auth, categoryController.getCategories);
+
 
 /**
  * @swagger

@@ -10,7 +10,6 @@ import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from './api/modules/dashboard/dashboard.routes';
 import categoriesRoutes from './api/modules/categories/category.routes'
 const app = express();
-
 app.use(cors());
 // Updated CORS configuration
 app.use(cors({
