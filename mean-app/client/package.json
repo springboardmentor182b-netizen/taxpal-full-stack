@@ -38,6 +38,7 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
+    "mongodb": "^6.20.0",
     "mongoose": "^8.18.1",
     "ng2-charts": "^8.0.0",
     "postcss": "^8.5.6",

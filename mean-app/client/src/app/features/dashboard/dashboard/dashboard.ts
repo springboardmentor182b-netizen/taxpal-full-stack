@@ -7,7 +7,8 @@ import { Router } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { IncomeForm } from '../../income/income-form/income-form';
 import { ExpensesForm } from '../../expenses/expenses-form/expenses-form';
-
+import { BudgetFormComponent } from '../../budget/budget-form/budget-form.component';
+import { RouterModule } from '@angular/router';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -15,7 +16,8 @@ import { ExpensesForm } from '../../expenses/expenses-form/expenses-form';
     CommonModule,
     BaseChartDirective,
     FormsModule,
-    MatDialogModule
+    MatDialogModule,
+     RouterModule
   ],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './dashboard.html',
@@ -133,6 +135,8 @@ dashboardLetters: string[] = 'Dashboard'.split('');
       }
     });
   }
+
+
 
 
 

@@ -1,13 +1,21 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load .env from project root
+dotenv.config({ path: path.resolve(__dirname, "../../../.env") });
+
+const mongoUri = process.env.MONGO_URI;
+
+if (!mongoUri) {
+  throw new Error("❌ MONGO_URI is not defined in .env");
+}
 
 export const connectDB = async () => {
   try {
-    await mongoose.connect("mongodb+srv://rupak:rupak2003@cluster0.fcbka.mongodb.net/Taxpal");
+    await mongoose.connect(mongoUri); // Mongoose 7+ no options needed
     console.log("✅ MongoDB connected");
-    // mongodb+srv://pavithrareddy2702_db_user:pavithra@cluster0.bbglqsr.mongodb.net/?retryWrites=true");
-    // console.log("✅ MongoDB connected");
-  } catch (err) {
-    console.error("❌ DB connection error:", err);
-    process.exit(1);
+  } catch (error: any) {
+    console.error("❌ MongoDB connection error:", error.message);
   }
 };
