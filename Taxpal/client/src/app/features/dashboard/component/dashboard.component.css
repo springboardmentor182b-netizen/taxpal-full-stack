@@ -145,6 +145,24 @@
   width: 100% !important;
   height: 80% !important;
 }
+/* Ensure the chart has a visible area */
+.chart-panel {
+  position: relative;
+  /* You can tweak this */
+  height: 360px; 
+}
+
+.chart-wrap {
+  position: absolute;
+  inset: 0;
+}
+
+.chart-wrap canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
 
 /* Transactions */
 .transactions {
