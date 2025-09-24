@@ -3,14 +3,9 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-<<<<<<< HEAD
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-=======
     "start": "ts-node src/server.ts",
     "dev": "nodemon src/server.ts"
->>>>>>> 45e65eac (Swagger Intialized and apis tested)
-  },
+},
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -27,17 +22,15 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
+    "@types/body-parser": "^1.19.6",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.5.2",
     "@types/nodemailer": "^7.0.1",
-<<<<<<< HEAD
-    "nodemon": "^3.0.1",
-=======
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-express": "^4.1.8",
     "nodemon": "^3.1.10",
->>>>>>> 45e65eac (Swagger Intialized and apis tested)
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }

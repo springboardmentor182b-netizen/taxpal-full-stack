@@ -1,0 +1,87 @@
+
+.form-field {
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.form-field__label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.form-field__input-container {
+  position: relative;
+  width: 100%;
+}
+
+.form-field__input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: var(--border-radius);
+  font-size: var(--font-size);
+  font-family: var(--font-family);
+  background-color: #f9fafb;
+  color: var(--text-primary);
+  transition: all 0.2s ease-in-out;
+  box-sizing: border-box;
+}
+
+.form-field__input:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(44, 164, 157, 0.1);
+}
+
+.form-field__input--error {
+  border-color: var(--accent-500);
+  background-color: #fef2f2;
+}
+
+.form-field__input--error:focus {
+  border-color: var(--accent-500);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.form-field__input::placeholder {
+  color: var(--text-secondary);
+}
+
+.form-field__input:disabled {
+  background-color: #f3f4f6;
+  color: var(--text-secondary);
+  cursor: not-allowed;
+}
+
+.form-field__password-toggle {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+.form-field__password-toggle .icon {
+  font-size: 1.25rem;
+  user-select: none;
+}
+
+.form-field__error {
+  color: var(--accent-500);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  font-weight: 400;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .form-field__input {
+    padding: 1rem 0.875rem;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+}

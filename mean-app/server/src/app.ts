@@ -8,6 +8,7 @@ import userRoutes from "./api/modules/user/user.routes";
 import incomeRoutes from "./api/modules/income/income.routes";
 import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from './api/modules/dashboard/dashboard.routes';
+import categoriesRoutes from './api/modules/categories/category.routes'
 const app = express();
 
 app.use(cors());
@@ -23,7 +24,7 @@ app.use(express.json());
 setupSwagger(app);
 // register routes
 app.use('/api/v1/dashboard', dashboardRoutes);
-
+app.use('/api/v1/categories',categoriesRoutes);
 // simple route
 app.get('/', (req, res) => {
   res.send('Hello from Express 🚀');
@@ -31,4 +32,5 @@ app.get('/', (req, res) => {
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
+
 export default app;

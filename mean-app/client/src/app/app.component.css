@@ -1,0 +1,12 @@
+/* App Component Styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background: #f5f5f5;
+  color: var(--text-primary);
+}
