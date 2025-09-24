@@ -224,15 +224,12 @@ export class AuthService {
    * Reset password with token
    */
   resetPassword(token: string, password: string, confirmPassword: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/user/request-reset`, {
-      token,
+    return this.http.post(`${this.API_URL}/user/reset-password/${token}`, {
       password,
       confirmPassword
-    }).pipe(
-      retry(2),
-      catchError(this.handleError.bind(this))
-    );
+    });
   }
+  
   /**
    * Get current user
    */

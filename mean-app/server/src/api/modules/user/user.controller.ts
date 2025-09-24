@@ -42,14 +42,19 @@ export const login = async (req: Request, res: Response) => {
 };
 
 // FORGOT PASSWORD (placeholder)
+// FORGOT PASSWORD (should send email)
 export const forgot = async (req: Request, res: Response) => {
+  console.log("Received email:", req.body.email);  // 👈 check value
   try {
-    const response = await forgotPassword(req.body.email);
+    const response = await generateResetToken(req.body.email);
     res.status(200).json(response);
   } catch (err: any) {
+    console.error(err.message);  // 👈 log error
     res.status(400).json({ error: err.message });
   }
 };
+
+
 
 // REQUEST RESET
 export const requestReset = async (req: Request, res: Response) => {

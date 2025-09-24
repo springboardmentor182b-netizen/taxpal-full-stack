@@ -18,7 +18,6 @@ export const createCategory = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ success: false, message: "Server Error", error: err.message });
   }
 };
-
 export const getCategories = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) return res.status(401).json({ success: false, message: "Unauthorized" });
