@@ -10,11 +10,12 @@ import { DashboardService } from '../../../services/dashboard.service';
 import { IncomeForm } from '../../income/income-form/income-form.component';
 import { ExpensesForm } from '../../expenses/expenses-form/expenses-form.component';
 import { DashboardForm } from '../../dashboard-form/dashboard-form/dashboard-form.component';
-
+import { RouterModule } from '@angular/router'; 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, FormsModule, MatDialogModule, MatIconModule],
+   
+  imports: [CommonModule, BaseChartDirective, FormsModule, MatDialogModule, MatIconModule, RouterModule,],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
