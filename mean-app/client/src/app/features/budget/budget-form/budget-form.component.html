@@ -1,0 +1,112 @@
+<div class="budget-container">
+  
+
+  <!--sidebar-->
+  
+  <!-- Header -->
+       
+    <div class="budget-card">
+     
+  <div class="header">
+    <h2 class="heading">Budgets</h2>
+    <button  class="button-save" (click)="isFormVisible.set(true)" >Create Budget</button>
+  </div>
+
+  <!-- Form Modal -->
+  <div *ngIf="isFormVisible()" class="modal-backdrop">
+    <div class="modal">
+      <button class="close-btn" (click)="isFormVisible.set(false)">×</button>
+      <h3 class="headings">Create New Budget</h3>
+
+      <div class="form-grid">
+        <!-- Category -->
+        <div class="form-group">
+          <label>Category</label>
+          <select [ngModel]="newBudget().category"
+                  (ngModelChange)="updateNewBudgetCategory($event)">
+            <option disabled [ngValue]="null">Select a category</option>
+            <option value="Design Project">Design Project</option>
+            <option value="Consulting">Consulting</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <!-- Budget Amount -->
+        <div class="form-group">
+          <label>Budget Amount</label>
+          <div class="input-prefix">
+            <span>$</span>
+            <input type="number" [ngModel]="newBudget().amount"
+                   (ngModelChange)="updateNewBudgetAmount($event)"
+                   placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Month -->
+        <div class="form-group">
+          <label>Month</label>
+          <select [ngModel]="newBudget().month"
+                  (ngModelChange)="updateNewBudgetMonth($event)">
+            <option disabled [ngValue]="null">Select a month</option>
+            <option value="january, 2025">january, 2025</option>
+              <option value="feb, 2025">feb, 2025</option>
+               <option value="march, 2025">March, 2025</option>
+              <option value="april, 2025">april, 2025</option>
+              <option value="May, 2025">May, 2025</option>
+            <option value="June, 2025">June, 2025</option>
+            <option value="July, 2025">July, 2025</option>
+                       
+          </select>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <textarea rows="3"
+                  placeholder="Add any additional details..."
+                  [ngModel]="newBudget().description"
+                  (ngModelChange)="updateNewBudgetDescription($event)"></textarea>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button (click)="isFormVisible.set(false)" class="btn-cencel">Cancel</button>
+        <button (click)="addBudget()" class="btn-save" >Create Budget</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Budgets Table -->
+  <div class="budget-table">
+    <h3>Budget List</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Budget</th>
+          <th>Spent</th>
+          <th>Remaining</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let budget of budgets(); trackBy: trackByCategory">
+          <td>{{ budget.category }}</td>
+          <td>{{ budget.amount | currency:'USD':'symbol' }}</td>
+          <td>{{ budget.spent | currency:'USD':'symbol' }}</td>
+          <td>{{ budget.remaining | currency:'USD':'symbol' }}</td>
+          <td [ngClass]="{
+                'status-good': budget.status === 'Good',
+                'status-fair': budget.status === 'Fair',
+                'status-poor': budget.status === 'Poor'
+              }">{{ budget.status }}</td>
+          <td class="action">View</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  
+</div>
