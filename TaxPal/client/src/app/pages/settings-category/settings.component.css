@@ -1,0 +1,79 @@
+.subheader .back svg{margin-right:6px}
+.card .list .row .name{margin-left:8px}
+.add-btn svg{margin-right:10px}
+/* Global CSS (no Tailwind) */
+:root{
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --text: #1E293B;
+  --muted: #64748B;
+  --border: rgba(70,130,180,0.08);
+  --border-strong: rgba(70,130,180,0.20);
+  --primary: #4682B4;
+  --radius: 14px;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family: Segoe UI, -apple-system, BlinkMacSystemFont, system-ui, Roboto, Helvetica, Arial, sans-serif;
+  color:var(--text);
+  background:var(--bg);
+}
+
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+.container{max-width:1280px;margin:0 auto;padding:0 24px}
+
+.site-header{position:sticky;top:0;z-index:50;width:100%;backdrop-filter:blur(4px);background:rgba(248,250,252,.6);border-bottom:1px solid var(--border)}
+.site-header .bar{height:64px;display:flex;align-items:center;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:24px;height:24px;color:#ffffff;filter:drop-shadow(0 1px 0 rgba(0,0,0,.05))}
+.brand .name{font-weight:700;font-size:20px}
+
+.nav{display:none;gap:32px}
+@media (min-width: 768px){.nav{display:flex}}
+.nav a{color:var(--muted);font-weight:600;transition:color .2s}
+.nav a:hover{color:var(--primary)}
+.nav a.is-active{color:var(--primary)}
+
+.header-actions{display:flex;align-items:center;gap:16px}
+.icon-btn{padding:8px;color:#334155}
+.icon-btn:hover{color:var(--primary)}
+.badge{position:absolute;inset:auto auto calc(100% - 10px) calc(100% - 10px);display:flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:9999px;background:linear-gradient(90deg,#FB2C36,#E7000B);color:#fff;font-size:12px;font-weight:600;box-shadow:0 10px 15px -3px rgba(0,0,0,.10),0 4px 6px -4px rgba(0,0,0,.10)}
+.avatar{width:36px;height:36px;border-radius:9999px;border:1px solid var(--border-strong);background:var(--primary);color:#fff;font-weight:600;display:flex;align-items:center;justify-content:center}
+
+.subheader{position:sticky;top:64px;z-index:40;background:rgba(248,250,252,.95);backdrop-filter:blur(4px);border-bottom:1px solid var(--border)}
+.subheader .row{height:85px;display:flex;align-items:center}
+.back{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:6px 10px;color:var(--text)}
+.page-title{font-size:24px;font-weight:700;margin:0}
+.page-desc{margin-top:4px;color:var(--muted);font-size:14px}
+
+.main{padding:24px 0}
+.card{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius);max-width:900px;margin:0 auto;padding:24px}
+.card h4{margin:0 0 4px 0;font-size:16px;font-weight:600}
+.card .sub{margin:0 0 12px 0;color:var(--muted);font-size:16px}
+
+.tabs{display:flex;gap:24px;border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:20px}
+.tab{padding:8px 0;font-weight:600;color:var(--muted);position:relative;cursor:pointer;background:none;border:0}
+.tab.active{color:var(--primary)}
+.tab.active::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:2px;background:var(--primary)}
+
+.list{display:flex;flex-direction:column;gap:12px;margin-top:12px}
+.row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;height:66px;padding:0 16px;border:1px solid var(--border);border-radius:10px;background:rgba(241,245,249,.30)}
+.dot{width:12px;height:12px;border-radius:9999px}
+.name{font-size:16px;font-weight:600}
+.actions{display:flex;gap:16px}
+.action{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;color:#64748B}
+.action:hover{background:rgba(100,116,139,.06)}
+
+.add-btn{display:flex;align-items:center;justify-content:center;gap:10px;height:36px;margin:20px auto 0 auto;width:100%;max-width:846px;border-radius:8px;background:var(--primary);color:#fff;font-weight:600}
+
+/* Responsive container spacing */
+@media (max-width: 640px){
+  .subheader .row{height:auto;padding:16px 0;align-items:flex-start}
+  .page-title{font-size:20px}
+  .card{padding:16px}
+}
