@@ -5,7 +5,7 @@ const cors = require('cors');
 const path = require('path');
 
 // Load .env
-dotenv.config({ path: path.join(__dirname, '.env') });
+dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app = express();
 app.use(express.json());
