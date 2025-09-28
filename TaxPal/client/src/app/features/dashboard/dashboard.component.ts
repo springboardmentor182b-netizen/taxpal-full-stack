@@ -1,8 +1,15 @@
+<<<<<<< HEAD
 import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+=======
+import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { RouterModule } from '@angular/router';
+>>>>>>> Group-D/feature-api-somnath
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -97,6 +104,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
       this.pieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
+<<<<<<< HEAD
           labels:['Expenses','Remaining'],
           datasets:[{
             data:[0,0],
@@ -107,10 +115,20 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           }]
         },
         options:{plugins:{legend:{display:true}},responsive:true,maintainAspectRatio:false}
+=======
+          labels: ['Rent/Mortgage', 'Utilities', 'Groceries', 'Others'],
+          datasets: [{
+            data: [32, 20, 25, 23],
+            backgroundColor: [getComputedStyle(document.documentElement).getPropertyValue('--pie-blue'), getComputedStyle(document.documentElement).getPropertyValue('--pie-light-blue'), getComputedStyle(document.documentElement).getPropertyValue('--pie-teal'), getComputedStyle(document.documentElement).getPropertyValue('--pie-green')]
+          }]
+        },
+        options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
+>>>>>>> Group-D/feature-api-somnath
       });
 
       const barCtx = (document.getElementById('barChart') as HTMLCanvasElement).getContext('2d');
       this.barChart = new Chart(barCtx, {
+<<<<<<< HEAD
         type:'bar',
         data:{
           labels:['Summary'],
@@ -126,6 +144,23 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
           scales:{
             y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'}} ,
             x:{grid:{color:'transparent'},ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'}}
+=======
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+          datasets: [
+            { label: 'Income', data: [8700, 7700, 9500, 5600, 8800, 7900], backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-income') },
+            { label: 'Expenses', data: [3200, 3100, 3900, 2800, 3500, 3000], backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-expense') }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: true, labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8' } } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8' } },
+            x: { grid: { color: 'transparent' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8' } }
+>>>>>>> Group-D/feature-api-somnath
           }
         }
       });
@@ -138,6 +173,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (this.pieChart) this.pieChart.destroy();
       if (this.barChart) this.barChart.destroy();
-    } catch (e) {}
+    } catch (e) { }
   }
 }

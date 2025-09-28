@@ -7,30 +7,23 @@ const Expense = require('../models/Expense');
 // POST /api/users/register
 router.post('/register', async (req, res) => {
   try {
-    let { email, name } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email is required' });
-    email = email.trim().toLowerCase();
-
-    // Register user in main users collection
-    const user = new User({ email, name });
-    await user.save();
-
-    // ...existing code for per-user DB...
-
-    res.status(201).json({ 
-      message: 'User registered and database created', 
-      user: {
-        email: user.email,
-        name: user.name,
-        // Add avatar initial based on email or name
-        initial: (user.name && user.name.trim()) ? user.name.trim()[0].toUpperCase() : user.email[0].toUpperCase()
-      }
-    });
-  } catch (err) {
-    console.error('Registration backend error:', err);
-    if (err.code === 11000) {
-      return res.status(409).json({ error: 'Email already exists' });
+    const { email, name, country } = req.body;
+    if (!email || !name) {
+      return res.status(400).json({ error: 'Email and name are required.' });
     }
+    // Check if user already exists
+    const existing = await User.findOne({ email: email.trim().toLowerCase() });
+    if (existing) {
+      return res.status(409).json({ error: 'User already exists.' });
+    }
+    const user = new User({
+      email: email.trim().toLowerCase(),
+      name,
+      country
+    });
+    await user.save();
+    res.status(201).json({ message: 'User registered', user });
+  } catch (err) {
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
@@ -162,3 +155,8 @@ router.get('/expense-list', async (req, res) => {
 });
 
 module.exports = router;
+
+// Make sure this file is loaded in your Express app:
+// In your main server file (e.g. app.js or server.js):
+// const userRoutes = require('./routes/user');
+// app.use('/api/users', userRoutes);

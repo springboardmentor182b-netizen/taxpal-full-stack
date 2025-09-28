@@ -11,7 +11,7 @@ export const routes: Routes = [
   // User dashboard routes
   { path: 'user-profile', component: UserProfileComponent },
   { path: 'transactions', component: UserProfileComponent },
-  { path: 'budget', component: UserProfileComponent },
+  { path: 'budget', loadComponent: () => import('./components/budget/budget.component').then(m => m.BudgetComponent) },
   { path: 'reports', component: UserProfileComponent },
   { path: 'tax-estimator', component: UserProfileComponent },
 

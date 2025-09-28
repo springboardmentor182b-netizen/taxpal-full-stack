@@ -29,9 +29,11 @@ if (process.env.NODE_ENV !== 'test') {
 // Routes
 const authRoutes = require("./routes/auth");
 const transactionRoutes = require("./routes/transactions");
+const budgetRoutes = require('./routes/budget');
 
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
+app.use("/api/budget", budgetRoutes);
 
 // Test route
 app.get("/", (req, res) => {
