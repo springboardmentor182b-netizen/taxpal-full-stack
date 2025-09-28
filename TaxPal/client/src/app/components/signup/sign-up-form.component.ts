@@ -142,3 +142,10 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
     this.switchToSignIn.emit();
   }
 }
+
+// Make sure your frontend is POSTing to the correct backend URL.
+// If you run Angular with a dev server (ng serve), and your backend is on a different port (e.g. 3000),
+// you need to use the backend's port, not 4200, or set up a proxy.
+// Example (if backend runs on http://localhost:3000):
+// this.http.post('http://localhost:3000/api/users/register', payload)
+// Or use Angular's proxy.conf.json to forward /api to your backend.
