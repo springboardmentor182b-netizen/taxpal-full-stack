@@ -19,16 +19,15 @@ app.use((req, res, next) => {
 app.use(express.json()); // Parse JSON requests
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
-// Connect to MongoDB
 // Connect to MongoDB only if not testing
-if (process.env.NODE_ENV !== 'test') {
+if (process.env.NODE_ENV !== "test") {
   connectDB();
 }
 
 // Routes
 const authRoutes = require("./routes/auth");
 const transactionRoutes = require("./routes/transactions");
-const budgetRoutes = require("./apis/budget/budget");
+const budgetRoutes = require("./routes/budget");
 
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/auth", authRoutes);
