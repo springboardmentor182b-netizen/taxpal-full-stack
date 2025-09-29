@@ -5,7 +5,7 @@ const budgetService = new BudgetService();
 exports.createBudget = async (req, res) => {
   try {
     const budget = await budgetService.createBudget({
-      user_id: req.body.user_id, // <-- changed here
+      user_id: req.user?._id || req.body.user_id, // support both cases
       ...req.body,
     });
     res.status(201).json(budget);

@@ -1,11 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const budgetController = require("./budget.controller");
-// Optional auth: if your app requires auth, import and use it here.
-// const protect = require("../auth/authMiddleware");
+const { protect } = require("../auth/authMiddleware"); // adjust path if needed
 
-// If you need protection, uncomment the next line.
-// router.use(protect);
+// ✅ Protect all budget routes (requires login)
+router.use(protect);
 
 // Routes
 router.post("/", budgetController.createBudget);
