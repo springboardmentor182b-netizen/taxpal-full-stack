@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: '.env.test' });
 
-// Extend Jest timeout for memory server setup
+// Extend Jest timeout for Atlas connection
 jest.setTimeout(300000); // 5 minutes
 
 const app = express();
@@ -22,9 +22,26 @@ const mockToken = jwt.sign({ id: mockUserId }, JWT_SECRET);
 
 describe("TaxPal Backend Tests - Category Management", () => {
 
-  beforeAll(async () => { await setupTestDb(); });
-  afterAll(async () => { await teardownTestDb(); });
-  beforeEach(async () => { await clearTestDb(); });
+  beforeAll(async () => { 
+    await setupTestDb(); 
+  });
+  
+  afterAll(async () => { 
+    await teardownTestDb();
+    // Force garbage collection if available
+    if (global.gc) {
+      global.gc();
+    }
+  });
+  
+  beforeEach(async () => { 
+    await clearTestDb(); 
+  });
+  
+  afterEach(async () => {
+    // Clean up any hanging requests
+    await new Promise(resolve => setTimeout(resolve, 100));
+  });
 
   describe("POST /api/v1/categories", () => {
     it("should create an expense category", async () => {

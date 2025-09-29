@@ -1,42 +1,48 @@
 import mongoose from "mongoose";
-import { MongoMemoryServer } from "mongodb-memory-server";
-import * as os from "os";
-import * as path from "path";
+import dotenv from "dotenv";
 
-let mongoServer: MongoMemoryServer | null = null;
+// Load test environment variables
+dotenv.config({ path: '.env.test' });
 
 /**
- * Start MongoDB Memory Server and connect
+ * Connect to MongoDB Atlas Test Database
  */
 export const setupTestDb = async (): Promise<void> => {
   try {
-    // Disconnect if already connected
+    // Force disconnect and cleanup any existing connections
     if (mongoose.connection.readyState !== 0) {
-      await mongoose.disconnect();
+      await mongoose.connection.close(true);
     }
 
-    // Create MongoMemoryServer if not exists
-    if (!mongoServer) {
-      console.log('🚀 Creating MongoDB Memory Server...');
-      const cacheDir = path.join(os.homedir(), '.cache', 'mongodb-binaries');
-      mongoServer = await MongoMemoryServer.create({
-        binary: {
-          version: '5.0.8',
-          downloadDir: cacheDir,
-          checkMD5: false,
-        },
-        instance: { dbName: 'testDb', launchTimeout: 120000 }
-      });
-      console.log('✅ MongoDB Memory Server created');
+    const mongoUri = process.env.MONGODB_URI;
+    
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI is not defined in .env.test');
     }
 
-    const mongoUri = mongoServer.getUri();
+    // Safety check: Ensure we're using a test database
+    if (!mongoUri.includes('test') && !mongoUri.includes('Test') && !mongoUri.includes('TEST')) {
+      throw new Error('⚠️ SAFETY CHECK FAILED: Database name must contain "test", "Test", or "TEST"');
+    }
+
+    // Safety check: Ensure NODE_ENV is test
+    if (process.env.NODE_ENV !== 'test') {
+      throw new Error('⚠️ SAFETY CHECK FAILED: NODE_ENV must be "test"');
+    }
+
+    console.log('🚀 Connecting to MongoDB Atlas Test Database...');
+    
+    // Optimized connection settings to prevent memory leaks
     await mongoose.connect(mongoUri, {
-      maxPoolSize: 10,
+      maxPoolSize: 5,
+      minPoolSize: 1,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
+      maxIdleTimeMS: 10000,
+      connectTimeoutMS: 10000,
     });
-    console.log('✅ Test MongoDB connected');
+    
+    console.log('✅ Test MongoDB Atlas connected');
   } catch (error) {
     console.error('❌ Test DB setup failed:', error);
     throw error;
@@ -44,33 +50,36 @@ export const setupTestDb = async (): Promise<void> => {
 };
 
 /**
- * Disconnect and stop MongoMemoryServer
+ * Disconnect from MongoDB Atlas and cleanup
  */
 export const teardownTestDb = async (): Promise<void> => {
   try {
     if (mongoose.connection.readyState !== 0) {
+      // Optional: Clear all data before disconnecting
+      await clearTestDb();
       await mongoose.connection.close();
     }
-    if (mongoServer) {
-      await mongoServer.stop();
-      mongoServer = null;
-    }
-    console.log('✅ Test MongoDB disconnected');
+    console.log('✅ Test MongoDB Atlas disconnected');
   } catch (error) {
     console.error('❌ Test DB teardown failed:', error);
+    throw error;
   }
 };
 
 /**
- * Clear all collections
+ * Clear all collections in the test database
  */
 export const clearTestDb = async (): Promise<void> => {
   try {
     if (mongoose.connection.readyState === 1) {
       const collections = mongoose.connection.collections;
+      
+      // Delete all documents from all collections
       await Promise.all(
         Object.keys(collections).map(key => collections[key].deleteMany({}))
       );
+      
+      console.log('🧹 Test database cleared');
     }
   } catch (error) {
     console.error('❌ Test DB clear failed:', error);

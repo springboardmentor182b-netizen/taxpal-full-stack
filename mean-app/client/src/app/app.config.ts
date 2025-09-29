@@ -7,26 +7,14 @@ import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@a
 import { AuthService } from './features/auth.service';
 import { ThemeService } from './core/service/theme.service';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
-import { BudgetFormComponent } from './features/budget/budget-form/budget-form.component';
-import { Dashboard } from './features/dashboard/dashboard/dashboard.component';
-import { LoginComponent } from './features/login/login.component';
-
-//import { LayoutComponent } from './layout/layout.component';
-export const appRoutes = [
-  { path: 'dashboard', component: Dashboard },
-  { path: 'budgets', component: BudgetFormComponent },
-  { path: 'login', component: LoginComponent },
-  { path: '', redirectTo: '/login', pathMatch: 'full' as const}
-];
+import { routes } from './app.routes';  // Import routes from app.routes.ts
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(appRoutes), // ✅ use appRoutes here
-    provideHttpClient(),
-
-    // Traditional modules (if needed)
+    provideRouter(routes),  // Use the imported routes
     provideHttpClient(withInterceptorsFromDi()),
+    
     importProvidersFrom(
       BrowserModule,
       CommonModule,
@@ -34,12 +22,12 @@ export const appConfig: ApplicationConfig = {
       ReactiveFormsModule
     ),
 
-    // Interceptors & services
     {
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
     },
+    
     AuthService,
     ThemeService
   ]

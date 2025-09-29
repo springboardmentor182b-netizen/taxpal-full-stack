@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-
 import { LoginComponent } from './features/login/login.component';
 import { SignupComponent } from './features/signup/signup.component';
 
@@ -28,7 +27,12 @@ export const routes: Routes = [
     path: 'dashboard-form', 
     loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
   },
+  { 
+    path: 'budgets', 
+    loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
+  },
   
+  // Legacy route redirects (for backwards compatibility)
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
   { path: 'features/forgot-password', redirectTo: '/forgot-password' },
