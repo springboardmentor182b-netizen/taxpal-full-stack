@@ -6,7 +6,7 @@ import { SignupComponent } from './features/signup/signup.component';
 export const routes: Routes = [
   // Default route - redirect to login
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-  
+
   // Authentication routes
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },

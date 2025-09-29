@@ -7,9 +7,8 @@ import incomeRoutes from "./api/modules/income/income.routes";
 import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from "./api/modules/dashboard/dashboard.routes";
 import categoriesRoutes from "./api/modules/categories/category.routes";
-
+import taxEstimatorRoutes from "./api/modules/taxEstimator/taxEstimator.route";
 const app = express();
-
 app.use(
   cors({
     origin: "http://localhost:4200",
@@ -18,7 +17,6 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization", "Accept"],
   })
 );
-
 app.use(bodyParser.json());
 app.use(express.json());
 
@@ -27,6 +25,7 @@ setupSwagger(app);
 // Routes
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/categories", categoriesRoutes);
+app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
