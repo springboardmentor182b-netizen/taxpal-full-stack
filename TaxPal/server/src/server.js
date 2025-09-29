@@ -1,7 +1,7 @@
 const express = require("express");
 const dotenv = require("dotenv");
 
-// Always use absolute path for .env!
+// Always use absolute path for .env
 dotenv.config({ path: __dirname + "/.env" });
 console.log("MONGO_URI:", process.env.MONGO_URI); // For debugging
 
@@ -20,7 +20,11 @@ app.use(express.json()); // Parse JSON requests
 app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
 // Connect to MongoDB
-connectDB();
+// Connect to MongoDB only if not testing
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
+
 
 // Routes
 const authRoutes = require("./routes/auth");
@@ -36,8 +40,13 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-// Start server
+// Start server only if run directly
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+// Export app for testing
+module.exports = app;

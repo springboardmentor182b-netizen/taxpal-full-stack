@@ -4,7 +4,7 @@ const dashboardService = new DashboardService();
 class DashboardController {
     async getSummary(req, res) {
         try {
-            const userId = req.user.userId;
+            const userId = req.body.user_id;
             const summary = await dashboardService.getSummary(userId);
             res.json(summary);
         } catch (error) {
