@@ -25,15 +25,14 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB();
 }
 
-
 // Routes
 const authRoutes = require("./routes/auth");
 const transactionRoutes = require("./routes/transactions");
+const budgetRoutes = require("./apis/budget/budget");
 
-
+app.use("/api/budgets", budgetRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
-
 
 // Test route
 app.get("/", (req, res) => {
