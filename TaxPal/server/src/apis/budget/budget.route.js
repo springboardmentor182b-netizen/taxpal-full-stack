@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const budgetController = require("./budget.controller");
-const { protect } = require("../auth/authMiddleware"); // adjust if your path differs
+const { protect } = require("../auth/authMiddleware"); // adjust path if needed
 
-// Protect all budget routes (requires login)
+// ✅ Protect all budget routes (requires login)
 router.use(protect);
 
 // Routes

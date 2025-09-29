@@ -1,8 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router, NavigationEnd } from '@angular/router';
-import { SignInFormComponent } from '../auth/sign-in-form.component';
-import { SignUpFormComponent } from '../auth/sign-up-form.component';
+import { SignInFormComponent } from '../signin/sign-in-form.component';
+import { SignUpFormComponent } from '../signup/sign-up-form.component';
 
 @Component({
   selector: 'app-navbar',
