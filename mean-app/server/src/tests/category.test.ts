@@ -28,7 +28,7 @@ describe("TaxPal Backend Tests - Category Management", () => {
   
   afterAll(async () => { 
     await teardownTestDb();
-    // Force garbage collection if available
+    
     if (global.gc) {
       global.gc();
     }
@@ -39,7 +39,7 @@ describe("TaxPal Backend Tests - Category Management", () => {
   });
   
   afterEach(async () => {
-    // Clean up any hanging requests
+    
     await new Promise(resolve => setTimeout(resolve, 100));
   });
 
@@ -70,7 +70,7 @@ describe("TaxPal Backend Tests - Category Management", () => {
 
   describe("GET /api/v1/categories", () => {
     it("should return default and user categories", async () => {
-      // Insert user category
+      
       await Category.create({ name: "Web Dev Tools", type: "expense", createdBy: mockUserId });
 
       const response = await request(app)

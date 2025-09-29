@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
-// Load test environment variables
+
 dotenv.config({ path: '.env.test' });
 
 /**
@@ -9,7 +9,7 @@ dotenv.config({ path: '.env.test' });
  */
 export const setupTestDb = async (): Promise<void> => {
   try {
-    // Force disconnect and cleanup any existing connections
+    
     if (mongoose.connection.readyState !== 0) {
       await mongoose.connection.close(true);
     }
@@ -20,12 +20,12 @@ export const setupTestDb = async (): Promise<void> => {
       throw new Error('MONGODB_URI is not defined in .env.test');
     }
 
-    // Safety check: Ensure we're using a test database
+    
     if (!mongoUri.includes('test') && !mongoUri.includes('Test') && !mongoUri.includes('TEST')) {
       throw new Error('⚠️ SAFETY CHECK FAILED: Database name must contain "test", "Test", or "TEST"');
     }
 
-    // Safety check: Ensure NODE_ENV is test
+    
     if (process.env.NODE_ENV !== 'test') {
       throw new Error('⚠️ SAFETY CHECK FAILED: NODE_ENV must be "test"');
     }
@@ -49,13 +49,13 @@ export const setupTestDb = async (): Promise<void> => {
   }
 };
 
-/**
- * Disconnect from MongoDB Atlas and cleanup
- */
+
+ 
+ 
 export const teardownTestDb = async (): Promise<void> => {
   try {
     if (mongoose.connection.readyState !== 0) {
-      // Optional: Clear all data before disconnecting
+      
       await clearTestDb();
       await mongoose.connection.close();
     }
@@ -66,15 +66,13 @@ export const teardownTestDb = async (): Promise<void> => {
   }
 };
 
-/**
- * Clear all collections in the test database
- */
+
 export const clearTestDb = async (): Promise<void> => {
   try {
     if (mongoose.connection.readyState === 1) {
       const collections = mongoose.connection.collections;
       
-      // Delete all documents from all collections
+      
       await Promise.all(
         Object.keys(collections).map(key => collections[key].deleteMany({}))
       );
