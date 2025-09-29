@@ -103,8 +103,13 @@ export class SignInFormComponent implements OnInit, OnDestroy {
         password: this.password // only if you want to check password
       }).toPromise();
       this.successMsg = 'Signed in! Redirecting...';
+
+      // Store user_id (MongoDB ObjectId) in localStorage for budget and other features
+      if (res && res.user && res.user._id) {
+        localStorage.setItem('user_id', res.user._id);
+      }
+
       setTimeout(() => {
-        // ...close modal and navigate as needed...
         this.closeForm();
         this.router.navigate(['/user-profile']);
       }, 1200);
