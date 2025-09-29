@@ -4,16 +4,32 @@ import { AuthedRequest } from '../auth/auth';
 import Transaction from '../dashboard/Transaction';
 import Budget from '../dashboard/Budget';
 
+// ---------------- existing helpers ----------------
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
 const monthRange = (year: number, month1to12: number) => {
   const start = new Date(year, month1to12 - 1, 1);
-  const end = new Date(year, month1to12, 1);
+  const end = new Date(year, month1to12, 1); // exclusive
   return { start, end };
 };
 
+const quarterRange = (year: number, q1to4: number) => {
+  const startMonth = (q1to4 - 1) * 3;
+  const start = new Date(year, startMonth, 1);
+  const end = new Date(year, startMonth + 3, 1); // exclusive
+  return { start, end };
+};
+
+const yearRange = (year: number) => {
+  const start = new Date(year, 0, 1);
+  const end = new Date(year + 1, 0, 1); // exclusive
+  return { start, end };
+};
+
+// ---------------- existing handlers ----------------
 export const getDashboardData = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
+    if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
     const userId = new Types.ObjectId(req.user.id);
     const { month, year } = req.query;
 
@@ -25,13 +41,12 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
     const prevYear  = currentMonth === 1 ? currentYear - 1 : currentYear;
     const { start: pStart, end: pEnd } = monthRange(prevYear, prevMonth);
 
-    // --- Current month totals (income/expense) ---
+    // --- Current month totals ---
     const curTotals = await Transaction.aggregate([
       { $match: { userId, date: { $gte: start, $lt: end } } },
       { $group: { _id: '$type', total: { $sum: '$amount' } } }
     ]);
-
-    const monthlyIncome  = curTotals.find(r => r._id === 'income')?.total || 0;
+    const monthlyIncome   = curTotals.find(r => r._id === 'income')?.total || 0;
     const monthlyExpenses = curTotals.find(r => r._id === 'expense')?.total || 0;
 
     // --- Previous month totals for % change ---
@@ -39,14 +54,13 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
       { $match: { userId, date: { $gte: pStart, $lt: pEnd } } },
       { $group: { _id: '$type', total: { $sum: '$amount' } } }
     ]);
-
-    const prevIncome  = prevTotals.find(r => r._id === 'income')?.total || 0;
+    const prevIncome   = prevTotals.find(r => r._id === 'income')?.total || 0;
     const prevExpenses = prevTotals.find(r => r._id === 'expense')?.total || 0;
 
-    const incomeChange  = prevIncome  > 0 ? ((monthlyIncome  - prevIncome)  / prevIncome)  * 100 : 0;
+    const incomeChange  = prevIncome   > 0 ? ((monthlyIncome   - prevIncome)   / prevIncome)   * 100 : 0;
     const expenseChange = prevExpenses > 0 ? ((monthlyExpenses - prevExpenses) / prevExpenses) * 100 : 0;
 
-    // --- Expense breakdown by category (pie) ---
+    // --- Expense breakdown (pie) for current month ---
     const breakdown = await Transaction.aggregate([
       { $match: { userId, type: 'expense', date: { $gte: start, $lt: end } } },
       { $group: { _id: '$category', amount: { $sum: '$amount' } } },
@@ -54,7 +68,7 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
       { $sort: { amount: -1 } }
     ]);
 
-    // --- Budgets for this month with "spent" merged (single pipeline + map) ---
+    // --- Budgets (with spent/remaining/usedPct) ---
     const budgets = await Budget.find({ userId, month: currentMonth, year: currentYear }).lean();
 
     const spentByCategory = await Transaction.aggregate([
@@ -79,91 +93,137 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
     res.json({
       period: { year: currentYear, month: currentMonth, start, end },
       cards: {
-        income:   { amount: round2(monthlyIncome),  changePct: round2(incomeChange) },
+        income:   { amount: round2(monthlyIncome),   changePct: round2(incomeChange) },
         expenses: { amount: round2(monthlyExpenses), changePct: round2(expenseChange) },
-        estimatedTaxDues: round2(monthlyIncome * 0.30),
+        estimatedTaxDues: round2(monthlyIncome * 0.30), // placeholder
         savingsRatePct: monthlyIncome > 0 ? round2(((monthlyIncome - monthlyExpenses) / monthlyIncome) * 100) : 0
       },
-      breakdown: {
-        byCategory: breakdown
-      },
+      breakdown: { byCategory: breakdown },
       budgets: budgetsOut,
       recentTransactions
     });
+    return;
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch dashboard data' });
+    return;
   }
 };
 
+/**
+ * GET /api/v1/dashboard/income-vs-expenses
+ * Query:
+ * - period|range: 'month' | 'quarter' | 'year' (default 'month')
+ * - month?: 1-12 (defaults to current month for month/quarter)
+ * - year?:  YYYY (defaults to current year)
+ */
 export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
+    if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
     const userId = new Types.ObjectId(req.user.id);
-    const period = (req.query.period as string) || 'month'; // 'month' | 'quarter' | 'year'
 
-    const addProjectionForPeriod =
-      period === 'year'
-        ? {
-            y: { $year: '$date' }
-          }
-        : period === 'quarter'
-        ? {
-            y: { $year: '$date' },
-            q: { $ceil: { $divide: [{ $month: '$date' }, 3] } }
-          }
-        : {
-            y: { $year: '$date' },
-            m: { $month: '$date' }
-          };
+    const qPeriod = (req.query.period as string) || (req.query.range as string) || 'month';
+    const period: 'month' | 'quarter' | 'year' =
+      qPeriod === 'quarter' ? 'quarter' : qPeriod === 'year' ? 'year' : 'month';
 
-    const grouped = await Transaction.aggregate([
-      { $match: { userId } },
-      { $project: { amount: 1, type: 1, date: 1, ...addProjectionForPeriod } },
-      {
-        $group: {
-          _id:
-            period === 'year'
-              ? { y: '$y', type: '$type' }
-              : period === 'quarter'
-              ? { y: '$y', q: '$q', type: '$type' }
-              : { y: '$y', m: '$m', type: '$type' },
-          total: { $sum: '$amount' }
-        }
+    const now = new Date();
+    const qMonth = req.query.month ? parseInt(req.query.month as string, 10) : (now.getMonth() + 1);
+    const qYear  = req.query.year  ? parseInt(req.query.year  as string, 10) : now.getFullYear();
+
+    let start: Date, end: Date;
+    let labels: string[] = [];
+
+    if (period === 'month') {
+      ({ start, end } = monthRange(qYear, qMonth));
+
+      // Aggregate by DAY within the month
+      const rows = await Transaction.aggregate([
+        { $match: { userId, date: { $gte: start, $lt: end } } },
+        {
+          $project: {
+            amount: 1,
+            type: 1,
+            dayKey: { $dateToString: { format: '%Y-%m-%d', date: '$date' } }
+          }
+        },
+        { $group: { _id: { dayKey: '$dayKey', type: '$type' }, total: { $sum: '$amount' } } }
+      ]);
+
+      const incomeMap = new Map<string, number>();
+      const expenseMap = new Map<string, number>();
+      for (const r of rows) {
+        const k = r._id.dayKey as string;
+        if (r._id.type === 'income') incomeMap.set(k, r.total);
+        if (r._id.type === 'expense') expenseMap.set(k, r.total);
       }
-    ]);
 
-    // Pivot -> labels + series arrays for Chart.js
-    type Key = string;
-    const keyOf = (d: any) =>
-      period === 'year' ? `${d._id.y}` : period === 'quarter' ? `Q${d._id.q} ${d._id.y}` : `${d._id.y}-${String(d._id.m).padStart(2, '0')}`;
+      const incomeSeries: number[] = [];
+      const expenseSeries: number[] = [];
+      const cur = new Date(start);
 
-    const labelSet = new Set<Key>();
-    const incomeMap = new Map<Key, number>();
-    const expenseMap = new Map<Key, number>();
+      while (cur < end) {
+        const key = cur.toISOString().slice(0, 10); // YYYY-MM-DD
+        labels.push(cur.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })); // "03 May"
+        incomeSeries.push(round2(incomeMap.get(key) || 0));
+        expenseSeries.push(round2(expenseMap.get(key) || 0));
+        cur.setDate(cur.getDate() + 1);
+      }
 
-    for (const row of grouped) {
-      const key = keyOf(row);
-      labelSet.add(key);
-      if (row._id.type === 'income') incomeMap.set(key, row.total);
-      if (row._id.type === 'expense') expenseMap.set(key, row.total);
+      res.json({
+        labels,
+        series: [
+          { label: 'Income', data: incomeSeries },
+          { label: 'Expenses', data: expenseSeries }
+        ],
+        period
+      });
+      return;
     }
 
-    const labels = Array.from(labelSet);
-    // sort labels chronologically
-    labels.sort((a, b) => {
-      if (period === 'year') return Number(a) - Number(b);
-      if (period === 'quarter') {
-        const [qa, ya] = a.split(' ');
-        const [qb, yb] = b.split(' ');
-        const na = Number(ya) * 10 + Number(qa.replace('Q', ''));
-        const nb = Number(yb) * 10 + Number(qb.replace('Q', ''));
-        return na - nb;
-      }
-      // YYYY-MM lexicographic works here
-      return a.localeCompare(b);
-    });
+    // quarter/year -> aggregate by MONTH within the range
+    if (period === 'quarter') {
+      const q = Math.ceil(qMonth / 3);
+      const qr = quarterRange(qYear, q);
+      start = qr.start; end = qr.end;
+    } else {
+      const yr = yearRange(qYear);
+      start = yr.start; end = yr.end;
+    }
 
-    const incomeSeries = labels.map(l => round2(incomeMap.get(l) || 0));
-    const expenseSeries = labels.map(l => round2(expenseMap.get(l) || 0));
+    const rows = await Transaction.aggregate([
+      { $match: { userId, date: { $gte: start, $lt: end } } },
+      {
+        $project: {
+          amount: 1,
+          type: 1,
+          ym: { $dateToString: { format: '%Y-%m', date: '$date' } }
+        }
+      },
+      { $group: { _id: { ym: '$ym', type: '$type' }, total: { $sum: '$amount' } } }
+    ]);
+
+    const incomeMap = new Map<string, number>();
+    const expenseMap = new Map<string, number>();
+    for (const r of rows) {
+      const k = r._id.ym as string;
+      if (r._id.type === 'income') incomeMap.set(k, r.total);
+      if (r._id.type === 'expense') expenseMap.set(k, r.total);
+    }
+
+    const incomeSeries: number[] = [];
+    const expenseSeries: number[] = [];
+    const cur = new Date(start);
+
+    while (cur < end) {
+      const y = cur.getFullYear();
+      const m = cur.getMonth() + 1;
+      const ym = `${y}-${String(m).padStart(2, '0')}`;
+
+      labels.push(new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })); // "May 2025"
+      incomeSeries.push(round2(incomeMap.get(ym) || 0));
+      expenseSeries.push(round2(expenseMap.get(ym) || 0));
+
+      cur.setMonth(cur.getMonth() + 1);
+    }
 
     res.json({
       labels,
@@ -173,7 +233,54 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
       ],
       period
     });
+    return;
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch income vs expenses data' });
+    return;
+  }
+};
+
+// ---------------- NEW: Recent transactions endpoint ----------------
+/**
+ * GET /api/v1/dashboard/recent?limit=8&startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
+ * Returns the latest N transactions for the authenticated user.
+ */
+export const getRecentTransactions = async (req: AuthedRequest, res: Response): Promise<void> => {
+  try {
+    if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
+    const userId = new Types.ObjectId(req.user.id);
+
+    const limitRaw = Number(req.query.limit ?? 8);
+    const limit = Math.max(1, Math.min(isFinite(limitRaw) ? limitRaw : 8, 100));
+
+    const { startDate, endDate } = req.query as any;
+    const q: any = { userId };
+
+    if (startDate || endDate) {
+      q.date = {};
+      if (startDate) q.date.$gte = new Date(String(startDate));
+      if (endDate)   q.date.$lte = new Date(String(endDate));
+    }
+
+    const docs = await Transaction.find(q)
+      .sort({ date: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+
+    const transactions = docs.map(d => ({
+      _id: String(d._id),
+      user_id: String(d.userId),
+      type: d.type, // 'income' | 'expense'
+      category: (d as any).category ?? 'General',
+      amount: Number((d as any).amount),
+      date: d.date,
+      description: (d as any).description ?? (d as any).source ?? (d.type === 'income' ? 'Income' : 'Expense'),
+      createdAt: d.createdAt,
+      updatedAt: d.updatedAt,
+    }));
+
+    res.json({ transactions });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to fetch recent transactions' });
   }
 };

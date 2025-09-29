@@ -1,18 +1,15 @@
 // server/src/server.ts
-// --- load .env before anything else ---
-import fs from 'fs';
+
+// ---------- 1) Load .env BEFORE anything else ----------
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 
 const candidates = [
-  path.resolve(process.cwd(), '.env'),       // when running from /server with cwd=server
+  path.resolve(process.cwd(), '.env'),       // when running with cwd=server
   path.resolve(__dirname, '../.env'),        // /server/.env
-  path.resolve(__dirname, '../../.env'),     // repo-root/.env  ✅ your current case
+  path.resolve(__dirname, '../../.env'),     // repo-root/.env
 ];
-
-console.log('[debug] SMTP_HOST=', process.env.SMTP_HOST || '(none)');
-console.log('[debug] SMTP_USER=', process.env.SMTP_USER ? '(set)' : '(none)');
-console.log('[debug] GMAIL_USER=', process.env.GMAIL_USER ? '(set)' : '(none)');
 
 let loaded = false;
 for (const p of candidates) {
@@ -24,9 +21,8 @@ for (const p of candidates) {
   }
 }
 if (!loaded) console.warn('[env] .env not found; tried:', candidates);
-// 1) Load .env BEFORE any other imports (especially before mailer)
-import 'dotenv/config';
 
+// ---------- 2) Imports that rely on env ----------
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
@@ -35,17 +31,19 @@ import { verifyMailer } from './utils/mailer';
 import authRoutes from './api/auth/auth-route';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
-
-// ⬇️ NEW: Dashboard routes
 import dashboardRoutes from './api/dashboard/dashboard-routes';
 
+// ---------- 3) App setup ----------
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
 
-// ---------- Middleware ----------
+// Security-ish niceties
+app.disable('x-powered-by');
+
+// ---------- 4) CORS ----------
 /**
- * If you set multiple origins in CORS_ORIGIN (comma-separated),
- * this will allow all of them. Otherwise defaults to localhost:4200.
+ * CORS_ORIGIN can be a single origin or comma-separated list.
+ * Example: CORS_ORIGIN=http://localhost:4200,http://127.0.0.1:4200
  */
 const corsOrigins =
   process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || ['http://localhost:4200'];
@@ -53,43 +51,43 @@ const corsOrigins =
 app.use(
   cors({
     origin: corsOrigins,
-    credentials: true,
+    credentials: true, // fine to keep; mainly needed if you ever use cookies
   })
 );
+
+// ---------- 5) Core middleware ----------
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ---------- DB connection ----------
+// (Optional) quick debug of env AFTER load
+console.log('[debug] SMTP_HOST=', process.env.SMTP_HOST || '(none)');
+console.log('[debug] SMTP_USER=', process.env.SMTP_USER ? '(set)' : '(none)');
+console.log('[debug] GMAIL_USER=', process.env.GMAIL_USER ? '(set)' : '(none)');
+
+// ---------- 6) DB connection ----------
 mongoose
   .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taxpal')
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// ---------- Routes (use ONLY v1 prefix) ----------
+// ---------- 7) Routes (use ONLY /api/v1 prefix) ----------
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
-
-// ⬇️ NEW: Mount dashboard APIs
-//    GET /api/v1/dashboard
-//    GET /api/v1/dashboard/income-vs-expenses
 app.use('/api/v1/dashboard', dashboardRoutes);
 
-// ---------- Health check ----------
+// Health check
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'OK', message: 'TaxPal API is running' });
 });
 
-// ---------- Route inspector (DEV ONLY) ----------
+// ---------- 8) Route inspector (DEV ONLY) ----------
 app.get('/__routes', (_req, res) => {
   const stack: any[] = (app as any)._router?.stack || [];
   const routes: string[] = [];
 
   stack.forEach((l: any) => {
-    if (l.route && l.route.path) {
-      const methods = Object.keys(l.route.methods).join(',').toUpperCase();
-      routes.push(`${methods} ${l.route.path}`);
-    } else if (l.name === 'router' && l.handle?.stack) {
+    if (l.name === 'router' && l.handle?.stack) {
       const prefix =
         l.regexp?.toString().replace(/^\/\^\\/, '/').replace(/\\\/\?\(\?\=\/\|\$\)\/i$/, '') || '';
       l.handle.stack.forEach((s: any) => {
@@ -98,22 +96,27 @@ app.get('/__routes', (_req, res) => {
           routes.push(`${methods} ${prefix}${s.route.path}`);
         }
       });
+    } else if (l.route && l.route.path) {
+      const methods = Object.keys(l.route.methods).join(',').toUpperCase();
+      routes.push(`${methods} ${l.route.path}`);
     }
   });
 
   res.json({ routes });
 });
 
-// ---------- START SERVER (single listen + guard) ----------
+// ---------- 9) START SERVER (single listen + graceful shutdown) ----------
 if (!(global as any).__taxpal_server_started) {
   const server = app.listen(PORT, () => {
     (global as any).__taxpal_server_started = true;
     console.log(`TaxPal server running on port ${PORT}`);
-    // Verify mailer AFTER env is loaded
-    verifyMailer(); // logs whether SMTP is ready or if you're in DEV log mode
+    try {
+      verifyMailer();
+    } catch (e) {
+      console.warn('[mailer] verify skipped/failed:', (e as Error)?.message);
+    }
   });
 
-  // Optional graceful shutdown
   const shutdown = () => server.close(() => process.exit(0));
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);

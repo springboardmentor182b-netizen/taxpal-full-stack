@@ -11,31 +11,31 @@
   </div>
   <div class="profile">
     <p><img src="assets/images/image.png" alt="profile"> <b> Alex Morgan </b> </p>
-    
     <small>alex@company.com</small>
   </div>
 </div>
 
 <div class="main">
   <!-- Top bar -->
- <div class="top-bar">
-  <h1><strong>Dashboard</strong></h1>
-  <div>
-    <button (click)="openIncome()">+ Add Income</button>
-    <button (click)="openExpense()">+ Add Expense</button>
+  <div class="top-bar">
+    <h1><strong>Dashboard</strong></h1>
+    <div>
+      <button (click)="openIncome()">+ Add Income</button>
+      <button (click)="openExpense()">+ Add Expense</button>
+    </div>
   </div>
-</div>
-<!-- your income form -->
-<div *ngIf="showIncome">
-  <!-- Income form markup here -->
-  <button (click)="closeIncome()">Close</button>
-</div>
 
-<!-- your expense form -->
-<div *ngIf="showExpense">
-  <!-- Expense form markup here -->
-  <button (click)="closeExpense()">Close</button>
-</div>
+  <!-- your income form -->
+  <div *ngIf="showIncome">
+    <!-- Income form markup here -->
+    <button (click)="closeIncome()">Close</button>
+  </div>
+
+  <!-- your expense form -->
+  <div *ngIf="showExpense">
+    <!-- Expense form markup here -->
+    <button (click)="closeExpense()">Close</button>
+  </div>
 
   <!-- Cards -->
   <div class="cards">
@@ -65,11 +65,23 @@
   <div class="charts">
     <div class="chart-container">
       <h3>Income vs Expenses</h3>
-      <canvas id="barChart"></canvas>
+      <!-- SIZED WRAPPER ADDED -->
+      <div style="width:100%; max-width:720px; height:360px;">
+        <canvas id="barChart"></canvas>
+      </div>
     </div>
+
     <div class="chart-container">
       <h3>Expense Breakdown</h3>
-      <canvas id="pieChart"></canvas>
+      <!-- SIZED WRAPPER ADDED -->
+      <div style="width:100%; max-width:520px; height:360px;">
+        <canvas id="pieChart"></canvas>
+      </div>
+
+      <!-- Optional helper text when there are no expenses yet -->
+      <div *ngIf="!expenses?.length" style="font-size:12px; opacity:0.7; margin-top:8px; margin-left: 32%;">
+        No expenses yet — add one to see the breakdown.
+      </div>
     </div>
   </div>
 
@@ -79,8 +91,8 @@
       <tr>
         <td><h3>Recent Transactions</h3></td>
         <td><button>View All</button></td>
-      </tr> 
-    </table>     
+      </tr>
+    </table>
 
     <table>
       <thead>
@@ -92,20 +104,31 @@
           <th>Type</th>
         </tr>
       </thead>
+
+      <!-- UPDATED: dynamic recent transactions -->
       <tbody>
-        <tr>
-          <td>May 3, 2025</td>
-          <td>Design Project</td>
-          <td>Consulting</td>
-          <td>+$1200.00</td>
-          <td>Income</td>
+        <tr *ngIf="loadingRecent">
+          <td colspan="5">Loading…</td>
+        </tr>
+
+        <tr *ngIf="!loadingRecent && recentTxns.length === 0">
+          <td colspan="5">No transactions yet. Add one to get started.</td>
+        </tr>
+
+        <tr *ngFor="let t of recentTxns; trackBy: trackByTxId">
+          <td>{{ t.date | date:'MMM d, y' }}</td>
+          <td>{{ t.description }}</td>
+          <td>{{ t.category }}</td>
+          <td [ngClass]="t.type === 'Income' ? 'amt-green' : 'amt-red'">
+            {{ t.signed | currency:'USD':'symbol':'1.0-2' }}
+          </td>
+          <td>{{ t.type }}</td>
         </tr>
       </tbody>
+      <!-- /UPDATED -->
     </table>
   </div>
 </div>
-
-<!-- existing HTML above ... -->
 
 <!-- Modals -->
 <app-income-modal

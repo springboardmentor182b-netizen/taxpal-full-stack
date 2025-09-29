@@ -196,8 +196,15 @@
   border: none;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 12px;
+  font-size: 15px;
+  margin-left: 72%;
+  width: 30%;
 }
+
+/* dashboard.component.css */
+.amt-green { color: #1a7f37; font-weight: 600; }
+.amt-red   { color: #b42318; font-weight: 600; }
+
 
 /* ===================== */
 /* 📱 Responsive Design */
