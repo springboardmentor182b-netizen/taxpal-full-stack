@@ -29,7 +29,6 @@ app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
-
 // Root route
 app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");

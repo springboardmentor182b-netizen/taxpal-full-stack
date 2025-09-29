@@ -15,6 +15,8 @@ const router = Router();
  *   post:
  *     summary: Create a new tax estimate
  *     tags: [TaxEstimator]
+ *     security:
+ *       - bearerAuth: []   # <-- add this line
  *     requestBody:
  *       required: true
  *       content:
@@ -54,6 +56,8 @@ router.post("/",auth, controller.createTaxEstimate);
  *   get:
  *     summary: Get all tax estimates
  *     tags: [TaxEstimator]
+ *     security:
+ *       - bearerAuth: []   # <-- add this line
  *     responses:
  *       200:
  *         description: List of tax estimates
@@ -65,6 +69,8 @@ router.get("/",auth, controller.getTaxEstimates);
  *   get:
  *     summary: Get tax estimate by ID
  *     tags: [TaxEstimator]
+ *     security:
+ *       - bearerAuth: []   # <-- add this line
  *     parameters:
  *       - in: path
  *         name: id
