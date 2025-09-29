@@ -1,5 +1,6 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -11,6 +12,8 @@ import { RouterModule } from '@angular/router';
 export class DashboardComponent implements AfterViewInit, OnDestroy {
   private pieChart: any = null;
   private barChart: any = null;
+
+  constructor(private http: HttpClient) {}
 
   ngAfterViewInit(): void {
     // Theme toggle (dark/light)
