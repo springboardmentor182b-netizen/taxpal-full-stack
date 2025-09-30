@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 
 @Component({
     selector: 'app-budget',
@@ -14,7 +15,7 @@ export class BudgetComponent implements OnInit {
     form!: FormGroup;
     budgets: any[] = [];
 
-    constructor(private fb: FormBuilder, private router: Router) { }
+    constructor(private fb: FormBuilder, private router: Router, private http: HttpClient) { }
 
     ngOnInit(): void {
         this.form = this.fb.group({
@@ -29,19 +30,17 @@ export class BudgetComponent implements OnInit {
         }
 
         const formValue = this.form.value;
-        const userId = localStorage.getItem('user_id') ?? undefined;
-
-        const payload = {
-            limit: formValue.amount,
-            user_id: userId
-        };
-
-        // Add your API call here
-        console.log('Budget payload:', payload);
-        
-        // Reset form after submission
-        this.form.reset();
-        
-        alert('Budget created successfully!');
+        // Send to the correct backend API endpoint
+        this.http.post('/api/users/add-simple-budget', { amount: formValue.amount }).subscribe({
+            next: (res) => {
+                // Optionally update budgets list here
+                this.form.reset();
+                alert('Budget created successfully!');
+            },
+            error: (err) => {
+                alert('Failed to create budget!');
+                console.error(err);
+            }
+        });
     }
 }
