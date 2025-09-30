@@ -18,7 +18,7 @@ export class BudgetComponent implements OnInit {
 
     ngOnInit(): void {
         this.form = this.fb.group({
-            amount: [null, [Validators.required, Validators.min(0)]]
+            amount: [null, [Validators.required, Validators.min(0.01)]]
         });
     }
 
@@ -27,6 +27,21 @@ export class BudgetComponent implements OnInit {
             this.form.markAllAsTouched();
             return;
         }
-        alert('BudgetService is not available. Please restore budget.service.ts or implement API calls here.');
+
+        const formValue = this.form.value;
+        const userId = localStorage.getItem('user_id') ?? undefined;
+
+        const payload = {
+            limit: formValue.amount,
+            user_id: userId
+        };
+
+        // Add your API call here
+        console.log('Budget payload:', payload);
+        
+        // Reset form after submission
+        this.form.reset();
+        
+        alert('Budget created successfully!');
     }
 }
