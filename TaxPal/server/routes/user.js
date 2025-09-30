@@ -8,12 +8,15 @@ const Expense = require('../models/Expense');
 router.post('/register', async (req, res) => {
   try {
     const { email, name, country } = req.body;
+    console.log('[DEBUG] Register attempt for:', email);
     if (!email || !name) {
+      console.log('[DEBUG] Register failed: Email and name required');
       return res.status(400).json({ error: 'Email and name are required.' });
     }
     // Check if user already exists
     const existing = await User.findOne({ email: email.trim().toLowerCase() });
     if (existing) {
+      console.log('[DEBUG] Register failed: User already exists for', email);
       return res.status(409).json({ error: 'User already exists.' });
     }
     const user = new User({
@@ -22,8 +25,10 @@ router.post('/register', async (req, res) => {
       country
     });
     await user.save();
+    console.log('[DEBUG] Register successful for:', email);
     res.status(201).json({ message: 'User registered', user });
   } catch (err) {
+    console.error('[DEBUG] Register error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
@@ -33,21 +38,21 @@ router.post('/signin', async (req, res) => {
   try {
     let { email } = req.body;
     if (!email) {
-      console.log('Sign-in failed: No email provided');
+      console.log('[DEBUG] Sign-in failed: No email provided');
       return res.status(400).json({ error: 'Email is required' });
     }
     email = email.trim().toLowerCase();
 
-    console.log('Sign-in attempt for:', email);
+    console.log('[DEBUG] Sign-in attempt for:', email);
 
     // Explicitly search in the default database's users collection
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('Sign-in failed: No account found for', email);
+      console.log('[DEBUG] Sign-in failed: No account found for', email);
       return res.status(404).json({ error: 'No account found' });
     }
     
-    console.log('Sign-in successful for:', email);
+    console.log('[DEBUG] Sign-in successful for:', email);
     
     // Return user data with avatar initial
     res.status(200).json({ 
@@ -60,7 +65,7 @@ router.post('/signin', async (req, res) => {
       }
     });
   } catch (err) {
-    console.error('Sign-in error:', err);
+    console.error('[DEBUG] Sign-in error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -71,9 +76,10 @@ router.get('/me', async (req, res) => {
     // For demo: return the first user in the database
     const user = await User.findOne();
     if (!user) {
+      console.log('[DEBUG] /me: No user found');
       return res.status(404).json({ error: 'No user found' });
     }
-    
+    console.log('[DEBUG] /me: Returning user', user.email);
     res.json({ 
       name: user.name, 
       email: user.email,
@@ -81,6 +87,7 @@ router.get('/me', async (req, res) => {
       initial: (user.name && user.name.trim()) ? user.name.trim()[0].toUpperCase() : user.email[0].toUpperCase()
     });
   } catch (err) {
+    console.error('[DEBUG] /me error:', err);
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -89,7 +96,9 @@ router.get('/me', async (req, res) => {
 router.post('/add-income', async (req, res) => {
   try {
     const { title, amount, category, date, notes, userEmail } = req.body;
+    console.log('[DEBUG] Add income attempt:', { title, amount, category, userEmail });
     if (!title || !amount || !date || !userEmail) {
+      console.log('[DEBUG] Add income failed: Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const income = new Income({
@@ -101,8 +110,10 @@ router.post('/add-income', async (req, res) => {
       userEmail: userEmail.trim().toLowerCase()
     });
     await income.save();
+    console.log('[DEBUG] Income added for:', userEmail);
     res.status(201).json({ message: 'Income added', income });
   } catch (err) {
+    console.error('[DEBUG] Add income error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
@@ -111,7 +122,9 @@ router.post('/add-income', async (req, res) => {
 router.post('/add-expense', async (req, res) => {
   try {
     const { title, amount, category, date, notes, taxDeductible, userEmail } = req.body;
+    console.log('[DEBUG] Add expense attempt:', { title, amount, category, userEmail });
     if (!title || !amount || !date || !userEmail) {
+      console.log('[DEBUG] Add expense failed: Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
     const expense = new Expense({
@@ -124,8 +137,10 @@ router.post('/add-expense', async (req, res) => {
       userEmail: userEmail.trim().toLowerCase()
     });
     await expense.save();
+    console.log('[DEBUG] Expense added for:', userEmail);
     res.status(201).json({ message: 'Expense added', expense });
   } catch (err) {
+    console.error('[DEBUG] Add expense error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
   }
 });
@@ -134,10 +149,12 @@ router.post('/add-expense', async (req, res) => {
 router.get('/income-list', async (req, res) => {
   try {
     const userEmail = (req.query.userEmail || '').trim().toLowerCase();
+    console.log('[DEBUG] Fetch income list for:', userEmail);
     if (!userEmail) return res.status(400).json([]);
     const incomeList = await Income.find({ userEmail }).sort({ date: -1, createdAt: -1 });
     res.json(incomeList);
   } catch (err) {
+    console.error('[DEBUG] Income list error:', err);
     res.status(500).json([]);
   }
 });
@@ -146,10 +163,12 @@ router.get('/income-list', async (req, res) => {
 router.get('/expense-list', async (req, res) => {
   try {
     const userEmail = (req.query.userEmail || '').trim().toLowerCase();
+    console.log('[DEBUG] Fetch expense list for:', userEmail);
     if (!userEmail) return res.status(400).json([]);
     const expenseList = await Expense.find({ userEmail }).sort({ date: -1, createdAt: -1 });
     res.json(expenseList);
   } catch (err) {
+    console.error('[DEBUG] Expense list error:', err);
     res.status(500).json([]);
   }
 });

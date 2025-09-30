@@ -27,13 +27,9 @@ if (process.env.NODE_ENV !== "test") {
 // Routes
 const authRoutes = require("./routes/auth");
 const transactionRoutes = require("./routes/transactions");
-const budgetRoutes = require("./routes/budget");
-const budgetRoutes = require('./routes/budget');
 
-app.use("/api/budgets", budgetRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
-app.use('/api/budget', budgetRoutes);
 
 // Test route
 app.get("/", (req, res) => {
@@ -48,5 +44,9 @@ if (require.main === module) {
   });
 }
 
+// Export app for testing
+module.exports = app;
+// Export app for testing
+module.exports = app;
 // Export app for testing
 module.exports = app;
