@@ -1,225 +1,207 @@
 <header class="topbar">
-    <div class="brand">
-      <div class="logo-icon">TP</div>
-      <div style="font-weight:700;color:var(--text-light)">TaxPal</div>
-    </div>
+  <div class="brand">
+    <div class="logo-icon">TP</div>
+    <div style="font-weight:700;color:var(--text-light)">TaxPal</div>
+  </div>
 
-    <nav class="main-nav" aria-label="Main navigation">
-      <a href="#" class="active">Dashboard</a>
-      <a href="#">Transactions</a>
-      <a href="#">Budget</a>
-      <a href="#">Reports</a>
-      <a href="#">Tax Estimator</a>
-    </nav>
+  <nav class="main-nav" aria-label="Main navigation">
+    <a href="#" class="active">Dashboard</a>
+    <a href="#">Transactions</a>
+    <a routerLink="/budget">Budget</a>
+    <a href="#">Reports</a>
+    <a href="#">Tax Estimator</a>
+  </nav>
 
-    <div class="top-actions">
-      <div class="icon-wrap">
-        <div id="modeToggle" class="icon-circle" title="Toggle light/dark mode"><i class="fa-solid fa-moon"></i></div>
-        <div class="icon-circle" title="Search"><i class="fa-solid fa-magnifying-glass"></i></div>
-        <div class="icon-circle" title="Notifications">
-          <i class="fa-regular fa-bell"></i>
-          <div class="badge">3</div>
-        </div>
-        <div class="icon-circle" title="Profile">U</div>
+  <div class="top-actions">
+    <div class="icon-wrap">
+      <div id="modeToggle" class="icon-circle" title="Toggle light/dark mode"><i class="fa-solid fa-moon"></i></div>
+      <div class="icon-circle" title="Search"><i class="fa-solid fa-magnifying-glass"></i></div>
+      <div class="icon-circle" title="Notifications">
+        <i class="fa-regular fa-bell"></i>
+        <div class="badge">3</div>
       </div>
+      <div class="icon-circle" title="Profile">U</div>
     </div>
-  </header>
+  </div>
+</header>
 
-  <section class="page-hero">
-    <div class="page-left">
-      <h1>Financial Dashboard</h1>
-      <p class="muted">Track your freelance income, expenses, and financial goals</p>
+<section class="page-hero">
+  <div class="page-left">
+    <h1>Financial Dashboard</h1>
+    <p class="muted">Track your freelance income, expenses, and financial goals</p>
+  </div>
+
+  <div style="display:flex;gap:12px;align-items:center">
+    <button class="btn add-income">+ Add Income</button>
+    <button class="btn add-expense">+ Add Expense</button>
+  </div>
+</section>
+
+<main class="grid" role="main">
+  <!-- KPI row (each spans 3 columns to make 4 across) -->
+  <div class="kpi-card col-span-3">
+    <div class="card-head">
+      <h3>Monthly Income</h3>
+      <div class="kpi-square kpi-green"><i class="fa-solid fa-chart-line"></i></div>
     </div>
+    <h2>${{ dashboardSummary.totalIncome | number:'1.0-0' }}</h2>
+    <p class="green">↗ +15.2% from last month</p>
+  </div>
 
-    <div style="display:flex;gap:12px;align-items:center">
-      <button class="btn add-income">+ Add Income</button>
-      <button class="btn add-expense">+ Add Expense</button>
-      <button class="btn" (click)="refreshData()" [disabled]="loading">
-        <i class="fa-solid fa-refresh"></i> Refresh
-      </button>
+  <div class="kpi-card col-span-3">
+    <div class="card-head">
+      <h3>Monthly Expenses</h3>
+      <div class="kpi-square kpi-red"><i class="fa-solid fa-arrow-down-short-wide"></i></div>
     </div>
-  </section>
+    <h2>${{ dashboardSummary.totalExpenses | number:'1.0-0' }}</h2>
+    <p class="red">↘ -8.1% from last month</p>
+  </div>
 
-  <!-- Loading indicator -->
-  <div *ngIf="loading" class="loading-overlay">
-    <div class="loading-spinner">
-      <i class="fa-solid fa-spinner fa-spin"></i>
-      Loading dashboard data...
+  <div class="kpi-card col-span-3">
+    <div class="card-head">
+      <h3>Estimated Tax Due</h3>
+      <div class="kpi-square kpi-orange"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+    </div>
+    <h2>${{ taxEstimation?.estimatedTax || 0 | number:'1.0-0' }}</h2>
+    <p class="green">↗ +5.3% from last month</p>
+  </div>
+
+  <div class="kpi-card col-span-3">
+    <div class="card-head">
+      <h3>Savings Rate</h3>
+      <div class="kpi-square kpi-blue"><i class="fa-solid fa-chart-simple"></i></div>
+    </div>
+    <h2>{{ ((dashboardSummary.totalIncome - dashboardSummary.totalExpenses) / dashboardSummary.totalIncome * 100) | number:'1.1-1' }}%</h2>
+    <p class="green">↗ +2.1% from last month</p>
+  </div>
+
+  <!-- Balance & Transactions row (each spans 6 columns) -->
+  <div class="kpi-card col-span-6">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0;color:var(--muted)">Total Balance</h3>
+    </div>
+    <div class="balance-card">
+      <div class="circle-wrap">
+        <svg width="140" height="140" viewBox="0 0 140 140">
+          <circle class="ring-bg" cx="70" cy="70" r="60"></circle>
+          <circle class="ring-fill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="47"></circle>
+        </svg>
+        <div class="balance-text">
+          <div style="font-size:20px;font-weight:700">${{ dashboardSummary.netBalance | number:'1.0-0' }}</div>
+          <div style="font-size:12px;color:var(--muted)">calculated</div>
+        </div>
+      </div>
+      <div style="flex:1;padding-left:12px">
+        <p class="green" style="margin:0;">↗ +12.5% this month</p>
+        <p class="muted" style="margin-top:8px">{{ ((dashboardSummary.netBalance / dashboardSummary.totalIncome) * 100) | number:'1.1-1' }}% of monthly income</p>
+      </div>
     </div>
   </div>
 
-  <!-- Error message -->
-  <div *ngIf="error" class="error-message">
-    <i class="fa-solid fa-exclamation-triangle"></i>
-    {{ error }}
-    <button (click)="refreshData()">Try Again</button>
-  </div>
-
-  <main class="grid" role="main">
-    <!-- KPI row (each spans 3 columns to make 4 across) -->
-    <div class="kpi-card col-span-3">
-      <div class="card-head">
-        <h3>Monthly Income</h3>
-        <div class="kpi-square kpi-green"><i class="fa-solid fa-chart-line"></i></div>
-      </div>
-      <h2>${{ dashboardSummary.totalIncome | number:'1.0-0' }}</h2>
-      <p class="green">↗ +15.2% from last month</p>
+  <div class="kpi-card col-span-6">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <h3 style="margin:0;color:var(--muted)">Recent Transactions</h3>
+      <a href="#" style="color:var(--primary-blue);text-decoration:none;font-weight:700">View All →</a>
     </div>
 
-    <div class="kpi-card col-span-3">
-      <div class="card-head">
-        <h3>Monthly Expenses</h3>
-        <div class="kpi-square kpi-red"><i class="fa-solid fa-arrow-down-short-wide"></i></div>
-      </div>
-      <h2>${{ dashboardSummary.totalExpenses | number:'1.0-0' }}</h2>
-      <p class="red">↘ -8.1% from last month</p>
-    </div>
-
-    <div class="kpi-card col-span-3">
-      <div class="card-head">
-        <h3>Estimated Tax Due</h3>
-        <div class="kpi-square kpi-orange"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-      </div>
-      <h2>${{ taxEstimation?.estimatedTax || 0 | number:'1.0-0' }}</h2>
-      <p class="green">↗ +5.3% from last month</p>
-    </div>
-
-    <div class="kpi-card col-span-3">
-      <div class="card-head">
-        <h3>Savings Rate</h3>
-        <div class="kpi-square kpi-blue"><i class="fa-solid fa-chart-simple"></i></div>
-      </div>
-      <h2>{{ ((dashboardSummary.totalIncome - dashboardSummary.totalExpenses) / dashboardSummary.totalIncome * 100) | number:'1.1-1' }}%</h2>
-      <p class="green">↗ +2.1% from last month</p>
-    </div>
-
-    <!-- Balance & Transactions row (each spans 6 columns) -->
-    <div class="kpi-card col-span-6">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <h3 style="margin:0;color:var(--muted)">Total Balance</h3>
-      </div>
-      <div class="balance-card">
-        <div class="circle-wrap">
-          <svg width="140" height="140" viewBox="0 0 140 140">
-            <circle class="ring-bg" cx="70" cy="70" r="60"></circle>
-            <circle class="ring-fill" cx="70" cy="70" r="60" stroke-dasharray="377" stroke-dashoffset="47"></circle>
-          </svg>
-          <div class="balance-text">
-            <div style="font-size:20px;font-weight:700">${{ dashboardSummary.netBalance | number:'1.0-0' }}</div>
-            <div style="font-size:12px;color:var(--muted)">calculated</div>
-          </div>
-        </div>
-        <div style="flex:1;padding-left:12px">
-          <p class="green" style="margin:0;">↗ +12.5% this month</p>
-          <p class="muted" style="margin-top:8px">{{ ((dashboardSummary.netBalance / dashboardSummary.totalIncome) * 100) | number:'1.1-1' }}% of monthly income</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="kpi-card col-span-6">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <h3 style="margin:0;color:var(--muted)">Recent Transactions</h3>
-        <a href="#" style="color:var(--primary-blue);text-decoration:none;font-weight:700">View All →</a>
-      </div>
-
-      <ul class="transactions-list">
-        <li *ngFor="let transaction of recentTransactions" class="transaction-item">
-          <div class="tx-left">
-            <div
-              [style.background]="transaction.type === 'income' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.06)'"
-              [style.color]="transaction.type === 'income' ? 'var(--primary-green)' : 'var(--primary-red)'"
-              style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center">
-              <i [class]="transaction.type === 'income' ? 'fa-solid fa-arrow-up-right-from-square' : 'fa-solid fa-arrow-down-left'"></i>
-            </div>
-            <div class="tx-meta">
-              <strong>{{ transaction.description }}</strong>
-              <small class="muted">{{ transaction.date | date:'yyyy-MM-dd' }} • {{ transaction.category }}</small>
-            </div>
-          </div>
+    <ul class="transactions-list">
+      <li *ngFor="let transaction of recentTransactions" class="transaction-item">
+        <div class="tx-left">
           <div
+            [style.background]="transaction.type === 'income' ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.06)'"
             [style.color]="transaction.type === 'income' ? 'var(--primary-green)' : 'var(--primary-red)'"
-            style="align-self:center;font-weight:700">
-            {{ transaction.type === 'income' ? '+' : '-' }} ${{ transaction.amount | number:'1.0-0' }}
+            style="width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center">
+            <i [class]="transaction.type === 'income' ? 'fa-solid fa-arrow-up-right-from-square' : 'fa-solid fa-arrow-down-left'"></i>
           </div>
-        </li>
-        <li *ngIf="recentTransactions.length === 0" class="transaction-item">
-          <div class="tx-left">
-            <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;color:var(--muted)">
-              <i class="fa-solid fa-inbox"></i>
-            </div>
-            <div class="tx-meta">
-              <strong>No recent transactions</strong>
-              <small class="muted">Add some transactions to see them here</small>
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Budget progress (col 7-12 width) and Expense breakdown -->
-    <div class="kpi-card budget col-span-6">
-      <h3 style="margin-top:0;color:var(--muted)">Budget Progress</h3>
-
-      <div *ngFor="let budget of budgetProgress" style="margin-top:10px">
-        <div class="label">
-          <div>{{ budget.category }}</div>
-          <div>${{ budget.spent | number:'1.0-0' }} / ${{ budget.budget | number:'1.0-0' }}</div>
-        </div>
-        <div class="progress-track">
-          <div class="progress-fill" [style.width.%]="budget.percentage"></div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px">
-          <div class="muted">{{ budget.percentage | number:'1.1-1' }}% used</div>
-          <div class="muted">${{ budget.budget - budget.spent | number:'1.0-0' }} remaining</div>
-        </div>
-      </div>
-
-      <div *ngIf="budgetProgress.length === 0" style="margin-top:10px;text-align:center;color:var(--muted)">
-        <i class="fa-solid fa-chart-pie" style="font-size:24px;margin-bottom:8px"></i>
-        <p>No budget data available</p>
-      </div>
-    </div>
-
-    <div class="kpi-card pie-wrap col-span-6">
-      <h3 style="margin-top:0;color:var(--muted)">Expense Breakdown</h3>
-      <div style="display:flex;gap:18px;align-items:center;margin-top:12px">
-        <canvas id="pieChart" style="max-width:260px;width:100%"></canvas>
-        <div style="flex:1">
-          <div *ngFor="let expense of expenseBreakdown" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            <span
-              [style.background]="getExpenseColor(expense._id)"
-              style="width:10px;height:10px;border-radius:999px;display:inline-block"></span>
-            <div class="muted">{{ expense._id }}</div>
-            <div style="margin-left:auto;color:var(--muted)">
-              {{ getExpensePercentage(expense) | number:'1.1-1' }}%
-            </div>
-          </div>
-          <div *ngIf="expenseBreakdown.length === 0" style="text-align:center;color:var(--muted)">
-            <i class="fa-solid fa-chart-pie" style="font-size:24px;margin-bottom:8px"></i>
-            <p>No expense data available</p>
+          <div class="tx-meta">
+            <strong>{{ transaction.description }}</strong>
+            <small class="muted">{{ transaction.date | date:'yyyy-MM-dd' }} • {{ transaction.category }}</small>
           </div>
         </div>
-      </div>
-    </div>
-
-    <!-- Wide chart at bottom -->
-    <div class="wide-card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <h3 style="margin:0;color:var(--muted)">Income vs Expenses</h3>
-        <div class="chart-controls">
-          <div class="chip">Week</div>
-          <div class="chip active">Month</div>
-          <div class="chip">Year</div>
+        <div
+          [style.color]="transaction.type === 'income' ? 'var(--primary-green)' : 'var(--primary-red)'"
+          style="align-self:center;font-weight:700">
+          {{ transaction.type === 'income' ? '+' : '-' }} ${{ transaction.amount | number:'1.0-0' }}
         </div>
-      </div>
-
-      <div style="margin-top:12px">
-        <canvas id="barChart" style="height:260px;width:100%"></canvas>
-      </div>
-    </div>
-
-  </main>
-
-  <div class="fab" title="Add">
-    <i class="fa-solid fa-plus" style="color:var(--primary-blue)"></i>
+      </li>
+      <li *ngIf="recentTransactions.length === 0" class="transaction-item">
+        <div class="tx-left">
+          <div style="width:36px;height:36px;border-radius:8px;background:rgba(0,0,0,0.05);display:flex;align-items:center;justify-content:center;color:var(--muted)">
+            <i class="fa-solid fa-inbox"></i>
+          </div>
+          <div class="tx-meta">
+            <strong>No recent transactions</strong>
+            <small class="muted">Add some transactions to see them here</small>
+          </div>
+        </div>
+      </li>
+    </ul>
   </div>
+
+  <!-- Budget progress (col 7-12 width) and Expense breakdown -->
+  <div class="kpi-card budget col-span-6">
+    <h3 style="margin-top:0;color:var(--muted)">Budget Progress</h3>
+
+    <div *ngFor="let budget of budgetProgress" style="margin-top:10px">
+      <div class="label">
+        <div>{{ budget.category }}</div>
+        <div>${{ budget.spent | number:'1.0-0' }} / ${{ budget.budget | number:'1.0-0' }}</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" [style.width.%]="budget.percentage"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-top:6px">
+        <div class="muted">{{ budget.percentage | number:'1.1-1' }}% used</div>
+        <div class="muted">${{ budget.budget - budget.spent | number:'1.0-0' }} remaining</div>
+      </div>
+    </div>
+
+    <div *ngIf="budgetProgress.length === 0" style="margin-top:10px;text-align:center;color:var(--muted)">
+      <i class="fa-solid fa-chart-pie" style="font-size:24px;margin-bottom:8px"></i>
+      <p>No budget data available</p>
+    </div>
+  </div>
+
+  <div class="kpi-card pie-wrap col-span-6">
+    <h3 style="margin-top:0;color:var(--muted)">Expense Breakdown</h3>
+    <div style="display:flex;gap:18px;align-items:center;margin-top:12px">
+      <canvas id="pieChart" style="max-width:260px;width:100%"></canvas>
+      <div style="flex:1">
+        <div *ngFor="let expense of expenseBreakdown" style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+          <span
+            [style.background]="getExpenseColor(expense._id)"
+            style="width:10px;height:10px;border-radius:999px;display:inline-block"></span>
+          <div class="muted">{{ expense._id }}</div>
+          <div style="margin-left:auto;color:var(--muted)">
+            {{ getExpensePercentage(expense) | number:'1.1-1' }}%
+          </div>
+        </div>
+        <div *ngIf="expenseBreakdown.length === 0" style="text-align:center;color:var(--muted)">
+          <i class="fa-solid fa-chart-pie" style="font-size:24px;margin-bottom:8px"></i>
+          <p>No expense data available</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Wide chart at bottom -->
+  <div class="wide-card">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3 style="margin:0;color:var(--muted)">Income vs Expenses</h3>
+      <div class="chart-controls">
+        <div class="chip">Week</div>
+        <div class="chip active">Month</div>
+        <div class="chip">Year</div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <canvas id="barChart" style="height:260px;width:100%"></canvas>
+    </div>
+  </div>
+
+</main>
+
+<div class="fab" title="Add">
+  <i class="fa-solid fa-plus" style="color:var(--primary-blue)"></i>
+</div>

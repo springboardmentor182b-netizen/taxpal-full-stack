@@ -22,7 +22,7 @@ mongoose.connect(process.env.MONGO_URI)
 .catch(err => console.error('MongoDB Atlas connection error:', err));
 
 // Routes (correct paths)
-const transactionRoutes = require('./apis/incomeExpenseapi/transactionsRoute'); 
+const transactionRoutes = require('./apis/incomeExpenseapi/transactionsRoute');
 const dashboardRoutes   = require('./apis/dashboard/dashboard.routes');
 const userRoutes        = require('./apis/user/user.routes');
 const authRoutes        = require('./apis/auth/auth');

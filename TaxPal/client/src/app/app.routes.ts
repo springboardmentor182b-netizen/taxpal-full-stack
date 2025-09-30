@@ -12,7 +12,7 @@ export const routes: Routes = [
   { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
   { path: 'user-profile', component: UserProfileComponent },
   { path: 'transactions', component: UserProfileComponent },
-  { path: 'budget', component: UserProfileComponent },
+  { path: 'budget', loadComponent: () => import('./components/budget/budget.component').then(m => m.BudgetComponent) },
   { path: 'reports', component: UserProfileComponent },
   { path: 'tax-estimator', component: UserProfileComponent },
 

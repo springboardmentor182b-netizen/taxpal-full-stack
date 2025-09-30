@@ -4,9 +4,10 @@ import { DashboardService, DashboardSummary, Transaction, ExpenseBreakdown, Budg
 
 @Component({
   selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, DecimalPipe, DatePipe],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css'],
-  imports: [CommonModule, DecimalPipe, DatePipe]
+  styleUrls: ['./dashboard.component.css']
 })
 export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   private pieChart: any = null;
@@ -152,39 +153,72 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     // Initialize static charts first (will be updated later by API)
     try {
       const Chart = (window as any).Chart;
+
+      // Pie chart
       const pieCtx = (document.getElementById('pieChart') as HTMLCanvasElement).getContext('2d');
       this.pieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
-          labels:['Expenses','Remaining'],
-          datasets:[{
-            data:[0,0],
-            backgroundColor:[
+          labels: ['Expenses', 'Remaining'],
+          datasets: [{
+            data: [0, 0],
+            backgroundColor: [
               getComputedStyle(document.documentElement).getPropertyValue('--pie-blue'),
               getComputedStyle(document.documentElement).getPropertyValue('--pie-green')
             ]
           }]
         },
-        options:{plugins:{legend:{display:true}},responsive:true,maintainAspectRatio:false}
+        options: {
+          plugins: { legend: { display: true } },
+          responsive: true,
+          maintainAspectRatio: false
+        }
       });
 
+      // Bar chart
       const barCtx = (document.getElementById('barChart') as HTMLCanvasElement).getContext('2d');
       this.barChart = new Chart(barCtx, {
-        type:'bar',
-        data:{
-          labels:['Summary'],
-          datasets:[
-            {label:'Income',data:[0],backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--graph-income')},
-            {label:'Expenses',data:[0],backgroundColor:getComputedStyle(document.documentElement).getPropertyValue('--graph-expense')}
+        type: 'bar',
+        data: {
+          labels: ['Summary'],
+          datasets: [
+            {
+              label: 'Income',
+              data: [0],
+              backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-income')
+            },
+            {
+              label: 'Expenses',
+              data: [0],
+              backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-expense')
+            }
           ]
         },
-        options:{
-          responsive:true,
-          maintainAspectRatio:false,
-          plugins:{legend:{display:true,labels:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'}}},
-          scales:{
-            y:{beginAtZero:true,grid:{color:'rgba(255,255,255,0.03)'},ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'}} ,
-            x:{grid:{color:'transparent'},ticks:{color:getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'}}
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: { color: 'rgba(255,255,255,0.03)' },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'
+              }
+            },
+            x: {
+              grid: { color: 'transparent' },
+              ticks: {
+                color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'
+              }
+            }
           }
         }
       });
