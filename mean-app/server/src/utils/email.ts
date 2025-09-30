@@ -1,43 +1,50 @@
-import nodemailer from "nodemailer";
-import dotenv from "dotenv";
-import { google } from "googleapis";
+import nodemailer from 'nodemailer';
+import { google } from 'googleapis';
+import dotenv from 'dotenv';
 dotenv.config();
+
+const CLIENT_ID = process.env.CLIENT_ID!;
+const CLIENT_SECRET = process.env.CLIENT_SECRET!;
+const REDIRECT_URI = 'https://developers.google.com/oauthplayground';
+const REFRESH_TOKEN = process.env.REFRESH_TOKEN!;
+const SENDER_EMAIL = process.env.GMAIL_USER!;
+
 const oAuth2Client = new google.auth.OAuth2(
-  process.env.CLIENT_ID,
-  process.env.CLIENT_SECRET,
-  "https://developers.google.com/oauthplayground"
+  CLIENT_ID,
+  CLIENT_SECRET,
+  REDIRECT_URI
 );
 
-oAuth2Client.setCredentials({ refresh_token: process.env.REFRESH_TOKEN });
+oAuth2Client.setCredentials({ refresh_token: REFRESH_TOKEN });
 
-export async function sendEmail(to: string, subject: string, html: string) {
+export const sendEmail = async (to: string, subject: string, html: string) => {
   try {
-    const accessTokenObj = await oAuth2Client.getAccessToken();
-    const accessToken = accessTokenObj.token; // get the string token
-
-    if (!accessToken) throw new Error("Failed to get access token");
+    const accessToken = await oAuth2Client.getAccessToken();
 
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true, // use TLS
+      service: 'gmail',
       auth: {
-        type: "OAuth2",
+        type: 'OAuth2',
         user: process.env.GMAIL_USER,
-        clientId: process.env.CLIENT_ID,
-        clientSecret: process.env.CLIENT_SECRET,
-        refreshToken: process.env.REFRESH_TOKEN,
-        accessToken,
+        clientId: process.env.GMAIL_CLIENT_ID,
+        clientSecret: process.env.GMAIL_CLIENT_SECRET,
+        refreshToken: process.env.GMAIL_REFRESH_TOKEN,
+        accessToken: accessToken.token,
       },
-    });
-    await transporter.sendMail({
-      from: `Your App <${process.env.GMAIL_USER}>`,
+    } as any); // <--- cast to any bypasses TS error
+    
+
+    const mailOptions = {
+      from: `Your App <${SENDER_EMAIL}>`,
       to,
       subject,
       html,
-    });
-    console.log("Email sent successfully");
-  } catch (err) {
-    console.error("Error sending email:", err);
+    };
+
+    const result = await transporter.sendMail(mailOptions);
+    return result;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw new Error('Email sending failed');
   }
-}
+};

@@ -61,13 +61,14 @@ export const generateResetToken = async (email: string) => {
   await user.save();
 
   const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
-  const html = `
-    <p>Hello ${user.fullName},</p>
-    <p>You requested a password reset. Click the link below to reset your password:</p>
-    <a href="${resetLink}">${resetLink}</a>
-    <p>This link will expire in 1 hour.</p>
-  `;
-  await sendEmail(user.email, "Password Reset Request", html);
+const html = `
+  <p>Hello ${user.fullName},</p>
+  <p>You requested a password reset. Click below to reset:</p>
+  <a href="${resetLink}">${resetLink}</a>
+  <p>Link expires in 1 hour.</p>
+`;
+
+await sendEmail(user.email, "Password Reset Request", html);
   return { message: "Password reset link sent to your email" };
 };
 
