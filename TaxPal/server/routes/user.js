@@ -3,6 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Income = require('../models/Income');
 const Expense = require('../models/Expense');
+const SimpleBudget = require('../models/SimpleBudget');
 
 // POST /api/users/register
 router.post('/register', async (req, res) => {
@@ -145,6 +146,22 @@ router.post('/add-expense', async (req, res) => {
   }
 });
 
+// POST /api/users/add-simple-budget
+router.post('/add-simple-budget', async (req, res) => {
+  try {
+    const { amount } = req.body;
+    if (typeof amount !== 'number' || isNaN(amount) || amount < 0) {
+      return res.status(400).json({ error: 'Amount is required and must be a non-negative number.' });
+    }
+    // Save to SimpleBudget collection, not to "budgets" collection
+    const budget = new SimpleBudget({ amount });
+    await budget.save();
+    res.status(201).json({ message: 'Budget added', budget });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error', details: err.message });
+  }
+});
+
 // GET /api/users/income-list?userEmail=...
 router.get('/income-list', async (req, res) => {
   try {
@@ -169,6 +186,16 @@ router.get('/expense-list', async (req, res) => {
     res.json(expenseList);
   } catch (err) {
     console.error('[DEBUG] Expense list error:', err);
+    res.status(500).json([]);
+  }
+});
+
+// GET /api/users/simple-budget-list
+router.get('/simple-budget-list', async (req, res) => {
+  try {
+    const budgets = await SimpleBudget.find().sort({ createdAt: -1 });
+    res.json(budgets);
+  } catch (err) {
     res.status(500).json([]);
   }
 });
