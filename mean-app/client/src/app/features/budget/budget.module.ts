@@ -1,15 +1,14 @@
-
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { BudgetFormComponent } from './budget-form/budget-form.component';
 
 const routes: Routes = [
-  { path: 'budgets', component: BudgetFormComponent }, // route to Budgets UI
-  { path: '', redirectTo: '/budgets', pathMatch: 'full' } // default route
+  { path: 'budgets', component: BudgetFormComponent },
+  { path: '', redirectTo: '/budgets', pathMatch: 'full' }
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule] // ✅ just export RouterModule once
+  exports: [RouterModule]
 })
 export class AppRoutingModule {}

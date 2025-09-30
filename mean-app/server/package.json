@@ -2,14 +2,13 @@
   "name": "taxpal-server",
   "version": "1.0.0",
   "main": "server.js",
- "scripts": {
-  "start": "ts-node src/server.ts",
-  "dev": "nodemon src/server.ts",
-  "test": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --runInBand",
-  "test:watch": "cross-env NODE_ENV=test jest --watch --runInBand",
-  "test:coverage": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles --runInBand"
-},
-
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "dev": "nodemon src/server.ts",
+    "test": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --runInBand",
+    "test:watch": "cross-env NODE_ENV=test jest --watch --runInBand",
+    "test:coverage": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles --runInBand"
+  },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
@@ -19,7 +18,7 @@
     "express-validator": "^6.15.0",
     "googleapis": "^160.0.0",
     "jsonwebtoken": "^9.0.0",
-    "mongoose": "^7.4.0",
+    "mongoose": "^8.18.2",
     "nodemailer": "^7.0.6",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
