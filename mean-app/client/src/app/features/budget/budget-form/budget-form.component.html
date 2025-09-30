@@ -43,8 +43,16 @@
           </div>
         </div>
 
-        <!-- Month -->
-        
+              <!-- Month -->
+        <div class="form-group">
+          <label>Select Month</label>
+          <input
+            type="month"
+            [ngModel]="newBudget().month"
+            (ngModelChange)="updateNewBudgetMonth($event)"
+          />
+        </div>
+      </div>
               
 
       <!-- Description -->
