@@ -60,7 +60,7 @@ export const generateResetToken = async (email: string) => {
   user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
   await user.save();
 
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${token}`;
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 const html = `
   <p>Hello ${user.fullName},</p>
   <p>You requested a password reset. Click below to reset:</p>
@@ -73,8 +73,8 @@ await sendEmail(user.email, "Password Reset Request", html);
 };
 
 // RESET PASSWORD
-export const resetPassword = async (token: string, newPassword: string, confirmPassword: string) => {
-  if (newPassword !== confirmPassword) throw new Error("Passwords do not match");
+export const resetPassword = async (token: string, password: string, confirmPassword: string) => {
+  if (password !== confirmPassword) throw new Error("Passwords do not match");
 
   const user = await User.findOne({
     resetToken: token,
@@ -83,11 +83,10 @@ export const resetPassword = async (token: string, newPassword: string, confirmP
 
   if (!user) throw new Error("Invalid or expired reset token");
 
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  const hashedPassword = await bcrypt.hash(password, 10);
   user.password = hashedPassword;
   user.resetToken = undefined;
   user.resetTokenExpiry = undefined;
-
   await user.save();
   return { message: "Password reset successful" };
 };

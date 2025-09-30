@@ -29,10 +29,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
   },
   
-  { path: 'features/login', redirectTo: '/login' },
-  { path: 'features/signup', redirectTo: '/signup' },
-  { path: 'features/forgot-password', redirectTo: '/forgot-password' },
-  { path: 'features/reset-password/:token', redirectTo: '/reset-password/:token' },
+  // { path: 'features/login', redirectTo: '/login' },
+  // { path: 'features/signup', redirectTo: '/signup' },
+  // { path: 'features/forgot-password', redirectTo: '/forgot-password' },
+  // { path: 'features/reset-password/:token', redirectTo: '/reset-password/:token' },
   
   // Wildcard route - redirect to login for any unknown routes
   { path: '**', redirectTo: '/login' }
