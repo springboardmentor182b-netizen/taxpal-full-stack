@@ -1,11 +1,89 @@
+<!-- Sidebar -->
+<aside class="sidebar" [class.active]="sidebarActive" [class.collapsed]="collapsed">
+  <!-- Top brand row -->
+  <div class="sidebar-top">
+    <div class="brand-row">
+      <div class="brand">TaxPal</div>
+      <!-- Collapse toggle button -->
+      <button
+        class="collapse-btn"
+        title="Collapse sidebar"
+        (click)="toggleCollapse()"
+        [style.transform]="collapsed ? 'rotate(180deg)' : 'rotate(0deg)'"
+        style="transition: transform 0.3s;"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            d="M9 6L15 12L9 18"
+            stroke="white"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="nav">
+    <a class="nav-item active"><span class="label">Dashboard</span></a>
+    <a class="nav-item"><span class="label">Transactions</span></a>
+    <a class="nav-item" [routerLink]="'/budgets'"><span class="label">Budgets</span></a>
+    <a class="nav-item"><span class="label">Tax Estimator</span></a>
+    <a class="nav-item"><span class="label">Reports</span></a>
+  </nav>
+
+  <!-- Bottom area -->
+  <div class="sidebar-bottom">
+    <!-- Settings button -->
+    <button class="action settings">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path
+          d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z"
+          stroke="white"
+          stroke-width="2"
+        />
+        <path
+          d="M19.4 15A1.65 1.65 0 0 0 20 13.5V10.5A1.65 1.65 0 0 0 19.4 9L17.6 7.2A1.65 1.65 0 0 0 16 6.6H8A1.65 1.65 0 0 0 6.4 7.2L4.6 9A1.65 1.65 0 0 0 4 10.5V13.5A1.65 1.65 0 0 0 4.6 15L6.4 16.8A1.65 1.65 0 0 0 8 17.4H16A1.65 1.65 0 0 0 17.6 16.8L19.4 15Z"
+          stroke="white"
+          stroke-width="2"
+        />
+      </svg>
+      <span class="label">Settings</span>
+    </button>
+
+    <!-- Profile info -->
+    <div class="profile">
+      <div class="avatar">{{ userInitials }}</div>
+      <div class="meta">
+        <div class="name">{{ currentUser?.fullName }}</div>
+        <div class="email">{{ currentUser?.email }}</div>
+      </div>
+    </div>
+
+    <!-- Logout -->
+    <div class="sidebar-actions">
+      <button class="action logout" (click)="logout()">Logout</button>
+    </div>
+  </div>
+</aside>
+
+<!-- Overlay -->
+<div class="overlay" *ngIf="sidebarActive" (click)="closeSidebarOverlay()"></div>
+
 <!-- Main Budget Content -->
 <div class="budget-main">
   <!-- Header -->
   <div class="header">
     <h2 class="heading">Budgets</h2>
-    <button class="button-save" (click)="isFormVisible.set(true)">
-      Create Budget
-    </button>
+    <button class="button-save" (click)="isFormVisible.set(true)">Create Budget</button>
   </div>
 
   <!-- Form Modal -->
@@ -44,7 +122,7 @@
           </div>
         </div>
 
-              <!-- Month -->
+        <!-- Month -->
         <div class="form-group">
           <label>Select Month</label>
           <input
@@ -54,7 +132,6 @@
           />
         </div>
       </div>
-              
 
       <!-- Description -->
       <div class="form-group">
@@ -69,12 +146,8 @@
 
       <!-- Form Actions -->
       <div class="form-actions">
-        <button (click)="isFormVisible.set(false)" class="btn-cencel">
-          Cancel
-        </button>
-        <button (click)="addBudget()" class="btn-save">
-          Create Budget
-        </button>
+        <button (click)="isFormVisible.set(false)" class="btn-cancel">Cancel</button>
+        <button (click)="addBudget()" class="btn-save">Create Budget</button>
       </div>
     </div>
   </div>
@@ -96,9 +169,9 @@
       <tbody>
         <tr *ngFor="let budget of budgets(); trackBy: trackByCategory">
           <td>{{ budget.category }}</td>
-          <td>{{ budget.amount | currency:'USD':'symbol' }}</td>
-          <td>{{ budget.spent | currency:'USD':'symbol' }}</td>
-          <td>{{ budget.remaining | currency:'USD':'symbol' }}</td>
+          <td>{{ budget.amount | currency: 'USD':'symbol' }}</td>
+          <td>{{ budget.spent | currency: 'USD':'symbol' }}</td>
+          <td>{{ budget.remaining | currency: 'USD':'symbol' }}</td>
           <td
             [ngClass]="{
               'status-good': budget.status === 'Good',
