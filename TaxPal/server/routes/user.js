@@ -3,7 +3,7 @@ const router = express.Router();
 const User = require('../models/User');
 const Income = require('../models/Income');
 const Expense = require('../models/Expense');
-const Budget = require('../models/Budget');
+const Budget = require('../models/Budget'); // Make sure this file exists at server/models/Budget.js
 
 // POST /api/users/register
 router.post('/register', async (req, res) => {

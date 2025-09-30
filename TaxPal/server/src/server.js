@@ -17,7 +17,12 @@ app.use((req, res, next) => {
 
 // Middleware
 app.use(express.json()); // Parse JSON requests
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
+app.use(cors({
+  origin: "*",
+  credentials: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,Authorization"
+}));
 
 // Connect to MongoDB only if not testing
 if (process.env.NODE_ENV !== "test") {
@@ -32,6 +37,7 @@ const budgetRoutes = require("./routes/budget");
 app.use("/api/budgets", budgetRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/transactions", transactionRoutes);
+app.use('/api/budget', budgetRoutes);
 
 // Test route
 app.get("/", (req, res) => {
@@ -47,4 +53,5 @@ if (require.main === module) {
 }
 
 // Export app for testing
+module.exports = app;
 module.exports = app;
