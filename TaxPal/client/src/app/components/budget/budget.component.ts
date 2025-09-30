@@ -40,20 +40,23 @@ export class BudgetComponent implements OnInit {
             this.form.markAllAsTouched();
             return;
         }
+        // Convert date (yyyy-MM-dd) to YYYY-MM for backend
         const raw: string = this.form.value.month;
         const month = raw?.slice(0, 7); // YYYY-MM
 
         const formValue = this.form.value;
-        // Do not send user_id at all
+        const userId = localStorage.getItem('user_id') ?? undefined; // userId is string | undefined
+
         const payload = {
             category: formValue.category,
-            limit: formValue.amount,
-            month: month,
-            description: formValue.description
-            // user_id is not sent
+            limit: formValue.amount, // <-- map amount to limit
+            month: formValue.month?.slice(0, 7), // ensure YYYY-MM format
+            description: formValue.description,
+            user_id: userId // Now matches expected type
         };
         this.budgetApi.createBudget(payload).subscribe({
             next: (created) => {
+                // Optimistically prepend and refresh list
                 this.budgets = [created, ...this.budgets];
                 this.form.reset({
                     category: '',
@@ -74,5 +77,5 @@ export class BudgetComponent implements OnInit {
             next: (list) => this.budgets = list ?? [],
             error: (err) => console.error('Failed to fetch budgets', err)
         });
-}
+    }
 }
