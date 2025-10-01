@@ -149,12 +149,20 @@ router.post('/add-expense', async (req, res) => {
 // POST /api/users/add-simple-budget
 router.post('/add-simple-budget', async (req, res) => {
   try {
-    const { amount } = req.body;
+    const { amount, category, date, description } = req.body;
+    
     if (typeof amount !== 'number' || isNaN(amount) || amount < 0) {
       return res.status(400).json({ error: 'Amount is required and must be a non-negative number.' });
     }
-    // Save to SimpleBudget collection, not to "budgets" collection
-    const budget = new SimpleBudget({ amount });
+    
+    // Create budget with all fields
+    const budget = new SimpleBudget({ 
+      amount, 
+      category: category || 'General',
+      date: date ? new Date(date) : new Date(),
+      description: description || ''
+    });
+    
     await budget.save();
     res.status(201).json({ message: 'Budget added', budget });
   } catch (err) {
