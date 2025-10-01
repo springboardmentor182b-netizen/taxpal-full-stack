@@ -27,6 +27,7 @@ const dashboardRoutes   = require('./apis/dashboard/dashboard.routes');
 const userRoutes        = require('./apis/user/user.routes');
 const authRoutes        = require('./apis/auth/auth');
 const categoriesRoutes  = require('./apis/Categories/categoriesRoutes');
+const budgetRoutes = require('./apis/budget/budget.route');
 
 // Mount routes
 app.use('/api/dashboard', dashboardRoutes);
@@ -34,8 +35,7 @@ app.use('/api/user', userRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoriesRoutes);
-
-
+app.use('/api/budget', budgetRoutes);
 
 // Root route
 app.get('/', (req, res) => {
@@ -48,3 +48,5 @@ app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
 
+const swaggerDocs = require("./config/swagger");
+swaggerDocs(app);
