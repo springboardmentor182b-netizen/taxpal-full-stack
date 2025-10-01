@@ -169,8 +169,8 @@ export class SignupComponent implements OnInit, OnDestroy {
         });
     } else {
       this.markFormGroupTouched();
-      this.errorMessage = 'Please fill in all required fields correctly.';
-      this.scrollToFirstError();
+      this.errorMessage = '⚠️ All fields are required. Please fill them correctly.';
+    this.scrollToFirstError();
     }
   }
 

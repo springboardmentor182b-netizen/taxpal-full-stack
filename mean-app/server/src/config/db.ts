@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 export const connectDB = async () => {
   try {
     await mongoose.connect(
-      "mongodb+srv://sarithavijayakumar24_db_user:0dOKIevk2DCfPmi0@cluster0.77ewkcb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0",
+      "mongodb+srv://rupak:rupak2003@cluster0.fcbka.mongodb.net/Taxpal",
       {
               maxPoolSize: 10,
         serverSelectionTimeoutMS: 10000,

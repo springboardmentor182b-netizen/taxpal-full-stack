@@ -164,15 +164,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   navigateToSignup(): void {
-    console.log('Navigating to signup...');
     const queryParams = this.returnUrl !== '/dashboard' ? { returnUrl: this.returnUrl } : {};
-    this.router.navigate(['/features/signup'], { queryParams });
+    this.router.navigate(['/signup'], { queryParams }); // ✅ direct route
   }
-
+  
   navigateToForgotPassword(): void {
-    console.log('Navigating to forgot password...');
-    this.router.navigate(['/features/forgot-password']);
+    this.router.navigate(['/forgot-password']); // ✅ direct route
   }
+  
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
