@@ -8,26 +8,53 @@ const SimpleBudget = require('../models/SimpleBudget');
 // POST /api/users/register
 router.post('/register', async (req, res) => {
   try {
-    const { email, name, country } = req.body;
+    const { email, name, country, password } = req.body;
     console.log('[DEBUG] Register attempt for:', email);
-    if (!email || !name) {
-      console.log('[DEBUG] Register failed: Email and name required');
-      return res.status(400).json({ error: 'Email and name are required.' });
+    
+    if (!email || !name || !password) {
+      console.log('[DEBUG] Register failed: Email, name and password required');
+      return res.status(400).json({ error: 'Email, name and password are required.' });
     }
+    
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email)) {
+      console.log('[DEBUG] Register failed: Invalid email format');
+      return res.status(400).json({ error: 'Invalid email format' });
+    }
+    
+    // Password validation
+    if (password.length < 8) {
+      console.log('[DEBUG] Register failed: Password too short');
+      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
+    }
+    
     // Check if user already exists
     const existing = await User.findOne({ email: email.trim().toLowerCase() });
     if (existing) {
       console.log('[DEBUG] Register failed: User already exists for', email);
       return res.status(409).json({ error: 'User already exists.' });
     }
+    
     const user = new User({
       email: email.trim().toLowerCase(),
       name,
-      country
+      country,
+      password
     });
+    
     await user.save();
     console.log('[DEBUG] Register successful for:', email);
-    res.status(201).json({ message: 'User registered', user });
+    
+    // Don't return password in the response
+    const userResponse = {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      country: user.country
+    };
+    
+    res.status(201).json({ message: 'User registered', user: userResponse });
   } catch (err) {
     console.error('[DEBUG] Register error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
