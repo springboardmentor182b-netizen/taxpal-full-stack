@@ -64,31 +64,38 @@ router.post('/register', async (req, res) => {
 // Sign-in route: POST /api/users/signin
 router.post('/signin', async (req, res) => {
   try {
-    let { email } = req.body;
-    if (!email) {
-      console.log('[DEBUG] Sign-in failed: No email provided');
-      return res.status(400).json({ error: 'Email is required' });
+    let { email, password } = req.body;
+    
+    if (!email || !password) {
+      console.log('[DEBUG] Sign-in failed: Missing email or password');
+      return res.status(400).json({ error: 'Email and password are required' });
     }
+    
     email = email.trim().toLowerCase();
-
     console.log('[DEBUG] Sign-in attempt for:', email);
 
-    // Explicitly search in the default database's users collection
+    // Find the user
     const user = await User.findOne({ email });
     if (!user) {
       console.log('[DEBUG] Sign-in failed: No account found for', email);
       return res.status(404).json({ error: 'No account found' });
     }
     
+    // Verify password using the matchPassword method from the User model
+    const isPasswordMatch = await user.matchPassword(password);
+    if (!isPasswordMatch) {
+      console.log('[DEBUG] Sign-in failed: Incorrect password for', email);
+      return res.status(401).json({ error: 'Incorrect password' });
+    }
+    
     console.log('[DEBUG] Sign-in successful for:', email);
     
-    // Return user data with avatar initial
+    // Return user data with avatar initial (exclude password)
     res.status(200).json({ 
       message: 'Sign in successful', 
       user: {
         email: user.email,
         name: user.name,
-        // Priority: name first letter, then email first letter
         initial: (user.name && user.name.trim()) ? user.name.trim()[0].toUpperCase() : user.email[0].toUpperCase()
       }
     });
