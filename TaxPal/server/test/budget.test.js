@@ -1,88 +1,63 @@
+const request = require('supertest');
 const mongoose = require('mongoose');
-const Budget = require('../models/Budget'); // adjust path if needed
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const express = require('express');
+const app = express();
+const userRoutes = require('../routes/user');
 
-// Connect to in-memory MongoDB (or test DB)
+let mongoServer;
+
+// Set up the app
+app.use(express.json());
+app.use('/api/users', userRoutes);
+
+// Connect to a new in-memory database before running any tests
 beforeAll(async () => {
-  await mongoose.connect('mongodb://127.0.0.1:27017/budget_test', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
+  mongoServer = await MongoMemoryServer.create();
+  const uri = mongoServer.getUri();
+  await mongoose.connect(uri);
 });
 
+// Disconnect and close connection after all tests have finished
 afterAll(async () => {
-  await mongoose.connection.dropDatabase();
-  await mongoose.connection.close();
+  await mongoose.disconnect();
+  await mongoServer.stop();
 });
 
-describe('Budget Model Test Cases', () => {
+describe('Simple Budget API Tests', () => {
+  // Test creating a budget
+  test('POST /api/users/add-simple-budget should create a new budget', async () => {
+    const response = await request(app)
+      .post('/api/users/add-simple-budget')
+      .send({ amount: 500 });
 
-  // TC_026 – Create Budget (Valid)
-  it('TC_026: should create a budget successfully with valid details', async () => {
-    const validBudget = new Budget({
-      user_id: new mongoose.Types.ObjectId(),
-      category: 'food',
-      limit: 5000,
-      month: '2025-09',
-      description: 'Monthly food budget'
-    });
-
-    const savedBudget = await validBudget.save();
-
-    expect(savedBudget._id).toBeDefined();
-    expect(savedBudget.category).toBe('food');
-    expect(savedBudget.limit).toBe(5000);
-    expect(savedBudget.month).toBe('2025-09');
-    expect(savedBudget.description).toBe('Monthly food budget');
+    expect(response.statusCode).toBe(201);
+    expect(response.body.message).toBe('Budget added');
+    expect(response.body.budget).toBeDefined();
+    expect(response.body.budget.amount).toBe(500);
   });
 
-  // TC_027 – Create Budget (Missing Fields)
-  it('TC_027: should throw validation error if required fields are missing', async () => {
-    const invalidBudget = new Budget({}); // missing all fields
-    let err;
-    try {
-      await invalidBudget.save();
-    } catch (error) {
-      err = error;
-    }
-    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
-    expect(err.errors.user_id).toBeDefined();
-    expect(err.errors.category).toBeDefined();
-    expect(err.errors.limit).toBeDefined();
-    expect(err.errors.month).toBeDefined();
+  // Test validation for negative amount
+  test('POST /api/users/add-simple-budget should reject negative amount', async () => {
+    const response = await request(app)
+      .post('/api/users/add-simple-budget')
+      .send({ amount: -100 });
+
+    expect(response.statusCode).toBe(400);
   });
 
-  // TC_028 – Create Budget (Invalid Amount)
-  it('TC_028: should throw validation error if amount is invalid (negative)', async () => {
-    const invalidAmountBudget = new Budget({
-      user_id: new mongoose.Types.ObjectId(),
-      category: 'utilities',
-      limit: -200, // ❌ invalid
-      month: '2025-09',
-      description: 'Invalid budget test'
-    });
+  // Test fetching all budgets
+  test('GET /api/users/simple-budget-list should return all budgets', async () => {
+    // First create a budget to make sure we have one
+    await request(app)
+      .post('/api/users/add-simple-budget')
+      .send({ amount: 1000 });
+    
+    const response = await request(app)
+      .get('/api/users/simple-budget-list');
 
-    let err;
-    try {
-      await invalidAmountBudget.save();
-    } catch (error) {
-      err = error;
-    }
-    expect(err).toBeInstanceOf(mongoose.Error.ValidationError);
-    expect(err.errors.limit).toBeDefined();
-  });
-
-  // TC_029 – Cancel Budget Form (no save)
-  it('TC_029: should not save budget if cancel operation is performed', async () => {
-    const draftBudget = new Budget({
-      user_id: new mongoose.Types.ObjectId(),
-      category: 'entertainment',
-      limit: 1000,
-      month: '2025-09'
-    });
-
-    // Simulate cancel → do not call save()
-    // So budget should not exist in DB
-    const foundBudget = await Budget.findOne({ category: 'entertainment', limit: 1000 });
-    expect(foundBudget).toBeNull();
+    expect(response.statusCode).toBe(200);
+    expect(Array.isArray(response.body)).toBe(true);
+    expect(response.body.length).toBeGreaterThan(0);
   });
 });
