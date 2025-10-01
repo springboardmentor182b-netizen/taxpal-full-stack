@@ -45,6 +45,15 @@ export class UserProfileComponent implements OnInit {
   expenseList: any[] = [];
   recentTransactions: any[] = [];
 
+  // Add these properties to your class
+  monthlyData: { month: string; income: number; expense: number }[] = [];
+  maxValue = 0;
+  yAxisValues: number[] = [];
+
+  // Add these properties for the tooltip
+  tooltipStyle = { display: 'none', left: '0px', top: '0px' };
+  tooltipData: { month: string, label: string, value: string } = { month: '', label: '', value: '' };
+
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
@@ -207,10 +216,12 @@ export class UserProfileComponent implements OnInit {
             }))
           : [];
         this.updateRecentTransactions();
+        this.prepareChartData(); // Add this line
       },
       error: () => {
         this.incomeList = [];
         this.updateRecentTransactions();
+        this.prepareChartData(); // Add this line
       }
     });
   }
@@ -230,14 +241,16 @@ export class UserProfileComponent implements OnInit {
             }))
           : [];
         this.updateRecentTransactions();
+        this.prepareChartData(); // Add this line
       },
       error: () => {
         this.expenseList = [];
         this.updateRecentTransactions();
+        this.prepareChartData(); // Add this line
       }
     });
   }
-
+  
   fetchUserProfile() {
     // Get the user email from localStorage instead of making an API call
     this.userEmail = localStorage.getItem('user_email') || '';
@@ -274,11 +287,149 @@ export class UserProfileComponent implements OnInit {
       .slice(0, 5);
   }
 
+  prepareChartData() {
+    // Get all months from both income and expense lists
+    const monthsSet = new Set<string>();
+    
+    // Process income dates
+    this.incomeList.forEach(income => {
+      if (income.date) {
+        const date = new Date(income.date);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthsSet.add(monthYear);
+      }
+    });
+    
+    // Process expense dates
+    this.expenseList.forEach(expense => {
+      if (expense.date) {
+        const date = new Date(expense.date);
+        const monthYear = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+        monthsSet.add(monthYear);
+      }
+    });
+    
+    // Convert Set to Array and sort
+    const months = Array.from(monthsSet).sort();
+    
+    // Calculate totals for each month
+    this.monthlyData = months.map(month => {
+      // Calculate income for this month
+      const incomeTotal = this.incomeList
+        .filter(income => {
+          if (!income.date) return false;
+          const date = new Date(income.date);
+          const incomeMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          return incomeMonth === month;
+        })
+        .reduce((sum, income) => sum + (income.amount || 0), 0);
+      
+      // Calculate expenses for this month
+      const expenseTotal = this.expenseList
+        .filter(expense => {
+          if (!expense.date) return false;
+          const date = new Date(expense.date);
+          const expenseMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+          return expenseMonth === month;
+        })
+        .reduce((sum, expense) => sum + (expense.amount || 0), 0);
+      
+      // Format month for display (YYYY-MM to MMM YYYY)
+      const [year, monthNum] = month.split('-');
+      const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleString('default', { month: 'short' });
+      const displayMonth = `${monthName} ${year}`;
+      
+      return {
+        month: displayMonth,
+        income: incomeTotal,
+        expense: expenseTotal
+      };
+    });
+    
+    // Find the maximum value for scaling
+    this.maxValue = Math.max(
+      1, // Ensure we have a non-zero value for empty data
+      ...this.monthlyData.map(data => Math.max(data.income, data.expense))
+    );
+    
+    // Create y-axis values (5 steps)
+    this.yAxisValues = [0, this.maxValue / 4, this.maxValue / 2, this.maxValue * 3/4, this.maxValue];
+  }
+  
+  // Add this method to limit the number of months displayed
+  getDisplayMonths(): { month: string; income: number; expense: number }[] {
+    // If we have 6 or fewer months, show them all
+    if (this.monthlyData.length <= 6) {
+      return this.monthlyData;
+    }
+    
+    // Otherwise, show the most recent 6 months
+    return this.monthlyData.slice(-6);
+  }
+  
+  getBarHeight(value: number): number {
+    if (!value || !this.maxValue) return 0;
+    return (value / this.maxValue) * 100;
+  }
+  
+  formatCurrency(value: number): string {
+    return new Intl.NumberFormat('en-US', { 
+      style: 'currency', 
+      currency: 'USD',
+      maximumFractionDigits: 0
+    }).format(value);
+  }
+  
+  hasFinancialData(): boolean {
+    return this.monthlyData.length > 0 && 
+           this.monthlyData.some(data => data.income > 0 || data.expense > 0);
+  }
+  
   getCurrentDate(): string {
     const now = new Date();
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+  
+  /**
+   * Show tooltip with financial information when hovering over a bar
+   */
+  showTooltip(event: MouseEvent) {
+    const target = event.target as HTMLElement;
+    const month = target.getAttribute('data-month') || '';
+    const label = target.getAttribute('data-label') || '';
+    const value = target.getAttribute('data-value') || '';
+    
+    // Update tooltip content
+    this.tooltipData = { month, label, value };
+    
+    // Position tooltip next to the cursor
+    const offset = 10; // offset from cursor
+    this.tooltipStyle = {
+      display: 'block',
+      left: `${event.clientX + offset}px`,
+      top: `${event.clientY - offset}px`
+    };
+    
+    // Add visible class after a small delay to ensure smooth animation
+    setTimeout(() => {
+      const tooltip = document.getElementById('chart-tooltip');
+      if (tooltip) {
+        tooltip.classList.add('visible');
+      }
+    }, 10);
+  }
+  
+  /**
+   * Hide tooltip when not hovering over a bar
+   */
+  hideTooltip() {
+    this.tooltipStyle = { display: 'none', left: '0px', top: '0px' };
+    const tooltip = document.getElementById('chart-tooltip');
+    if (tooltip) {
+      tooltip.classList.remove('visible');
+    }
   }
 }
