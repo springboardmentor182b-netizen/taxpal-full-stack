@@ -26,12 +26,16 @@ const transactionRoutes = require('./apis/incomeExpenseapi/transactionsRoute');
 const dashboardRoutes   = require('./apis/dashboard/dashboard.routes');
 const userRoutes        = require('./apis/user/user.routes');
 const authRoutes        = require('./apis/auth/auth');
+const categoriesRoutes  = require('./apis/Categories/categoriesRoutes');
 
 // Mount routes
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoriesRoutes);
+
+
 
 // Root route
 app.get('/', (req, res) => {
@@ -43,3 +47,4 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
+
