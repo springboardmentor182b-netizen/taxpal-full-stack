@@ -109,7 +109,13 @@ export class SignInFormComponent implements OnInit, OnDestroy {
       if (res?.user) {
         localStorage.setItem('user_email', res.user.email);
         localStorage.setItem('user_name', res.user.name || '');
-        // Don't store passwords in localStorage
+        localStorage.setItem('user_id', res.user._id || '');
+        
+        // Create a custom event to notify other components about the user login
+        const loginEvent = new CustomEvent('userLoggedIn', { 
+          detail: { email: res.user.email, name: res.user.name } 
+        });
+        window.dispatchEvent(loginEvent);
       }
       
       setTimeout(() => {

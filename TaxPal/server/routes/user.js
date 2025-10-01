@@ -81,7 +81,7 @@ router.post('/signin', async (req, res) => {
       return res.status(404).json({ error: 'No account found' });
     }
     
-    // Verify password using the matchPassword method from the User model
+    // Verify password
     const isPasswordMatch = await user.matchPassword(password);
     if (!isPasswordMatch) {
       console.log('[DEBUG] Sign-in failed: Incorrect password for', email);
@@ -94,6 +94,7 @@ router.post('/signin', async (req, res) => {
     res.status(200).json({ 
       message: 'Sign in successful', 
       user: {
+        _id: user._id, // Include the user ID
         email: user.email,
         name: user.name,
         initial: (user.name && user.name.trim()) ? user.name.trim()[0].toUpperCase() : user.email[0].toUpperCase()
@@ -108,17 +109,26 @@ router.post('/signin', async (req, res) => {
 // GET /api/users/me
 router.get('/me', async (req, res) => {
   try {
-    // For demo: return the first user in the database
-    const user = await User.findOne();
+    // Get user email from query parameter instead of returning first user
+    const userEmail = req.query.email;
+    
+    if (!userEmail) {
+      console.log('[DEBUG] /me: No email provided');
+      return res.status(400).json({ error: 'Email parameter is required' });
+    }
+    
+    // Find the user by email
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
-      console.log('[DEBUG] /me: No user found');
+      console.log('[DEBUG] /me: No user found for email', userEmail);
       return res.status(404).json({ error: 'No user found' });
     }
+    
     console.log('[DEBUG] /me: Returning user', user.email);
     res.json({ 
       name: user.name, 
       email: user.email,
-      // Add initial for avatar
+      _id: user._id,
       initial: (user.name && user.name.trim()) ? user.name.trim()[0].toUpperCase() : user.email[0].toUpperCase()
     });
   } catch (err) {
@@ -132,10 +142,19 @@ router.post('/add-income', async (req, res) => {
   try {
     const { title, amount, category, date, notes, userEmail } = req.body;
     console.log('[DEBUG] Add income attempt:', { title, amount, category, userEmail });
+    
+    // Verify that the user email exists
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      console.log('[DEBUG] Add income failed: User not found for email:', userEmail);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
     if (!title || !amount || !date || !userEmail) {
       console.log('[DEBUG] Add income failed: Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    
     const income = new Income({
       title,
       amount,
@@ -158,10 +177,19 @@ router.post('/add-expense', async (req, res) => {
   try {
     const { title, amount, category, date, notes, taxDeductible, userEmail } = req.body;
     console.log('[DEBUG] Add expense attempt:', { title, amount, category, userEmail });
+    
+    // Verify that the user email exists
+    const user = await User.findOne({ email: userEmail });
+    if (!user) {
+      console.log('[DEBUG] Add expense failed: User not found for email:', userEmail);
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
     if (!title || !amount || !date || !userEmail) {
       console.log('[DEBUG] Add expense failed: Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
+    
     const expense = new Expense({
       title,
       amount,

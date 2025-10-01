@@ -93,15 +93,15 @@ import { RouterLink, Router } from '@angular/router';
             </button>
             <div class="profile-dropdown">
               <button type="button" class="profile-avatar" (click)="openMenu($event)">
-                <span>S</span>
+                <span>{{ userInitial || 'U' }}</span>
               </button>
               
               <!-- Simplified profile menu dropdown -->
               <div class="profile-menu-dropdown" *ngIf="showProfileMenu" (click)="$event.stopPropagation()">
                 <div class="profile-section">
                   <div class="profile-info centered-profile">
-                    <h3>Sam Johnson</h3>
-                    <p>sam.johnson@example.com</p>
+                    <h3>{{ userName || 'User' }}</h3>
+                    <p>{{ userEmail }}</p>
                   </div>
                 </div>
                 <div class="profile-menu-divider"></div>
@@ -798,7 +798,7 @@ import { RouterLink, Router } from '@angular/router';
     }
     
     .dark .centered-profile p {
-      color: #9ca3af;
+      color: #9ca3baf;
     }
     
     /* Enhanced logout item */
@@ -864,7 +864,7 @@ import { RouterLink, Router } from '@angular/router';
       --border-color: #1f2937;
       --highlight-color: #60a5fa;
       --highlight-hover: #93c5fd;
-      --muted-color: #9ca3af;
+      --muted-color: #9ca3baf;
       --bg-muted: #374151;
     }
     
@@ -989,7 +989,7 @@ import { RouterLink, Router } from '@angular/router';
     }
     
     .dark .centered-profile p {
-      color: #9ca3af;
+      color: #9ca3baf;
     }
   `]
 })
@@ -1000,7 +1000,10 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
   private maxEmojis = 15;
   private animationInterval: any;
   showProfileMenu = false;
-
+  userEmail: string = '';
+  userName: string = '';
+  userInitial: string = '';
+  
   constructor(private router: Router, private renderer: Renderer2, private elementRef: ElementRef) {
     // Check for saved preference on component initialization
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -1008,6 +1011,9 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
       this.isDarkMode = true;
       this.applyDarkMode();
     }
+    
+    // Get user info from localStorage
+    this.loadUserData();
   }
 
   ngOnInit() {
@@ -1030,6 +1036,11 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
         this.applyDarkMode();
       }, 100);
     }
+    
+    // Refresh user data when storage changes
+    window.addEventListener('storage', () => {
+      this.loadUserData();
+    });
   }
 
   ngOnDestroy() {
@@ -1068,6 +1079,13 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
     
     // Navigate to home with force reload to ensure complete reset
     window.location.href = '/';
+  }
+
+  // Load user data from localStorage
+  private loadUserData() {
+    this.userEmail = localStorage.getItem('user_email') || 'user@example.com';
+    this.userName = localStorage.getItem('user_name') || 'User';
+    this.userInitial = this.userName.charAt(0).toUpperCase();
   }
 
   private startEmojiAnimation() {
@@ -1130,152 +1148,426 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
       styleEl.textContent = `
         body, html { 
           background-color: #0f172a !important; 
-          color: #e2e8f0 !important; 
+          color: #f9fafb !important; 
         }
         
-        .hero-section {
+        .navbar.dark {
           background-color: #0f172a !important;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
         }
         
-        .hero-section h1 {
-          color: #f1f5f9 !important;
-        }
-        
-        .hero-section p {
-          color: #cbd5e1 !important;
-        }
-        
-        .hero-section .demo-btn {
-          border-color: #475569 !important;
-          color: #e2e8f0 !important;
-          background-color: #1e293b !important;
-        }
-        
-        .hero-section .demo-btn:hover {
-          background-color: #334155 !important;
-          border-color: #64748b !important;
-        }
-        
-        .hero-section .image-placeholder {
-          background-color: #1e293b !important;
-          color: #94a3b8 !important;
-        }
-        
-        /* Dashboard specific styles */
-        .profile-container {
+        .navbar-box.dark {
           background-color: #0f172a !important;
+          color: #f9fafb !important;
+          border-bottom: 1px solid #1e293b !important;
         }
         
-        .dashboard-section, .metric-card, .balance-card, .quick-actions {
-          background-color: #1e293b !important;
-          border-color: #334155 !important;
+        .dark .logo a {
+          color: #f9fafb;
         }
         
-        .dashboard-header h1 {
-          color: #f1f5f9 !important;
+        .dark .calculator-icon {
+          stroke: #60a5fa;
         }
         
-        .dashboard-subtitle {
-          color: #94a3b8 !important;
+        .dark .logo a:hover {
+          color: #60a5fa;
         }
         
-        .metric-header h3, .balance-header h3 {
-          color: #94a3b8 !important;
+        .dark .logo a:hover .calculator-icon {
+          stroke: #93c5fd;
         }
         
-        .metric-value, .balance-value {
-          color: #f1f5f9 !important;
+        .dark .nav-link {
+          color: #e5e7eb;
         }
         
-        .metric-subtitle, .balance-goal, .progress-text {
-          color: #64748b !important;
+        .dark .nav-icon {
+          stroke: #9ca3baf;
         }
         
-        .section-header h3, .transaction-info h4, .budget-info h4 {
-          color: #f1f5f9 !important;
+        .dark .nav-link:hover {
+          color: #60a5fa;
         }
         
-        .transaction-meta, .budget-amounts, .progress-stats {
-          color: #94a3b8 !important;
+        .dark .nav-link:hover .nav-icon {
+          stroke: #60a5fa;
         }
         
-        .breakdown-label span {
-          color: #e2e8f0 !important;
+        .dark .nav-link::before {
+          background-color: #60a5fa;
         }
         
-        .breakdown-percentage {
-          color: #f1f5f9 !important;
+        .dark .nav-link.active {
+          color: #60a5fa;
         }
         
-        .progress-bar {
-          background-color: #334155 !important;
+        .dark .nav-link.active .nav-icon {
+          stroke: #60a5fa;
         }
         
-        .action-btn {
-          background-color: #1e293b !important;
-          border-color: #334155 !important;
-          color: #e2e8f0 !important;
+        .dark .theme-toggle-btn {
+          background-color: transparent;
         }
         
-        .action-btn:hover {
-          background-color: #334155 !important;
-          border-color: #475569 !important;
+        .dark .theme-toggle-btn:hover {
+          background-color: rgba(255, 255, 255, 0.1);
         }
         
-        .chart-btn {
-          background-color: #1e293b !important;
-          border-color: #334155 !important;
-          color: #94a3b8 !important;
+        .dark .theme-icon {
+          stroke: #9ca3baf;
         }
         
-        .welcome-section h2 {
-          color: #f1f5f9 !important;
+        .dark .theme-toggle-btn:hover .theme-icon {
+          stroke: #60a5fa;
         }
         
-        .quick-actions h2 {
-          color: #f1f5f9 !important;
+        .dark .moon-icon {
+          opacity: 1;
+          transform: rotate(0) scale(1);
         }
         
-        .subtitle {
-          color: #94a3b8 !important;
+        .dark .sun-icon {
+          opacity: 0;
+          transform: rotate(30deg) scale(0);
         }
         
-        footer, section, .container, main {
-          background-color: #0f172a !important;
-          color: #e2e8f0 !important;
+        /* User profile indicator styles */
+        .user-profile-indicator {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.5rem 0.75rem;
+          border-radius: 0.5rem;
+          background-color: #374151;
+          margin-right: 2rem;
+          transition: all 0.3s ease;
         }
         
-        h1, h2, h3, h4, h5, h6, p {
-          color: #e2e8f0 !important;
+        .user-avatar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          background-color: #4b5563;
+          color: #e5e7eb;
         }
         
-        .card, .box {
-          background-color: #1e293b !important;
-          border-color: #334155 !important;
+        .user-name {
+          font-weight: 500;
+          color: #e5e7eb;
+          font-size: 0.9rem;
         }
         
-        /* Better text contrast for readability */
-        input, select, textarea {
-          background-color: #1e293b !important;
-          color: #e2e8f0 !important;
-          border-color: #334155 !important;
+        /* Floating emoji animation */
+        .floating-emoji {
+          position: absolute;
+          font-size: 1.5rem;
+          opacity: 0;
+          z-index: 1;
+          pointer-events: none;
+          animation: float 8s linear forwards;
+          transform: translateZ(0);
+          will-change: transform, opacity, top, left;
         }
         
-        /* Link colors */
-        a:not(.nav-link):not(.profile-menu-item):not(.action-btn) {
-          color: #38bdf8 !important;
+        @keyframes float {
+          0% {
+            opacity: 0;
+            transform: translateY(0) rotate(0deg) scale(0.8);
+          }
+          10% {
+            opacity: 1;
+          }
+          90% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0;
+            transform: translateY(-100px) rotate(360deg) scale(1.2);
+          }
         }
         
-        a:not(.nav-link):not(.profile-menu-item):not(.action-btn):hover {
-          color: #0ea5e9 !important;
+        /* Media queries */
+        @media (max-width: 1024px) {
+          .nav-links {
+            position: static;
+            transform: none;
+            margin: 0 auto;
+            justify-content: center;
+            gap: 2rem;
+          }
+          
+          .navbar-container {
+            justify-content: space-between;
+          }
+          
+          .right-container {
+            position: static;
+            right: auto;
+          }
+          
+          .user-profile-indicator {
+            margin-right: 1rem;
+          }
+          
+          .logo {
+            margin-left: 1rem;
+          }
         }
         
-        .view-all-link {
-          color: #38bdf8 !important;
+        @media (max-width: 768px) {
+          .navbar-container {
+            padding: 0 1rem;
+          }
+          
+          .navbar-box {
+            padding: 1rem 1.5rem;
+          }
+          
+          .nav-links {
+            gap: 1.5rem;
+          }
+          
+          .right-container {
+            gap: 1rem;
+          }
+          
+          .user-profile-indicator {
+            padding: 0.4rem 0.6rem;
+          }
         }
         
-        .view-all-link:hover {
-          color: #0ea5e9 !important;
+        @media (max-width: 640px) {
+          .nav-links {
+            display: none;
+          }
+          
+          .logo a {
+            font-size: 1.4rem;
+          }
+          
+          .navbar-box {
+            padding: 0.75rem 0;
+          }
+          
+          .theme-toggle-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0.4rem;
+          }
+          
+          .user-profile-indicator {
+            margin-right: 0.5rem;
+          }
+          
+          .user-name {
+            display: none;
+          }
+        }
+        
+        /* Fix for Tax Estimator text */
+        .nav-link span {
+          white-space: nowrap;
+          position: relative;
+          z-index: 1;
+        }
+        
+        /* Simple Profile Menu Overlay */
+        .profile-menu-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background-color: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999999;
+        }
+        
+        .profile-menu-container {
+          width: 280px;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .dark .profile-menu-container {
+          background-color: #1f2937;
+        }
+        
+        .profile-menu-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 15px 20px;
+          border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .dark .profile-menu-header {
+          border-bottom-color: #374151;
+        }
+        
+        .profile-menu-header span {
+          font-weight: 600;
+          color: #111827;
+        }
+        
+        .dark .profile-menu-header span {
+          color: #f9fafb;
+        }
+        
+        .close-menu-btn {
+          background: none;
+          border: none;
+          font-size: 24px;
+          line-height: 1;
+          color: #6b7280;
+          cursor: pointer;
+        }
+        
+        .close-menu-btn:hover {
+          color: #111827;
+        }
+        
+        .dark .close-menu-btn:hover {
+          color: #f9fafb;
+        }
+        
+        .profile-menu-items {
+          padding: 10px 0;
+        }
+        
+        .profile-menu-item {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 20px;
+          color: #4b5563;
+          text-decoration: none;
+          transition: all 0.2s ease;
+        }
+        
+        .profile-menu-item:hover {
+          background-color: #f3f4f6;
+          color: #1f2937;
+        }
+        
+        .dark .profile-menu-item {
+          color: #e5e7eb;
+        }
+        
+        .dark .profile-menu-item:hover {
+          background-color: #374151;
+          color: #f9fafb;
+        }
+        
+        .profile-menu-divider {
+          height: 1px;
+          background-color: #e5e7eb;
+          margin: 5px 0;
+        }
+        
+        .dark .profile-menu-divider {
+          background-color: #374151;
+        }
+        
+        /* Profile Avatar Styles */
+        .profile-avatar {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          background-color: #3b82f6;
+          color: #ffffff;
+          font-weight: 600;
+          font-size: 0.9rem;
+          border: none;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+        }
+        
+        .profile-avatar:hover {
+          background-color: #60a5fa;
+          color: #111827;
+          box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
+        }
+        
+        .dark .profile-avatar:hover {
+          background-color: #93c5fd;
+          box-shadow: 0 4px 6px rgba(96, 165, 250, 0.4);
+        }
+        
+        /* Profile dropdown positioning */
+        .profile-dropdown {
+          position: relative;
+          margin-right: 2rem;
+          z-index: 99999; /* Increased z-index */
+        }
+        
+        /* Repositioned menu dropdown with better alignment */
+        .profile-menu-dropdown {
+          position: fixed;
+          top: 70px; /* Slightly higher for better positioning */
+          right: 2rem;
+          width: 300px;
+          background-color: white;
+          border-radius: 10px;
+          overflow: visible;
+          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
+          z-index: 999999;
+          animation: dropdown-appear 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+          transform-origin: top right;
+        }
+        
+        /* Ensure backdrop is above hero section */
+        .menu-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          z-index: 99998; /* Just below dropdown but above everything else */
+          background-color: rgba(0, 0, 0, 0.2); /* Slight darkening */
+        }
+        
+        /* Additional style to ensure menu appearance */
+        .profile-menu-dropdown::before {
+          content: '';
+          position: absolute;
+          top: -8px;
+          right: 12px;
+          width: 16px;
+          height: 16px;
+          background-color: white;
+          transform: rotate(45deg);
+          border-top: 1px solid rgba(0, 0, 0, 0.05);
+          border-left: 1px solid rgba(0, 0, 0, 0.05);
+          z-index: -1;
+        }
+        
+        .dark .profile-menu-dropdown::before {
+          background-color: #1f2937;
+          border-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Make all other elements work with the dropdown */
+        body {
+          position: relative;
+        }
+        
+        /* Updated animation for better appearance */
+        @keyframes dropdown-appear {
+          from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
         }
       `;
       

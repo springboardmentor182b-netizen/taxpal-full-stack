@@ -63,6 +63,11 @@ export class UserProfileComponent implements OnInit {
     this.fetchIncomeList();
     this.fetchExpenseList();
     this.updateRecentTransactions();
+
+    // Set default date to today for both forms
+    const today = this.getCurrentDate();
+    this.incomeForm.date = today;
+    this.expenseForm.date = today;
   }
   
   toggleDarkMode() {
@@ -118,17 +123,21 @@ export class UserProfileComponent implements OnInit {
   }
   
   submitIncome() {
-    if (!this.incomeForm.title || !this.incomeForm.amount || !this.incomeForm.date || !this.userEmail) {
+    // Remove the userEmail check since it's now set from localStorage
+    if (!this.incomeForm.title || !this.incomeForm.amount || !this.incomeForm.date) {
       this.incomeErrorMsg = 'Please fill all required fields.';
       return;
     }
+    
     this.incomeLoading = true;
     this.incomeErrorMsg = '';
     this.incomeSuccessMsg = '';
+    
     const payload = {
       ...this.incomeForm,
-      userEmail: this.userEmail
+      userEmail: this.userEmail // This will be available from localStorage
     };
+    
     this.http.post('/api/users/add-income', payload).subscribe({
       next: (res: any) => {
         this.incomeSuccessMsg = 'Income added!';
@@ -149,17 +158,21 @@ export class UserProfileComponent implements OnInit {
   }
 
   submitExpense() {
-    if (!this.expenseForm.title || !this.expenseForm.amount || !this.expenseForm.date || !this.userEmail) {
+    // Remove the userEmail check since it's now set from localStorage
+    if (!this.expenseForm.title || !this.expenseForm.amount || !this.expenseForm.date) {
       this.expenseErrorMsg = 'Please fill all required fields.';
       return;
     }
+    
     this.expenseLoading = true;
     this.expenseErrorMsg = '';
     this.expenseSuccessMsg = '';
+    
     const payload = {
       ...this.expenseForm,
-      userEmail: this.userEmail
+      userEmail: this.userEmail // This will be available from localStorage
     };
+    
     this.http.post('/api/users/add-expense', payload).subscribe({
       next: (res: any) => {
         this.expenseSuccessMsg = 'Expense added!';
@@ -226,23 +239,15 @@ export class UserProfileComponent implements OnInit {
   }
 
   fetchUserProfile() {
-    this.http.get<any>('/api/users/me').subscribe({
-      next: (user) => {
-        this.userName = user?.name || '';
-        this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : '';
-        this.userEmail = user?.email || '';
-        this.fetchIncomeList();
-        this.fetchExpenseList();
-      },
-      error: () => {
-        this.userName = '';
-        this.userInitial = '';
-        this.userEmail = '';
-        this.incomeList = [];
-        this.expenseList = [];
-        this.updateRecentTransactions();
-      }
-    });
+    // Get the user email from localStorage instead of making an API call
+    this.userEmail = localStorage.getItem('user_email') || '';
+    this.userName = localStorage.getItem('user_name') || '';
+    this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : this.userEmail.trim()[0].toUpperCase();
+    
+    if (this.userEmail) {
+      this.fetchIncomeList();
+      this.fetchExpenseList();
+    }
   }
 
   updateRecentTransactions() {
