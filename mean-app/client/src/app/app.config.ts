@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { provideHttpClient, withInterceptorsFromDi, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { withRouterConfig } from '@angular/router';
 
 import { AuthService } from './features/auth.service';
 import { ThemeService } from './core/service/theme.service';
@@ -36,7 +37,10 @@ export const appRoutes = [
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(appRoutes),
+    provideRouter(
+      appRoutes,
+      withRouterConfig({ onSameUrlNavigation: 'reload' })   // ✅ correct way
+    ),
     provideHttpClient(withInterceptorsFromDi()),
 
     importProvidersFrom(

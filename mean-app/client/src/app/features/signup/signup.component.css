@@ -253,6 +253,17 @@
   font-size: 0.875rem;
   border: 1px solid #fecaca;
 }
+.global-error {
+  color: #d32f2f;
+  background: #fdecea;
+  border: 1px solid #f5c6cb;
+  padding: 10px 14px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
 
 .submit-button {
   background: var(--primary-600);
