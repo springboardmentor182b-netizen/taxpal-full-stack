@@ -8,7 +8,10 @@
           <h3 class="form-subtitle-title">Create Your TaxPal Account</h3>
           <p class="form-subtitle">Enter your details to get started with managing your finances</p>
         </div>
-
+        <!-- Global Error Message -->
+<div *ngIf="errorMessage" class="global-error">
+  {{ errorMessage }}
+</div>
         <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="auth-form">
           <!-- Full Name Field -->
           <div class="form-field">

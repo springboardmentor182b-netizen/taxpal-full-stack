@@ -5,7 +5,7 @@ export const connectDB = async () => {
     await mongoose.connect(
       "mongodb+srv://rupak:rupak2003@cluster0.fcbka.mongodb.net/Taxpal",
       {
-        maxPoolSize: 10,
+              maxPoolSize: 10,
         serverSelectionTimeoutMS: 10000,
         socketTimeoutMS: 45000,
       }

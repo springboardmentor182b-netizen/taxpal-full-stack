@@ -32,11 +32,14 @@ export const routes: Routes = [
     loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
   },
   
+
   // Legacy route redirects (for backwards compatibility)
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
   { path: 'features/forgot-password', redirectTo: '/forgot-password' },
   { path: 'features/reset-password/:token', redirectTo: '/reset-password/:token' },
+
+
   
   // Wildcard route - redirect to login for any unknown routes
   { path: '**', redirectTo: '/login' }

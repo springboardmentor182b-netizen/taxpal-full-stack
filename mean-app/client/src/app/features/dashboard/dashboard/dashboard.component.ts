@@ -294,4 +294,14 @@ export class Dashboard implements OnInit {
     sessionStorage.clear();
     this.router.navigate(['/features/login']);
   }
+  goToDashboard() {
+    if (this.router.url === '/dashboard') {
+      // Force reload: navigate away and back
+      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+        this.router.navigate(['/dashboard']);
+      });
+    } else {
+      this.router.navigate(['/dashboard']);
+    }
+  }
 }
