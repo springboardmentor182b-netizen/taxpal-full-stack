@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
-import { NgFor, NgIf, NgClass } from '@angular/common';
+import { NgFor, NgIf } from '@angular/common';
 
 interface Category { name: string; color: string; }
 
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [NgFor, NgIf, NgClass],
+  imports: [NgFor, NgIf],
   styleUrls: ['./settings.component.css'],
   template: `
     <!-- Subheader -->

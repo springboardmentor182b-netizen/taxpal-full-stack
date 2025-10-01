@@ -1,4 +1,5 @@
 import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { DashboardService, DashboardSummary, Transaction, ExpenseBreakdown, BudgetProgress, TaxEstimation } from './dashboard.service';
 
@@ -9,7 +10,7 @@ import { DashboardService, DashboardSummary, Transaction, ExpenseBreakdown, Budg
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
+export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
   private pieChart: any = null;
   private barChart: any = null;
 
@@ -131,7 +132,7 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit(): void {
-    // Theme toggle remains the same...
+    // Theme toggle (dark/light)
     const modeToggle = document.getElementById('modeToggle');
     const setModeIcon = () => {
       const iconEl = modeToggle?.querySelector('i');
@@ -150,80 +151,49 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     }
     setModeIcon();
 
-    // Initialize static charts first (will be updated later by API)
+    // Charts: assume Chart.js is loaded globally (via CDN in index.html) or installed and exposed.
     try {
       const Chart = (window as any).Chart;
-
-      // Pie chart
       const pieCtx = (document.getElementById('pieChart') as HTMLCanvasElement).getContext('2d');
       this.pieChart = new Chart(pieCtx, {
         type: 'pie',
         data: {
-          labels: ['Expenses', 'Remaining'],
+          labels: ['Rent/Mortgage', 'Utilities', 'Groceries', 'Others'],
           datasets: [{
-            data: [0, 0],
+            data: [32, 20, 25, 23],
             backgroundColor: [
               getComputedStyle(document.documentElement).getPropertyValue('--pie-blue'),
+              getComputedStyle(document.documentElement).getPropertyValue('--pie-light-blue'),
+              getComputedStyle(document.documentElement).getPropertyValue('--pie-teal'),
               getComputedStyle(document.documentElement).getPropertyValue('--pie-green')
             ]
           }]
         },
-        options: {
-          plugins: { legend: { display: true } },
-          responsive: true,
-          maintainAspectRatio: false
-        }
+        options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }
       });
 
-      // Bar chart
       const barCtx = (document.getElementById('barChart') as HTMLCanvasElement).getContext('2d');
       this.barChart = new Chart(barCtx, {
         type: 'bar',
         data: {
-          labels: ['Summary'],
+          labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
           datasets: [
-            {
-              label: 'Income',
-              data: [0],
-              backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-income')
-            },
-            {
-              label: 'Expenses',
-              data: [0],
-              backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-expense')
-            }
+            { label: 'Income', data: [8700, 7700, 9500, 5600, 8800, 7900], backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-income') },
+            { label: 'Expenses', data: [3200, 3100, 3900, 2800, 3500, 3000], backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--graph-expense') }
           ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: true,
-              labels: {
-                color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'
-              }
-            }
-          },
+          plugins: { legend: { display: true, labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8' } } },
           scales: {
-            y: {
-              beginAtZero: true,
-              grid: { color: 'rgba(255,255,255,0.03)' },
-              ticks: {
-                color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'
-              }
-            },
-            x: {
-              grid: { color: 'transparent' },
-              ticks: {
-                color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8'
-              }
-            }
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.03)' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8' } },
+            x: { grid: { color: 'transparent' }, ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--muted') || '#9aa8b8' } }
           }
         }
       });
     } catch (e) {
-      console.warn('Chart initialization skipped — Chart.js not found globally.', e);
+      console.warn('Chart initialization skipped — Chart.js not found globally. See README to add Chart.js.', e);
     }
   }
 
@@ -231,6 +201,6 @@ export class DashboardComponent implements OnInit, AfterViewInit, OnDestroy {
     try {
       if (this.pieChart) this.pieChart.destroy();
       if (this.barChart) this.barChart.destroy();
-    } catch (e) {}
+    } catch (e) { }
   }
 }

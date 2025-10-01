@@ -16,7 +16,8 @@ export interface BudgetDto {
 
 @Injectable({ providedIn: 'root' })
 export class BudgetService {
-    private readonly baseUrl = '/api/budget';
+    // Set this to match your backend route!
+    private baseUrl = '/api/budget'; // <-- use singular if backend route is /api/budget
 
     constructor(private http: HttpClient) { }
 
@@ -30,7 +31,7 @@ export class BudgetService {
 
     updateBudget(id: string, payload: Partial<BudgetDto>): Observable<BudgetDto> {
         return this.http.put<BudgetDto>(`${this.baseUrl}/${id}`, payload, { withCredentials: true });
-    }
+}
 
     deleteBudget(id: string): Observable<{ message: string }> {
         return this.http.delete<{ message: string }>(`${this.baseUrl}/${id}`, { withCredentials: true });
