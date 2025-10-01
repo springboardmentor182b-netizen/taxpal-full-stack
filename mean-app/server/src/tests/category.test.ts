@@ -9,7 +9,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: '.env.test' });
 
-// Extend Jest timeout for Atlas connection
+
 jest.setTimeout(300000); // 5 minutes
 
 const app = express();
