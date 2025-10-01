@@ -1,16 +1,135 @@
-import { Component, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, AfterViewInit, OnDestroy, OnInit } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
+import { DashboardService, DashboardSummary, Transaction, ExpenseBreakdown, BudgetProgress, TaxEstimation } from './dashboard.service';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [RouterModule],
+  imports: [CommonModule, DecimalPipe, DatePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
-export class DashboardComponent implements AfterViewInit, OnDestroy {
+export class DashboardComponent implements AfterViewInit, OnDestroy, OnInit {
   private pieChart: any = null;
   private barChart: any = null;
+
+  // Dashboard data
+  dashboardSummary: DashboardSummary = { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
+  recentTransactions: Transaction[] = [];
+  expenseBreakdown: ExpenseBreakdown[] = [];
+  budgetProgress: BudgetProgress[] = [];
+  taxEstimation: TaxEstimation | null = null;
+
+  // UI state
+  loading = false;
+  error: string | null = null;
+
+  constructor(private dashboardService: DashboardService) {}
+
+  ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData(): void {
+    this.loading = true;
+    this.error = null;
+
+    // Load all dashboard data
+    this.dashboardService.getDashboardSummary().subscribe({
+      next: (summary) => {
+        this.dashboardSummary = summary;
+        this.updateCharts(summary);
+      },
+      error: (err) => {
+        this.error = 'Failed to load dashboard summary';
+        console.error('Error fetching dashboard summary:', err);
+      }
+    });
+
+    this.dashboardService.getRecentTransactions().subscribe({
+      next: (transactions) => {
+        this.recentTransactions = transactions;
+      },
+      error: (err) => {
+        console.error('Error fetching recent transactions:', err);
+      }
+    });
+
+    this.dashboardService.getExpenseBreakdown().subscribe({
+      next: (breakdown) => {
+        this.expenseBreakdown = breakdown;
+        this.updatePieChart(breakdown);
+      },
+      error: (err) => {
+        console.error('Error fetching expense breakdown:', err);
+      }
+    });
+
+    this.dashboardService.getBudgetProgress().subscribe({
+      next: (budget) => {
+        this.budgetProgress = budget;
+      },
+      error: (err) => {
+        console.error('Error fetching budget progress:', err);
+      }
+    });
+
+    this.dashboardService.getTaxEstimation().subscribe({
+      next: (tax) => {
+        this.taxEstimation = tax;
+      },
+      error: (err) => {
+        console.error('Error fetching tax estimation:', err);
+      }
+    });
+
+    this.loading = false;
+  }
+
+  refreshData(): void {
+    this.loadDashboardData();
+  }
+
+  // 🔹 Update charts dynamically
+  updateCharts(data: DashboardSummary): void {
+    if (this.barChart) {
+      this.barChart.data.datasets[0].data = [data.totalIncome];
+      this.barChart.data.datasets[1].data = [data.totalExpenses];
+      this.barChart.update();
+    }
+  }
+
+  // 🔹 Update pie chart with expense breakdown
+  updatePieChart(breakdown: ExpenseBreakdown[]): void {
+    if (this.pieChart && breakdown.length > 0) {
+      const labels = breakdown.map(item => item._id);
+      const data = breakdown.map(item => item.total);
+
+      this.pieChart.data.labels = labels;
+      this.pieChart.data.datasets[0].data = data;
+      this.pieChart.update();
+    }
+  }
+
+  // 🔹 Get color for expense category
+  getExpenseColor(category: string): string {
+    const colors: { [key: string]: string } = {
+      'Office': 'var(--pie-blue)',
+      'Software & Tools': 'var(--pie-light-blue)',
+      'Marketing': 'var(--pie-teal)',
+      'Travel': 'var(--pie-green)',
+      'Meals': 'var(--pie-orange)',
+      'Other': 'var(--pie-gray)'
+    };
+    return colors[category] || 'var(--pie-gray)';
+  }
+
+  // 🔹 Calculate percentage for expense breakdown
+  getExpensePercentage(expense: ExpenseBreakdown): number {
+    const total = this.expenseBreakdown.reduce((sum, e) => sum + e.total, 0);
+    return total > 0 ? (expense.total / total) * 100 : 0;
+  }
 
   ngAfterViewInit(): void {
     // Theme toggle (dark/light)
@@ -42,7 +161,12 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
           labels: ['Rent/Mortgage', 'Utilities', 'Groceries', 'Others'],
           datasets: [{
             data: [32, 20, 25, 23],
-            backgroundColor: [getComputedStyle(document.documentElement).getPropertyValue('--pie-blue'), getComputedStyle(document.documentElement).getPropertyValue('--pie-light-blue'), getComputedStyle(document.documentElement).getPropertyValue('--pie-teal'), getComputedStyle(document.documentElement).getPropertyValue('--pie-green')]
+            backgroundColor: [
+              getComputedStyle(document.documentElement).getPropertyValue('--pie-blue'),
+              getComputedStyle(document.documentElement).getPropertyValue('--pie-light-blue'),
+              getComputedStyle(document.documentElement).getPropertyValue('--pie-teal'),
+              getComputedStyle(document.documentElement).getPropertyValue('--pie-green')
+            ]
           }]
         },
         options: { plugins: { legend: { display: false } }, responsive: true, maintainAspectRatio: false }

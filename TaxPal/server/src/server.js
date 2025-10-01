@@ -1,52 +1,49 @@
-const express = require("express");
-const dotenv = require("dotenv");
+const express = require('express');
+const dotenv = require('dotenv');
+const mongoose = require('mongoose');
+const cors = require('cors');
+const path = require('path');
 
-// Always use absolute path for .env
-dotenv.config({ path: __dirname + "/.env" });
-console.log("MONGO_URI:", process.env.MONGO_URI); // For debugging
+// Load .env
+dotenv.config({ path: path.join(__dirname, '.env') });
 
-const cors = require("cors");
-const connectDB = require("./config/db");
 const app = express();
+app.use(express.json());
 
-// Quick request logger for debugging
-app.use((req, res, next) => {
-  console.log(new Date().toISOString(), req.method, req.originalUrl);
-  next();
+// Enable CORS for frontend
+app.use(cors({
+    origin: process.env.CLIENT_URL || 'http://localhost:4200',
+    credentials: true
+}));
+
+// MongoDB connection
+mongoose.connect(process.env.MONGO_URI)
+.then(() => console.log('MongoDB Atlas connected successfully'))
+.catch(err => console.error('MongoDB Atlas connection error:', err));
+
+// Routes (correct paths)
+const transactionRoutes = require('./apis/incomeExpenseapi/transactionsRoute');
+const dashboardRoutes   = require('./apis/dashboard/dashboard.routes');
+const userRoutes        = require('./apis/user/user.routes');
+const authRoutes        = require('./apis/auth/auth');
+const categoriesRoutes  = require('./apis/Categories/categoriesRoutes');
+
+// Mount routes
+app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/user', userRoutes);
+app.use('/api/transactions', transactionRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoriesRoutes);
+
+// Root route
+app.get('/', (req, res) => {
+    res.send('Welcome to TaxPal API 🚀');
 });
 
-// Middleware
-app.use(express.json()); // Parse JSON requests
-app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
-
-// Connect to MongoDB only if not testing
-if (process.env.NODE_ENV !== "test") {
-  connectDB();
-}
-
-// Routes
-const authRoutes = require("./routes/auth");
-const transactionRoutes = require("./routes/transactions");
-
-app.use("/api/auth", authRoutes);
-app.use("/api/transactions", transactionRoutes);
-
-// Test route
-app.get("/", (req, res) => {
-  res.send("Backend is running!");
-});
-
-// Start server only if run directly
+// Start server
 const PORT = process.env.PORT || 5000;
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
-}
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+});
 
-// Export app for testing
-module.exports = app;
-// Export app for testing
-module.exports = app;
-// Export app for testing
 module.exports = app;
