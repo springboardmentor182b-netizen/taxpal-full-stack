@@ -1,11 +1,53 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('./categoriesController');
+const authenticate = require('../auth/authMiddleware');
 
-router.get('/', controller.getAll);
-router.get('/:id', controller.getById);
-router.post('/', controller.create);
-router.put('/:id', controller.update);
-router.delete('/:id', controller.remove);
+router.get('/', authenticate, async (req, res) => {
+  try {
+    const categories = await controller.getAll(req.user.id, req.query.q);
+    res.json(categories);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get('/:id', authenticate, async (req, res) => {
+  try {
+    const category = await controller.getById(req.user.id, req.params.id);
+    res.json(category);
+  } catch (err) {
+    res.status(404).json({ error: err.message });
+  }
+});
+
+router.post('/', authenticate, async (req, res) => {
+  try {
+    const { name, description, isActive } = req.body;
+    const category = await controller.create(req.user.id, name, description, isActive);
+    res.status(201).json(category);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.put('/:id', authenticate, async (req, res) => {
+  try {
+    const { name, description, isActive } = req.body;
+    const category = await controller.update(req.user.id, req.params.id, name, description, isActive);
+    res.json(category);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete('/:id', authenticate, async (req, res) => {
+  try {
+    const result = await controller.remove(req.user.id, req.params.id);
+    res.json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 module.exports = router;
