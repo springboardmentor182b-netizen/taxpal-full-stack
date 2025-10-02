@@ -33,7 +33,7 @@ app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoriesRoutes);
+app.use('/api/Categories', categoriesRoutes);
 
 
 
