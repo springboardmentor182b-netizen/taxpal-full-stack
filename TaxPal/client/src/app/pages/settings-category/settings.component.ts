@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { NgFor, NgIf, NgClass } from '@angular/common';
+import { CategoriesService, CategoryDto } from '../../services/categories.service';
 
-interface Category { name: string; color: string; }
+interface Category { name: string; color: string; _id?: string; }
 
 @Component({
   selector: 'app-settings',
@@ -109,29 +110,28 @@ interface Category { name: string; color: string; }
     </main>
   `
 })
-export class SettingsComponent {
+export class SettingsComponent implements OnInit {
   selectedTab: 'expense' | 'income' = 'expense';
 
-  expenseCategories: Category[] = [
-    { name: 'Business Expenses', color: '#EF4444' },
-    { name: 'Office Rent', color: '#3B82F6' },
-    { name: 'Software Subscriptions', color: '#8B5CF6' },
-    { name: 'Professional Development', color: '#10B981' },
-    { name: 'Marketing', color: '#F59E0B' },
-    { name: 'Travel', color: '#EC4899' },
-    { name: 'Meals & Entertainment', color: '#6366F1' },
-    { name: 'Utilities', color: '#EF4444' }
-  ];
-
-  incomeCategories: Category[] = [
-    { name: 'Consulting Income', color: '#10B981' },
-    { name: 'Product Sales', color: '#3B82F6' },
-    { name: 'Interest Income', color: '#F59E0B' },
-    { name: 'Refunds', color: '#8B5CF6' },
-    { name: 'Other Income', color: '#6366F1' }
-  ];
+  expenseCategories: Category[] = [];
+  incomeCategories: Category[] = [];
 
   private palette = ['#EF4444','#3B82F6','#8B5CF6','#10B981','#F59E0B','#EC4899','#6366F1'];
+
+  constructor(private categoriesService: CategoriesService) {}
+
+  ngOnInit() {
+    this.loadCategories();
+  }
+
+  loadCategories() {
+    this.categoriesService.getCategories('expense').subscribe(categories => {
+      this.expenseCategories = categories.map(c => ({ ...c, color: this.getRandomColor() }));
+    });
+    this.categoriesService.getCategories('income').subscribe(categories => {
+      this.incomeCategories = categories.map(c => ({ ...c, color: this.getRandomColor() }));
+    });
+  }
 
   switchTab(tab: 'expense' | 'income') {
     this.selectedTab = tab;
@@ -140,22 +140,34 @@ export class SettingsComponent {
   addCategory() {
     const name = (window.prompt(`Add ${this.selectedTab} category name:`) || '').trim();
     if (!name) return;
-    const color = this.palette[(Math.random()*this.palette.length)|0];
-    const list = this.selectedTab === 'expense' ? this.expenseCategories : this.incomeCategories;
-    list.push({ name, color });
+    const category: Partial<CategoryDto> = { name, type: this.selectedTab, isActive: true };
+    this.categoriesService.createCategory(category).subscribe(newCategory => {
+      const color = this.getRandomColor();
+      const list = this.selectedTab === 'expense' ? this.expenseCategories : this.incomeCategories;
+      list.push({ ...newCategory, color });
+    });
   }
 
   editCategory(tab: 'expense'|'income', index: number) {
     const list = tab === 'expense' ? this.expenseCategories : this.incomeCategories;
     const current = list[index];
     const name = (window.prompt('Edit category name:', current.name) || '').trim();
-    if (!name) return;
-    list[index] = { ...current, name };
+    if (!name || !current._id) return;
+    this.categoriesService.updateCategory(current._id, { name }).subscribe(updated => {
+      list[index] = { ...updated, color: current.color };
+    });
   }
 
   deleteCategory(tab: 'expense'|'income', index: number) {
     const list = tab === 'expense' ? this.expenseCategories : this.incomeCategories;
     const c = list[index];
-    if (window.confirm(`Delete "${c.name}"?`)) list.splice(index, 1);
+    if (!c._id || !window.confirm(`Delete "${c.name}"?`)) return;
+    this.categoriesService.deleteCategory(c._id).subscribe(() => {
+      list.splice(index, 1);
+    });
+  }
+
+  private getRandomColor(): string {
+    return this.palette[(Math.random() * this.palette.length) | 0];
   }
 }

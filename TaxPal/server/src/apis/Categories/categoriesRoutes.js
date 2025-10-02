@@ -5,7 +5,8 @@ const authenticate = require('../auth/authMiddleware');
 
 router.get('/', authenticate, async (req, res) => {
   try {
-    const categories = await controller.getAll(req.user.id, req.query.q);
+    const type = req.query.type;
+    const categories = await controller.getAll(req.user.id, req.query.q, type);
     res.json(categories);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -23,8 +24,8 @@ router.get('/:id', authenticate, async (req, res) => {
 
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { name, description, isActive } = req.body;
-    const category = await controller.create(req.user.id, name, description, isActive);
+    const { name, description, type, isActive } = req.body;
+    const category = await controller.create(req.user.id, name, description, type, isActive);
     res.status(201).json(category);
   } catch (err) {
     res.status(400).json({ error: err.message });

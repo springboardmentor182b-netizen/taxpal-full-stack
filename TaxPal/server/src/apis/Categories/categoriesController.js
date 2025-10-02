@@ -1,17 +1,17 @@
 const Category = require('./categoriesModel');
 
 // GET all categories for a user
-exports.getAll = async (userId, q) => {
+exports.getAll = async (userId, q, type) => {
   try {
     let filter = { userId };
+    if (type && ['expense', 'income'].includes(type)) {
+      filter.type = type;
+    }
     if (q) {
-      filter = {
-        userId,
-        $or: [
-          { name: { $regex: q, $options: 'i' } },
-          { description: { $regex: q, $options: 'i' } }
-        ]
-      };
+      filter.$or = [
+        { name: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } }
+      ];
     }
     const categories = await Category.find(filter);
     return categories;
@@ -32,10 +32,11 @@ exports.getById = async (userId, id) => {
 };
 
 // CREATE new category for a user
-exports.create = async (userId, name, description, isActive) => {
+exports.create = async (userId, name, description, type, isActive) => {
   try {
     if (!name) throw new Error('Name is required');
-    const category = new Category({ userId, name, description, isActive });
+    if (!type || !['expense', 'income'].includes(type)) throw new Error('Valid type is required');
+    const category = new Category({ userId, name, description, type, isActive });
     const saved = await category.save();
     return saved;
   } catch (err) {
