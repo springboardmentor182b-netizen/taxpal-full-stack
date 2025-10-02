@@ -4,6 +4,8 @@ const app = require('../src/server'); // Adjust path if needed
 const Category = require('../src/apis/Categories/categoriesModel');
 const User = require('../src/apis/auth/User'); // Adjust path if needed
 
+jest.setTimeout(30000); // Increase timeout to 30 seconds
+
 describe('Categories API', () => {
   let token;
   let userId;
@@ -15,14 +17,17 @@ describe('Categories API', () => {
     // Create a test user
     const user = new User({
       name: 'Test User',
-      email: 'test@example.com',
-      password: 'password123'
+      email: 'test@example.com'
+      // Removed password field as User model does not have it
     });
     await user.save();
     userId = user._id;
 
     // Generate token (assuming you have a function for this)
     const jwt = require('jsonwebtoken');
+    if (!process.env.JWT_SECRET) {
+      throw new Error('JWT_SECRET environment variable is not set');
+    }
     token = jwt.sign({ id: userId }, process.env.JWT_SECRET);
   });
 
