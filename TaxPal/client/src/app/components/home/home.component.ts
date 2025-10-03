@@ -1,13 +1,13 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { RouterLink, RouterModule } from '@angular/router';
 import { SignInFormComponent } from '../signin/sign-in-form.component';
 import { SignUpFormComponent } from '../signup/sign-up-form.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterModule, SignInFormComponent, SignUpFormComponent],
+  imports: [CommonModule, RouterLink, RouterModule, SignInFormComponent, SignUpFormComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

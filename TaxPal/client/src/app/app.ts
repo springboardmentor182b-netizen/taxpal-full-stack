@@ -9,8 +9,12 @@ import { ProfileNavbarComponent } from './components/navbar/profile-navbar.compo
   standalone: true,
   imports: [CommonModule, RouterOutlet, NavbarComponent, ProfileNavbarComponent],
   template: `
-    <app-navbar *ngIf="!isProfilePage"></app-navbar>
-    <app-profile-navbar *ngIf="isProfilePage"></app-profile-navbar>
+    <!-- Display regular navbar on home page -->
+    <app-navbar *ngIf="shouldShowMainNavbar()"></app-navbar>
+    
+    <!-- Display profile navbar on user-related pages -->
+    <app-profile-navbar *ngIf="shouldShowProfileNavbar()"></app-profile-navbar>
+    
     <router-outlet></router-outlet>
   `,
   styles: [`
@@ -20,8 +24,8 @@ import { ProfileNavbarComponent } from './components/navbar/profile-navbar.compo
   `]
 })
 export class App implements OnInit {
+  private isProfilePage: boolean = false;
   title = 'TaxPal';
-  isProfilePage = false;
   
   constructor(private router: Router) {}
   
@@ -43,5 +47,22 @@ export class App implements OnInit {
                          url.includes('/budget') ||
                          url.includes('/reports') ||
                          url.includes('/tax-estimator');
+  }
+  
+  shouldShowMainNavbar(): boolean {
+    // Show main navbar only on routes that aren't user profile related
+    const path = window.location.pathname;
+    return !this.isUserProfilePath(path);
+  }
+  
+  shouldShowProfileNavbar(): boolean {
+    // Show profile navbar on user profile related routes
+    const path = window.location.pathname;
+    return this.isUserProfilePath(path);
+  }
+  
+  private isUserProfilePath(path: string): boolean {
+    const userPaths = ['/user-profile', '/profile-settings', '/transactions', '/budget', '/reports', '/tax-estimator'];
+    return userPaths.some(userPath => path.startsWith(userPath));
   }
 }

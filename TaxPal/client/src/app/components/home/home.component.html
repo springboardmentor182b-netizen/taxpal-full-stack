@@ -15,7 +15,7 @@
         </div>
         <div class="profile-menu-divider"></div>
         <div class="profile-menu-items">
-          <a routerLink="/user-profile" class="profile-menu-item" (click)="closeProfileMenu()">
+          <a [routerLink]="['/user-profile']" class="profile-menu-item" (click)="closeProfileMenu()">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="3" width="7" height="9"/>
               <rect x="14" y="3" width="7" height="5"/>
@@ -49,7 +49,7 @@
     <p class="subtitle">Maximize your tax savings with our intuitive platform built specifically for independent professionals and small business owners.</p>
     <div class="cta-buttons">
       <a *ngIf="!isLoggedIn" class="cta-button primary" (click)="openSignUpForm()">Get started today</a>
-      <a *ngIf="isLoggedIn" routerLink="/user-profile" class="cta-button primary">Go to Dashboard</a>
+      <a *ngIf="isLoggedIn" [routerLink]="['/user-profile']" class="cta-button primary">Go to Dashboard</a>
       <a routerLink="/features" class="cta-button secondary">Learn more</a>
     </div>
   </div>
