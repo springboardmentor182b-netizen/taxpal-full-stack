@@ -69,13 +69,14 @@ export const requestReset = async (req: Request, res: Response) => {
 // RESET PASSWORD
 export const reset = async (req: Request, res: Response) => {
   try {
+    const { password, confirmPassword } = req.body;   // 👈 match Angular
     const token = req.params.token;
-    const { newPassword, confirmPassword } = req.body;
 
-    const response = await resetPassword(token, newPassword, confirmPassword);
+    const response = await resetPassword(token, password, confirmPassword);
     res.status(200).json(response);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 };
+
 
