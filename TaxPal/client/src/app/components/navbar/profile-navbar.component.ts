@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 
@@ -91,47 +91,18 @@ import { RouterLink, Router } from '@angular/router';
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
               </svg>
             </button>
-            <div class="profile-dropdown">
-              <button type="button" class="profile-avatar" (click)="openMenu($event)">
-                <span>{{ userInitial || 'U' }}</span>
-              </button>
-              
-              <!-- Simplified profile menu dropdown -->
-              <div class="profile-menu-dropdown" *ngIf="showProfileMenu" (click)="$event.stopPropagation()">
-                <div class="profile-section">
-                  <div class="profile-info centered-profile">
-                    <h3>{{ userName || 'User' }}</h3>
-                    <p>{{ userEmail }}</p>
-                  </div>
-                </div>
-                <div class="profile-menu-divider"></div>
-                <div class="profile-menu-items">
-                  <a routerLink="/profile-settings" class="profile-menu-item" (click)="closeMenu()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <circle cx="12" cy="12" r="3"></circle>
-                      <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-                    </svg>
-                    <span>Profile Settings</span>
-                  </a>
-                  <div class="profile-menu-divider"></div>
-                  <a routerLink="/" class="profile-menu-item logout-item" (click)="logoutAndClose($event)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                      <polyline points="16 17 21 12 16 7"></polyline>
-                      <line x1="21" y1="12" x2="9" y2="12"></line>
-                    </svg>
-                    <span>Logout</span>
-                  </a>
-                </div>
-              </div>
-            </div>
+            <button class="logout-btn" (click)="logout()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>
     </nav>
-    
-    <!-- Backdrop overlay when menu is open -->
-    <div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeMenu()"></div>
   `,
   styles: [`
     .navbar {
@@ -155,7 +126,7 @@ import { RouterLink, Router } from '@angular/router';
       width: 100%;
       border-bottom: 1px solid #e5e7eb;
       position: relative;
-      overflow: hidden;  /* Contain the floating emojis */
+      overflow: hidden;
     }
     
     .navbar-container {
@@ -282,27 +253,42 @@ import { RouterLink, Router } from '@angular/router';
       padding-left: 1rem;
       flex: 0 0 auto;
       position: absolute;
-      right: -1rem;
+      right: 2rem;
     }
     
-    .theme-toggle-btn {
+    .theme-toggle-btn, .logout-btn {
       background: transparent;
       border: none;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 0.5rem;
-      border-radius: 50%;
-      transition: background-color 0.3s ease;
-      position: relative;
-      width: 36px;
-      height: 36px;
-      flex-shrink: 0; /* Prevent shrinking */
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+      color: #4b5563;
+      font-weight: 500;
+      font-size: 0.9rem;
     }
     
-    .theme-toggle-btn:hover {
+    .theme-toggle-btn {
+      padding: 0.5rem;
+      width: 36px;
+      height: 36px;
+      gap: 0;
+    }
+    
+    .theme-toggle-btn:hover, .logout-btn:hover {
       background-color: rgba(0, 0, 0, 0.05);
+    }
+    
+    .logout-btn:hover {
+      color: #ef4444;
+    }
+    
+    .logout-btn svg {
+      stroke: currentColor;
     }
     
     .theme-icon {
@@ -325,18 +311,6 @@ import { RouterLink, Router } from '@angular/router';
       transform: rotate(0) scale(1);
     }
     
-    /* When the dark mode is active */
-    .dark-mode .moon-icon {
-      opacity: 1;
-      transform: rotate(0) scale(1);
-    }
-    
-    .dark-mode .sun-icon {
-      opacity: 0;
-      transform: rotate(30deg) scale(0);
-    }
-    
-    /* Dark mode styles */
     .navbar.dark {
       background-color: #111827;
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
@@ -392,12 +366,16 @@ import { RouterLink, Router } from '@angular/router';
       stroke: #60a5fa;
     }
     
-    .dark .theme-toggle-btn {
-      background-color: transparent;
+    .dark .theme-toggle-btn, .dark .logout-btn {
+      color: #e5e7eb;
     }
     
-    .dark .theme-toggle-btn:hover {
+    .dark .theme-toggle-btn:hover, .dark .logout-btn:hover {
       background-color: rgba(255, 255, 255, 0.1);
+    }
+    
+    .dark .logout-btn:hover {
+      color: #f87171;
     }
     
     .dark .theme-icon {
@@ -418,49 +396,6 @@ import { RouterLink, Router } from '@angular/router';
       transform: rotate(30deg) scale(0);
     }
     
-    /* User profile indicator styles */
-    .user-profile-indicator {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.5rem 0.75rem;
-      border-radius: 0.5rem;
-      background-color: #f3f4f6;
-      margin-right: 2rem;
-      transition: all 0.3s ease;
-    }
-    
-    .dark .user-profile-indicator {
-      background-color: #374151;
-    }
-    
-    .user-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 32px;
-      height: 32px;
-      border-radius: 50%;
-      background-color: #e5e7eb;
-      color: #4b5563;
-    }
-    
-    .dark .user-avatar {
-      background-color: #4b5563;
-      color: #e5e7eb;
-    }
-    
-    .user-name {
-      font-weight: 500;
-      color: #4b5563;
-      font-size: 0.9rem;
-    }
-    
-    .dark .user-name {
-      color: #e5e7eb;
-    }
-    
-    /* Floating emoji animation */
     .floating-emoji {
       position: absolute;
       font-size: 1.5rem;
@@ -489,507 +424,42 @@ import { RouterLink, Router } from '@angular/router';
       }
     }
     
-    .dark .floating-emoji {
-      filter: brightness(1.2);
-    }
-    
-    /* Media queries */
-    @media (max-width: 1024px) {
-      .nav-links {
-        position: static;
-        transform: none;
-        margin: 0 auto;
-        justify-content: center;
-        gap: 2rem;
-      }
-      
-      .navbar-container {
-        justify-content: space-between;
-      }
-      
-      .right-container {
-        position: static;
-        right: auto;
-      }
-      
-      .user-profile-indicator {
-        margin-right: 1rem;
-      }
-      
-      .logo {
-        margin-left: 1rem;
-      }
-    }
-    
-    @media (max-width: 768px) {
-      .navbar-container {
-        padding: 0 1rem;
-      }
-      
-      .navbar-box {
-        padding: 1rem 1.5rem;
-      }
-      
-      .nav-links {
-        gap: 1.5rem;
-      }
-      
-      .right-container {
-        gap: 1rem;
-      }
-      
-      .user-profile-indicator {
-        padding: 0.4rem 0.6rem;
-      }
-    }
-    
-    @media (max-width: 640px) {
-      .nav-links {
-        display: none;
-      }
-      
-      .logo a {
-        font-size: 1.4rem;
-      }
-      
-      .navbar-box {
-        padding: 0.75rem 0;
-      }
-      
-      .theme-toggle-btn {
-        width: 32px;
-        height: 32px;
-        padding: 0.4rem;
-      }
-      
-      .user-profile-indicator {
-        margin-right: 0.5rem;
-      }
-      
-      .user-name {
-        display: none;
-      }
-    }
-    
-    /* Fix for Tax Estimator text */
-    .nav-link span {
-      white-space: nowrap;
-      position: relative;
-      z-index: 1;
-    }
-    
-    /* Simple Profile Menu Overlay */
-    .profile-menu-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background-color: rgba(0, 0, 0, 0.5);
+    /* Logout button styles */
+    .logout-btn {
       display: flex;
       align-items: center;
-      justify-content: center;
-      z-index: 9999999;
-    }
-    
-    .profile-menu-container {
-      width: 280px;
-      background-color: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    }
-    
-    .dark .profile-menu-container {
-      background-color: #1f2937;
-    }
-    
-    .profile-menu-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 15px 20px;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    
-    .dark .profile-menu-header {
-      border-bottom-color: #374151;
-    }
-    
-    .profile-menu-header span {
-      font-weight: 600;
-      color: #111827;
-    }
-    
-    .dark .profile-menu-header span {
-      color: #f9fafb;
-    }
-    
-    .close-menu-btn {
-      background: none;
-      border: none;
-      font-size: 24px;
-      line-height: 1;
-      color: #6b7280;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      background-color: transparent;
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      font-weight: 500;
+      font-size: 0.9rem;
       cursor: pointer;
-    }
-    
-    .close-menu-btn:hover {
-      color: #111827;
-    }
-    
-    .dark .close-menu-btn:hover {
-      color: #f9fafb;
-    }
-    
-    .profile-menu-items {
-      padding: 10px 0;
-    }
-    
-    .profile-menu-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 20px;
-      color: #4b5563;
-      text-decoration: none;
       transition: all 0.2s ease;
     }
-    
-    .profile-menu-item:hover {
-      background-color: #f3f4f6;
-      color: #1f2937;
+
+    .logout-btn svg {
+      stroke: #ef4444;
     }
-    
-    .dark .profile-menu-item {
-      color: #e5e7eb;
+
+    .logout-btn:hover {
+      background-color: rgba(239, 68, 68, 0.1);
     }
-    
-    .dark .profile-menu-item:hover {
-      background-color: #374151;
-      color: #f9fafb;
+
+    /* Dark mode styles */
+    .dark .logout-btn {
+      color: #f87171;
+      border-color: rgba(248, 113, 113, 0.3);
     }
-    
-    .profile-menu-divider {
-      height: 1px;
-      background-color: #e5e7eb;
-      margin: 5px 0;
+
+    .dark .logout-btn svg {
+      stroke: #f87171;
     }
-    
-    .dark .profile-menu-divider {
-      background-color: #374151;
-    }
-    
-    /* Profile Avatar Styles */
-    .profile-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 36px;
-      height: 36px;
-      border-radius: 50%;
-      background-color: #3b82f6;
-      color: #ffffff;
-      font-weight: 600;
-      font-size: 0.9rem;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-    }
-    
-    .profile-avatar:hover {
-      background-color: #60a5fa;
-      color: #111827;
-      box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
-    }
-    
-    .dark .profile-avatar:hover {
-      background-color: #93c5fd;
-      box-shadow: 0 4px 6px rgba(96, 165, 250, 0.4);
-    }
-    
-    /* Profile dropdown positioning */
-    .profile-dropdown {
-      position: relative;
-      margin-right: 2rem;
-      z-index: 99999; /* Increased z-index */
-    }
-    
-    /* Repositioned menu dropdown with better alignment */
-    .profile-menu-dropdown {
-      position: fixed;
-      top: 70px; /* Slightly higher for better positioning */
-      right: 2rem;
-      width: 300px;
-      background-color: white;
-      border-radius: 10px;
-      overflow: visible;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 999999;
-      animation: dropdown-appear 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-      transform-origin: top right;
-    }
-    
-    /* Ensure backdrop is above hero section */
-    .menu-backdrop {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 99998; /* Just below dropdown but above everything else */
-      background-color: rgba(0, 0, 0, 0.2); /* Slight darkening */
-    }
-    
-    /* Additional style to ensure menu appearance */
-    .profile-menu-dropdown::before {
-      content: '';
-      position: absolute;
-      top: -8px;
-      right: 12px;
-      width: 16px;
-      height: 16px;
-      background-color: white;
-      transform: rotate(45deg);
-      border-top: 1px solid rgba(0, 0, 0, 0.05);
-      border-left: 1px solid rgba(0, 0, 0, 0.05);
-      z-index: -1;
-    }
-    
-    .dark .profile-menu-dropdown::before {
-      background-color: #1f2937;
-      border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    /* Make all other elements work with the dropdown */
-    body {
-      position: relative;
-    }
-    
-    /* Updated animation for better appearance */
-    @keyframes dropdown-appear {
-      from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-    
-    /* Centered profile info without avatar duplication */
-    .centered-profile {
-      text-align: center;
-      padding: 1.25rem 1rem;
-      width: 100%;
-    }
-    
-    .centered-profile h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #111827;
-    }
-    
-    .centered-profile p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #6b7280;
-    }
-    
-    .dark .centered-profile h3 {
-      color: #f9fafb;
-    }
-    
-    .dark .centered-profile p {
-      color: #9ca3baf;
-    }
-    
-    /* Enhanced logout item */
-    .logout-item {
-      color: #ef4444 !important; /* Red color for logout */
-    }
-    
-    .logout-item svg {
-      color: #ef4444 !important;
-      stroke: #ef4444 !important;
-    }
-    
-    .dark .logout-item {
-      color: #f87171 !important;
-    }
-    
-    .dark .logout-item svg {
-      color: #f87171 !important;
-      stroke: #f87171 !important;
-    }
-    
-    .logout-item:hover {
-      background-color: rgba(239, 68, 68, 0.1) !important;
-    }
-    
-    .dark .logout-item:hover {
-      background-color: rgba(248, 113, 113, 0.1) !important;
-    }
-    
-    /* Fix for dropdown alignment and top section */
-    .profile-section {
-      padding: 0; /* Remove default padding */
-    }
-    
-    /* Improved dropdown menu */
-    .profile-menu-dropdown {
-      position: fixed;
-      top: 70px;
-      right: 2rem;
-      width: 270px; /* Smaller width for better proportions */
-      background-color: white;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
-      z-index: 999999;
-      animation: dropdown-appear 0.2s ease;
-    }
-    
-    /* Global Dark Mode Variables */
-    :host {
-      --text-color: #1f2937;
-      --bg-color: #ffffff;
-      --border-color: #e5e7eb;
-      --highlight-color: #3b82f6;
-      --highlight-hover: #2563eb;
-      --muted-color: #6b7280;
-      --bg-muted: #f3f4f6;
-    }
-    
-    :host-context(.dark-mode) {
-      --text-color: #f9fafb;
-      --bg-color: #111827;
-      --border-color: #1f2937;
-      --highlight-color: #60a5fa;
-      --highlight-hover: #93c5fd;
-      --muted-color: #9ca3baf;
-      --bg-muted: #374151;
-    }
-    
-    /* Additional Dark Mode Styles for Global Application */
-    :root.dark-mode {
-      color-scheme: dark;
-    }
-    
-    :root.dark {
-      color-scheme: dark;
-    }
-    
-    body.dark-mode {
-      background-color: #111827;
-      color: #f9fafb;
-    }
-    
-    body.dark {
-      background-color: #111827;
-      color: #f9fafb;
-    }
-    
-    /* Dark mode hero section */
-    body.dark-mode .hero-section,
-    body.dark .hero-section {
-      background-color: #111827;
-      color: #f9fafb;
-    }
-    
-    /* Dark mode card styles */
-    body.dark-mode .card,
-    body.dark .card {
-      background-color: #1f2937;
-      border-color: #374151;
-    }
-    
-    /* Dark mode footer */
-    body.dark-mode footer,
-    body.dark footer {
-      background-color: #111827;
-      color: #f9fafb;
-      border-top-color: #1f2937;
-    }
-    
-    /* Dark mode for buttons */
-    body.dark-mode .btn-primary,
-    body.dark .btn-primary {
-      background-color: #3b82f6;
-      color: white;
-    }
-    
-    body.dark-mode .btn-secondary,
-    body.dark .btn-secondary {
-      background-color: #1f2937;
-      color: #e5e7eb;
-      border-color: #374151;
-    }
-    
-    /* Dark mode for inputs */
-    body.dark-mode input, 
-    body.dark-mode select, 
-    body.dark-mode textarea,
-    body.dark input, 
-    body.dark select, 
-    body.dark textarea {
-      background-color: #1f2937;
-      color: #f9fafb;
-      border-color: #374151;
-    }
-    
-    /* Ensure all text is properly colored in dark mode */
-    body.dark-mode h1, 
-    body.dark-mode h2, 
-    body.dark-mode h3, 
-    body.dark-mode h4, 
-    body.dark-mode h5, 
-    body.dark-mode h6,
-    body.dark-mode p,
-    body.dark h1, 
-    body.dark h2, 
-    body.dark h3, 
-    body.dark h4, 
-    body.dark h5, 
-    body.dark h6,
-    body.dark p {
-      color: #f9fafb;
-    }
-    
-    /* Add dark mode compatible links */
-    body.dark-mode a:not(.nav-link):not(.profile-menu-item),
-    body.dark a:not(.nav-link):not(.profile-menu-item) {
-      color: #60a5fa;
-    }
-    
-    body.dark-mode a:not(.nav-link):not(.profile-menu-item):hover,
-    body.dark a:not(.nav-link):not(.profile-menu-item):hover {
-      color: #93c5fd;
-    }
-    
-    /* Centered profile info without avatar duplication */
-    .centered-profile {
-      text-align: center;
-      padding: 1.25rem 1rem;
-      width: 100%;
-    }
-    
-    .centered-profile h3 {
-      margin: 0 0 0.5rem 0;
-      font-size: 1.1rem;
-      font-weight: 600;
-      color: #111827;
-    }
-    
-    .centered-profile p {
-      margin: 0;
-      font-size: 0.9rem;
-      color: #6b7280;
-    }
-    
-    .dark .centered-profile h3 {
-      color: #f9fafb;
-    }
-    
-    .dark .centered-profile p {
-      color: #9ca3baf;
+
+    .dark .logout-btn:hover {
+      background-color: rgba(248, 113, 113, 0.1);
     }
   `]
 })
@@ -999,93 +469,31 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
   private animationInterval: any;
-  showProfileMenu = false;
-  userEmail: string = '';
-  userName: string = '';
-  userInitial: string = '';
   
-  constructor(private router: Router, private renderer: Renderer2, private elementRef: ElementRef) {
+  constructor(private router: Router) {
     // Check for saved preference on component initialization
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'true') {
       this.isDarkMode = true;
       this.applyDarkMode();
     }
-    
-    // Get user info from localStorage
-    this.loadUserData();
   }
 
   ngOnInit() {
     this.startEmojiAnimation();
     
-    // Add global click handler to close menu when clicking outside
-    this.renderer.listen('document', 'click', (event) => {
-      if (this.showProfileMenu && 
-          !this.elementRef.nativeElement.querySelector('.profile-menu-dropdown')?.contains(event.target) &&
-          !this.elementRef.nativeElement.querySelector('.profile-avatar')?.contains(event.target)) {
-        this.closeMenu();
-      }
-    });
-    
     // Apply dark mode if needed on component init
     if (this.isDarkMode) {
-      console.log('Component initialized with dark mode enabled');
-      // Delay to ensure the DOM is ready
       setTimeout(() => {
         this.applyDarkMode();
       }, 100);
     }
-    
-    // Refresh user data when storage changes
-    window.addEventListener('storage', () => {
-      this.loadUserData();
-    });
   }
 
   ngOnDestroy() {
     if (this.animationInterval) {
       clearInterval(this.animationInterval);
     }
-  }
-
-  // Remove all other toggle methods and keep only these clean, simple methods
-  openMenu(event: Event) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    this.showProfileMenu = true;
-    console.log('Menu opened cleanly');
-  }
-
-  closeMenu() {
-    this.showProfileMenu = false;
-    console.log('Menu closed cleanly');
-  }
-
-  logoutAndClose(event: Event) {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-    
-    this.closeMenu();
-    
-    // Clear all storage
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    // Navigate to home with force reload to ensure complete reset
-    window.location.href = '/';
-  }
-
-  // Load user data from localStorage
-  private loadUserData() {
-    this.userEmail = localStorage.getItem('user_email') || 'user@example.com';
-    this.userName = localStorage.getItem('user_name') || 'User';
-    this.userInitial = this.userName.charAt(0).toUpperCase();
   }
 
   private startEmojiAnimation() {
@@ -1124,538 +532,40 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
     
-    // Apply dark mode with delay to ensure proper application
     setTimeout(() => {
       this.applyDarkMode();
     }, 0);
     
     localStorage.setItem('darkMode', this.isDarkMode.toString());
-    console.log(`Dark mode toggled to: ${this.isDarkMode ? 'enabled' : 'disabled'}`);
   }
 
   private applyDarkMode() {
-    console.log('Applying dark mode:', this.isDarkMode);
-    
-    // Create a style element with CSS rules to force dark mode
     if (this.isDarkMode) {
-      // Remove any existing dark mode style
-      const existingStyle = document.getElementById('dark-mode-global');
-      if (existingStyle) existingStyle.remove();
-      
-      // Create new style element with improved color palette
-      const styleEl = document.createElement('style');
-      styleEl.id = 'dark-mode-global';
-      styleEl.textContent = `
-        body, html { 
-          background-color: #0f172a !important; 
-          color: #f9fafb !important; 
-        }
-        
-        .navbar.dark {
-          background-color: #0f172a !important;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3) !important;
-        }
-        
-        .navbar-box.dark {
-          background-color: #0f172a !important;
-          color: #f9fafb !important;
-          border-bottom: 1px solid #1e293b !important;
-        }
-        
-        .dark .logo a {
-          color: #f9fafb;
-        }
-        
-        .dark .calculator-icon {
-          stroke: #60a5fa;
-        }
-        
-        .dark .logo a:hover {
-          color: #60a5fa;
-        }
-        
-        .dark .logo a:hover .calculator-icon {
-          stroke: #93c5fd;
-        }
-        
-        .dark .nav-link {
-          color: #e5e7eb;
-        }
-        
-        .dark .nav-icon {
-          stroke: #9ca3baf;
-        }
-        
-        .dark .nav-link:hover {
-          color: #60a5fa;
-        }
-        
-        .dark .nav-link:hover .nav-icon {
-          stroke: #60a5fa;
-        }
-        
-        .dark .nav-link::before {
-          background-color: #60a5fa;
-        }
-        
-        .dark .nav-link.active {
-          color: #60a5fa;
-        }
-        
-        .dark .nav-link.active .nav-icon {
-          stroke: #60a5fa;
-        }
-        
-        .dark .theme-toggle-btn {
-          background-color: transparent;
-        }
-        
-        .dark .theme-toggle-btn:hover {
-          background-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        .dark .theme-icon {
-          stroke: #9ca3baf;
-        }
-        
-        .dark .theme-toggle-btn:hover .theme-icon {
-          stroke: #60a5fa;
-        }
-        
-        .dark .moon-icon {
-          opacity: 1;
-          transform: rotate(0) scale(1);
-        }
-        
-        .dark .sun-icon {
-          opacity: 0;
-          transform: rotate(30deg) scale(0);
-        }
-        
-        /* User profile indicator styles */
-        .user-profile-indicator {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.5rem 0.75rem;
-          border-radius: 0.5rem;
-          background-color: #374151;
-          margin-right: 2rem;
-          transition: all 0.3s ease;
-        }
-        
-        .user-avatar {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 32px;
-          height: 32px;
-          border-radius: 50%;
-          background-color: #4b5563;
-          color: #e5e7eb;
-        }
-        
-        .user-name {
-          font-weight: 500;
-          color: #e5e7eb;
-          font-size: 0.9rem;
-        }
-        
-        /* Floating emoji animation */
-        .floating-emoji {
-          position: absolute;
-          font-size: 1.5rem;
-          opacity: 0;
-          z-index: 1;
-          pointer-events: none;
-          animation: float 8s linear forwards;
-          transform: translateZ(0);
-          will-change: transform, opacity, top, left;
-        }
-        
-        @keyframes float {
-          0% {
-            opacity: 0;
-            transform: translateY(0) rotate(0deg) scale(0.8);
-          }
-          10% {
-            opacity: 1;
-          }
-          90% {
-            opacity: 1;
-          }
-          100% {
-            opacity: 0;
-            transform: translateY(-100px) rotate(360deg) scale(1.2);
-          }
-        }
-        
-        /* Media queries */
-        @media (max-width: 1024px) {
-          .nav-links {
-            position: static;
-            transform: none;
-            margin: 0 auto;
-            justify-content: center;
-            gap: 2rem;
-          }
-          
-          .navbar-container {
-            justify-content: space-between;
-          }
-          
-          .right-container {
-            position: static;
-            right: auto;
-          }
-          
-          .user-profile-indicator {
-            margin-right: 1rem;
-          }
-          
-          .logo {
-            margin-left: 1rem;
-          }
-        }
-        
-        @media (max-width: 768px) {
-          .navbar-container {
-            padding: 0 1rem;
-          }
-          
-          .navbar-box {
-            padding: 1rem 1.5rem;
-          }
-          
-          .nav-links {
-            gap: 1.5rem;
-          }
-          
-          .right-container {
-            gap: 1rem;
-          }
-          
-          .user-profile-indicator {
-            padding: 0.4rem 0.6rem;
-          }
-        }
-        
-        @media (max-width: 640px) {
-          .nav-links {
-            display: none;
-          }
-          
-          .logo a {
-            font-size: 1.4rem;
-          }
-          
-          .navbar-box {
-            padding: 0.75rem 0;
-          }
-          
-          .theme-toggle-btn {
-            width: 32px;
-            height: 32px;
-            padding: 0.4rem;
-          }
-          
-          .user-profile-indicator {
-            margin-right: 0.5rem;
-          }
-          
-          .user-name {
-            display: none;
-          }
-        }
-        
-        /* Fix for Tax Estimator text */
-        .nav-link span {
-          white-space: nowrap;
-          position: relative;
-          z-index: 1;
-        }
-        
-        /* Simple Profile Menu Overlay */
-        .profile-menu-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 9999999;
-        }
-        
-        .profile-menu-container {
-          width: 280px;
-          background-color: white;
-          border-radius: 8px;
-          overflow: hidden;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        
-        .dark .profile-menu-container {
-          background-color: #1f2937;
-        }
-        
-        .profile-menu-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 15px 20px;
-          border-bottom: 1px solid #e5e7eb;
-        }
-        
-        .dark .profile-menu-header {
-          border-bottom-color: #374151;
-        }
-        
-        .profile-menu-header span {
-          font-weight: 600;
-          color: #111827;
-        }
-        
-        .dark .profile-menu-header span {
-          color: #f9fafb;
-        }
-        
-        .close-menu-btn {
-          background: none;
-          border: none;
-          font-size: 24px;
-          line-height: 1;
-          color: #6b7280;
-          cursor: pointer;
-        }
-        
-        .close-menu-btn:hover {
-          color: #111827;
-        }
-        
-        .dark .close-menu-btn:hover {
-          color: #f9fafb;
-        }
-        
-        .profile-menu-items {
-          padding: 10px 0;
-        }
-        
-        .profile-menu-item {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          padding: 12px 20px;
-          color: #4b5563;
-          text-decoration: none;
-          transition: all 0.2s ease;
-        }
-        
-        .profile-menu-item:hover {
-          background-color: #f3f4f6;
-          color: #1f2937;
-        }
-        
-        .dark .profile-menu-item {
-          color: #e5e7eb;
-        }
-        
-        .dark .profile-menu-item:hover {
-          background-color: #374151;
-          color: #f9fafb;
-        }
-        
-        .profile-menu-divider {
-          height: 1px;
-          background-color: #e5e7eb;
-          margin: 5px 0;
-        }
-        
-        .dark .profile-menu-divider {
-          background-color: #374151;
-        }
-        
-        /* Profile Avatar Styles */
-        .profile-avatar {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 36px;
-          height: 36px;
-          border-radius: 50%;
-          background-color: #3b82f6;
-          color: #ffffff;
-          font-weight: 600;
-          font-size: 0.9rem;
-          border: none;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-        }
-        
-        .profile-avatar:hover {
-          background-color: #60a5fa;
-          color: #111827;
-          box-shadow: 0 2px 4px rgba(96, 165, 250, 0.3);
-        }
-        
-        .dark .profile-avatar:hover {
-          background-color: #93c5fd;
-          box-shadow: 0 4px 6px rgba(96, 165, 250, 0.4);
-        }
-        
-        /* Profile dropdown positioning */
-        .profile-dropdown {
-          position: relative;
-          margin-right: 2rem;
-          z-index: 99999; /* Increased z-index */
-        }
-        
-        /* Repositioned menu dropdown with better alignment */
-        .profile-menu-dropdown {
-          position: fixed;
-          top: 70px; /* Slightly higher for better positioning */
-          right: 2rem;
-          width: 300px;
-          background-color: white;
-          border-radius: 10px;
-          overflow: visible;
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2), 0 4px 8px rgba(0, 0, 0, 0.1);
-          z-index: 999999;
-          animation: dropdown-appear 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-          transform-origin: top right;
-        }
-        
-        /* Ensure backdrop is above hero section */
-        .menu-backdrop {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          z-index: 99998; /* Just below dropdown but above everything else */
-          background-color: rgba(0, 0, 0, 0.2); /* Slight darkening */
-        }
-        
-        /* Additional style to ensure menu appearance */
-        .profile-menu-dropdown::before {
-          content: '';
-          position: absolute;
-          top: -8px;
-          right: 12px;
-          width: 16px;
-          height: 16px;
-          background-color: white;
-          transform: rotate(45deg);
-          border-top: 1px solid rgba(0, 0, 0, 0.05);
-          border-left: 1px solid rgba(0, 0, 0, 0.05);
-          z-index: -1;
-        }
-        
-        .dark .profile-menu-dropdown::before {
-          background-color: #1f2937;
-          border-color: rgba(255, 255, 255, 0.1);
-        }
-        
-        /* Make all other elements work with the dropdown */
-        body {
-          position: relative;
-        }
-        
-        /* Updated animation for better appearance */
-        @keyframes dropdown-appear {
-          from { opacity: 0; transform: translateY(-8px) scale(0.98); }
-          to { opacity: 1; transform: translateY(0) scale(1); }
-        }
-      `;
-      
-      // Add the style to head
-      document.head.appendChild(styleEl);
-      
-      // Add classes to body and html
       document.body.classList.add('dark-mode');
       document.documentElement.classList.add('dark-mode');
       document.body.classList.add('dark');
       document.documentElement.classList.add('dark');
-      
-      // Force a repaint by temporarily changing display
-      document.body.style.display = 'none';
-      // Trigger reflow
-      void document.body.offsetHeight;
-      document.body.style.display = '';
-      
     } else {
-      // Remove dark mode style if it exists
-      const darkModeStyle = document.getElementById('dark-mode-global');
-      if (darkModeStyle) darkModeStyle.remove();
-      
-      // Remove classes
       document.body.classList.remove('dark-mode');
       document.documentElement.classList.remove('dark-mode');
       document.body.classList.remove('dark');
       document.documentElement.classList.remove('dark');
     }
     
-    // Ensure hero section is updated by dispatching a custom event
+    // Dispatch event for other components
     window.dispatchEvent(new CustomEvent('darkModeChanged', { 
       detail: { isDarkMode: this.isDarkMode } 
     }));
   }
   
-  private injectGlobalStyles() {
-    // Remove any existing injected style
-    this.removeInjectedStyles();
+  logout() {
+    // Clear user data from localStorage
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
     
-    // Create a new style element
-    const style = document.createElement('style');
-    style.id = 'dark-mode-styles';
-    style.textContent = `
-      body, html { background-color: #111827 !important; color: #f9fafb !important; }
-      .hero-section, section, .container, .content-area, main, .main-content { 
-        background-color: #111827 !important; 
-        color: #f9fafb !important; 
-      }
-      .card, .box, .panel { 
-        background-color: #1f2937 !important; 
-        color: #f9fafb !important; 
-        border-color: #374151 !important; 
-      }
-      h1, h2, h3, h4, h5, h6, p, span:not(.icon):not(.material-icons) { 
-        color: #f9fafb !important; 
-      }
-      a:not(.nav-link):not(.profile-menu-item) { 
-        color: #60a5fa !important; 
-      }
-      a:not(.nav-link):not(.profile-menu-item):hover { 
-        color: #93c5fd !important; 
-      }
-    `;
-    
-    // Append to document head
-    document.head.appendChild(style);
-    console.log('Injected global dark mode styles');
-  }
-  
-  private removeInjectedStyles() {
-    const style = document.getElementById('dark-mode-styles');
-    if (style) {
-      style.remove();
-      console.log('Removed injected dark mode styles');
-    }
-  }
-  
-  private updateMetaThemeColor(color: string) {
-    // Update meta theme-color for browser UI
-    let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement('meta');
-      metaThemeColor.setAttribute('name', 'theme-color');
-      document.head.appendChild(metaThemeColor);
-    }
-    metaThemeColor.setAttribute('content', color);
-    console.log('Updated meta theme color to:', color);
+    // Navigate to home page
+    window.location.href = '/';
   }
   
   isActiveRoute(route: string): boolean {

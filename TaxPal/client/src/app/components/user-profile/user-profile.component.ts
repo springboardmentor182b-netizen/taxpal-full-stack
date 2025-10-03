@@ -54,6 +54,8 @@ export class UserProfileComponent implements OnInit {
   tooltipStyle = { display: 'none', left: '0px', top: '0px' };
   tooltipData: { month: string, label: string, value: string } = { month: '', label: '', value: '' };
 
+  showProfileMenu: boolean = false; // Add this property
+
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
@@ -431,5 +433,23 @@ export class UserProfileComponent implements OnInit {
     if (tooltip) {
       tooltip.classList.remove('visible');
     }
+  }
+
+  toggleProfileMenu() {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+  
+  closeProfileMenu() {
+    this.showProfileMenu = false;
+  }
+  
+  logout() {
+    // Clear user data from localStorage
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    
+    // Redirect to the home page
+    window.location.href = '/';
   }
 }

@@ -66,7 +66,7 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
-        <div class="auth-buttons" *ngIf="!isProfilePage">
+        <div class="auth-buttons" *ngIf="!isUserLoggedIn()">
           <a class="login-btn btn" (click)="openSignInForm($event)">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
               <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -76,15 +76,6 @@
             <span>Sign in</span>
           </a>
           <a class="register-btn btn" (click)="openSignUpForm($event)">Get started</a>
-        </div>
-        <div class="user-profile-indicator" *ngIf="isProfilePage">
-          <div class="user-avatar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-          </div>
-          <span class="user-name">User Account</span>
         </div>
       </div>
     </div>
