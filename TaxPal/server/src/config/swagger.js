@@ -34,10 +34,42 @@ const options = {
           },
           required: ["user_id", "category", "limit", "month"],
         },
+        Transaction: {
+          type: "object",
+          required: ["userId", "type", "amount", "category", "date", "description"],
+          properties: {
+            _id: { type: "string", description: "Auto-generated unique ID" },
+            userId: { type: "string", description: "Reference to the User" },
+            type: { type: "string", enum: ["income", "expense"] },
+            amount: { type: "number" },
+            category: { type: "string" },
+            date: { type: "string", format: "date-time" },
+            description: { type: "string" },
+            notes: { type: "string" },
+          },
+        },
+        User: {
+          type: "object",
+          required: ["name", "email", "password", "country"],
+          properties: {
+            name: { type: "string", example: "John Doe" },
+            email: { type: "string", example: "john@example.com" },
+            password: { type: "string", example: "mySecurePassword" },
+            country: { type: "string", example: "India" },
+          },
+        },
+        LoginRequest: {
+          type: "object",
+          required: ["email", "password"],
+          properties: {
+            email: { type: "string", example: "john@example.com" },
+            password: { type: "string", example: "mySecurePassword" },
+          },
+        },
       },
     },
   },
-  apis: ["./src/apis/budget/*.route.js"], // docs live in route files
+  apis: ["./src/apis/**/*.js"], // Swagger will read docs from route files
 };
 
 const swaggerSpec = swaggerJsDoc(options);
