@@ -2,12 +2,17 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+
+interface Category {
+  name: string;
+  _id?: string;
+}
 
 @Component({
   selector: 'app-profile-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterLink],
   templateUrl: './profile-settings.component.html',
   styleUrls: ['./profile-settings.component.css']
 })
@@ -33,6 +38,20 @@ export class ProfileSettingsComponent implements OnInit {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
+  
+  // Categories
+  incomeCategories: Category[] = [];
+  expenseCategories: Category[] = [];
+  categoryColors = [
+    '#3b82f6', // blue
+    '#10b981', // green
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#8b5cf6', // violet
+    '#ec4899', // pink
+    '#14b8a6', // teal
+    '#f97316'  // orange
+  ];
   
   constructor(private http: HttpClient, private router: Router) {}
   
@@ -60,6 +79,107 @@ export class ProfileSettingsComponent implements OnInit {
     window.addEventListener('darkModeChanged', (event: any) => {
       this.isDarkMode = event.detail?.isDarkMode || false;
     });
+    
+    // Load categories
+    this.loadCategories();
+  }
+  
+  loadCategories() {
+    // Fetch categories from localStorage first
+    const savedIncomeCategories = localStorage.getItem('income_categories');
+    const savedExpenseCategories = localStorage.getItem('expense_categories');
+    
+    if (savedIncomeCategories) {
+      this.incomeCategories = JSON.parse(savedIncomeCategories);
+    } else {
+      // Default income categories
+      this.incomeCategories = [
+        { name: 'Salary' },
+        { name: 'Freelance' },
+        { name: 'Consulting' },
+        { name: 'Investment' },
+        { name: 'Other' }
+      ];
+    }
+    
+    if (savedExpenseCategories) {
+      this.expenseCategories = JSON.parse(savedExpenseCategories);
+    } else {
+      // Default expense categories
+      this.expenseCategories = [
+        { name: 'Rent/Mortgage' },
+        { name: 'Utilities' },
+        { name: 'Business Expenses' },
+        { name: 'Food' },
+        { name: 'Transportation' },
+        { name: 'Insurance' },
+        { name: 'Office Supplies' },
+        { name: 'Software & Subscriptions' },
+        { name: 'Travel' },
+        { name: 'Other' }
+      ];
+    }
+    
+    // TODO: If you have an API, you can also fetch from the server
+    // this.http.get('/api/user/categories').subscribe({...});
+  }
+  
+  getCategoryColor(index: number, type: 'income' | 'expense'): string {
+    // Get a consistent color based on the index
+    return this.categoryColors[index % this.categoryColors.length];
+  }
+  
+  addCategory(type: 'income' | 'expense') {
+    if (type === 'income') {
+      this.incomeCategories.push({ name: '' });
+    } else {
+      this.expenseCategories.push({ name: '' });
+    }
+  }
+  
+  removeCategory(index: number, type: 'income' | 'expense') {
+    if (type === 'income') {
+      this.incomeCategories.splice(index, 1);
+    } else {
+      this.expenseCategories.splice(index, 1);
+    }
+  }
+  
+  saveCategories() {
+    this.loading = true;
+    this.successMsg = '';
+    this.errorMsg = '';
+    
+    // Filter out empty category names
+    this.incomeCategories = this.incomeCategories.filter(cat => cat.name.trim() !== '');
+    this.expenseCategories = this.expenseCategories.filter(cat => cat.name.trim() !== '');
+    
+    // Save to localStorage
+    localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
+    localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
+    
+    // TODO: If you have an API, save to the server
+    // const payload = {
+    //   incomeCategories: this.incomeCategories,
+    //   expenseCategories: this.expenseCategories
+    // };
+    // 
+    // this.http.post('/api/user/categories', payload).subscribe({
+    //   next: (response: any) => {
+    //     this.successMsg = 'Categories saved successfully!';
+    //     this.loading = false;
+    //   },
+    //   error: (error) => {
+    //     this.errorMsg = error.error?.message || 'Failed to save categories';
+    //     this.loading = false;
+    //   }
+    // });
+    
+    // For now, simulate API call with timeout
+    setTimeout(() => {
+      this.successMsg = 'Categories saved successfully!';
+      this.loading = false;
+    }, 800);
   }
   
   toggleProfileMenu() {
