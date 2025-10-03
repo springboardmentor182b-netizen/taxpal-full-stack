@@ -12,6 +12,7 @@ class MockAuthService {
       id: 'user-1',
       fullName: 'Test User',
       email: 'test@example.com',
+      
       username: 'testuser'
     };
   }
