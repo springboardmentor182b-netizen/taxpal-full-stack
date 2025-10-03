@@ -107,7 +107,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   }
 
   navigateToLogin(): void {
-    this.router.navigate(['/features/login']);
+    this.router.navigate(['/login']);
   }
 
   private handleResetError(error: any): void {

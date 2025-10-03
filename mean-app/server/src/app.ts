@@ -8,7 +8,10 @@ import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from "./api/modules/dashboard/dashboard.routes";
 import categoriesRoutes from "./api/modules/categories/category.routes";
 import taxEstimatorRoutes from "./api/modules/taxEstimator/taxEstimator.route";
+
+
 import budgetRoutes from "./api/modules/budget/budget.routes";
+
 
 const app = express();
 app.use(
@@ -31,6 +34,7 @@ app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
+
 app.use("/api/v1/budgets", budgetRoutes);
 
 // Root route

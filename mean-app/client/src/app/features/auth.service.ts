@@ -213,7 +213,7 @@ export class AuthService {
    * Request password reset
    */
   forgotPassword(email: string): Observable<any> {
-    return this.http.post(`${this.API_URL}/user/forgot-password`, { email })
+    return this.http.post(`${this.API_URL}/user/request-reset`, { email })
       .pipe(
         retry(2),
         catchError(this.handleError.bind(this))

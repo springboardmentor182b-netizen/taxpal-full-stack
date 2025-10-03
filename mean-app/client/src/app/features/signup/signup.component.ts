@@ -155,7 +155,7 @@ export class SignupComponent implements OnInit, OnDestroy {
             
             // Navigate to login with success message
             setTimeout(() => {
-              this.router.navigate(['/features/login'], {
+              this.router.navigate(['/login'], {
                 queryParams: { 
                   message: encodeURIComponent('Account created successfully! Please log in.') 
                 }
@@ -169,8 +169,8 @@ export class SignupComponent implements OnInit, OnDestroy {
         });
     } else {
       this.markFormGroupTouched();
-      this.errorMessage = 'Please fill in all required fields correctly.';
-      this.scrollToFirstError();
+      this.errorMessage = '⚠️ All fields are required. Please fill them correctly.';
+    this.scrollToFirstError();
     }
   }
 
@@ -287,7 +287,7 @@ export class SignupComponent implements OnInit, OnDestroy {
 
   navigateToLogin(): void {
     console.log('Navigating to login...');
-    this.router.navigate(['/features/login']).then(
+    this.router.navigate(['/login']).then(
       (success) => {
         console.log('Navigation success:', success);
       },

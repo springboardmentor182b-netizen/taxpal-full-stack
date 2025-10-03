@@ -89,7 +89,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
         
         // Redirect to login after 3 seconds
         setTimeout(() => {
-          this.router.navigate(['/features/login'], {
+          this.router.navigate(['/login'], {
             queryParams: { message: 'Password reset successfully. Please log in with your new password.' }
           });
         }, 3000);
@@ -162,11 +162,11 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   }
 
   goBackToLogin(): void {
-    this.router.navigate(['/features/login']);
+    this.router.navigate(['/login']);
   }
 
   requestNewResetLink(): void {
-    this.router.navigate(['/features/forgot-password']);
+    this.router.navigate(['/forgot-password']);
   }
 
   private async resetPassword(token: string, password: string, confirmPassword: string): Promise<void> {
