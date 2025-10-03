@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 
 interface Category {
   name: string;
@@ -11,6 +12,7 @@ interface Category {
 interface CategoryResponse extends Category {
   userId: string;
   type: 'income' | 'expense';
+  color?: string;
 }
 
 @Component({
@@ -24,6 +26,9 @@ export class CategoriesComponent implements OnInit {
   // Categories
   incomeCategories: Category[] = [];
   expenseCategories: Category[] = [];
+  
+  // API base URL
+  private apiUrl = environment.apiUrl || '/api';
   
   // Loading and message states
   loading = false;
@@ -82,33 +87,88 @@ export class CategoriesComponent implements OnInit {
     this.successMsg = '';
     this.errorMsg = '';
     
-    // Get user ID from localStorage
+    // Get user ID and email from localStorage
     const userId = localStorage.getItem('user_id');
-    if (!userId) {
-      this.errorMsg = 'User ID not found';
+    const userEmail = localStorage.getItem('user_email');
+    
+    if (!userId && !userEmail) {
+      this.errorMsg = 'User information not found';
+      // Load from localStorage as fallback
+      this.loadCategoriesFromLocalStorage();
       return;
     }
     
     // Set loading state
     this.loading = true;
     
-    // First, try to load from MongoDB via API
-    this.http.get(`/api/categories/${userId}`).subscribe({
+    // Try first with userId, then with email if userId fails
+    if (userId) {
+      this.loadCategoriesByUserId(userId);
+    } else if (userEmail) {
+      this.loadCategoriesByEmail(userEmail);
+    }
+  }
+
+  loadCategoriesByUserId(userId: string) {
+    this.http.get(`${this.apiUrl}/users/categories/${userId}`).subscribe({
       next: (response: any) => {
-        if (response && Array.isArray(response)) {
-          // Process categories from the backend
-          this.incomeCategories = response.filter(cat => cat.type === 'income');
-          this.expenseCategories = response.filter(cat => cat.type === 'expense');
-          this.loading = false;
-        }
+        this.processCategoriesResponse(response);
       },
       error: (error) => {
-        console.log('Failed to load categories from API, falling back to localStorage');
-        // Fallback to localStorage if API fails
+        console.log('Failed to load categories by user ID, trying email instead...');
+        // Try to load by email if userId fails
+        const userEmail = localStorage.getItem('user_email');
+        if (userEmail) {
+          this.loadCategoriesByEmail(userEmail);
+        } else {
+          console.log('No email found, falling back to localStorage');
+          this.loadCategoriesFromLocalStorage();
+          this.loading = false;
+        }
+      }
+    });
+  }
+
+  loadCategoriesByEmail(email: string) {
+    // Use a workaround to handle the route conflict between /categories/:userId and /categories/email/:email
+    // By using a custom prefix for email endpoint
+    this.http.get(`${this.apiUrl}/users/categories-by-email/${encodeURIComponent(email)}`).subscribe({
+      next: (response: any) => {
+        this.processCategoriesResponse(response);
+      },
+      error: (error) => {
+        console.log('Failed to load categories from API, falling back to localStorage', error);
         this.loadCategoriesFromLocalStorage();
         this.loading = false;
       }
     });
+  }
+
+  processCategoriesResponse(response: any) {
+    if (response && Array.isArray(response)) {
+      // Process categories from the backend
+      this.incomeCategories = response
+        .filter((cat: CategoryResponse) => cat.type === 'income')
+        .map((cat: CategoryResponse) => ({
+          name: cat.name,
+          _id: cat._id
+        }));
+        
+      this.expenseCategories = response
+        .filter((cat: CategoryResponse) => cat.type === 'expense')
+        .map((cat: CategoryResponse) => ({
+          name: cat.name,
+          _id: cat._id
+        }));
+        
+      // Save to localStorage as backup
+      localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
+      localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
+    } else {
+      // If response is not an array, fall back to localStorage
+      this.loadCategoriesFromLocalStorage();
+    }
+    this.loading = false;
   }
   
   loadCategoriesFromLocalStorage() {
@@ -167,29 +227,46 @@ export class CategoriesComponent implements OnInit {
     
     // Prepare all categories for the API
     const allCategories = [
-      ...this.incomeCategories.map(cat => ({
+      ...this.incomeCategories.map((cat, index) => ({
         userId,
         name: cat.name,
         type: 'income',
+        color: this.getCategoryColor(index, 'income'),
         _id: cat._id
       })),
-      ...this.expenseCategories.map(cat => ({
+      ...this.expenseCategories.map((cat, index) => ({
         userId,
         name: cat.name,
         type: 'expense',
+        color: this.getCategoryColor(index, 'expense'),
         _id: cat._id
       }))
     ];
     
-    // Save to MongoDB via API
-    this.http.post('/api/categories', { categories: allCategories }).subscribe({
+    // Save to MongoDB via API - use the correct endpoint path
+    this.http.post(`${this.apiUrl}/users/categories/batch`, { categories: allCategories }).subscribe({
       next: (response: any) => {
         this.successMsg = 'Categories saved successfully!';
         
         // Update local categories with the ones from the server (with IDs)
         if (response.categories) {
-          this.incomeCategories = response.categories.filter((cat: CategoryResponse) => cat.type === 'income');
-          this.expenseCategories = response.categories.filter((cat: CategoryResponse) => cat.type === 'expense');
+          this.incomeCategories = response.categories
+            .filter((cat: CategoryResponse) => cat.type === 'income')
+            .map((cat: CategoryResponse) => ({
+              name: cat.name,
+              _id: cat._id
+            }));
+            
+          this.expenseCategories = response.categories
+            .filter((cat: CategoryResponse) => cat.type === 'expense')
+            .map((cat: CategoryResponse) => ({
+              name: cat.name,
+              _id: cat._id
+            }));
+            
+          // Update localStorage with updated data
+          localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
+          localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
         }
         
         this.loading = false;

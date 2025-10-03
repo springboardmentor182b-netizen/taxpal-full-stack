@@ -4,7 +4,8 @@ const CategorySchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
+    required: true,
+    index: true // Add index for performance
   },
   name: {
     type: String,
@@ -26,8 +27,8 @@ const CategorySchema = new mongoose.Schema({
   }
 });
 
-// Compound index to ensure unique categories per user and type
+// Create a compound index for userId, name, and type to ensure uniqueness
+// This prevents duplicate categories for the same user
 CategorySchema.index({ userId: 1, name: 1, type: 1 }, { unique: true });
 
 module.exports = mongoose.model('Category', CategorySchema);
-``
