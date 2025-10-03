@@ -18,10 +18,22 @@ export class BudgetComponent implements OnInit {
         'General', 'Housing', 'Food', 'Utilities', 'Transportation', 
         'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Travel', 'Other'
     ];
+    userEmail: string = '';
+    loading: boolean = false;
+    error: string = '';
 
     constructor(private fb: FormBuilder, private router: Router, private http: HttpClient) { }
 
     ngOnInit(): void {
+        // Get user email from localStorage
+        this.userEmail = localStorage.getItem('user_email') || '';
+        
+        // If no user email, redirect to login
+        if (!this.userEmail) {
+            this.router.navigate(['/']);
+            return;
+        }
+        
         const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD format for date input
         
         this.form = this.fb.group({
@@ -36,14 +48,17 @@ export class BudgetComponent implements OnInit {
     }
 
     onSubmit(): void {
-        if (this.form.invalid) {
+        if (this.form.invalid || !this.userEmail) {
             this.form.markAllAsTouched();
             return;
         }
 
+        this.loading = true;
         const formValue = this.form.value;
-        // Send to the correct backend API endpoint with all fields
+        
+        // Send to the correct backend API endpoint with all fields including userEmail
         this.http.post('/api/users/add-simple-budget', { 
+            userEmail: this.userEmail,
             amount: formValue.amount,
             category: formValue.category,
             date: formValue.date,
@@ -62,23 +77,35 @@ export class BudgetComponent implements OnInit {
                     date: new Date().toISOString().slice(0, 10),
                     description: ''
                 });
+                
+                // Show success message
                 alert('Budget created successfully!');
+                this.loading = false;
             },
             error: (err) => {
-                alert('Failed to create budget!');
+                this.error = 'Failed to create budget';
                 console.error(err);
+                this.loading = false;
             }
         });
     }
     
     // Load budgets from backend
     private loadBudgets(): void {
-        this.http.get('/api/users/simple-budget-list').subscribe({
+        // Check if user is logged in
+        if (!this.userEmail) return;
+        
+        this.loading = true;
+        // Get budgets for the current user only
+        this.http.get(`/api/users/simple-budget-list?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
             next: (data: any) => {
                 this.budgets = data || [];
+                this.loading = false;
             },
             error: (err) => {
                 console.error('Failed to load budgets:', err);
+                this.error = 'Failed to load budgets';
+                this.loading = false;
             }
         });
     }

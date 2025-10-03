@@ -8,6 +8,9 @@
                         <h2 id="createBudgetTitle" class="form-card-title">Create New Budget</h2>
                     </div>
 
+                    <!-- Display error message if any -->
+                    <div class="error-alert" *ngIf="error">{{ error }}</div>
+
                     <form class="budget-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
                         <!-- Amount field -->
                         <div class="form-group">
@@ -71,12 +74,13 @@
                         </div>
 
                         <div class="actions">
-                            <a routerLink="/dashboard" class="btn btn-ghost">Cancel</a>
+                            <a routerLink="/user-profile" class="btn btn-ghost">Cancel</a>
                             <button 
                                 type="submit" 
                                 class="btn btn-primary"
-                                [disabled]="form.invalid">
-                                Create Budget
+                                [disabled]="form.invalid || loading">
+                                <span *ngIf="loading">Creating...</span>
+                                <span *ngIf="!loading">Create Budget</span>
                             </button>
                         </div>
                     </form>
@@ -85,12 +89,24 @@
 
             <!-- Budgets List - Right side -->
             <div class="budget-list-section">
-                <div class="form-card" *ngIf="budgets?.length">
+                <div class="form-card">
                     <div class="form-card-header">
                         <h2 class="form-card-title">Your Budgets</h2>
                     </div>
                     <div class="budget-form" style="padding-top:16px">
-                        <div class="budget-table-simple">
+                        <!-- Loading state -->
+                        <div *ngIf="loading" class="loading-indicator">Loading budgets...</div>
+                        
+                        <!-- Error state -->
+                        <div *ngIf="error" class="error-message">{{ error }}</div>
+                        
+                        <!-- Empty state -->
+                        <div *ngIf="!loading && !budgets?.length" class="empty-state">
+                            No budgets found. Create your first budget using the form.
+                        </div>
+                        
+                        <!-- Budget table -->
+                        <div class="budget-table-simple" *ngIf="!loading && budgets?.length">
                             <div class="budget-row budget-head">
                                 <div>Amount</div>
                                 <div>Category</div>

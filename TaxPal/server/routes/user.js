@@ -199,27 +199,62 @@ router.post('/add-expense', async (req, res) => {
   }
 });
 
-// POST /api/users/add-simple-budget
+/**
+ * @route   POST /api/users/add-simple-budget
+ * @desc    Add a new simple budget
+ */
 router.post('/add-simple-budget', async (req, res) => {
   try {
-    const { amount, category, date, description } = req.body;
+    const { amount, category, date, description, userEmail } = req.body;
     
-    if (typeof amount !== 'number' || isNaN(amount) || amount < 0) {
-      return res.status(400).json({ error: 'Amount is required and must be a non-negative number.' });
+    // Validate required fields
+    if (!amount || !userEmail) {
+      return res.status(400).json({ error: 'Amount and user email are required' });
     }
     
-    // Create budget with all fields
-    const budget = new SimpleBudget({ 
-      amount, 
+    // Create a new simple budget
+    const simpleBudget = new SimpleBudget({
+      userEmail: userEmail.toLowerCase(),
+      amount,
       category: category || 'General',
       date: date ? new Date(date) : new Date(),
-      description: description || ''
+      description
     });
     
-    await budget.save();
-    res.status(201).json({ message: 'Budget added', budget });
+    // Save the budget
+    const budget = await simpleBudget.save();
+    
+    return res.status(201).json({ 
+      message: 'Budget added successfully!', 
+      budget 
+    });
   } catch (err) {
-    res.status(500).json({ error: 'Server error', details: err.message });
+    console.error('Error adding budget:', err);
+    return res.status(500).json({ error: 'Server error' });
+  }
+});
+
+/**
+ * @route   GET /api/users/simple-budget-list
+ * @desc    Get simple budgets for a user
+ */
+router.get('/simple-budget-list', async (req, res) => {
+  try {
+    const { userEmail } = req.query;
+    
+    if (!userEmail) {
+      return res.status(400).json({ error: 'User email is required' });
+    }
+    
+    // Find budgets for this specific user, sorted by date (newest first)
+    const budgets = await SimpleBudget.find({ userEmail: userEmail.toLowerCase() })
+      .sort({ date: -1, createdAt: -1 })
+      .lean();
+    
+    return res.json(budgets);
+  } catch (err) {
+    console.error('Error fetching budgets:', err);
+    return res.status(500).json({ error: 'Server error' });
   }
 });
 
@@ -261,16 +296,6 @@ router.get('/expense-list', async (req, res) => {
     res.json(expenseList);
   } catch (err) {
     console.error('[DEBUG] Expense list error:', err);
-    res.status(500).json([]);
-  }
-});
-
-// GET /api/users/simple-budget-list
-router.get('/simple-budget-list', async (req, res) => {
-  try {
-    const budgets = await SimpleBudget.find().sort({ createdAt: -1 });
-    res.json(budgets);
-  } catch (err) {
     res.status(500).json([]);
   }
 });
