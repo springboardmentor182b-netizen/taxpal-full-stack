@@ -30,4 +30,3 @@ const CategorySchema = new mongoose.Schema({
 CategorySchema.index({ userId: 1, name: 1, type: 1 }, { unique: true });
 
 module.exports = mongoose.model('Category', CategorySchema);
-``

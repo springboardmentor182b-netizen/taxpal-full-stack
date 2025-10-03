@@ -119,9 +119,13 @@ export class ProfileSettingsComponent implements OnInit {
     const userId = localStorage.getItem('user_id');
     
     if (userId) {
-      // Try to fetch categories from API first
-      this.http.get(`/api/categories/user/${userId}`).subscribe({
+      // Use the correct API URL (no trailing slash)
+      const apiUrl = `http://localhost:5000/api/categories/user/${userId}`;
+      console.log('Fetching categories from:', apiUrl);
+      
+      this.http.get(apiUrl).subscribe({
         next: (response: any) => {
+          console.log('Categories API response:', response);
           if (response.success && response.data) {
             this.incomeCategories = response.data.incomeCategories || [];
             this.expenseCategories = response.data.expenseCategories || [];
@@ -204,13 +208,18 @@ export class ProfileSettingsComponent implements OnInit {
         }))
       ];
       
+      const apiUrl = 'http://localhost:5000/api/categories/batch';
+      console.log('Saving categories to:', apiUrl);
+      
       // Save to API
-      this.http.post('/api/categories/batch', { userId, categories }).subscribe({
+      this.http.post(apiUrl, { userId, categories }).subscribe({
         next: (response: any) => {
+          console.log('Save categories response:', response);
           this.successMsg = 'Categories saved successfully!';
           this.loading = false;
         },
         error: (error) => {
+          console.error('Error saving categories:', error);
           this.errorMsg = error.error?.message || 'Failed to save categories';
           this.loading = false;
         }
@@ -278,7 +287,7 @@ export class ProfileSettingsComponent implements OnInit {
     };
     
     // Make API call to update name
-    this.http.post('/api/users/update-profile', userData).subscribe({
+    this.http.post('http://localhost:5000/api/users/update-profile', userData).subscribe({
       next: (response: any) => {
         this.successMsg = 'Profile updated successfully!';
         
@@ -337,7 +346,7 @@ export class ProfileSettingsComponent implements OnInit {
     };
     
     // Make API call to update password
-    this.http.post('/api/users/update-password', passwordData).subscribe({
+    this.http.post('http://localhost:5000/api/users/update-password', passwordData).subscribe({
       next: (response: any) => {
         this.successMsg = 'Password updated successfully!';
         

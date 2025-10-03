@@ -21,7 +21,7 @@ mongoose.connect(process.env.MONGO_URI)
 .then(() => console.log('MongoDB Atlas connected successfully'))
 .catch(err => console.error('MongoDB Atlas connection error:', err));
 
-// Routes (correct paths)
+// Routes
 const transactionRoutes = require('./apis/incomeExpenseapi/transactionsRoute');
 const dashboardRoutes   = require('./apis/dashboard/dashboard.routes');
 const userRoutes        = require('./apis/user/user.routes');
@@ -42,14 +42,19 @@ app.get('/', (req, res) => {
     res.send('Welcome to TaxPal API 🚀');
 });
 
-// Swagger docs
-const swaggerDocs = require("./config/swagger");
-swaggerDocs(app);
+// Swagger docs (if configured)
+try {
+    const swaggerDocs = require("./config/swagger");
+    swaggerDocs(app);
+} catch (error) {
+    console.log('Swagger not configured');
+}
 
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
+    console.log(`API endpoints available at http://localhost:${PORT}/api`);
 });
 
 module.exports = app;
