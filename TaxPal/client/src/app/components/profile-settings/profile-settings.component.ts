@@ -3,16 +3,12 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
-
-interface Category {
-  name: string;
-  _id?: string;
-}
+import { CategoriesComponent } from '../categories/categories.component';
 
 @Component({
   selector: 'app-profile-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule, RouterLink],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterLink, CategoriesComponent],
   templateUrl: './profile-settings.component.html',
   styleUrls: ['./profile-settings.component.css']
 })
@@ -31,56 +27,13 @@ export class ProfileSettingsComponent implements OnInit {
   
   // Form states
   loading = false;
-  successMsg = '';
-  errorMsg = '';
+  successMsg: string = '';
+  errorMsg: string = '';
   
   // Password visibility toggles
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
-  
-  // Categories
-  incomeCategories: Category[] = [];
-  expenseCategories: Category[] = [];
-  categoryColors = [
-    '#3b82f6', // blue
-    '#10b981', // green
-    '#f59e0b', // amber
-    '#ef4444', // red
-    '#8b5cf6', // violet
-    '#ec4899', // pink
-    '#14b8a6', // teal
-    '#f97316'  // orange
-  ];
-  
-  // Category suggestions
-  incomeCategorySuggestions = [
-    'Salary',
-    'Freelance',
-    'Consulting',
-    'Investments',
-    'Rental Income',
-    'Dividends',
-    'Client Payments',
-    'Commissions',
-    'Royalties',
-    'Side Gig'
-  ];
-
-  expenseCategorySuggestions = [
-    'Rent/Mortgage',
-    'Utilities',
-    'Business Expenses',
-    'Groceries',
-    'Transportation',
-    'Software/Subscriptions',
-    'Office Supplies',
-    'Insurance',
-    'Marketing',
-    'Travel',
-    'Professional Fees',
-    'Equipment'
-  ];
   
   constructor(private http: HttpClient, private router: Router) {}
   
@@ -108,80 +61,6 @@ export class ProfileSettingsComponent implements OnInit {
     window.addEventListener('darkModeChanged', (event: any) => {
       this.isDarkMode = event.detail?.isDarkMode || false;
     });
-    
-    // Load categories
-    this.loadCategories();
-  }
-  
-  loadCategories() {
-    // Fetch categories from localStorage first
-    const savedIncomeCategories = localStorage.getItem('income_categories');
-    const savedExpenseCategories = localStorage.getItem('expense_categories');
-    
-    // Initialize with empty arrays instead of defaults
-    this.incomeCategories = savedIncomeCategories ? JSON.parse(savedIncomeCategories) : [];
-    this.expenseCategories = savedExpenseCategories ? JSON.parse(savedExpenseCategories) : [];
-    
-    // TODO: If you have an API, you can also fetch from the server
-    // this.http.get('/api/user/categories').subscribe({...});
-  }
-  
-  getCategoryColor(index: number, type: 'income' | 'expense'): string {
-    // Get a consistent color based on the index
-    return this.categoryColors[index % this.categoryColors.length];
-  }
-  
-  addCategory(type: 'income' | 'expense') {
-    if (type === 'income') {
-      this.incomeCategories.push({ name: 'New Category' });
-    } else {
-      this.expenseCategories.push({ name: 'New Category' });
-    }
-  }
-  
-  removeCategory(index: number, type: 'income' | 'expense') {
-    if (type === 'income') {
-      this.incomeCategories.splice(index, 1);
-    } else {
-      this.expenseCategories.splice(index, 1);
-    }
-  }
-  
-  saveCategories() {
-    this.loading = true;
-    this.successMsg = '';
-    this.errorMsg = '';
-    
-    // Filter out empty category names
-    this.incomeCategories = this.incomeCategories.filter(cat => cat.name.trim() !== '');
-    this.expenseCategories = this.expenseCategories.filter(cat => cat.name.trim() !== '');
-    
-    // Save to localStorage
-    localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
-    localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
-    
-    // TODO: If you have an API, save to the server
-    // const payload = {
-    //   incomeCategories: this.incomeCategories,
-    //   expenseCategories: this.expenseCategories
-    // };
-    // 
-    // this.http.post('/api/user/categories', payload).subscribe({
-    //   next: (response: any) => {
-    //     this.successMsg = 'Categories saved successfully!';
-    //     this.loading = false;
-    //   },
-    //   error: (error) => {
-    //     this.errorMsg = error.error?.message || 'Failed to save categories';
-    //     this.loading = false;
-    //   }
-    // });
-    
-    // For now, simulate API call with timeout
-    setTimeout(() => {
-      this.successMsg = 'Categories saved successfully!';
-      this.loading = false;
-    }, 800);
   }
   
   toggleProfileMenu() {
@@ -313,71 +192,5 @@ export class ProfileSettingsComponent implements OnInit {
         this.loading = false;
       }
     });
-  }
-  
-  /**
-   * Add a suggested category to the appropriate list
-   */
-  addSuggestedCategory(type: 'income' | 'expense', name: string) {
-    // Check if category already exists
-    if (type === 'income') {
-      if (!this.incomeCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
-        this.incomeCategories.push({ name });
-        
-        // Animate the newly added item
-        setTimeout(() => {
-          const elements = document.querySelectorAll('.category-item');
-          if (elements.length > 0) {
-            const lastElement = elements[elements.length - 1] as HTMLElement;
-            lastElement.classList.add('highlight-animation');
-            setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
-          }
-        }, 50);
-      } else {
-        // Highlight the existing category
-        const index = this.incomeCategories.findIndex(
-          cat => cat.name.toLowerCase() === name.toLowerCase()
-        );
-        if (index >= 0) {
-          setTimeout(() => {
-            const elements = document.querySelectorAll('.category-item');
-            if (elements.length > index) {
-              const element = elements[index] as HTMLElement;
-              element.classList.add('highlight-animation');
-              setTimeout(() => element.classList.remove('highlight-animation'), 1000);
-            }
-          }, 50);
-        }
-      }
-    } else {
-      if (!this.expenseCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
-        this.expenseCategories.push({ name });
-        
-        // Animate the newly added item
-        setTimeout(() => {
-          const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
-          if (elements.length > 0) {
-            const lastElement = elements[elements.length - 1] as HTMLElement;
-            lastElement.classList.add('highlight-animation');
-            setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
-          }
-        }, 50);
-      } else {
-        // Highlight the existing category
-        const index = this.expenseCategories.findIndex(
-          cat => cat.name.toLowerCase() === name.toLowerCase()
-        );
-        if (index >= 0) {
-          setTimeout(() => {
-            const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
-            if (elements.length > index) {
-              const element = elements[index] as HTMLElement;
-              element.classList.add('highlight-animation');
-              setTimeout(() => element.classList.remove('highlight-animation'), 1000);
-            }
-          }, 50);
-        }
-      }
-    }
   }
 }

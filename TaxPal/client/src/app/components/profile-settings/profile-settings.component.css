@@ -172,6 +172,42 @@
   margin: 0 auto;
 }
 
+/* Update settings cards layout for better space usage */
+.settings-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Ensure each card uses proper width */
+.settings-card {
+  width: 100%;
+}
+
+/* Ensure app-categories component expands full width */
+app-categories {
+  grid-column: 1 / -1;
+  width: 100%;
+  display: block;
+}
+
+/* Adjust the layout of the settings content */
+.settings-content {
+  max-width: 1200px;
+  width: 100%;
+  padding: 0 1.5rem;
+  margin: 0 auto;
+}
+
+/* Create a more balanced view */
+@media (min-width: 1200px) {
+  .settings-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* Settings Header */
 .settings-header {
   text-align: center;
@@ -195,8 +231,9 @@
 /* Settings Cards */
 .settings-cards {
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 2rem;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+  width: 100%;
 }
 
 .settings-card {
@@ -942,5 +979,10 @@ input:disabled + .toggle-slider {
 @media (max-width: 768px) {
   .categories-card {
     grid-column: span 1;
+  }
+  
+  /* Update settings cards layout to accommodate full-width categories */
+  .settings-cards {
+    grid-template-columns: 1fr;
   }
 }
