@@ -363,6 +363,10 @@ router.get('/categories/:userId', async (req, res) => {
     // Find the user to get their name
     const user = await User.findById(userId);
     
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
     const categories = await Category.find({ userId });
     
     // If categories exist but don't have userName, add it
@@ -480,14 +484,14 @@ router.post('/categories/batch', async (req, res) => {
       }
     }
     
-    // First, remove all existing categories for this user
+    // First, remove all existing categories for this specific user
     await Category.deleteMany({ userId });
     
-    // Then create all new categories
+    // Then create all new categories for this specific user
     const savedCategories = await Category.insertMany(
       categories.map(cat => ({
         userId,
-        userName, // Use the userName we found
+        userName,
         name: cat.name.trim(),
         type: cat.type,
         color: cat.color || undefined

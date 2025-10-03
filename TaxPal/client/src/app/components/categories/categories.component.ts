@@ -93,7 +93,7 @@ export class CategoriesComponent implements OnInit {
     const userEmail = localStorage.getItem('user_email');
     
     if (!userId && !userEmail) {
-      this.errorMsg = 'User information not found';
+      this.errorMsg = 'User information not found. Please sign in again.';
       // Load from localStorage as fallback
       this.loadCategoriesFromLocalStorage();
       return;
@@ -219,7 +219,7 @@ export class CategoriesComponent implements OnInit {
     const userName = localStorage.getItem('user_name') || 'User';
     
     if (!userId) {
-      this.errorMsg = 'User ID not found';
+      this.errorMsg = 'User ID not found. Please sign in again.';
       this.loading = false;
       return;
     }
@@ -228,7 +228,7 @@ export class CategoriesComponent implements OnInit {
     localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
     localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
     
-    // Prepare all categories for the API
+    // Prepare all categories for the API with current user's ID and name
     const allCategories = [
       ...this.incomeCategories.map((cat, index) => ({
         userId,

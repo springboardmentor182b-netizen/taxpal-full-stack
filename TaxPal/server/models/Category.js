@@ -32,7 +32,7 @@ const CategorySchema = new mongoose.Schema({
 });
 
 // Create a compound index for userId, name, and type to ensure uniqueness
-// This prevents duplicate categories for the same user
+// This prevents duplicate categories for the same user - ensure uniqueness per user!
 CategorySchema.index({ userId: 1, name: 1, type: 1 }, { unique: true });
 
 module.exports = mongoose.model('Category', CategorySchema);
