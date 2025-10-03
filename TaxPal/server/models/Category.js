@@ -7,6 +7,10 @@ const CategorySchema = new mongoose.Schema({
     required: true,
     index: true // Add index for performance
   },
+  userName: {
+    type: String,
+    default: 'User'
+  },
   name: {
     type: String,
     required: true,

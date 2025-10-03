@@ -357,7 +357,16 @@ router.get('/categories/:userId', async (req, res) => {
       return res.status(400).json({ message: 'Invalid user ID format' });
     }
     
+    // Find the user to get their name
+    const user = await User.findById(userId);
+    
     const categories = await Category.find({ userId });
+    
+    // If categories exist but don't have userName, add it
+    if (categories.length > 0 && user && !categories[0].userName) {
+      const userName = user.name || 'User';
+      await Category.updateMany({ userId }, { $set: { userName } });
+    }
     
     return res.json(categories);
   } catch (error) {
@@ -368,7 +377,7 @@ router.get('/categories/:userId', async (req, res) => {
 
 /**
  * @route   GET /api/users/categories-by-email/:email
- * @desc    Get all categories for a specific user by email (renamed to avoid route conflict)
+ * @desc    Get all categories for a specific user by email
  */
 router.get('/categories-by-email/:email', async (req, res) => {
   try {
@@ -384,6 +393,12 @@ router.get('/categories-by-email/:email', async (req, res) => {
     // Find categories with the user's ID
     const categories = await Category.find({ userId: user._id });
     
+    // If categories exist but don't have userName, add it
+    if (categories.length > 0 && !categories[0].userName) {
+      const userName = user.name || 'User';
+      await Category.updateMany({ userId: user._id }, { $set: { userName } });
+    }
+    
     return res.json(categories);
   } catch (error) {
     console.error('Error fetching categories by email:', error);
@@ -397,15 +412,25 @@ router.get('/categories-by-email/:email', async (req, res) => {
  */
 router.post('/categories', async (req, res) => {
   try {
-    const { userId, name, type, color } = req.body;
+    const { userId, userName, name, type, color } = req.body;
     
     if (!userId || !name || !type) {
       return res.status(400).json({ message: 'User ID, name, and type are required' });
     }
     
+    // Find user to get name if not provided
+    let userNameToUse = userName || 'User';
+    if (!userName) {
+      const user = await User.findById(userId);
+      if (user) {
+        userNameToUse = user.name || 'User';
+      }
+    }
+    
     // Create new category
     const category = new Category({
       userId,
+      userName: userNameToUse,
       name: name.trim(),
       type,
       color: color || undefined
@@ -443,6 +468,15 @@ router.post('/categories/batch', async (req, res) => {
       return res.status(400).json({ message: 'Invalid or missing user ID' });
     }
     
+    // Find user to get name if not provided
+    let userName = categories[0]?.userName || 'User';
+    if (!userName || userName === 'User') {
+      const user = await User.findById(userId);
+      if (user) {
+        userName = user.name || 'User';
+      }
+    }
+    
     // First, remove all existing categories for this user
     await Category.deleteMany({ userId });
     
@@ -450,6 +484,7 @@ router.post('/categories/batch', async (req, res) => {
     const savedCategories = await Category.insertMany(
       categories.map(cat => ({
         userId,
+        userName, // Use the userName we found
         name: cat.name.trim(),
         type: cat.type,
         color: cat.color || undefined

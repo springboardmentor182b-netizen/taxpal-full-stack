@@ -11,6 +11,7 @@ interface Category {
 
 interface CategoryResponse extends Category {
   userId: string;
+  userName?: string;  // Add userName field
   type: 'income' | 'expense';
   color?: string;
 }
@@ -213,8 +214,10 @@ export class CategoriesComponent implements OnInit {
     this.incomeCategories = this.incomeCategories.filter(cat => cat.name.trim() !== '');
     this.expenseCategories = this.expenseCategories.filter(cat => cat.name.trim() !== '');
     
-    // Get user ID from localStorage
+    // Get user ID and name from localStorage
     const userId = localStorage.getItem('user_id');
+    const userName = localStorage.getItem('user_name') || 'User';
+    
     if (!userId) {
       this.errorMsg = 'User ID not found';
       this.loading = false;
@@ -229,6 +232,7 @@ export class CategoriesComponent implements OnInit {
     const allCategories = [
       ...this.incomeCategories.map((cat, index) => ({
         userId,
+        userName,  // Include the user's name
         name: cat.name,
         type: 'income',
         color: this.getCategoryColor(index, 'income'),
@@ -236,6 +240,7 @@ export class CategoriesComponent implements OnInit {
       })),
       ...this.expenseCategories.map((cat, index) => ({
         userId,
+        userName,  // Include the user's name
         name: cat.name,
         type: 'expense',
         color: this.getCategoryColor(index, 'expense'),
