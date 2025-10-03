@@ -103,7 +103,7 @@ export class SignInFormComponent implements OnInit, OnDestroy {
         password: this.password
       }).toPromise();
       
-      this.successMsg = 'Signed in! Redirecting...';
+      this.successMsg = 'Signed in!';
       
       // Store user info in localStorage or a service
       if (res?.user) {
@@ -118,10 +118,9 @@ export class SignInFormComponent implements OnInit, OnDestroy {
         window.dispatchEvent(loginEvent);
       }
       
-      setTimeout(() => {
-        this.closeForm();
-        this.router.navigate(['/user-profile']);
-      }, 1200);
+      // Immediate navigation without delay
+      this.closeForm();
+      this.router.navigate(['/user-profile']);
     } catch (err: any) {
       console.error('Sign in error:', err);
       // Show more specific error messages

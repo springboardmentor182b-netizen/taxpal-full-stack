@@ -20,14 +20,14 @@ export class UserProfileComponent implements OnInit {
   isAddExpenseModalVisible: boolean = false;
   incomeForm = {
     title: '',
-    amount: null,
+    amount: null as number | null,
     category: '',
     date: '',
     notes: ''
   };
   expenseForm = {
     title: '',
-    amount: null,
+    amount: null as number | null,
     category: '',
     date: '',
     notes: '',
@@ -135,73 +135,87 @@ export class UserProfileComponent implements OnInit {
   }
   
   submitIncome() {
-    // Remove the userEmail check since it's now set from localStorage
-    if (!this.incomeForm.title || !this.incomeForm.amount || !this.incomeForm.date) {
-      this.incomeErrorMsg = 'Please fill all required fields.';
+    // Basic validation only for required fields
+    if (!this.incomeForm.title || !this.incomeForm.amount) {
+      this.incomeErrorMsg = 'Title and amount are required';
       return;
     }
     
     this.incomeLoading = true;
     this.incomeErrorMsg = '';
     this.incomeSuccessMsg = '';
-    
-    const payload = {
+
+    // Pre-format the data
+    const formData = {
       ...this.incomeForm,
-      userEmail: this.userEmail // This will be available from localStorage
+      userEmail: this.userEmail,
+      // Ensure amount is numeric
+      amount: parseFloat(this.incomeForm.amount?.toString() || '0'),
+      // Use current date if not provided
+      date: this.incomeForm.date || new Date().toISOString().split('T')[0]
     };
-    
-    this.http.post('/api/users/add-income', payload).subscribe({
-      next: (res: any) => {
-        this.incomeSuccessMsg = 'Income added!';
-        this.fetchIncomeList(); // Refresh table after adding
-        setTimeout(() => {
+
+    this.http.post('/api/users/add-income', formData)
+      .subscribe({
+        next: (response: any) => {
+          // Add to local array immediately to avoid refetching
+          if (response && response.income) {
+            this.incomeList.unshift(response.income);
+            this.updateRecentTransactions(); // Update recent transactions list
+          }
+          
+          this.incomeSuccessMsg = 'Income added successfully!';
+          this.resetIncomeForm();
           this.hideAddIncomeModal();
-          this.incomeForm = { title: '', amount: null, category: '', date: '', notes: '' };
-          this.incomeSuccessMsg = '';
-        }, 1200);
-      },
-      error: (err) => {
-        this.incomeErrorMsg = err?.error?.error || 'Failed to add income.';
-      },
-      complete: () => {
-        this.incomeLoading = false;
-      }
-    });
+          this.incomeLoading = false;
+        },
+        error: (error) => {
+          this.incomeErrorMsg = error.error?.error || 'Failed to add income';
+          this.incomeLoading = false;
+        }
+      });
   }
 
   submitExpense() {
-    // Remove the userEmail check since it's now set from localStorage
-    if (!this.expenseForm.title || !this.expenseForm.amount || !this.expenseForm.date) {
-      this.expenseErrorMsg = 'Please fill all required fields.';
+    // Basic validation only for required fields
+    if (!this.expenseForm.title || !this.expenseForm.amount) {
+      this.expenseErrorMsg = 'Title and amount are required';
       return;
     }
     
     this.expenseLoading = true;
     this.expenseErrorMsg = '';
     this.expenseSuccessMsg = '';
-    
-    const payload = {
+
+    // Pre-format the data
+    const formData = {
       ...this.expenseForm,
-      userEmail: this.userEmail // This will be available from localStorage
+      userEmail: this.userEmail,
+      // Ensure amount is numeric
+      amount: parseFloat(this.expenseForm.amount?.toString() || '0'),
+      // Use current date if not provided
+      date: this.expenseForm.date || new Date().toISOString().split('T')[0]
     };
-    
-    this.http.post('/api/users/add-expense', payload).subscribe({
-      next: (res: any) => {
-        this.expenseSuccessMsg = 'Expense added!';
-        this.fetchExpenseList(); // Refresh table after adding
-        setTimeout(() => {
+
+    this.http.post('/api/users/add-expense', formData)
+      .subscribe({
+        next: (response: any) => {
+          // Add to local array immediately to avoid refetching
+          if (response && response.expense) {
+            this.expenseList.unshift(response.expense);
+            this.updateRecentTransactions(); // Update recent transactions list
+          }
+          
+          this.expenseSuccessMsg = 'Expense added successfully!';
+          this.resetExpenseForm();
           this.hideAddExpenseModal();
-          this.expenseForm = { title: '', amount: null, category: '', date: '', notes: '', taxDeductible: '' };
-          this.expenseSuccessMsg = '';
-        }, 1200);
-      },
-      error: (err) => {
-        this.expenseErrorMsg = err?.error?.error || 'Failed to add expense.';
-      },
-      complete: () => {
-        this.expenseLoading = false;
-      }
-    });
+          this.expenseLoading = false;
+        },
+        error: (error) => {
+          this.expenseErrorMsg = error.error?.error || 'Failed to add expense';
+          this.expenseLoading = false;
+        }
+      });
   }
   
   fetchIncomeList() {
@@ -267,27 +281,17 @@ export class UserProfileComponent implements OnInit {
   }
 
   updateRecentTransactions() {
-    // Merge and sort by date descending, take latest 5
-    const txs = [
-      ...this.incomeList.map(i => ({
-        type: 'income',
-        title: i.title,
-        amount: i.amount,
-        category: i.category,
-        date: i.date,
-      })),
-      ...this.expenseList.map(e => ({
-        type: 'expense',
-        title: e.title,
-        amount: e.amount,
-        category: e.category,
-        date: e.date,
-      }))
+    // Combine income and expense lists
+    const allTransactions = [
+      ...this.incomeList.map(item => ({...item, type: 'income'})),
+      ...this.expenseList.map(item => ({...item, type: 'expense'}))
     ];
-    this.recentTransactions = txs
-      .filter(tx => !!tx.date)
-      .sort((a, b) => (b.date as any) - (a.date as any))
-      .slice(0, 5);
+    
+    // Sort by date (newest first)
+    allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    
+    // Take only the most recent ones
+    this.recentTransactions = allTransactions.slice(0, 5);
   }
 
   prepareChartData() {
@@ -452,5 +456,28 @@ export class UserProfileComponent implements OnInit {
     
     // Redirect to the home page
     window.location.href = '/';
+  }
+
+  resetExpenseForm() {
+    // Reset expense form fields to default values
+    this.expenseForm = {
+      title: '',
+      amount: null,
+      category: '',
+      date: this.getCurrentDate(),
+      notes: '',
+      taxDeductible: ''
+    };
+  }
+
+  resetIncomeForm() {
+    // Reset income form fields to default values
+    this.incomeForm = {
+      title: '',
+      amount: null,
+      category: '',
+      date: this.getCurrentDate(),
+      notes: ''
+    };
   }
 }

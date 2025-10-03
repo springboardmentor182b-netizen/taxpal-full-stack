@@ -69,37 +69,32 @@ router.post('/signin', async (req, res) => {
     let { email, password } = req.body;
     
     if (!email || !password) {
-      console.log('[DEBUG] Sign-in failed: Missing email or password');
       return res.status(400).json({ error: 'Email and password are required' });
     }
     
     email = email.trim().toLowerCase();
-    console.log('[DEBUG] Sign-in attempt for:', email);
 
-    // Find the user
-    const user = await User.findOne({ email });
+    // Find the user - use lean() for faster queries that don't need Mongoose methods
+    const user = await User.findOne({ email }).lean();
     if (!user) {
-      console.log('[DEBUG] Sign-in failed: No account found for', email);
       return res.status(404).json({ error: 'No account found' });
     }
     
-    // Verify password
-    const isPasswordMatch = await user.matchPassword(password);
+    // Get the full user document only for password verification
+    const fullUser = await User.findById(user._id);
+    const isPasswordMatch = await fullUser.matchPassword(password);
     if (!isPasswordMatch) {
-      console.log('[DEBUG] Sign-in failed: Incorrect password for', email);
       return res.status(401).json({ error: 'Incorrect password' });
     }
     
-    console.log('[DEBUG] Sign-in successful for:', email);
+    // Return user data (exclude password)
+    const { password: _, ...userData } = user;
     
-    // Return user data with avatar initial (exclude password)
     res.status(200).json({ 
       message: 'Sign in successful', 
       user: {
-        _id: user._id, // Include the user ID
-        email: user.email,
-        name: user.name,
-        initial: (user.name && user.name.trim()) ? user.name.trim()[0].toUpperCase() : user.email[0].toUpperCase()
+        ...userData,
+        initial: (userData.name && userData.name.trim()) ? userData.name.trim()[0].toUpperCase() : userData.email[0].toUpperCase()
       }
     });
   } catch (err) {
@@ -143,31 +138,28 @@ router.get('/me', async (req, res) => {
 router.post('/add-income', async (req, res) => {
   try {
     const { title, amount, category, date, notes, userEmail } = req.body;
-    console.log('[DEBUG] Add income attempt:', { title, amount, category, userEmail });
     
-    // Verify that the user email exists
-    const user = await User.findOne({ email: userEmail });
-    if (!user) {
-      console.log('[DEBUG] Add income failed: User not found for email:', userEmail);
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    if (!title || !amount || !date || !userEmail) {
-      console.log('[DEBUG] Add income failed: Missing required fields');
-      return res.status(400).json({ error: 'Missing required fields' });
+    // Simplified validation
+    if (!title || !amount) {
+      return res.status(400).json({ error: 'Title and amount are required' });
     }
     
     const income = new Income({
       title,
-      amount,
+      amount: parseFloat(amount), // Ensure numeric
       category,
-      date,
+      date: date || new Date(), // Default to today if not provided
       notes,
       userEmail: userEmail.trim().toLowerCase()
     });
+    
     await income.save();
-    console.log('[DEBUG] Income added for:', userEmail);
-    res.status(201).json({ message: 'Income added', income });
+    
+    // Return minimal response
+    res.status(201).json({ 
+      message: 'Income added', 
+      income 
+    });
   } catch (err) {
     console.error('[DEBUG] Add income error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
@@ -178,32 +170,29 @@ router.post('/add-income', async (req, res) => {
 router.post('/add-expense', async (req, res) => {
   try {
     const { title, amount, category, date, notes, taxDeductible, userEmail } = req.body;
-    console.log('[DEBUG] Add expense attempt:', { title, amount, category, userEmail });
     
-    // Verify that the user email exists
-    const user = await User.findOne({ email: userEmail });
-    if (!user) {
-      console.log('[DEBUG] Add expense failed: User not found for email:', userEmail);
-      return res.status(404).json({ error: 'User not found' });
-    }
-    
-    if (!title || !amount || !date || !userEmail) {
-      console.log('[DEBUG] Add expense failed: Missing required fields');
-      return res.status(400).json({ error: 'Missing required fields' });
+    // Simplified validation
+    if (!title || !amount) {
+      return res.status(400).json({ error: 'Title and amount are required' });
     }
     
     const expense = new Expense({
       title,
-      amount,
+      amount: parseFloat(amount), // Ensure numeric
       category,
-      date,
+      date: date || new Date(), // Default to today if not provided
       notes,
       taxDeductible,
       userEmail: userEmail.trim().toLowerCase()
     });
+    
     await expense.save();
-    console.log('[DEBUG] Expense added for:', userEmail);
-    res.status(201).json({ message: 'Expense added', expense });
+    
+    // Return minimal response
+    res.status(201).json({ 
+      message: 'Expense added', 
+      expense 
+    });
   } catch (err) {
     console.error('[DEBUG] Add expense error:', err);
     res.status(500).json({ error: 'Server error', details: err.message });
@@ -234,13 +223,20 @@ router.post('/add-simple-budget', async (req, res) => {
   }
 });
 
-// GET /api/users/income-list?userEmail=...
+// GET /api/users/income-list - Optimized with pagination and limit
 router.get('/income-list', async (req, res) => {
   try {
     const userEmail = (req.query.userEmail || '').trim().toLowerCase();
-    console.log('[DEBUG] Fetch income list for:', userEmail);
+    const limit = parseInt(req.query.limit) || 50; // Default to 50 items
+    
     if (!userEmail) return res.status(400).json([]);
-    const incomeList = await Income.find({ userEmail }).sort({ date: -1, createdAt: -1 });
+    
+    // Use lean() for faster queries
+    const incomeList = await Income.find({ userEmail })
+      .sort({ date: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+      
     res.json(incomeList);
   } catch (err) {
     console.error('[DEBUG] Income list error:', err);
@@ -248,13 +244,20 @@ router.get('/income-list', async (req, res) => {
   }
 });
 
-// GET /api/users/expense-list?userEmail=...
+// GET /api/users/expense-list - Optimized with pagination and limit
 router.get('/expense-list', async (req, res) => {
   try {
     const userEmail = (req.query.userEmail || '').trim().toLowerCase();
-    console.log('[DEBUG] Fetch expense list for:', userEmail);
+    const limit = parseInt(req.query.limit) || 50; // Default to 50 items
+    
     if (!userEmail) return res.status(400).json([]);
-    const expenseList = await Expense.find({ userEmail }).sort({ date: -1, createdAt: -1 });
+    
+    // Use lean() for faster queries
+    const expenseList = await Expense.find({ userEmail })
+      .sort({ date: -1, createdAt: -1 })
+      .limit(limit)
+      .lean();
+      
     res.json(expenseList);
   } catch (err) {
     console.error('[DEBUG] Expense list error:', err);
