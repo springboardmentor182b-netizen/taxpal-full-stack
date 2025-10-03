@@ -7,6 +7,7 @@ import { Router, RouterLink } from '@angular/router';
 interface Category {
   name: string;
   _id?: string;
+  color?: string;
 }
 
 @Component({
@@ -114,29 +115,91 @@ export class ProfileSettingsComponent implements OnInit {
   }
   
   loadCategories() {
-    // Fetch categories from localStorage first
+    const userId = localStorage.getItem('user_id');
+    
+    if (!userId) {
+      // Use empty arrays if no user ID
+      this.incomeCategories = [];
+      this.expenseCategories = [];
+      return;
+    }
+    
+    // First, try to load from localStorage for immediate display
     const savedIncomeCategories = localStorage.getItem('income_categories');
     const savedExpenseCategories = localStorage.getItem('expense_categories');
     
-    // Initialize with empty arrays instead of defaults
-    this.incomeCategories = savedIncomeCategories ? JSON.parse(savedIncomeCategories) : [];
-    this.expenseCategories = savedExpenseCategories ? JSON.parse(savedExpenseCategories) : [];
+    if (savedIncomeCategories) {
+      this.incomeCategories = JSON.parse(savedIncomeCategories);
+    }
     
-    // TODO: If you have an API, you can also fetch from the server
-    // this.http.get('/api/user/categories').subscribe({...});
+    if (savedExpenseCategories) {
+      this.expenseCategories = JSON.parse(savedExpenseCategories);
+    }
+    
+    // Then fetch from server to get the latest data
+    this.http.get(`/api/categories/${userId}`).subscribe({
+      next: (response: any) => {
+        if (response.incomeCategories) {
+          this.incomeCategories = response.incomeCategories;
+          localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
+        }
+        
+        if (response.expenseCategories) {
+          this.expenseCategories = response.expenseCategories;
+          localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
+        }
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
+  }
+  
+  // When adding a category, automatically assign a color
+  addCategory(type: 'income' | 'expense') {
+    const targetCategories = type === 'income' ? this.incomeCategories : this.expenseCategories;
+    const color = this.generateCategoryColor(targetCategories.length);
+    
+    if (type === 'income') {
+      this.incomeCategories.push({ name: 'New Category', color });
+    } else {
+      this.expenseCategories.push({ name: 'New Category', color });
+    }
+  }
+  
+  // Generate a color based on the index and ensure it's visually distinct
+  generateCategoryColor(index: number): string {
+    // If color already exists in the categoryColors array, use it
+    if (index < this.categoryColors.length) {
+      return this.categoryColors[index];
+    }
+    
+    // Generate a new color using HSL to ensure good distribution
+    // We use the golden ratio to space out hues
+    const goldenRatioConjugate = 0.618033988749895;
+    const hue = (index * goldenRatioConjugate) % 1;
+    const h = Math.floor(hue * 360);
+    const s = 60 + Math.floor(Math.random() * 20); // 60-80% saturation
+    const l = 45 + Math.floor(Math.random() * 10); // 45-55% lightness
+    
+    return `hsl(${h}, ${s}%, ${l}%)`;
   }
   
   getCategoryColor(index: number, type: 'income' | 'expense'): string {
-    // Get a consistent color based on the index
-    return this.categoryColors[index % this.categoryColors.length];
-  }
-  
-  addCategory(type: 'income' | 'expense') {
-    if (type === 'income') {
-      this.incomeCategories.push({ name: 'New Category' });
-    } else {
-      this.expenseCategories.push({ name: 'New Category' });
+    const categories = type === 'income' ? this.incomeCategories : this.expenseCategories;
+    
+    if (index < categories.length && categories[index].color) {
+      return categories[index].color;
     }
+    
+    // If no color is saved, generate and save one
+    const color = this.generateCategoryColor(index);
+    
+    if (index < categories.length) {
+      categories[index].color = color;
+    }
+    
+    return color;
   }
   
   removeCategory(index: number, type: 'income' | 'expense') {
@@ -156,32 +219,35 @@ export class ProfileSettingsComponent implements OnInit {
     this.incomeCategories = this.incomeCategories.filter(cat => cat.name.trim() !== '');
     this.expenseCategories = this.expenseCategories.filter(cat => cat.name.trim() !== '');
     
-    // Save to localStorage
+    // Save to localStorage as a backup
     localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
     localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
     
-    // TODO: If you have an API, save to the server
-    // const payload = {
-    //   incomeCategories: this.incomeCategories,
-    //   expenseCategories: this.expenseCategories
-    // };
-    // 
-    // this.http.post('/api/user/categories', payload).subscribe({
-    //   next: (response: any) => {
-    //     this.successMsg = 'Categories saved successfully!';
-    //     this.loading = false;
-    //   },
-    //   error: (error) => {
-    //     this.errorMsg = error.error?.message || 'Failed to save categories';
-    //     this.loading = false;
-    //   }
-    // });
+    const userId = localStorage.getItem('user_id');
     
-    // For now, simulate API call with timeout
-    setTimeout(() => {
-      this.successMsg = 'Categories saved successfully!';
+    if (!userId) {
+      this.errorMsg = 'User ID not found. Please log in again.';
       this.loading = false;
-    }, 800);
+      return;
+    }
+    
+    // Save to server
+    const payload = {
+      userId,
+      incomeCategories: this.incomeCategories,
+      expenseCategories: this.expenseCategories
+    };
+    
+    this.http.post('/api/categories/save', payload).subscribe({
+      next: (response: any) => {
+        this.successMsg = 'Categories saved successfully!';
+        this.loading = false;
+      },
+      error: (error) => {
+        this.errorMsg = error.error?.message || 'Failed to save categories';
+        this.loading = false;
+      }
+    });
   }
   
   toggleProfileMenu() {
@@ -291,93 +357,84 @@ export class ProfileSettingsComponent implements OnInit {
     
     // Prepare data for API
     const passwordData = {
-      email: this.user.email,
       currentPassword: this.user.currentPassword,
-      newPassword: this.user.newPassword
+      newPassword: this.user.newPassword,
     };
     
     // Make API call to update password
     this.http.post('/api/users/update-password', passwordData).subscribe({
       next: (response: any) => {
         this.successMsg = 'Password updated successfully!';
-        
         // Clear password fields
         this.user.currentPassword = '';
         this.user.newPassword = '';
         this.user.confirmPassword = '';
-        
         this.loading = false;
       },
-      error: (error: any) => {
+      error: (error) => {
         this.errorMsg = error.error?.message || 'Failed to update password';
         this.loading = false;
       }
     });
   }
   
-  /**
-   * Add a suggested category to the appropriate list
-   */
-  addSuggestedCategory(type: 'income' | 'expense', name: string) {
-    // Check if category already exists
-    if (type === 'income') {
-      if (!this.incomeCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
-        this.incomeCategories.push({ name });
-        
-        // Animate the newly added item
+addSuggestedCategory(type: 'income' | 'expense', name: string) {
+  if (type === 'income') {
+    if (!this.incomeCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+      this.incomeCategories.push({ name });
+      // Animate the newly added item
+      setTimeout(() => {
+        const elements = document.querySelectorAll('.category-item');
+        if (elements.length > 0) {
+          const lastElement = elements[elements.length - 1] as HTMLElement;
+          lastElement.classList.add('highlight-animation');
+          setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
+        }
+      }, 50);
+    } else {
+      // Highlight the existing category
+      const index = this.incomeCategories.findIndex(
+        cat => cat.name.toLowerCase() === name.toLowerCase()
+      );
+      if (index >= 0) {
         setTimeout(() => {
           const elements = document.querySelectorAll('.category-item');
-          if (elements.length > 0) {
-            const lastElement = elements[elements.length - 1] as HTMLElement;
-            lastElement.classList.add('highlight-animation');
-            setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
+          if (elements.length > index) {
+            const element = elements[index] as HTMLElement;
+            element.classList.add('highlight-animation');
+            setTimeout(() => element.classList.remove('highlight-animation'), 1000);
           }
         }, 50);
-      } else {
-        // Highlight the existing category
-        const index = this.incomeCategories.findIndex(
-          cat => cat.name.toLowerCase() === name.toLowerCase()
-        );
-        if (index >= 0) {
-          setTimeout(() => {
-            const elements = document.querySelectorAll('.category-item');
-            if (elements.length > index) {
-              const element = elements[index] as HTMLElement;
-              element.classList.add('highlight-animation');
-              setTimeout(() => element.classList.remove('highlight-animation'), 1000);
-            }
-          }, 50);
-        }
       }
+    }
+  } else {
+    if (!this.expenseCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+      this.expenseCategories.push({ name });
+      // Animate the newly added item
+      setTimeout(() => {
+        const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
+        if (elements.length > 0) {
+          const lastElement = elements[elements.length - 1] as HTMLElement;
+          lastElement.classList.add('highlight-animation');
+          setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
+        }
+      }, 50);
     } else {
-      if (!this.expenseCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
-        this.expenseCategories.push({ name });
-        
-        // Animate the newly added item
+      // Highlight the existing category
+      const index = this.expenseCategories.findIndex(
+        cat => cat.name.toLowerCase() === name.toLowerCase()
+      );
+      if (index >= 0) {
         setTimeout(() => {
           const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
-          if (elements.length > 0) {
-            const lastElement = elements[elements.length - 1] as HTMLElement;
-            lastElement.classList.add('highlight-animation');
-            setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
+          if (elements.length > index) {
+            const element = elements[index] as HTMLElement;
+            element.classList.add('highlight-animation');
+            setTimeout(() => element.classList.remove('highlight-animation'), 1000);
           }
         }, 50);
-      } else {
-        // Highlight the existing category
-        const index = this.expenseCategories.findIndex(
-          cat => cat.name.toLowerCase() === name.toLowerCase()
-        );
-        if (index >= 0) {
-          setTimeout(() => {
-            const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
-            if (elements.length > index) {
-              const element = elements[index] as HTMLElement;
-              element.classList.add('highlight-animation');
-              setTimeout(() => element.classList.remove('highlight-animation'), 1000);
-            }
-          }, 50);
-        }
       }
     }
   }
+}
 }
