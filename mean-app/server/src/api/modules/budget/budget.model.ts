@@ -1,11 +1,13 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
 export interface IBudget {
   category: string;
   amount: number;
+  spent: number;
+  remaining?: number;
+  status?: 'Good' | 'Fair' | 'Poor';
   month: string;
   description?: string;
-  spent: number;
   userId: string;
 }
 
