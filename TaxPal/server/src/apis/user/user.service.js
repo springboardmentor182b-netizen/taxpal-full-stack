@@ -2,7 +2,6 @@ const jwt = require('jsonwebtoken');
 const User = require('../user/user.model');
 
 class UserService {
-    // Register a new user (store password as plain text)
     async register({ name, email, password, country }) {
         const existingUser = await User.findOne({ email });
         if (existingUser) {
@@ -12,7 +11,7 @@ class UserService {
         const newUser = new User({
             name,
             email,
-            password,  // plain text password
+            passwordHash: password, // map "password" from request to "passwordHash"
             country
         });
 
@@ -20,19 +19,16 @@ class UserService {
         return { message: 'User registered successfully' };
     }
 
-    // Login user without comparing hashed passwords
     async login({ email, password }) {
         const user = await User.findOne({ email });
         if (!user) {
             throw new Error('Invalid email or password');
         }
 
-        // Compare plain text password
-        if (password !== user.password) {
+        if (password !== user.passwordHash) { // compare with passwordHash
             throw new Error('Invalid email or password');
         }
 
-        // Generate JWT token
         const token = jwt.sign(
             { userId: user._id },
             process.env.JWT_SECRET,
