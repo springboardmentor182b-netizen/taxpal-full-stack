@@ -387,6 +387,22 @@
   margin-bottom: 1.5rem;
 }
 
+/* Message for no categories */
+.no-categories-message {
+  text-align: center;
+  padding: 1rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+.dark .no-categories-message {
+  background-color: #374151;
+  color: #9ca3af;
+}
+
 /* Loading Spinner */
 .loader {
   display: inline-block;
@@ -799,6 +815,94 @@ input:disabled + .toggle-slider {
   background-color: #374151;
   border-color: #60a5fa;
   color: #60a5fa;
+}
+
+/* Category Suggestions Styles */
+.category-suggestions {
+  margin-bottom: 1.25rem;
+  background-color: #f9fafb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+.dark .category-suggestions {
+  background-color: #1f2937;
+}
+
+.suggestion-label {
+  font-size: 0.875rem;
+  color: #4b5563;
+  margin: 0 0 0.75rem 0;
+}
+
+.dark .suggestion-label {
+  color: #9ca3af;
+}
+
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.suggestion-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.375rem 0.75rem;
+  background-color: #eef2ff;
+  border: 1px solid #e0e7ff;
+  border-radius: 1rem;
+  font-size: 0.875rem;
+  color: #4f46e5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.suggestion-chip:hover {
+  background-color: #e0e7ff;
+  transform: translateY(-1px);
+}
+
+.suggestion-chip svg {
+  stroke: #4f46e5;
+  width: 14px;
+  height: 14px;
+}
+
+.dark .suggestion-chip {
+  background-color: #374151;
+  border-color: #4b5563;
+  color: #93c5fd;
+}
+
+.dark .suggestion-chip:hover {
+  background-color: #4b5563;
+}
+
+.dark .suggestion-chip svg {
+  stroke: #93c5fd;
+}
+
+/* Animation for newly added categories */
+@keyframes highlight-pulse {
+  0% { background-color: rgba(59, 130, 246, 0.1); }
+  50% { background-color: rgba(59, 130, 246, 0.3); }
+  100% { background-color: rgba(59, 130, 246, 0); }
+}
+
+.highlight-animation {
+  animation: highlight-pulse 1s ease-in-out;
+}
+
+.dark .highlight-animation {
+  animation: highlight-pulse-dark 1s ease-in-out;
+}
+
+@keyframes highlight-pulse-dark {
+  0% { background-color: rgba(59, 130, 246, 0.2); }
+  50% { background-color: rgba(59, 130, 246, 0.4); }
+  100% { background-color: transparent; }
 }
 
 @media (min-width: 768px) {

@@ -53,6 +53,35 @@ export class ProfileSettingsComponent implements OnInit {
     '#f97316'  // orange
   ];
   
+  // Category suggestions
+  incomeCategorySuggestions = [
+    'Salary',
+    'Freelance',
+    'Consulting',
+    'Investments',
+    'Rental Income',
+    'Dividends',
+    'Client Payments',
+    'Commissions',
+    'Royalties',
+    'Side Gig'
+  ];
+
+  expenseCategorySuggestions = [
+    'Rent/Mortgage',
+    'Utilities',
+    'Business Expenses',
+    'Groceries',
+    'Transportation',
+    'Software/Subscriptions',
+    'Office Supplies',
+    'Insurance',
+    'Marketing',
+    'Travel',
+    'Professional Fees',
+    'Equipment'
+  ];
+  
   constructor(private http: HttpClient, private router: Router) {}
   
   ngOnInit() {
@@ -89,36 +118,9 @@ export class ProfileSettingsComponent implements OnInit {
     const savedIncomeCategories = localStorage.getItem('income_categories');
     const savedExpenseCategories = localStorage.getItem('expense_categories');
     
-    if (savedIncomeCategories) {
-      this.incomeCategories = JSON.parse(savedIncomeCategories);
-    } else {
-      // Default income categories
-      this.incomeCategories = [
-        { name: 'Salary' },
-        { name: 'Freelance' },
-        { name: 'Consulting' },
-        { name: 'Investment' },
-        { name: 'Other' }
-      ];
-    }
-    
-    if (savedExpenseCategories) {
-      this.expenseCategories = JSON.parse(savedExpenseCategories);
-    } else {
-      // Default expense categories
-      this.expenseCategories = [
-        { name: 'Rent/Mortgage' },
-        { name: 'Utilities' },
-        { name: 'Business Expenses' },
-        { name: 'Food' },
-        { name: 'Transportation' },
-        { name: 'Insurance' },
-        { name: 'Office Supplies' },
-        { name: 'Software & Subscriptions' },
-        { name: 'Travel' },
-        { name: 'Other' }
-      ];
-    }
+    // Initialize with empty arrays instead of defaults
+    this.incomeCategories = savedIncomeCategories ? JSON.parse(savedIncomeCategories) : [];
+    this.expenseCategories = savedExpenseCategories ? JSON.parse(savedExpenseCategories) : [];
     
     // TODO: If you have an API, you can also fetch from the server
     // this.http.get('/api/user/categories').subscribe({...});
@@ -131,9 +133,9 @@ export class ProfileSettingsComponent implements OnInit {
   
   addCategory(type: 'income' | 'expense') {
     if (type === 'income') {
-      this.incomeCategories.push({ name: '' });
+      this.incomeCategories.push({ name: 'New Category' });
     } else {
-      this.expenseCategories.push({ name: '' });
+      this.expenseCategories.push({ name: 'New Category' });
     }
   }
   
@@ -215,9 +217,14 @@ export class ProfileSettingsComponent implements OnInit {
     this.successMsg = '';
     this.errorMsg = '';
     
-    // Check if name is provided
+    // Check if name and email are provided
     if (!this.user.name.trim()) {
       this.errorMsg = 'Name is required';
+      return;
+    }
+
+    if (!this.user.email) {
+      this.errorMsg = 'Email is required';
       return;
     }
     
@@ -301,10 +308,76 @@ export class ProfileSettingsComponent implements OnInit {
         
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         this.errorMsg = error.error?.message || 'Failed to update password';
         this.loading = false;
       }
     });
+  }
+  
+  /**
+   * Add a suggested category to the appropriate list
+   */
+  addSuggestedCategory(type: 'income' | 'expense', name: string) {
+    // Check if category already exists
+    if (type === 'income') {
+      if (!this.incomeCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+        this.incomeCategories.push({ name });
+        
+        // Animate the newly added item
+        setTimeout(() => {
+          const elements = document.querySelectorAll('.category-item');
+          if (elements.length > 0) {
+            const lastElement = elements[elements.length - 1] as HTMLElement;
+            lastElement.classList.add('highlight-animation');
+            setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
+          }
+        }, 50);
+      } else {
+        // Highlight the existing category
+        const index = this.incomeCategories.findIndex(
+          cat => cat.name.toLowerCase() === name.toLowerCase()
+        );
+        if (index >= 0) {
+          setTimeout(() => {
+            const elements = document.querySelectorAll('.category-item');
+            if (elements.length > index) {
+              const element = elements[index] as HTMLElement;
+              element.classList.add('highlight-animation');
+              setTimeout(() => element.classList.remove('highlight-animation'), 1000);
+            }
+          }, 50);
+        }
+      }
+    } else {
+      if (!this.expenseCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+        this.expenseCategories.push({ name });
+        
+        // Animate the newly added item
+        setTimeout(() => {
+          const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
+          if (elements.length > 0) {
+            const lastElement = elements[elements.length - 1] as HTMLElement;
+            lastElement.classList.add('highlight-animation');
+            setTimeout(() => lastElement.classList.remove('highlight-animation'), 1000);
+          }
+        }, 50);
+      } else {
+        // Highlight the existing category
+        const index = this.expenseCategories.findIndex(
+          cat => cat.name.toLowerCase() === name.toLowerCase()
+        );
+        if (index >= 0) {
+          setTimeout(() => {
+            const elements = document.querySelectorAll('.categories-section:nth-child(2) .category-item');
+            if (elements.length > index) {
+              const element = elements[index] as HTMLElement;
+              element.classList.add('highlight-animation');
+              setTimeout(() => element.classList.remove('highlight-animation'), 1000);
+            }
+          }, 50);
+        }
+      }
+    }
   }
 }
