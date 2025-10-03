@@ -7,7 +7,6 @@ import { Router, RouterLink } from '@angular/router';
 interface Category {
   name: string;
   _id?: string;
-  color?: string;
 }
 
 @Component({
@@ -115,45 +114,16 @@ export class ProfileSettingsComponent implements OnInit {
   }
   
   loadCategories() {
-    // Get user ID from localStorage
-    const userId = localStorage.getItem('user_id');
-    
-    if (userId) {
-      // Use the API URL without hardcoding localhost
-      const apiUrl = `/api/categories/user/${userId}`;
-      console.log('Fetching categories from:', apiUrl);
-      
-      this.http.get(apiUrl).subscribe({
-        next: (response: any) => {
-          console.log('Categories API response:', response);
-          if (response.success && response.data) {
-            this.incomeCategories = response.data.incomeCategories || [];
-            this.expenseCategories = response.data.expenseCategories || [];
-          } else {
-            // If no categories in the API, load from localStorage
-            this.loadCategoriesFromLocalStorage();
-          }
-        },
-        error: (error) => {
-          console.error('Error fetching categories:', error);
-          // Fallback to localStorage if API call fails
-          this.loadCategoriesFromLocalStorage();
-        }
-      });
-    } else {
-      // Not logged in, use localStorage
-      this.loadCategoriesFromLocalStorage();
-    }
-  }
-  
-  loadCategoriesFromLocalStorage() {
-    // Fetch categories from localStorage
+    // Fetch categories from localStorage first
     const savedIncomeCategories = localStorage.getItem('income_categories');
     const savedExpenseCategories = localStorage.getItem('expense_categories');
     
     // Initialize with empty arrays instead of defaults
     this.incomeCategories = savedIncomeCategories ? JSON.parse(savedIncomeCategories) : [];
     this.expenseCategories = savedExpenseCategories ? JSON.parse(savedExpenseCategories) : [];
+    
+    // TODO: If you have an API, you can also fetch from the server
+    // this.http.get('/api/user/categories').subscribe({...});
   }
   
   getCategoryColor(index: number, type: 'income' | 'expense'): string {
@@ -186,52 +156,32 @@ export class ProfileSettingsComponent implements OnInit {
     this.incomeCategories = this.incomeCategories.filter(cat => cat.name.trim() !== '');
     this.expenseCategories = this.expenseCategories.filter(cat => cat.name.trim() !== '');
     
-    // Save to localStorage as backup
+    // Save to localStorage
     localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
     localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
     
-    // Get user ID
-    const userId = localStorage.getItem('user_id');
+    // TODO: If you have an API, save to the server
+    // const payload = {
+    //   incomeCategories: this.incomeCategories,
+    //   expenseCategories: this.expenseCategories
+    // };
+    // 
+    // this.http.post('/api/user/categories', payload).subscribe({
+    //   next: (response: any) => {
+    //     this.successMsg = 'Categories saved successfully!';
+    //     this.loading = false;
+    //   },
+    //   error: (error) => {
+    //     this.errorMsg = error.error?.message || 'Failed to save categories';
+    //     this.loading = false;
+    //   }
+    // });
     
-    if (userId) {
-      // Prepare all categories for API
-      const categories = [
-        ...this.incomeCategories.map(cat => ({
-          name: cat.name,
-          type: 'income',
-          color: cat.color || this.getCategoryColor(this.incomeCategories.indexOf(cat), 'income')
-        })),
-        ...this.expenseCategories.map(cat => ({
-          name: cat.name,
-          type: 'expense',
-          color: cat.color || this.getCategoryColor(this.expenseCategories.indexOf(cat), 'expense')
-        }))
-      ];
-      
-      // Use relative URL instead of hardcoding localhost
-      const apiUrl = '/api/categories/batch';
-      console.log('Saving categories to:', apiUrl);
-      
-      // Save to API
-      this.http.post(apiUrl, { userId, categories }).subscribe({
-        next: (response: any) => {
-          console.log('Save categories response:', response);
-          this.successMsg = 'Categories saved successfully!';
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error saving categories:', error);
-          this.errorMsg = error.error?.message || 'Failed to save categories';
-          this.loading = false;
-        }
-      });
-    } else {
-      // No user ID, just show success from localStorage
-      setTimeout(() => {
-        this.successMsg = 'Categories saved locally!';
-        this.loading = false;
-      }, 800);
-    }
+    // For now, simulate API call with timeout
+    setTimeout(() => {
+      this.successMsg = 'Categories saved successfully!';
+      this.loading = false;
+    }, 800);
   }
   
   toggleProfileMenu() {
@@ -288,7 +238,7 @@ export class ProfileSettingsComponent implements OnInit {
     };
     
     // Make API call to update name
-    this.http.post('http://localhost:5000/api/users/update-profile', userData).subscribe({
+    this.http.post('/api/users/update-profile', userData).subscribe({
       next: (response: any) => {
         this.successMsg = 'Profile updated successfully!';
         
@@ -347,7 +297,7 @@ export class ProfileSettingsComponent implements OnInit {
     };
     
     // Make API call to update password
-    this.http.post('http://localhost:5000/api/users/update-password', passwordData).subscribe({
+    this.http.post('/api/users/update-password', passwordData).subscribe({
       next: (response: any) => {
         this.successMsg = 'Password updated successfully!';
         
