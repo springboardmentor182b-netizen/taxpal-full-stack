@@ -52,6 +52,9 @@
           [(ngModel)]="email"
           required
         >
+        <div class="form-error" *ngIf="email && !isValidEmail(email)">
+          Please enter a valid email address
+        </div>
       </div>
       <div class="form-group">
         <label for="password">Create a secure password</label>
@@ -76,6 +79,9 @@
               <line x1="2" x2="22" y1="2" y2="22"/>
             </svg>
           </button>
+        </div>
+        <div class="form-error" *ngIf="password && password.length < 8">
+          Password must be at least 8 characters long
         </div>
       </div>
       <div class="form-group">

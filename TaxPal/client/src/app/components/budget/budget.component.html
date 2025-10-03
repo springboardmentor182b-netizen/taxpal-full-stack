@@ -1,13 +1,18 @@
 <div class="budget-page">
     <main class="budget-main">
         <div class="budget-container">
+            <!-- Form Section - Left side -->
             <div class="form-section">
                 <div class="form-card" role="dialog" aria-labelledby="createBudgetTitle" aria-modal="true">
                     <div class="form-card-header">
                         <h2 id="createBudgetTitle" class="form-card-title">Create New Budget</h2>
                     </div>
 
+                    <!-- Display error message if any -->
+                    <div class="error-alert" *ngIf="error">{{ error }}</div>
+
                     <form class="budget-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+                        <!-- Amount field -->
                         <div class="form-group">
                             <label for="amount">Budget Amount</label>
                             <div class="currency-wrap">
@@ -29,33 +34,91 @@
                             </span>
                         </div>
 
+                        <!-- Category field -->
+                        <div class="form-group">
+                            <label for="category">Category</label>
+                            <select 
+                                id="category" 
+                                class="input" 
+                                formControlName="category" 
+                                required>
+                                <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+                            </select>
+                        </div>
+
+                        <!-- Date field -->
+                        <div class="form-group">
+                            <label for="date">Budget Date</label>
+                            <input 
+                                id="date" 
+                                type="date" 
+                                class="input" 
+                                formControlName="date" 
+                                required />
+                        </div>
+
+                        <!-- Description field -->
+                        <div class="form-group">
+                            <label for="description">Description (optional)</label>
+                            <textarea 
+                                id="description" 
+                                class="input" 
+                                formControlName="description"
+                                rows="3"
+                                placeholder="Enter any additional notes..."></textarea>
+                            <span 
+                                class="error-message" 
+                                *ngIf="form.get('description')?.invalid">
+                                Description cannot exceed 200 characters
+                            </span>
+                        </div>
+
                         <div class="actions">
-                            <a routerLink="/dashboard" class="btn btn-ghost">Cancel</a>
+                            <a routerLink="/user-profile" class="btn btn-ghost">Cancel</a>
                             <button 
                                 type="submit" 
                                 class="btn btn-primary"
-                                [disabled]="form.invalid">
-                                Create Budget
+                                [disabled]="form.invalid || loading">
+                                <span *ngIf="loading">Creating...</span>
+                                <span *ngIf="!loading">Create Budget</span>
                             </button>
                         </div>
                     </form>
                 </div>
             </div>
 
-            <!-- Budgets List -->
-            <div class="form-card" style="margin-top:16px" *ngIf="budgets?.length">
-                <div class="form-card-header">
-                    <h2 class="form-card-title">Your Budgets</h2>
-                </div>
-                <div class="budget-form" style="padding-top:16px">
-                    <div class="budget-table-simple">
-                        <div class="budget-row budget-head">
-                            <div>Budget Amount</div>
-                            <div>Created</div>
+            <!-- Budgets List - Right side -->
+            <div class="budget-list-section">
+                <div class="form-card">
+                    <div class="form-card-header">
+                        <h2 class="form-card-title">Your Budgets</h2>
+                    </div>
+                    <div class="budget-form" style="padding-top:16px">
+                        <!-- Loading state -->
+                        <div *ngIf="loading" class="loading-indicator">Loading budgets...</div>
+                        
+                        <!-- Error state -->
+                        <div *ngIf="error" class="error-message">{{ error }}</div>
+                        
+                        <!-- Empty state -->
+                        <div *ngIf="!loading && !budgets?.length" class="empty-state">
+                            No budgets found. Create your first budget using the form.
                         </div>
-                        <div class="budget-row" *ngFor="let b of budgets">
-                            <div>${{ b.limit | number:'1.2-2' }}</div>
-                            <div>{{ b.createdAt | date:'MMM dd, yyyy' }}</div>
+                        
+                        <!-- Budget table -->
+                        <div class="budget-table-simple" *ngIf="!loading && budgets?.length">
+                            <div class="budget-row budget-head">
+                                <div>Amount</div>
+                                <div>Category</div>
+                                <div>Date</div>
+                                <div>Description</div>
+                            </div>
+                            <div class="budget-row" *ngFor="let b of budgets">
+                                <div>${{ b.amount | number:'1.2-2' }}</div>
+                                <div>{{ b.category }}</div>
+                                <div>{{ b.date | date:'MMM dd, yyyy' }}</div>
+                                <div class="budget-description">{{ b.description }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>

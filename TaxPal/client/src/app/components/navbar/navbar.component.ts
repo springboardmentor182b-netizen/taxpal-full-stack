@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink, Router, NavigationEnd } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { SignInFormComponent } from '../signin/sign-in-form.component';
 import { SignUpFormComponent } from '../signup/sign-up-form.component';
 
@@ -17,11 +17,11 @@ export class NavbarComponent implements OnInit, OnDestroy {
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
   private animationInterval: any;
+
   showSignInForm = false;
   showSignUpForm = false;
-  isProfilePage = false;
-
-  constructor(private router: Router) {
+  
+  constructor() {
     // Check for saved preference on component initialization
     const savedDarkMode = localStorage.getItem('darkMode');
     if (savedDarkMode === 'true') {
@@ -33,25 +33,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.startEmojiAnimation();
     
-    // Subscribe to router events to detect when we're on a profile page
-    this.router.events.subscribe(event => {
-      if (event instanceof NavigationEnd) {
-        const url = event.url;
-        this.isProfilePage = url.includes('/user-profile') || 
-                            url.includes('/transactions') || 
-                            url.includes('/budget') || 
-                            url.includes('/reports') || 
-                            url.includes('/tax-estimator');
-      }
-    });
-    
-    // Check initial URL
-    const currentUrl = this.router.url;
-    this.isProfilePage = currentUrl.includes('/user-profile') || 
-                        currentUrl.includes('/transactions') || 
-                        currentUrl.includes('/budget') || 
-                        currentUrl.includes('/reports') || 
-                        currentUrl.includes('/tax-estimator');
+    // Apply dark mode if needed on component init
+    if (this.isDarkMode) {
+      setTimeout(() => {
+        this.applyDarkMode();
+      }, 100);
+    }
   }
 
   ngOnDestroy() {
@@ -95,40 +82,47 @@ export class NavbarComponent implements OnInit, OnDestroy {
 
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
-    this.applyDarkMode();
     
-    // Save preference to localStorage
+    setTimeout(() => {
+      this.applyDarkMode();
+    }, 0);
+    
     localStorage.setItem('darkMode', this.isDarkMode.toString());
   }
 
   private applyDarkMode() {
-    // Apply dark mode to document body for global styling
-    if (document.body) {
-      document.body.classList.toggle('dark-mode', this.isDarkMode);
+    if (this.isDarkMode) {
+      document.body.classList.add('dark-mode');
+      document.documentElement.classList.add('dark-mode');
+      document.body.classList.add('dark');
+      document.documentElement.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark-mode');
+      document.documentElement.classList.remove('dark-mode');
+      document.body.classList.remove('dark');
+      document.documentElement.classList.remove('dark');
     }
-    
-    // Apply dark mode to HTML element to allow for CSS variable targeting
-    document.documentElement.classList.toggle('dark', this.isDarkMode);
   }
-
+  
+  isUserLoggedIn(): boolean {
+    return localStorage.getItem('user_email') !== null;
+  }
+  
   openSignInForm(event: Event) {
     event.preventDefault();
     this.showSignInForm = true;
     this.showSignUpForm = false;
-    document.body.classList.add('no-scroll');
   }
-
+  
   openSignUpForm(event: Event) {
     event.preventDefault();
     this.showSignUpForm = true;
     this.showSignInForm = false;
-    document.body.classList.add('no-scroll');
   }
-
+  
   closeAuthForms() {
     this.showSignInForm = false;
     this.showSignUpForm = false;
-    document.body.classList.remove('no-scroll');
   }
   
   switchToSignUp() {

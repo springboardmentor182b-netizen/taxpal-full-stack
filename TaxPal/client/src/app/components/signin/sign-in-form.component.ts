@@ -100,16 +100,37 @@ export class SignInFormComponent implements OnInit, OnDestroy {
     try {
       const res: any = await this.http.post('/api/users/signin', {
         email: this.email,
-        password: this.password // only if you want to check password
+        password: this.password
       }).toPromise();
-      this.successMsg = 'Signed in! Redirecting...';
-      setTimeout(() => {
-        // ...close modal and navigate as needed...
-        this.closeForm();
-        this.router.navigate(['/user-profile']);
-      }, 1200);
+      
+      this.successMsg = 'Signed in!';
+      
+      // Store user info in localStorage or a service
+      if (res?.user) {
+        localStorage.setItem('user_email', res.user.email);
+        localStorage.setItem('user_name', res.user.name || '');
+        localStorage.setItem('user_id', res.user._id || '');
+        
+        // Create a custom event to notify other components about the user login
+        const loginEvent = new CustomEvent('userLoggedIn', { 
+          detail: { email: res.user.email, name: res.user.name } 
+        });
+        window.dispatchEvent(loginEvent);
+      }
+      
+      // Immediate navigation without delay
+      this.closeForm();
+      this.router.navigate(['/user-profile']);
     } catch (err: any) {
-      this.errorMsg = err?.error?.error || 'No account found';
+      console.error('Sign in error:', err);
+      // Show more specific error messages
+      if (err.status === 401) {
+        this.errorMsg = 'Incorrect password';
+      } else if (err.status === 404) {
+        this.errorMsg = 'No account found with that email';
+      } else {
+        this.errorMsg = err?.error?.error || 'Failed to sign in. Please try again.';
+      }
     } finally {
       this.loading = false;
     }

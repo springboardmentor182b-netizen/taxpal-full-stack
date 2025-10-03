@@ -1,12 +1,15 @@
 import { Routes } from '@angular/router';
+import { HomeComponent } from './components/home/home.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { ProfileSettingsComponent } from './components/profile-settings/profile-settings.component';
 
+// Define the routes
 export const routes: Routes = [
   // Root route goes to home, not directly to user-profile
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
+  { path: '', component: HomeComponent },
 
   // Home page route (we'll create this component)
-  { path: 'home', loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent) },
+  { path: 'home', component: HomeComponent },
 
   // User dashboard routes
   { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
@@ -19,7 +22,10 @@ export const routes: Routes = [
   // Add the profile settings route
   {
     path: 'profile-settings',
-    loadComponent: () => import('./pages/profile-settings/profile-settings.component').then(m => m.ProfileSettingsComponent),
+    component: ProfileSettingsComponent,
     title: 'Profile Settings - TaxPal'
   },
+
+  // Redirect to home for any unknown routes
+  { path: '**', redirectTo: '' }
 ];

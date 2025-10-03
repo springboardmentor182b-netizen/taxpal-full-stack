@@ -1,0 +1,148 @@
+<!-- Categories Card -->
+<div class="settings-card categories-card">
+  <div class="card-header">
+    <h2>
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="12 2 2 7 12 12 22 7 12 2"/>
+        <polyline points="2 17 12 22 22 17"/>
+        <polyline points="2 12 12 17 22 12"/>
+      </svg>
+      Custom Categories
+    </h2>
+  </div>
+  <div class="card-body">
+    <!-- Status messages -->
+    <div *ngIf="successMsg" class="success-message">{{ successMsg }}</div>
+    <div *ngIf="errorMsg" class="error-message">{{ errorMsg }}</div>
+    
+    <div class="categories-container">
+      <!-- Income Categories Section -->
+      <div class="categories-section income-categories">
+        <h3 class="section-title">
+          <svg class="category-icon income" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          Income Categories
+        </h3>
+        
+        <!-- Category Suggestions -->
+        <div class="category-suggestions">
+          <p class="suggestion-label">Suggested categories:</p>
+          <div class="suggestion-chips">
+            <button 
+              *ngFor="let suggestion of incomeCategorySuggestions" 
+              class="suggestion-chip" 
+              type="button"
+              (click)="addSuggestedCategory('income', suggestion)">
+              <span>{{ suggestion }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="categories-list">
+          <div *ngIf="incomeCategories.length === 0" class="no-categories-message">
+            <p>No income categories added yet. Add categories to organize your income records.</p>
+          </div>
+
+          <div class="category-item" *ngFor="let category of incomeCategories; let i = index">
+            <div class="category-name">
+              <span class="category-color" [style.background-color]="getCategoryColor(i, 'income')"></span>
+              <input type="text" [(ngModel)]="category.name" placeholder="Category Name">
+            </div>
+            <div class="category-actions">
+              <button class="btn-icon" (click)="removeCategory(i, 'income')" aria-label="Remove category">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Add New Income Category Button -->
+          <button class="add-category-btn" (click)="addCategory('income')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Add Income Category
+          </button>
+        </div>
+      </div>
+      
+      <!-- Expense Categories Section -->
+      <div class="categories-section expense-categories">
+        <h3 class="section-title">
+          <svg class="category-icon expense" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+          Expense Categories
+        </h3>
+        
+        <!-- Category Suggestions -->
+        <div class="category-suggestions">
+          <p class="suggestion-label">Suggested categories:</p>
+          <div class="suggestion-chips">
+            <button 
+              *ngFor="let suggestion of expenseCategorySuggestions" 
+              class="suggestion-chip" 
+              type="button"
+              (click)="addSuggestedCategory('expense', suggestion)">
+              <span>{{ suggestion }}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <div class="categories-list">
+          <div *ngIf="expenseCategories.length === 0" class="no-categories-message">
+            <p>No expense categories added yet. Add categories to organize your expense records.</p>
+          </div>
+
+          <div class="category-item" *ngFor="let category of expenseCategories; let i = index">
+            <div class="category-name">
+              <span class="category-color" [style.background-color]="getCategoryColor(i, 'expense')"></span>
+              <input type="text" [(ngModel)]="category.name" placeholder="Category Name">
+            </div>
+            <div class="category-actions">
+              <button class="btn-icon" (click)="removeCategory(i, 'expense')" aria-label="Remove category">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Add New Expense Category Button -->
+          <button class="add-category-btn" (click)="addCategory('expense')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="16"></line>
+              <line x1="8" y1="12" x2="16" y2="12"></line>
+            </svg>
+            Add Expense Category
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-actions">
+      <button class="btn btn-primary" (click)="saveCategories()" [disabled]="loading">
+        <span *ngIf="loading" class="loader"></span>
+        <span *ngIf="!loading">Save Categories</span>
+      </button>
+    </div>
+  </div>
+</div>

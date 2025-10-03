@@ -102,9 +102,17 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
     return this.firstName && 
            this.lastName && 
            this.email && 
+           this.isValidEmail(this.email) && 
            this.password && 
+           this.password.length >= 8 &&  // Ensure password has minimum length
            this.country && 
            this.agreeToTerms;
+  }
+  
+  // Add email validation method
+  isValidEmail(email: string): boolean {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
   }
   
   async createAccount() {
@@ -116,8 +124,8 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
     const payload = {
       email: this.email,
       name: `${this.firstName} ${this.lastName}`.trim(),
-      country: this.country
-      // password: this.password, // Uncomment if backend supports password
+      country: this.country,
+      password: this.password  // Include password in the payload
     };
 
     try {

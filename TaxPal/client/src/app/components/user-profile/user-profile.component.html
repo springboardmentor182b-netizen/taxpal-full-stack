@@ -1,19 +1,53 @@
 <div class="profile-container" [ngClass]="{'dark': isDarkMode}">
-  <!-- User Profile Avatar -->
-  <!-- REMOVE this block to stop showing the letter and name below navbar -->
-  <!--
-  <div class="user-profile-avatar">
-    <div class="avatar-circle">
-      {{ userInitial }}
+  <!-- User Profile Circle Avatar - Top right corner -->
+  <div class="hero-user-profile">
+    <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
+      <span>{{ userInitial }}</span>
+    </button>
+    
+    <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
+      <div class="profile-section">
+        <div class="profile-info centered-profile">
+          <h3>{{ userName || 'User' }}</h3>
+          <p>{{ userEmail }}</p>
+        </div>
+      </div>
+      <div class="profile-menu-divider"></div>
+      <div class="profile-menu-items">
+        <a [routerLink]="['/user-profile']" class="profile-menu-item" (click)="closeProfileMenu()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="9"/>
+            <rect x="14" y="3" width="7" height="5"/>
+            <rect x="14" y="12" width="7" height="9"/>
+            <rect x="3" y="16" width="7" height="5"/>
+          </svg>
+          <span>Dashboard</span>
+        </a>
+        <a [routerLink]="['/profile-settings']" class="profile-menu-item" (click)="closeProfileMenu()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+          <span>Profile Settings</span>
+        </a>
+        <div class="profile-menu-divider"></div>
+        <button type="button" class="profile-menu-item logout-item" (click)="logout()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+      </div>
     </div>
-    <span class="user-full-name">{{ userName }}</span>
   </div>
-  -->
+  
   <div class="profile-content">
     <!-- Dashboard Header -->
     <div class="dashboard-header">
-      <h1>Dashboard</h1>
-      <p class="dashboard-subtitle">Track your freelance income, expenses, and financial goals</p>
+      <h1 class="page-title">Welcome back, {{ userName || 'User' }}</h1>
+      <p class="subtitle">Here's an overview of your tax and financial status</p>
     </div>
 
     <!-- Financial Metrics Cards -->
@@ -383,110 +417,11 @@
       </div>
     </div>
 
-    <!-- Charts Section -->
-    <div class="charts-grid">
-      <!-- Income vs Expenses Chart -->
-      <div class="dashboard-section">
-        <div class="section-header">
-          <h3>Income vs Expenses</h3>
-          <div class="chart-controls">
-            <button class="chart-btn active">Week</button>
-            <button class="chart-btn">Month</button>
-            <button class="chart-btn">Year</button>
-          </div>
-        </div>
-        <div class="chart-container">
-          <div class="chart-legend">
-            <div class="legend-item">
-              <div class="legend-color income"></div>
-              <span>Income</span>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color expenses"></div>
-              <span>Expenses</span>
-            </div>
-          </div>
-          
-          <div class="bar-chart">
-            <div class="month-group">
-              <div class="bar-container">
-                <div class="bar income-bar" style="height: 80%;" title="$8,500">
-                  <span class="bar-value">$8.5k</span>
-                </div>
-                <div class="bar expense-bar" style="height: 60%;" title="$5,100">
-                  <span class="bar-value">$5.1k</span>
-                </div>
-              </div>
-              <div class="month-label">Jan</div>
-            </div>
-            
-            <div class="month-group">
-              <div class="bar-container">
-                <div class="bar income-bar" style="height: 65%;" title="$6,900">
-                  <span class="bar-value">$6.9k</span>
-                </div>
-                <div class="bar expense-bar" style="height: 50%;" title="$4,200">
-                  <span class="bar-value">$4.2k</span>
-                </div>
-              </div>
-              <div class="month-label">Feb</div>
-            </div>
-            
-            <div class="month-group">
-              <div class="bar-container">
-                <div class="bar income-bar" style="height: 90%;" title="$9,600">
-                  <span class="bar-value">$9.6k</span>
-                </div>
-                <div class="bar expense-bar" style="height: 62%;" title="$5,300">
-                  <span class="bar-value">$5.3k</span>
-                </div>
-              </div>
-              <div class="month-label">Mar</div>
-            </div>
-            
-            <div class="month-group">
-              <div class="bar-container">
-                <div class="bar income-bar" style="height: 75%;" title="$8,000">
-                  <span class="bar-value">$8.0k</span>
-                </div>
-                <div class="bar expense-bar" style="height: 55%;" title="$4,700">
-                  <span class="bar-value">$4.7k</span>
-                </div>
-              </div>
-              <div class="month-label">Apr</div>
-            </div>
-            
-            <div class="month-group">
-              <div class="bar-container">
-                <div class="bar income-bar" style="height: 85%;" title="$9,100">
-                  <span class="bar-value">$9.1k</span>
-                </div>
-                <div class="bar expense-bar" style="height: 58%;" title="$4,950">
-                  <span class="bar-value">$5.0k</span>
-                </div>
-              </div>
-              <div class="month-label">May</div>
-            </div>
-            
-            <div class="month-group">
-              <div class="bar-container">
-                <div class="bar income-bar" style="height: 95%;" title="$10,200">
-                  <span class="bar-value">$10.2k</span>
-                </div>
-                <div class="bar expense-bar" style="height: 65%;" title="$5,500">
-                  <span class="bar-value">$5.5k</span>
-                </div>
-              </div>
-              <div class="month-label">Jun</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <!-- Income vs Expenses Chart - Removed as per new design -->
 
     <!-- Welcome Section -->
     <div class="welcome-section">
-      <h2>Welcome back, Sam</h2>
+      <h2>Welcome back, {{ userName || 'User' }}</h2>
       <p class="subtitle">Here's an overview of your tax and financial status</p>
     </div>
   </div>
@@ -612,4 +547,70 @@
       </div>
     </div>
   </div>
+
+  <!-- Replace your existing chart implementation with this one -->
+  <div class="card finance-chart-card">
+    <div class="card-header">
+      <h2 class="chart-title">Monthly Income & Expenses</h2>
+    </div>
+    <div class="card-body" style="padding-bottom: 60px;">
+      <div *ngIf="!hasFinancialData()" class="no-data-message">
+        <p>No financial data available yet. Add income and expenses to see your financial chart.</p>
+      </div>
+      
+      <div *ngIf="hasFinancialData()" class="finance-chart">
+        <div class="chart-container">
+          <div class="chart-y-axis">
+            <div class="axis-value" *ngFor="let value of yAxisValues">{{formatCurrency(value)}}</div>
+          </div>
+          
+          <div class="chart-bars">
+            <div class="month-column" *ngFor="let month of getDisplayMonths()">
+              <div class="bar-group">
+                <div class="bar income-bar" 
+                     [style.height.%]="getBarHeight(month.income)"
+                     [attr.data-label]="'Income'"
+                     [attr.data-value]="formatCurrency(month.income)"
+                     [attr.data-month]="month.month"
+                     (mouseenter)="showTooltip($event)"
+                     (mouseleave)="hideTooltip()">
+                </div>
+                <div class="bar expense-bar" 
+                     [style.height.%]="getBarHeight(month.expense)"
+                     [attr.data-label]="'Expense'"
+                     [attr.data-value]="formatCurrency(month.expense)"
+                     [attr.data-month]="month.month"
+                     (mouseenter)="showTooltip($event)"
+                     (mouseleave)="hideTooltip()">
+                </div>
+              </div>
+              <div class="month-label">{{month.month}}</div>
+            </div>
+          </div>
+          
+          <div class="chart-legend">
+            <div class="legend-item">
+              <div class="legend-color income-color"></div>
+              <div class="legend-label">Income</div>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color expense-color"></div>
+              <div class="legend-label">Expenses</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add tooltip element -->
+  <div id="chart-tooltip" class="chart-tooltip" [ngStyle]="tooltipStyle">
+    <div class="tooltip-month" *ngIf="tooltipData.month">{{tooltipData.month}}</div>
+    <div class="tooltip-value" *ngIf="tooltipData.label">
+      <strong>{{tooltipData.label}}:</strong> {{tooltipData.value}}
+    </div>
+  </div>
+
+  <!-- Backdrop overlay when profile menu is open -->
+  <div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeProfileMenu()"></div>
 </div>

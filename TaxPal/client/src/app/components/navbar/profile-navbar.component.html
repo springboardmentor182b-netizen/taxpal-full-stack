@@ -17,36 +17,52 @@
         </a>
       </div>
       <div class="nav-links">
-        <a routerLink="/features" class="nav-link">
+        <a routerLink="/user-profile" class="nav-link" [class.active]="isActiveRoute('/user-profile')">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+            <rect x="3" y="3" width="7" height="9"/>
+            <rect x="14" y="3" width="7" height="5"/>
+            <rect x="14" y="12" width="7" height="9"/>
+            <rect x="3" y="16" width="7" height="5"/>
           </svg>
-          <span>Features</span>
+          <span>Dashboard</span>
         </a>
-        <a routerLink="/plan" class="nav-link">
+        <a routerLink="/transactions" class="nav-link" [class.active]="isActiveRoute('/transactions')">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
+            <rect x="2" y="3" width="20" height="18" rx="2"/>
+            <path d="M7 8h10"/>
+            <path d="M7 13h10"/>
+            <path d="M7 18h4"/>
           </svg>
-          <span>Plan</span>
+          <span>Transactions</span>
         </a>
-        <a routerLink="/support" class="nav-link">
+        <a routerLink="/budget" class="nav-link" [class.active]="isActiveRoute('/budget')">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M16 12h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/>
+            <path d="M12 6v2"/>
+            <path d="M12 16v2"/>
           </svg>
-          <span>Support</span>
+          <span>Budget</span>
         </a>
-        <a routerLink="/about" class="nav-link">
+        <a routerLink="/reports" class="nav-link" [class.active]="isActiveRoute('/reports')">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="16"></line>
-            <line x1="8" y1="12" x2="16" y2="12"></line>
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6"/>
+            <path d="M16 13H8"/>
+            <path d="M16 17H8"/>
+            <path d="M10 9H8"/>
           </svg>
-          <span>About</span>
+          <span>Reports</span>
+        </a>
+        <a routerLink="/tax-estimator" class="nav-link" [class.active]="isActiveRoute('/tax-estimator')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
+            <rect x="2" y="4" width="20" height="16" rx="2"/>
+            <path d="M7 15h0"/>
+            <path d="M12 15h0"/>
+            <path d="M17 15h0"/>
+            <path d="M7 8h10"/>
+          </svg>
+          <span style="white-space: nowrap;">Tax Estimator</span>
         </a>
       </div>
       <div class="right-container">
@@ -66,30 +82,11 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
-        <div class="auth-buttons" *ngIf="!isUserLoggedIn()">
-          <a class="login-btn btn" (click)="openSignInForm($event)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
-              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-              <polyline points="10 17 15 12 10 7"/>
-              <line x1="15" y1="12" x2="3" y2="12"/>
-            </svg>
-            <span>Sign in</span>
-          </a>
-          <a class="register-btn btn" (click)="openSignUpForm($event)">Get started</a>
-        </div>
+        <!-- No logout button here as it's already in the user profile dropdown -->
       </div>
     </div>
   </div>
 </nav>
 
-<app-sign-in-form 
-  *ngIf="showSignInForm" 
-  (close)="closeAuthForms()"
-  (switchToSignUp)="switchToSignUp()"
-></app-sign-in-form>
-
-<app-sign-up-form 
-  *ngIf="showSignUpForm" 
-  (close)="closeAuthForms()"
-  (switchToSignIn)="switchToSignIn()"
-></app-sign-up-form>
+<!-- Backdrop overlay when menu is open -->
+<div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeMenu()"></div>

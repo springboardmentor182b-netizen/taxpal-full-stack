@@ -46,12 +46,18 @@ body.light-mode {
 
 .budget-container {
     width: 100%;
-    max-width: 600px;
+    max-width: 1200px; /* Increased from 600px */
+    display: flex;     /* Added to create horizontal layout */
+    flex-direction: row; /* Added to create horizontal layout */
+    gap: 20px;         /* Space between form and budget list */
+    flex-wrap: wrap;   /* Allow wrapping on smaller screens */
 }
 
 /* Form Section */
 .form-section {
-    width: 100%;
+    width: 48%;        /* Changed from 100% to roughly half */
+    min-width: 320px;  /* Ensure minimum width for usability */
+    flex: 1;           /* Allow flexible growth */
 }
 
 .form-card {
@@ -126,6 +132,23 @@ body.light-mode {
 .input::placeholder {
     color: var(--muted);
     font-weight: 400;
+}
+
+/* Additional styles for new form fields */
+textarea.input {
+    resize: vertical;
+    min-height: 80px;
+}
+
+select.input {
+    padding-right: 30px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239aa8b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 16px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 /* Currency Wrapper */
@@ -244,7 +267,7 @@ body.light-mode {
 /* Budgets list - simplified */
 .budget-table-simple {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 2fr;
     row-gap: 12px;
     padding: 16px;
     background: var(--card-darker);
@@ -268,6 +291,13 @@ body.light-mode {
     padding: 12px 0;
     border-bottom: 1px solid var(--border-color);
     color: var(--text-light);
+}
+
+.budget-description {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
 }
 
 /* Light mode adjustments */
@@ -347,6 +377,17 @@ body.light-mode .budget-row:not(.budget-head) > div {
     .form-card-title {
         font-size: 22px;
     }
+
+    .budget-table-simple {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .budget-row.budget-head:nth-child(3),
+    .budget-row.budget-head:nth-child(4),
+    .budget-row:not(.budget-head) :nth-child(3),
+    .budget-row:not(.budget-head) :nth-child(4) {
+        display: none;
+    }
 }
 
 @media (max-width: 480px) {
@@ -370,5 +411,16 @@ body.light-mode .budget-row:not(.budget-head) > div {
     .actions {
         margin-top: 16px;
         padding-top: 16px;
+    }
+}
+
+@media (max-width: 992px) {
+    .budget-container {
+        flex-direction: column;
+    }
+    
+    .form-section,
+    .budget-list-section {
+        width: 100%;
     }
 }
