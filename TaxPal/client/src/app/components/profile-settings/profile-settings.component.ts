@@ -119,8 +119,8 @@ export class ProfileSettingsComponent implements OnInit {
     const userId = localStorage.getItem('user_id');
     
     if (userId) {
-      // Use the correct API URL (no trailing slash)
-      const apiUrl = `http://localhost:5000/api/categories/user/${userId}`;
+      // Use the API URL without hardcoding localhost
+      const apiUrl = `/api/categories/user/${userId}`;
       console.log('Fetching categories from:', apiUrl);
       
       this.http.get(apiUrl).subscribe({
@@ -208,7 +208,8 @@ export class ProfileSettingsComponent implements OnInit {
         }))
       ];
       
-      const apiUrl = 'http://localhost:5000/api/categories/batch';
+      // Use relative URL instead of hardcoding localhost
+      const apiUrl = '/api/categories/batch';
       console.log('Saving categories to:', apiUrl);
       
       // Save to API
