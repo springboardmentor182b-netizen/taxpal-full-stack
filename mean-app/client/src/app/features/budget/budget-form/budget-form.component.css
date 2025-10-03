@@ -31,21 +31,51 @@
     font-size: var(--font-size);
 }
 
-/* 4. Remove Hardcoded Margins that caused misalignment */
+
 .heading {
-    /* REMOVED: margin-left: 240px; */
+   
     color: var(--color-primary-500);
 }
 
+.budget-tables {
+  
+    display: flex;
+    
+    gap: 20px; 
+    margin-bottom: 30px;
+}
+
+.left-item {
+    /* flex: <grow> <shrink> <basis> */
+    /* Grow by a factor of 7 (representing 70%) */
+    flex: 8 1 auto; /* You can also use flex: 7; since the default for the rest is usually what you want */
+    background: #f9f9f9;
+     
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: block; 
+}
+
+.right-item {
+    /* Grow by a factor of 3 (representing 30%) */
+    flex: 2 1 auto; /* You can also use flex: 3; */
+    background:#f9f9f9;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    display: block; 
+    color: #ca8a04;
+}
+
+
 .budget-table {
     background: #fff;
+    
     border-radius: 1rem;
     padding: 1.5rem;
     overflow-x: auto;
-    /* REMOVED: margin-left: 240px; */
+    
 }
 
-/* 5. Modal Fixes (To center it correctly over the whole screen) */
 .modal {
     background: #fff;
     max-width: 640px;
@@ -53,8 +83,8 @@
     border-radius: 1rem;
     padding: 2rem;
     position: relative;
-    /* REMOVED: margin-left: 180px; */
-    /* REMOVED: margin-top: 38px; */
+ margin-top: 80px;
+ margin-left: 200px;
 }
 
 
@@ -198,7 +228,7 @@
 }
 
 .meta .name {
-    font-weight: 600;
+    font-weight: 500;
 }
 
 .meta .email {
@@ -432,4 +462,47 @@
 
 .action:hover {
     color: #1d4ed8;
+}
+.popup-details {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  border-radius: 6px;
+  width: 180px;
+  z-index: 1000;
+  margin-right:10px;
+ 
+}
+.strong{
+    font-size:small;
+    font-weight: 350;
+}
+.popup-details h3 {
+  margin-top: 0;
+}
+.viewBox{
+    cursor: pointer;
+ 
+  border-radius: 50%;
+  background-color:#D6C3FF;
+}
+.viewBox:hover{
+     text-decoration:underline; 
+}
+
+.popup-details .close-btn {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  background: transparent;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+.active-link {
+background-color: rgba(255, 255, 255, 0.08);
+ 
+  border-radius: 10px;
 }

@@ -11,6 +11,7 @@ import { IncomeForm } from '../../income/income-form/income-form.component';
 import { ExpensesForm } from '../../expenses/expenses-form/expenses-form.component';
 import { DashboardForm } from '../../dashboard-form/dashboard-form/dashboard-form.component';
 import { RouterModule } from '@angular/router'; 
+import { AuthService } from '../../../features/auth.service';
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -63,7 +64,8 @@ export class Dashboard implements OnInit {
   constructor(
     private dialog: MatDialog,
     private router: Router,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private authService: AuthService  
   ) {}
 
   ngOnInit(): void {
@@ -158,28 +160,6 @@ export class Dashboard implements OnInit {
     });
   }
   
-  // openExpenseForm() {
-  //   const dialogRef = this.dialog.open(ExpensesForm, { width: '400px' });
-  //   dialogRef.afterClosed().subscribe(res => {
-  //     if (!res || !this.currentUser?.id) return;
-
-  //     const newExpense = { ...res, type: 'Expense', amount: res.amount };
-  //     this.transactions.push(newExpense);
-  //     this.updateCharts();
-
-  //     this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe({
-  //       next: updatedRes => {
-  //         this.monthlyIncome = updatedRes.monthlyIncome ?? 0;
-  //         this.monthlyExpenses = updatedRes.monthlyExpenses ?? 0;
-  //         this.estimatedTax = updatedRes.estimatedTaxDue ?? 0;
-  //         this.savingsRate = updatedRes.savingsRate ?? 0;
-  //         this.transactions = updatedRes.transactions ?? [];
-  //         this.updateCharts();
-  //       },
-  //       error: err => console.error('Failed to save expense:', err)
-  //     });
-  //   });
-  // }
 
   updateCharts() {
     const now = new Date();
@@ -290,18 +270,14 @@ export class Dashboard implements OnInit {
   }
 
   logout() {
-    localStorage.clear();
-    sessionStorage.clear();
-    this.router.navigate(['/features/login']);
-  }
-  goToDashboard() {
-    if (this.router.url === '/dashboard') {
-      // Force reload: navigate away and back
-      this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-        this.router.navigate(['/dashboard']);
-      });
-    } else {
-      this.router.navigate(['/dashboard']);
-    }
+    this.authService.logout().subscribe({
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Logout error:', err);
+        this.router.navigate(['/login']);
+      }
+    });
   }
 }
