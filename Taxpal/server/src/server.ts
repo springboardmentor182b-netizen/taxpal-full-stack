@@ -1,5 +1,5 @@
 // server/src/server.ts
-// --- load .env before anything else ---
+// ---- load .env before anything else ----
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
@@ -122,3 +122,4 @@ if (!(global as any).__taxpal_server_started) {
 }
 
 export default app;
+
