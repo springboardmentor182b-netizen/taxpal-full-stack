@@ -72,7 +72,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
-app.use('/api/v1/budgets', budgetsRoutes); // ✅ Budgets mounted
+app.use('/api/v1/budgets', budgetsRoutes); 
 
 // Health check
 app.get('/api/health', (_req, res) => {
