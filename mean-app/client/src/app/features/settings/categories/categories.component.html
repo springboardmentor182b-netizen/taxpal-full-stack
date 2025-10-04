@@ -1,0 +1,49 @@
+<!-- Category Modal -->
+<div *ngIf="showModal" class="modal-overlay">
+  <div class="modal-content">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Category Management</h2>
+      <button class="close-btn" (click)="closeModal()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button [class.active]="selectedTab==='Expense'" (click)="selectedTab='Expense'">
+        <span class="tab-symbol">−</span> Expense
+      </button>
+      <button [class.active]="selectedTab==='Income'" (click)="selectedTab='Income'">
+        <span class="tab-symbol">+</span> Income
+      </button>
+    </div>
+
+    <!-- Category List (scrollable) -->
+    <ul class="category-list">
+      <li *ngFor="let cat of categories" [hidden]="cat.type !== selectedTab">
+        <div class="cat-info">
+          <span class="dot"></span>
+          <span class="cat-name">{{ cat.name }}</span>
+        </div>
+        <div class="actions">
+          <button (click)="editCategory(cat)" class="edit-btn" title="Edit">✎</button>
+          <button (click)="deleteCategory(cat)" class="delete-btn" title="Delete">🗑️</button>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Add/Edit Form -->
+    <form [formGroup]="categoryForm" (ngSubmit)="addOrUpdateCategory()" class="category-form">
+      <input formControlName="name" placeholder="Category Name" />
+      <select formControlName="type">
+        <option value="Income">Income</option>
+        <option value="Expense">Expense</option>
+      </select>
+      <div class="form-buttons">
+        <button type="button" (click)="closeModal()" class="cancel-btn">Cancel</button>
+        <button type="submit" class="add-btn">{{ editingCategory ? 'Update' : 'Add' }}</button>
+      </div>
+    </form>
+
+  </div>
+</div>

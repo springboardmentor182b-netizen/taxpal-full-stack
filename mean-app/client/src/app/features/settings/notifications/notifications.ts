@@ -2,11 +2,9 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'app-notifications',
-  standalone:true,
+  standalone: true,
   imports: [],
   templateUrl: './notifications.html',
-  styleUrl: './notifications.css'
+  styleUrls: ['./notifications.css'] // ✅ corrected
 })
-export class Notifications {
-
-}
+export class Notifications {}

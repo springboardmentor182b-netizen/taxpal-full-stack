@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -13,10 +13,11 @@ interface Category {
   selector: 'app-categories',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
-  templateUrl: './categories.html',
-  styleUrls: ['./categories.css']
+  templateUrl: './categories.component.html',
+  styleUrls: ['./categories.component.css']
 })
 export class Categories implements OnInit {
+  @Input() open: boolean = false; 
   showModal = false;
   selectedTab: 'Income' | 'Expense' = 'Expense';
 
@@ -44,8 +45,10 @@ export class Categories implements OnInit {
   }
 
   ngOnInit() {
-    this.openModal(); // ✅ auto-open when component loads
+    this.openModal(); // initial value
   }
+
+ 
 
   setTab(tab: 'Income' | 'Expense') {
     this.selectedTab = tab;
