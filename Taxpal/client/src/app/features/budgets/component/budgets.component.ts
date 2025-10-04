@@ -58,7 +58,7 @@ export class BudgetsComponent implements OnInit {
   /** Normalize any browser-provided month into 'YYYY-MM'. */
   private toYYYYMM(value: unknown): string {
     if (typeof value === 'string') {
-      if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return value;             // already 'YYYY-MM'
+      if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return value;         
       const dmatch = value.match(/^(\d{4})-(\d{2})-\d{2}$/);               // 'YYYY-MM-DD'
       if (dmatch) return `${dmatch[1]}-${dmatch[2]}`;
     }
