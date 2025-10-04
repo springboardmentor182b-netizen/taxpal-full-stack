@@ -4,11 +4,14 @@ import { FormsModule } from '@angular/forms';
 
 type ExpensePayload = {
   description: string;
-  amount: number | null;
+  amount: number | null;    // internal form state can be null
   category: string;
-  date: string;   // yyyy-mm-dd
+  date: string;             // yyyy-mm-dd
   notes: string;
 };
+
+// Emitted type with guaranteed non-null amount
+export type ExpenseEmit = Omit<ExpensePayload, 'amount'> & { amount: number };
 
 @Component({
   selector: 'app-expense-modal',
@@ -20,9 +23,9 @@ type ExpensePayload = {
 export class ExpenseModalComponent {
   @Input() isOpen = false;
 
-  // renamed to match parent: (closeModal)="closeExpense()"
+  // parent listens with (closeModal) and (save)
   @Output() closeModal = new EventEmitter<void>();
-  @Output() save = new EventEmitter<ExpensePayload>();
+  @Output() save = new EventEmitter<ExpenseEmit>();
 
   formData: ExpensePayload = {
     description: '',
@@ -40,7 +43,14 @@ export class ExpenseModalComponent {
   onSave() {
     const d = this.formData;
     if (d.description?.trim() && d.amount != null && d.amount > 0 && d.category && d.date) {
-      this.save.emit({ ...d });
+      const emitPayload: ExpenseEmit = {
+        description: d.description.trim(),
+        amount: d.amount as number,       // guaranteed non-null here
+        category: d.category,
+        date: d.date,
+        notes: d.notes
+      };
+      this.save.emit(emitPayload);
       this.onClose();
     }
   }

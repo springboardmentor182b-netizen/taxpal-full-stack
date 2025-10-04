@@ -8,7 +8,7 @@
 
 /* Sidebar */
 .sidebar {
-  width: 220px;
+  width: 250px;
   background: #FBFBFB;
   color: #25295A;
   height: 100%;
@@ -35,23 +35,53 @@
   background: #534CA4;
   color: #FBFBFB;
 }
+
+/* ✅ Profile pinned to bottom-left */
 .profile {
-  text-align: center;
-  padding: 10px;
-  border-top: 1px solid #ccc;
+  margin-top: auto;              /* push to bottom */
+  padding: 12px 12px 8px 12px;
+  border-top: 1px solid #e9e9ef;
+  background: #F5F6FF;
+  border-radius: 10px;
+  margin: 12px;
 }
-.profile img {
+.profile-top {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 10px;
+  align-items: center;
+}
+.avatar {
+  width: 44px; height: 44px;
   border-radius: 50%;
-  width: 45px;
+  display: grid; place-items: center;
+  font-weight: 700;
+  color: #fff;
+  background: #5c62d6;
+  letter-spacing: 0.5px;
 }
-.profile p {
-  margin: 6px 0 0;
-  font-size: 14px;
+.who .name {
+  font-weight: 700; color: #2d335f; line-height: 1.2;
 }
-.profile small {
-  font-size: 12px;
-  color: #666;
+.who .email {
+  font-size: 12px; color: #6c6f91; margin-top: 2px; word-break: break-all;
 }
+.profile-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 14px;
+  padding: 10px 2px 2px;
+  margin-top: 6px;
+}
+.profile-actions .action {
+  display: inline-flex; align-items: center; gap: 8px;
+  text-decoration: none; font-size: 14px;
+  color: #404574; padding: 4px 2px;
+  border-radius: 8px;
+  transition: background .15s ease, color .15s ease;
+}
+.profile-actions .action:hover { background: #ECEEFF; color: #2d335f; }
+.profile-actions .action svg { width: 18px; height: 18px; fill: currentColor; }
 
 /* Main content */
 .main {
@@ -62,7 +92,6 @@
   gap: 10px;
   overflow: auto;
   background: #EBEFFF;
-  
 }
 .top-bar {
   display: flex;
@@ -70,23 +99,12 @@
   align-items: center;
   flex-wrap: wrap;
 }
-.top-bar h1 {
-  font-size: 34px;
-  color: #2d3e50;
-}
+.top-bar h1 { font-size: 34px; color: #2d3e50; }
 .top-bar button {
-  padding: 8px 14px;   /* was 6px 10px */
-  font-size: 14px;     /* was 12px */
-  margin-left: 8px;    /* a touch more spacing */
-  margin-top: 5px;
-  background: #534CA4;
-  color: white;
-  border: none;
-  border-radius: 6px;  /* was 5px */
-  cursor: pointer;
-  min-height: 36px; 
+  padding: 8px 14px; font-size: 14px; margin-left: 8px; margin-top: 5px;
+  background: #534CA4; color: #fff; border: none; border-radius: 6px;
+  cursor: pointer; min-height: 36px;
 }
-
 
 /* Cards */
 .cards {
@@ -97,106 +115,131 @@
   flex-shrink: 0;
 }
 .card {
-  background: white;
+  background: #fff;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
-.card h3 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  color: #666;
-}
-.card p {
-  font-size: 16px;
-  font-weight: bold;
-}
+.card h3 { margin: 0 0 8px; font-size: 18px; color: #666; }
+.card p { font-size: 16px; font-weight: bold; }
 
 /* Charts section */
 .charts {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 15px;
-  flex-grow: 1;
-  min-height: 0;
+  margin-bottom: 16px; /* keeps table from overlapping */
 }
 .chart-container {
-  background: white;
+  position: relative; /* for absolute notes */
+  background: #fff;
   padding: 10px;
   border-radius: 8px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
 }
 .chart-container h3 {
-  font-size: 18px;
-  margin-bottom: 8px;
-  flex-shrink: 0;
+  font-size: 18px; margin-bottom: 8px; flex-shrink: 0;
 }
 .chart-container canvas {
-  flex-grow: 1;
-}
-
-/* ensure chart containers have some height */
-.chart-container { min-height: 320px; }
-
-/* let Chart.js stretch to the container size */
-.chart-container canvas {
-  width: 100% !important;
-  height: 80% !important;
-}
-/* Ensure the chart has a visible area */
-.chart-panel {
-  position: relative;
-  /* You can tweak this */
-  height: 360px; 
-}
-
-.chart-wrap {
-  position: absolute;
-  inset: 0;
-}
-
-.chart-wrap canvas {
   width: 100% !important;
   height: 100% !important;
   display: block;
 }
+.chart-container { min-height: 320px; }
 
-
-/* Transactions */
-.transactions {
-  background: white;
-  padding: 10px;
-  border-radius: 8px;
-  box-shadow: 0px 2px 6px rgba(0,0,0,0.1);
-  font-size: 13px;
+/* helper note stays inside the pie card */
+.chart-note {
+  position: absolute; left: 16px; bottom: 12px;
+  font-size: 12px; opacity: 0.7; pointer-events: none;
 }
-.transactions table {
+
+/* (legacy transactions block styles can stay if used elsewhere) */
+.transactions { background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 13px; }
+.transactions table { width: 100%; border-collapse: collapse; }
+.transactions td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 16px; }
+.transactions th { background: #f4f6fa; font-size: 13px; padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
+.transactions button { padding: 5px 8px; background: #534CA4; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; margin-left: 72%; width: 30%; }
+
+/* amount colors */
+.amt-green { color: #1a7f37; font-weight: 600; }
+.amt-red   { color: #b42318; font-weight: 600; }
+
+/* ===================== */
+/* 🧾 Recent Transactions */
+/* ===================== */
+.recent-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  padding: 12px;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recent-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.recent-header h3 {
+  margin: 0; font-size: 18px; color: #2d3e50; font-weight: 600;
+}
+.btn-view-all {
+  padding: 6px 12px; font-size: 13px;
+  border: 1px solid #d7d9ff; background: #f4f6ff; color: #4a4fd4;
+  border-radius: 8px; cursor: pointer;
+  transition: background .15s ease, transform .05s ease;
+}
+.btn-view-all:hover { background: #eef0ff; }
+.btn-view-all:active { transform: translateY(1px); }
+
+.recent-table-wrap { width: 100%; overflow: auto; }
+
+.recent-table {
   width: 100%;
   border-collapse: collapse;
+  font-size: 14px;
+  min-width: 720px;        /* gives columns breathing room */
+  table-layout: auto;      /* let colgroup control sizing */
 }
-.transactions td {
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-  font-size: 16px;
+
+.recent-table thead, .recent-table tbody,
+.recent-table tr, .recent-table th, .recent-table td { box-sizing: border-box; }
+
+.recent-table th,
+.recent-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f2f7;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  text-align: left;        /* base alignment */
 }
-.transactions th {
-  background: #f4f6fa;
-  font-size: 13px;
-  padding: 8px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
+
+.recent-table thead th {
+  background: #f7f8ff;
+  font-weight: 600;
+  color: #475569;
 }
-.transactions button {
-  padding: 5px 8px;
-  background: #534CA4;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
+
+/* ✅ center the Amount column; keep Type left and narrow */
+.recent-table th:nth-child(4),
+.recent-table td:nth-child(4) {
+  text-align: center !important;   
+  padding-right: 12%;            /* remove extra right bias */
+  min-width: 140px;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1, "lnum" 1;
+}
+
+.recent-table th:nth-child(5),
+.recent-table td:nth-child(5) {
+  text-align: left !important;
+  min-width: 110px;
 }
 
 /* ===================== */
@@ -210,17 +253,13 @@
 @media (max-width: 768px) {
   :host { flex-direction: column; }
   .sidebar {
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
+    width: 100%; height: auto; flex-direction: row;
+    justify-content: space-between; align-items: center; padding: 10px;
   }
   .menu { display: flex; gap: 10px; }
   .menu a { font-size: 12px; padding: 6px 8px; }
-  .profile { border-top: none; }
   .cards { grid-template-columns: 1fr 1fr; }
+  .profile { margin: 10px; } /* keep it neat on small screens */
 }
 @media (max-width: 480px) {
   .cards { grid-template-columns: 1fr; }
@@ -228,3 +267,41 @@
   .menu { flex-direction: column; align-items: center; }
   .top-bar h1 { font-size: 20px; }
 }
+
+/* ===================== */
+/* 🧩 Budget modal overlay */
+/* ===================== */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(0,0,0,.35); backdrop-filter: blur(1px); z-index: 990;
+}
+.modal-shell {
+  position: fixed; inset: 0; padding: 24px; display: flex; align-items: center; justify-content: center; z-index: 995;
+}
+.modal-content {
+  width: min(96vw, 880px); max-height: 88vh; overflow: auto;
+  background: #fff; border-radius: 16px; padding: 20px;
+  box-shadow: 0 20px 25px -5px rgba(0,0,0,.10), 0 10px 10px -5px rgba(0,0,0,.04);
+}
+
+/* Modal header pieces reused by budget dialog */
+.form-card-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 0 12px 0; border-bottom: 1px solid #eef2f7;
+}
+.form-card-title { margin: 0; font-size: 22px; font-weight: 600; color: #656ed3; }
+.icon-btn {
+  appearance: none; border: none; background: transparent; width: 32px; height: 32px;
+  font-size: 22px; line-height: 1; border-radius: 8px; color: #6B7280; cursor: pointer; transition: all .2s ease;
+}
+.icon-btn:hover { background: #F3F4F6; color: #374151; }
+
+/* Minimal styling for the inline budget form inside the modal */
+.budget-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #333; }
+.budget-form input,
+.budget-form select,
+.budget-form textarea {
+  width: 100%; padding: 8px 10px; border: 1px solid #dcdcdc; border-radius: 6px; background: #fff; font-size: 14px;
+}
+.form-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 12px; }
+.form-actions button { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; background: #534CA4; color: #fff; }
+.form-actions .secondary { background: #e7e7ef; color: #333; }

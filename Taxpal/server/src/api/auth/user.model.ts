@@ -15,6 +15,7 @@ const userSchema = new mongoose.Schema(
 
     country: { type: String, default: 'US' },
     income_bracket: { type: String, enum: ['low', 'middle', 'high'], default: 'middle' },
+
     resetPasswordToken: { type: String, default: undefined },
     resetPasswordExpires: { type: Date, default: undefined },
   },
