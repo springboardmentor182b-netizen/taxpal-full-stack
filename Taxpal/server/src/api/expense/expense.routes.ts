@@ -1,4 +1,3 @@
-// server/src/api/expense/expense.routes.ts
 import { Router, Request, Response, NextFunction } from 'express';
 import { requireAuth } from '../auth/requireAuth';
 import { createExpense, deleteExpense, listExpenses, updateExpense } from './expense.controller';
@@ -32,7 +31,11 @@ function validateExpenseBody(req: Request, res: Response, next: NextFunction) {
 // CRUD
 router.post('/', validateExpenseBody, createExpense);
 router.get('/', listExpenses);
+
+// NOTE: PUT here expects a full, valid expense body (same validator).
+// If you want partial updates, switch to PATCH and a lighter validator.
 router.put('/:id', validateExpenseBody, updateExpense);
+
 router.delete('/:id', deleteExpense);
 
 export default router;

@@ -14,7 +14,11 @@ const IncomeSchema = new Schema(
 
     notes: { type: String }
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },   // <— include alias in API responses
+    toObject: { virtuals: true }
+  }
 );
 
 // Useful for dashboards and date filtering

@@ -1,6 +1,12 @@
 import { Response } from 'express';
-import type { AuthedRequest } from '../../api/auth/requireAuth';  // <-- fixed path
-import Expense from './Expense';                            // <-- model is in same folder
+import type { AuthedRequest } from '../auth/requireAuth';   // ← consistent with routes
+import Expense from './Expense.model';
+
+function toDate(input: any): Date {
+  if (!input) return new Date();
+  const d = input instanceof Date ? input : new Date(String(input));
+  return isNaN(d.getTime()) ? new Date() : d;
+}
 
 export async function createExpense(req: AuthedRequest, res: Response) {
   try {
@@ -9,12 +15,12 @@ export async function createExpense(req: AuthedRequest, res: Response) {
 
     const { description, amount, category, date, notes } = req.body ?? {};
     const doc = await Expense.create({
-      description,
-      amount,
-      category,
-      date,
-      notes,
-      userId
+      userId,
+      description: String(description).trim(),
+      amount: Number(amount),
+      category: String(category).trim(),
+      date: toDate(date),
+      notes: typeof notes === 'string' ? notes.trim() : notes
     });
 
     return res.status(201).json(doc);
@@ -35,11 +41,11 @@ export async function listExpenses(req: AuthedRequest, res: Response) {
     const { from, to, category } = (req.query as any) || {};
     const q: any = { userId };
 
-    if (category) q.category = category;
+    if (category) q.category = String(category);
     if (from || to) {
       q.date = {};
-      if (from) q.date.$gte = new Date(from);
-      if (to)   q.date.$lte = new Date(to);
+      if (from) q.date.$gte = toDate(from);
+      if (to)   q.date.$lte = toDate(to);
     }
 
     const items = await Expense.find(q).sort({ date: -1, createdAt: -1 });
@@ -56,10 +62,18 @@ export async function updateExpense(req: AuthedRequest, res: Response) {
     if (!userId) return res.status(401).json({ message: 'Missing user context' });
 
     const { id } = req.params;
+
+    // Normalize a couple of fields just in case
+    const body = { ...req.body };
+    if (body.date) body.date = toDate(body.date);
+    if (typeof body.description === 'string') body.description = body.description.trim();
+    if (typeof body.category === 'string') body.category = body.category.trim();
+    if (typeof body.amount !== 'undefined') body.amount = Number(body.amount);
+
     const updated = await Expense.findOneAndUpdate(
       { _id: id, userId },
-      req.body,
-      { new: true, runValidators: true }  // <-- keep validators
+      body,
+      { new: true, runValidators: true }
     );
 
     if (!updated) return res.status(404).json({ message: 'Not found' });

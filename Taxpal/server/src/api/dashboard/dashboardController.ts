@@ -1,11 +1,14 @@
+// src/api/v1/dashboard/dashboardController.ts
 import { Response } from 'express';
 import { Types } from 'mongoose';
 import { AuthedRequest } from '../auth/auth';
 import Transaction from '../dashboard/Transaction';
-import Budget from '../dashboard/Budget';
+import Budget from '../budget/budget.model';
 
-// ---------------- existing helpers ----------------
+// ---------------- helpers ----------------
 const round2 = (n: number) => Math.round(n * 100) / 100;
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
 
 const monthRange = (year: number, month1to12: number) => {
   const start = new Date(year, month1to12 - 1, 1);
@@ -26,7 +29,7 @@ const yearRange = (year: number) => {
   return { start, end };
 };
 
-// ---------------- existing handlers ----------------
+// ---------------- handlers ----------------
 export const getDashboardData = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
@@ -35,6 +38,7 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
 
     const currentMonth = month ? parseInt(month as string, 10) : new Date().getMonth() + 1;
     const currentYear  = year  ? parseInt(year  as string, 10) : new Date().getFullYear();
+    const monthStr = `${currentYear}-${pad2(currentMonth)}`;
 
     const { start, end } = monthRange(currentYear, currentMonth);
     const prevMonth = currentMonth === 1 ? 12 : currentMonth - 1;
@@ -69,7 +73,11 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
     ]);
 
     // --- Budgets (with spent/remaining/usedPct) ---
-    const budgets = await Budget.find({ userId, month: currentMonth, year: currentYear }).lean();
+    // Budget model uses:
+    //   - amount (number): budget cap
+    //   - month (string "YYYY-MM")
+    //   - monthStart (Date) auto-normalized
+    const budgets = await Budget.find({ userId, month: monthStr }).lean();
 
     const spentByCategory = await Transaction.aggregate([
       { $match: { userId, type: 'expense', date: { $gte: start, $lt: end } } },
@@ -79,9 +87,23 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
 
     const budgetsOut = budgets.map(b => {
       const spent = spentMap.get(b.category) || 0;
-      const remaining = Math.max(0, b.limit - spent);
-      const usedPct = b.limit > 0 ? Math.min(100, (spent / b.limit) * 100) : 0;
-      return { ...b, spent: round2(spent), remaining: round2(remaining), usedPct: round2(usedPct) };
+      const cap = Number(b.amount) || 0;
+      const remaining = Math.max(0, cap - spent);
+      const usedPct = cap > 0 ? Math.min(100, (spent / cap) * 100) : 0;
+      return {
+        _id: String((b as any)._id),
+        userId: (b as any).userId ? String((b as any).userId) : undefined,
+        category: b.category,
+        amount: round2(cap),
+        month: b.month,               // "YYYY-MM"
+        monthStart: b.monthStart,     // Date
+        description: b.description ?? '',
+        spent: round2(spent),
+        remaining: round2(remaining),
+        usedPct: round2(usedPct),
+        createdAt: (b as any).createdAt,
+        updatedAt: (b as any).updatedAt
+      };
     });
 
     // --- Recent transactions (top 10 by date desc) ---
@@ -91,7 +113,7 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
       .lean();
 
     res.json({
-      period: { year: currentYear, month: currentMonth, start, end },
+      period: { year: currentYear, month: currentMonth, monthStr, start, end },
       cards: {
         income:   { amount: round2(monthlyIncome),   changePct: round2(incomeChange) },
         expenses: { amount: round2(monthlyExpenses), changePct: round2(expenseChange) },
@@ -216,7 +238,7 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
     while (cur < end) {
       const y = cur.getFullYear();
       const m = cur.getMonth() + 1;
-      const ym = `${y}-${String(m).padStart(2, '0')}`;
+      const ym = `${y}-${pad2(m)}`;
 
       labels.push(new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })); // "May 2025"
       incomeSeries.push(round2(incomeMap.get(ym) || 0));
@@ -270,13 +292,16 @@ export const getRecentTransactions = async (req: AuthedRequest, res: Response): 
     const transactions = docs.map(d => ({
       _id: String(d._id),
       user_id: String(d.userId),
-      type: d.type, // 'income' | 'expense'
+      type: d.type as 'income' | 'expense',
       category: (d as any).category ?? 'General',
       amount: Number((d as any).amount),
       date: d.date,
-      description: (d as any).description ?? (d as any).source ?? (d.type === 'income' ? 'Income' : 'Expense'),
-      createdAt: d.createdAt,
-      updatedAt: d.updatedAt,
+      description:
+        (d as any).description ??
+        (d as any).source ??
+        (d.type === 'income' ? 'Income' : 'Expense'),
+      createdAt: (d as any).createdAt,
+      updatedAt: (d as any).updatedAt,
     }));
 
     res.json({ transactions });

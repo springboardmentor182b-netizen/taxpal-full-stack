@@ -1,19 +1,25 @@
 import { Response } from 'express';
-import Income from './Income';
+import Income from './Income.model';
 import { AuthedRequest } from '../auth/requireAuth';
+
+function toDate(input: any): Date {
+  if (!input) return new Date();
+  const d = input instanceof Date ? input : new Date(String(input));
+  return isNaN(d.getTime()) ? new Date() : d;
+}
 
 export async function createIncome(req: AuthedRequest, res: Response) {
   const body = req.body || {};
+  const source = String(body.source ?? body.description ?? '').trim();
+  if (!source) return res.status(400).json({ message: 'source/description is required' });
 
   const doc = await Income.create({
     userId: req.user!.id,
-    // accept either field name from the client
-    source: body.source ?? body.description,
-    description: body.description,     // lets the Mongoose alias set `source`
-    category: body.category,
-    amount: body.amount,
-    date: body.date ?? new Date(),
-    notes: body.notes
+    source,
+    category: body.category ? String(body.category).trim() : 'General',
+    amount: Number(body.amount),
+    date: toDate(body.date),
+    notes: body.notes ? String(body.notes).trim() : undefined
   });
 
   res.status(201).json(doc);
@@ -23,13 +29,13 @@ export async function listIncomes(req: AuthedRequest, res: Response) {
   const { from, to, source, category } = req.query as any;
 
   const q: any = { userId: req.user!.id };
-  if (source)   q.source = source;
-  if (category) q.category = category;
+  if (source)   q.source = String(source);
+  if (category) q.category = String(category);
 
   if (from || to) {
     q.date = {};
-    if (from) q.date.$gte = new Date(String(from));
-    if (to)   q.date.$lte = new Date(String(to));
+    if (from) q.date.$gte = toDate(from);
+    if (to)   q.date.$lte = toDate(to);
   }
 
   const items = await Income.find(q).sort({ date: -1, createdAt: -1 }).lean();
@@ -40,12 +46,18 @@ export async function updateIncome(req: AuthedRequest, res: Response) {
   const { id } = req.params;
   const body = req.body || {};
 
-  // allow updates via `description` too
-  if (body.description && !body.source) body.source = body.description;
+  const patch: any = {};
+  if (body.source != null || body.description != null) {
+    patch.source = String(body.source ?? body.description ?? '').trim();
+  }
+  if (body.category != null) patch.category = String(body.category).trim();
+  if (body.amount != null)   patch.amount = Number(body.amount);
+  if (body.date != null)     patch.date   = toDate(body.date);
+  if (body.notes != null)    patch.notes  = String(body.notes || '').trim() || undefined;
 
   const updated = await Income.findOneAndUpdate(
     { _id: id, userId: req.user!.id },
-    body,
+    patch,
     { new: true }
   );
 

@@ -28,10 +28,12 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { verifyMailer } from './utils/mailer';
 
-import authRoutes from './api/auth/auth-route';
+import authRoutes from './api/auth/auth.routes';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
 import dashboardRoutes from './api/dashboard/dashboard-routes';
+// ✅ Budgets
+import budgetsRoutes from './api/budget/budget.routes';
 
 // ---------- 3) App setup ----------
 const app = express();
@@ -48,12 +50,7 @@ app.disable('x-powered-by');
 const corsOrigins =
   process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || ['http://localhost:4200'];
 
-app.use(
-  cors({
-    origin: corsOrigins,
-    credentials: true, // fine to keep; mainly needed if you ever use cookies
-  })
-);
+app.use(cors({ origin: corsOrigins, credentials: true }));
 
 // ---------- 5) Core middleware ----------
 app.use(express.json());
@@ -75,6 +72,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
+app.use('/api/v1/budgets', budgetsRoutes); // ✅ Budgets mounted
 
 // Health check
 app.get('/api/health', (_req, res) => {

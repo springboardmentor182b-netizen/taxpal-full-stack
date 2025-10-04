@@ -5,13 +5,39 @@
       <a href="#">Dashboard</a>
       <a href="#">Transactions</a>
       <a href="#">Tax Estimator</a>
-      <a href="#">Budgets</a>
+
+      <!-- Budgets opens inline modal -->
+      <a href="#" (click)="openBudget(); $event.preventDefault()">Budgets</a>
+
       <a href="#">Reports</a>
     </div>
   </div>
+
+  <!-- ✅ Profile pinned to bottom-left -->
   <div class="profile">
-    <p><img src="assets/images/image.png" alt="profile"> <b> Alex Morgan </b> </p>
-    <small>alex@company.com</small>
+    <div class="profile-top">
+      <div class="avatar">AM</div>
+      <div class="who">
+        <div class="name">Alex Morgan</div>
+        <div class="email">alex@company.com</div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a href="#" class="action">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.44 7.44 0 0 0-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62.24-1.2.57-1.73 1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02.67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53.42 1.11.76 1.73 1l.36 2.54a.5.5 0 0 0 .5.43h3.84a.5.5 0 0 0 .5-.43l.36-2.54c.62-.24 1.2-.57 1.73-1l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
+        </svg>
+        <span>Settings</span>
+      </a>
+
+      <a href="#" class="action">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+        </svg>
+        <span>Log Out</span>
+      </a>
+    </div>
   </div>
 </div>
 
@@ -25,19 +51,17 @@
     </div>
   </div>
 
-  <!-- your income form -->
+  <!-- income form -->
   <div *ngIf="showIncome">
-    <!-- Income form markup here -->
     <button (click)="closeIncome()">Close</button>
   </div>
 
-  <!-- your expense form -->
+  <!-- expense form -->
   <div *ngIf="showExpense">
-    <!-- Expense form markup here -->
     <button (click)="closeExpense()">Close</button>
   </div>
 
-  <!-- Cards -->
+  <!-- ===== Cards ===== -->
   <div class="cards">
     <div class="card">
       <h3>Monthly Income</h3>
@@ -47,7 +71,7 @@
     <div class="card">
       <h3>Monthly Expenses</h3>
       <p>$0.00</p>
-      <p> 0% from last month</p>
+      <p>0% from last month</p>
     </div>
     <div class="card">
       <h3>Estimated Tax Dues</h3>
@@ -61,76 +85,88 @@
     </div>
   </div>
 
-  <!-- Charts -->
+  <!-- ===== Charts ===== -->
   <div class="charts">
     <div class="chart-container">
       <h3>Income vs Expenses</h3>
-      <!-- SIZED WRAPPER ADDED -->
       <div style="width:100%; max-width:720px; height:360px;">
-        <canvas id="barChart"></canvas>
+        <canvas #barCanvas></canvas>
       </div>
     </div>
 
-    <div class="chart-container">
+    <div class="chart-container chart-has-note">
       <h3>Expense Breakdown</h3>
-      <!-- SIZED WRAPPER ADDED -->
       <div style="width:100%; max-width:520px; height:360px;">
         <canvas id="pieChart"></canvas>
       </div>
-
-      <!-- Optional helper text when there are no expenses yet -->
-      <div *ngIf="!expenses?.length" style="font-size:12px; opacity:0.7; margin-top:8px; margin-left: 32%;">
+      <div class="chart-note" *ngIf="!expenses?.length">
         No expenses yet — add one to see the breakdown.
       </div>
     </div>
   </div>
 
-  <!-- Transactions -->
-  <div class="transactions">
-    <table>
-      <tr>
-        <td><h3>Recent Transactions</h3></td>
-        <td><button>View All</button></td>
-      </tr>
-    </table>
+  <!-- ===== Recent Transactions ===== -->
+  <section class="recent-card">
+    <div class="recent-header">
+      <h3>Recent Transactions</h3>
+      <button class="btn-view-all">View All</button>
+    </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th>Amount</th>
-          <th>Type</th>
-        </tr>
-      </thead>
+    <div class="recent-table-wrap">
+      <table class="recent-table">
+        <colgroup>
+          <col style="width:18%">
+          <col style="width:36%">
+          <col style="width:22%">
+          <col style="width:22%"><!-- Amount -->
+          <col style="width:120px"><!-- Type   -->
+        </colgroup>
 
-      <!-- UPDATED: dynamic recent transactions -->
-      <tbody>
-        <tr *ngIf="loadingRecent">
-          <td colspan="5">Loading…</td>
-        </tr>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Amount</th>   <!-- ⬅ removed class="right" -->
+            <th>Type</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>May 5, 2025</td>
+            <td>Design Project</td>
+            <td>Consulting</td>
+            <td class="amt-green">+ $320.00</td>  <!-- ⬅ no "right" class -->
+            <td>Income</td>
+          </tr>
+          <tr>
+            <td>May 3, 2025</td>
+            <td>Groceries</td>
+            <td>Food</td>
+            <td class="amt-red">- $54.20</td>
+            <td>Expense</td>
+          </tr>
+          <tr>
+            <td>May 2, 2025</td>
+            <td>Uber to client</td>
+            <td>Transport</td>
+            <td class="amt-red">- $12.80</td>
+            <td>Expense</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</div>
 
-        <tr *ngIf="!loadingRecent && recentTxns.length === 0">
-          <td colspan="5">No transactions yet. Add one to get started.</td>
-        </tr>
-
-        <tr *ngFor="let t of recentTxns; trackBy: trackByTxId">
-          <td>{{ t.date | date:'MMM d, y' }}</td>
-          <td>{{ t.description }}</td>
-          <td>{{ t.category }}</td>
-          <td [ngClass]="t.type === 'Income' ? 'amt-green' : 'amt-red'">
-            {{ t.signed | currency:'USD':'symbol':'1.0-2' }}
-          </td>
-          <td>{{ t.type }}</td>
-        </tr>
-      </tbody>
-      <!-- /UPDATED -->
-    </table>
+<!-- ===== Budget Modal (same tab) ===== -->
+<div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
+<div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-budgets [embedded]="true" (close)="closeBudget()"></app-budgets>
   </div>
 </div>
 
-<!-- Modals -->
 <app-income-modal
   [isOpen]="showIncome"
   (closeModal)="closeIncome()"
