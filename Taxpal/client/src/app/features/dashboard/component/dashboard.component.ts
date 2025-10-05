@@ -8,7 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { BudgetsComponent } from '../../budgets/component/budgets.component';
 import { IncomeModalComponent } from '../../auth/components/income/income';
 import { ExpenseModalComponent } from '../../auth/components/expense/expense';
-import { TaxEstimatorComponent } from '../../tax/components/tax-estimator.component'; // <-- NEW
+import { TaxEstimatorComponent } from '../../tax/components/tax-estimator/tax-estimator.component'; // <-- NEW
 
 import { DashboardService } from '../../dashboard/service/dashboard.service';
 import { ExpenseService } from '../../../core/services/expense.service';

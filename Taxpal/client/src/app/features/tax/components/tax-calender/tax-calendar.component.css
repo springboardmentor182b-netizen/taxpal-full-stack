@@ -1,0 +1,165 @@
+/* ----------------------------- */
+/* Layout (same as Budgets page) */
+/* ----------------------------- */
+
+/* Layout */
+.budgets-container {
+  min-height: 100vh;
+  background: #f8fafc;            /* page bg stays light */
+  color: #0f172a;                  /* base text */
+  display: flex;
+  flex-direction: column;
+}
+.main-content { flex: 1; }
+
+/* Page header */
+.page-header { max-width: 1120px; margin: 16px auto 0; padding: 0 20px; }
+.page-title { font-size: 28px; margin: 0; color: #8B7FF7; margin-left: 10%; }
+.page-subtitle { color: #323236; margin-top: 6px; margin-left: 10%; }
+
+/* Card section (modal-like) */
+.form-section { display: grid; place-items: center; padding: 24px; }
+.form-card {
+  width: 100%;
+  max-width: 860px;
+  background: #ffffff;                               /* modal-content bg */
+  border-radius: 16px;                               /* match modal radius */
+  padding: 32px;                                     /* modal-content padding */
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  border: none;                                      /* remove thin border */
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.10),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* (Keeping the shared utilities/buttons if you reuse them here later)
+.w-4 { width: 16px; height: 16px; }
+.w-5 { width: 20px; height: 20px; }
+.w-16 { width: 64px; height: 64px; }
+.h-4 { height: 16px; }
+.h-5 { height: 20px; }
+.h-16 { height: 64px; }
+.snack-success { background: #155724; color: #fff; }
+.snack-error   { background: #721c24; color: #fff; }
+*/
+
+/* ------------------------------ */
+/* Calendar-specific (refined)    */
+/* ------------------------------ */
+
+:root {
+  --card-bg: #ffffff;
+  --card-border: #ebe7f0;
+  --text-strong: #111827;
+  --text: #374151;
+  --muted: #6b7280;
+  --shadow: 0 6px 20px rgba(0,0,0,0.06);
+  --radius: 14px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --card-bg: #0f172a;
+    --card-border: #1f2937;
+    --text-strong: #e5e7eb;
+    --text: #d1d5db;
+    --muted: #9ca3af;
+    --shadow: 0 6px 24px rgba(0,0,0,0.25);
+  }
+}
+
+.calendar {
+  max-width: 920px;
+  margin: 0 auto;               /* already inside .form-card */
+  padding: 0;                    /* spacing is handled by .form-card */
+}
+
+.calendar__title {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-strong);
+  margin: 8px 0 16px;
+}
+
+.calendar__month {
+  margin: 22px 0 10px;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.calendar__list {
+  display: grid;
+  gap: 12px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 16px 18px;
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+
+.card__title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;   /* push badge to the right cleanly */
+  gap: 8px;
+  color: var(--text-strong);
+  font-weight: 700;
+}
+
+.card__title-text {
+  /* helps long titles wrap nicely without squishing the badge */
+  min-width: 0;
+}
+
+.card__date {
+  margin-top: 4px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.card__note {
+  margin-top: 6px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  text-transform: lowercase;
+  border: 1px solid transparent;
+  user-select: none;
+  white-space: nowrap;             /* keeps the pill tidy */
+}
+
+.badge--reminder {
+  background: #e8f1ff;
+  color: #1f54c9;
+  border-color: #cfe1ff;
+}
+
+.badge--payment {
+  background: #fff3cd;
+  color: #8a6d3b;
+  border-color: #ffe9a3;
+}
+
+/* Small screens */
+@media (max-width: 520px) {
+  .card { padding: 14px; }
+  .calendar__title { font-size: 20px; }
+}

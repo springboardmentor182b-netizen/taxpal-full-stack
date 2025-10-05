@@ -42,12 +42,21 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // ✅ New: Tax Estimator page
+  // ✅ Tax Estimator page
   {
     path: 'tax-estimator',
     loadComponent: () =>
-      import('./features/tax/components/tax-estimator.component')
+      import('./features/tax/components/tax-estimator/tax-estimator.component')
         .then(m => m.TaxEstimatorComponent),
+    canActivate: [authGuard]
+  },
+
+  // ✅ NEW: Tax Calendar page
+  {
+    path: 'tax-calendar',
+    loadComponent: () =>
+      import('./features/tax/components/tax-calender/tax-calendar.component')
+        .then(m => m.TaxCalendarComponent),
     canActivate: [authGuard]
   },
 
@@ -59,7 +68,7 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // wherever your Routes[] are defined
+  // Auth flows
   {
     path: 'forgot-password',
     loadComponent: () =>
@@ -73,6 +82,6 @@ export const routes: Routes = [
         .then(m => m.ResetPasswordComponent)
   },
 
-  // Fallback: if unknown route, go to login
+  // Fallback
   { path: '**', redirectTo: 'login' }
 ];
