@@ -41,13 +41,25 @@ export const routes: Routes = [
         .then(m => m.BudgetsComponent),
     canActivate: [authGuard]
   },
+
+  // ✅ Tax Estimator page
   {
-    path: 'tax',
+    path: 'tax-estimator',
     loadComponent: () =>
-      import('./features/tax/tax.component')
-        .then(m => m.TaxComponent),
+      import('./features/tax/components/tax-estimator/tax-estimator.component')
+        .then(m => m.TaxEstimatorComponent),
     canActivate: [authGuard]
   },
+
+  // ✅ NEW: Tax Calendar page
+  {
+    path: 'tax-calendar',
+    loadComponent: () =>
+      import('./features/tax/components/tax-calender/tax-calendar.component')
+        .then(m => m.TaxCalendarComponent),
+    canActivate: [authGuard]
+  },
+
   {
     path: 'reports',
     loadComponent: () =>
@@ -55,18 +67,21 @@ export const routes: Routes = [
         .then(m => m.ReportsComponent),
     canActivate: [authGuard]
   },
-  // wherever your Routes[] are defined
-{
-  path: 'forgot-password',
-  loadComponent: () => import('./features/auth/components/forgot-password/forgot-password.component')
-    .then(m => m.ForgotPasswordComponent)
-},
-{
-  path: 'reset-password',
-  loadComponent: () => import('./features/auth/components/reset-password/reset-password.component')
-    .then(m => m.ResetPasswordComponent)
-},
 
-  // Fallback: if unknown route, go to login
+  // Auth flows
+  {
+    path: 'forgot-password',
+    loadComponent: () =>
+      import('./features/auth/components/forgot-password/forgot-password.component')
+        .then(m => m.ForgotPasswordComponent)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () =>
+      import('./features/auth/components/reset-password/reset-password.component')
+        .then(m => m.ResetPasswordComponent)
+  },
+
+  // Fallback
   { path: '**', redirectTo: 'login' }
 ];

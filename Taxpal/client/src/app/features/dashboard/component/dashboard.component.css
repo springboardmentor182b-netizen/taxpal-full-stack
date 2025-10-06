@@ -24,21 +24,33 @@
   color: #25295A;
   font-size: 34px;
 }
+
+/* menu links with icons */
 .menu a {
-  display: block;
+  display: flex;                /* changed to flex to align icon + text */
+  align-items: center;
+  gap: 10px;                    /* space between icon and label */
   color: #25295A;
   padding: 10px 15px;
   text-decoration: none;
   font-size: 16px;
+  border-radius: 8px;           /* nicer hover */
 }
 .menu a:hover {
   background: #534CA4;
   color: #FBFBFB;
 }
+.menu a .nav-ic {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  display: inline-block;
+  color: currentColor;
+}
 
 /* ✅ Profile pinned to bottom-left */
 .profile {
-  margin-top: auto;              /* push to bottom */
+  margin-top: auto;
   padding: 12px 12px 8px 12px;
   border-top: 1px solid #e9e9ef;
   background: #F5F6FF;
@@ -60,12 +72,9 @@
   background: #5c62d6;
   letter-spacing: 0.5px;
 }
-.who .name {
-  font-weight: 700; color: #2d335f; line-height: 1.2;
-}
-.who .email {
-  font-size: 12px; color: #6c6f91; margin-top: 2px; word-break: break-all;
-}
+.who .name { font-weight: 700; color: #2d335f; line-height: 1.2; }
+.who .email { font-size: 12px; color: #6c6f91; margin-top: 2px; word-break: break-all; }
+
 .profile-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -128,10 +137,10 @@
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 15px;
-  margin-bottom: 16px; /* keeps table from overlapping */
+  margin-bottom: 16px;
 }
 .chart-container {
-  position: relative; /* for absolute notes */
+  position: relative;
   background: #fff;
   padding: 10px;
   border-radius: 8px;
@@ -139,9 +148,7 @@
   display: flex;
   flex-direction: column;
 }
-.chart-container h3 {
-  font-size: 18px; margin-bottom: 8px; flex-shrink: 0;
-}
+.chart-container h3 { font-size: 18px; margin-bottom: 8px; flex-shrink: 0; }
 .chart-container canvas {
   width: 100% !important;
   height: 100% !important;
@@ -179,7 +186,6 @@
   flex-direction: column;
   gap: 10px;
 }
-
 .recent-header {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
 }
@@ -201,10 +207,9 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
-  min-width: 720px;        /* gives columns breathing room */
-  table-layout: auto;      /* let colgroup control sizing */
+  min-width: 720px;
+  table-layout: auto;
 }
-
 .recent-table thead, .recent-table tbody,
 .recent-table tr, .recent-table th, .recent-table td { box-sizing: border-box; }
 
@@ -217,34 +222,30 @@
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
-  text-align: left;        /* base alignment */
+  text-align: left;
 }
-
 .recent-table thead th {
   background: #f7f8ff;
   font-weight: 600;
   color: #475569;
 }
 
-/* ✅ center the Amount column; keep Type left and narrow */
+/* center Amount column */
 .recent-table th:nth-child(4),
 .recent-table td:nth-child(4) {
-  text-align: center !important;   
-  padding-right: 12%;            /* remove extra right bias */
+  text-align: center !important;
+  padding-right: 12%;
   min-width: 140px;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
-
 .recent-table th:nth-child(5),
 .recent-table td:nth-child(5) {
   text-align: left !important;
   min-width: 110px;
 }
 
-/* ===================== */
-/* 📱 Responsive Design */
-/* ===================== */
+/* Responsive */
 @media (max-width: 1024px) {
   .cards { grid-template-columns: repeat(2, 1fr); }
   .charts { grid-template-columns: 1fr; }
@@ -259,7 +260,7 @@
   .menu { display: flex; gap: 10px; }
   .menu a { font-size: 12px; padding: 6px 8px; }
   .cards { grid-template-columns: 1fr 1fr; }
-  .profile { margin: 10px; } /* keep it neat on small screens */
+  .profile { margin: 10px; }
 }
 @media (max-width: 480px) {
   .cards { grid-template-columns: 1fr; }
@@ -268,9 +269,7 @@
   .top-bar h1 { font-size: 20px; }
 }
 
-/* ===================== */
-/* 🧩 Budget modal overlay */
-/* ===================== */
+/* Modal */
 .modal-backdrop {
   position: fixed; inset: 0; background: rgba(0,0,0,.35); backdrop-filter: blur(1px); z-index: 990;
 }
@@ -283,7 +282,7 @@
   box-shadow: 0 20px 25px -5px rgba(0,0,0,.10), 0 10px 10px -5px rgba(0,0,0,.04);
 }
 
-/* Modal header pieces reused by budget dialog */
+/* Reused dialog header */
 .form-card-header {
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 0 12px 0; border-bottom: 1px solid #eef2f7;
@@ -295,7 +294,7 @@
 }
 .icon-btn:hover { background: #F3F4F6; color: #374151; }
 
-/* Minimal styling for the inline budget form inside the modal */
+/* Minimal inline budget form */
 .budget-form label { display: flex; flex-direction: column; gap: 6px; font-size: 13px; color: #333; }
 .budget-form input,
 .budget-form select,

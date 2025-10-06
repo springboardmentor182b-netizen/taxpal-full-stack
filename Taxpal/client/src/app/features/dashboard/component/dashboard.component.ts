@@ -4,11 +4,12 @@ import Chart, { Chart as ChartType } from 'chart.js/auto';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
-// ✅ Correct path to your standalone Budgets component
+// ✅ Standalone components
 import { BudgetsComponent } from '../../budgets/component/budgets.component';
-
 import { IncomeModalComponent } from '../../auth/components/income/income';
 import { ExpenseModalComponent } from '../../auth/components/expense/expense';
+import { TaxEstimatorComponent } from '../../tax/components/tax-estimator/tax-estimator.component'; // <-- NEW
+
 import { DashboardService } from '../../dashboard/service/dashboard.service';
 import { ExpenseService } from '../../../core/services/expense.service';
 
@@ -42,7 +43,15 @@ type BudgetModel = {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, IncomeModalComponent, ExpenseModalComponent, BudgetsComponent],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    FormsModule,
+    IncomeModalComponent,
+    ExpenseModalComponent,
+    BudgetsComponent,
+    TaxEstimatorComponent, // <-- NEW
+  ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
 })
@@ -50,6 +59,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   showIncome = false;
   showExpense = false;
   showBudget = false;            // controls the Budget modal
+  showTaxEstimator = false;      // <-- NEW: controls inline tax estimator
 
   incomes: any[] = [];
   expenses: any[] = [];
@@ -79,16 +89,31 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   constructor(private dash: DashboardService, private expensesApi: ExpenseService) {}
 
   // ===== Sidebar / Top buttons =====
-  openIncome()  { this.showIncome = true;  this.showExpense = false; this.showBudget = false; }
-  openExpense() { this.showExpense = true; this.showIncome  = false; this.showBudget = false; }
+  openIncome()  { this.showIncome = true;  this.showExpense = false; this.showBudget = false; this.showTaxEstimator = false; }
+  openExpense() { this.showExpense = true; this.showIncome  = false; this.showBudget = false; this.showTaxEstimator = false; }
   closeIncome() { this.showIncome = false; }
   closeExpense(){ this.showExpense = false; }
 
-  // ===== Budgets — open inline on the dashboard (no routing) =====
-  openBudget()  { this.showBudget = true;  this.showIncome = false; this.showExpense = false; }
+  // ===== Budgets — inline modal =====
+  openBudget()  { this.showBudget = true;  this.showIncome = false; this.showExpense = false; this.showTaxEstimator = false; }
   closeBudget() { this.showBudget = false; }
 
-  // Optional local “save” if you keep the old inline budget block (not needed if using <app-budgets>)
+  // ===== Tax Estimator — inline (same tab, no route) =====
+  openTaxEstimator() {
+    this.showTaxEstimator = true;
+    this.showIncome = false;
+    this.showExpense = false;
+    this.showBudget = false;
+    this.destroyCharts(); // free resources while hidden
+  }
+  closeTaxEstimator() {
+    if (!this.showTaxEstimator) return;
+    this.showTaxEstimator = false;
+    // Wait for view to re-render dashboard, then (re)build charts
+    requestAnimationFrame(() => this.refreshDashboard());
+  }
+
+  // Optional local “save” if you keep an old inline budget block
   saveBudget() {
     const payload: BudgetModel = { ...this.budgetModel, amount: Number(this.budgetModel.amount ?? 0) };
     this.budgets = [payload, ...this.budgets];
@@ -145,16 +170,24 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   async ngAfterViewInit(): Promise<void> {
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
-    this.refreshDashboard();
+    if (!this.showTaxEstimator) this.refreshDashboard();
   }
 
   ngOnDestroy(): void {
+    this.destroyCharts();
+  }
+
+  private destroyCharts() {
     this.barChart?.destroy();
     this.pieChart?.destroy();
+    this.barChart = undefined;
+    this.pieChart = undefined;
   }
 
   // ===================== DASHBOARD (server data) =====================
   private refreshDashboard(): void {
+    if (this.showTaxEstimator) return; // don't build charts if estimator view is active
+
     // cards & pie
     this.dash.getDashboard(undefined, undefined, true).subscribe({
       next: (res: any) => {
@@ -222,6 +255,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private upsertBar(labels: string[], income: number[], expenses: number[]) {
+    if (this.showTaxEstimator) return; // don't render when hidden
     const el = this.barCanvas?.nativeElement;
     if (!el) { console.warn('[bar] canvas not found yet'); return; }
 
@@ -296,6 +330,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private upsertPie(labels: string[], data: number[]) {
+    if (this.showTaxEstimator) return; // don't render when hidden
     const ctx = document.getElementById('pieChart') as HTMLCanvasElement | null;
     if (!ctx) return;
 
@@ -340,7 +375,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   // ===================== OPTIMISTIC BAR PATCHER =====================
   private bumpBarSeries(dateISO: string, delta: number, kind: 'income' | 'expense') {
-    if (!this.barChart || !dateISO || !isFinite(delta)) return;
+    if (!this.barChart || !dateISO || !isFinite(delta) || this.showTaxEstimator) return;
 
     const labels = (this.barChart.data.labels || []) as (string | number)[];
     const idx = this.findBarBucketIndex(dateISO, labels);
