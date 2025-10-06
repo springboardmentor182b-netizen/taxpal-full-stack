@@ -19,8 +19,6 @@ type IncomePayload = {
 })
 export class IncomeModalComponent {
   @Input() isOpen = false;
-
-  // ✅ renamed to match parent usage: (closeModal)="closeIncome()"
   @Output() closeModal = new EventEmitter<void>();
   @Output() save = new EventEmitter<IncomePayload>();
 
@@ -32,7 +30,6 @@ export class IncomeModalComponent {
     notes: ''
   };
 
-  // call this from the X button or backdrop
   onClose() {
     this.closeModal.emit();
     this.resetForm();

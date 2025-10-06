@@ -7,13 +7,12 @@
   flex-direction: column;
 }
 
-
 /* Page header */
 .main-content { flex: 1; }
 .page-header {
   max-width: 1120px; margin: 16px auto 0; padding: 0 20px;
 }
-.page-title { font-size: 28px; margin: 0; color: #111113; }
+.page-title { font-size: 28px; margin: 0; color: #8B7FF7; }
 .page-subtitle { color: #323236; margin-top: 6px; }
 
 /* Form Section (modal-like card) */

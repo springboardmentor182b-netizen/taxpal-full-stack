@@ -1,14 +1,17 @@
+// src/app/core/services/transaction.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { environment } from '../../../environments/environments';
 
+// ===== Public models (what components use)
 export interface Transaction {
   _id: string;
   user_id: string;
   type: 'income' | 'expense';
   category: string;
   amount: number;
-  date: Date;
+  date: Date;               // <-- Date for the app
   description?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -18,7 +21,7 @@ export interface CreateTransactionRequest {
   type: 'income' | 'expense';
   category: string;
   amount: number;
-  date?: Date;
+  date?: Date | string;
   description?: string;
 }
 
@@ -26,7 +29,7 @@ export interface UpdateTransactionRequest {
   type?: 'income' | 'expense';
   category?: string;
   amount?: number;
-  date?: Date;
+  date?: Date | string;
   description?: string;
 }
 
@@ -35,21 +38,16 @@ export interface TransactionFilters {
   limit?: number;
   type?: 'income' | 'expense';
   category?: string;
-  startDate?: string;
-  endDate?: string;
+  startDate?: string; // ISO yyyy-mm-dd
+  endDate?: string;   // ISO yyyy-mm-dd
+  // optional forward-compat sorting if your API supports it
+  sortBy?: 'date' | 'createdAt' | 'amount';
+  sortDir?: 'asc' | 'desc';
 }
 
 export interface TransactionSummary {
-  typeStats: Array<{
-    _id: 'income' | 'expense';
-    total: number;
-    count: number;
-  }>;
-  categoryStats: Array<{
-    _id: string;
-    total: number;
-    count: number;
-  }>;
+  typeStats: Array<{ _id: 'income' | 'expense'; total: number; count: number }>;
+  categoryStats: Array<{ _id: string; total: number; count: number }>;
 }
 
 export interface TransactionResponse {
@@ -59,48 +57,95 @@ export interface TransactionResponse {
   total: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+// ===== DTOs (wire format from/to API)
+type TransactionDTO = Omit<Transaction, 'date' | 'createdAt' | 'updatedAt'> & {
+  date: string;       // ISO
+  createdAt: string;  // ISO
+  updatedAt: string;  // ISO
+};
+interface TransactionResponseDTO extends Omit<TransactionResponse, 'transactions'> {
+  transactions: TransactionDTO[];
+}
+
+@Injectable({ providedIn: 'root' })
 export class TransactionService {
-  private readonly API_URL = 'http://localhost:3000/api/transactions';
+  private readonly API = `${environment.API_URL}/transactions`;
 
   constructor(private http: HttpClient) {}
 
-  getTransactions(filters?: TransactionFilters): Observable<TransactionResponse> {
-    const params: any = {};
-    if (filters) {
-      Object.keys(filters).forEach(key => {
-        if (filters[key as keyof TransactionFilters] !== undefined) {
-          params[key] = filters[key as keyof TransactionFilters];
-        }
-      });
-    }
+  // ---------- Helpers ----------
+  private toISO(d?: Date | string): string | undefined {
+    if (!d) return undefined;
+    return typeof d === 'string' ? d : d.toISOString();
+  }
+  private fromDTO(t: TransactionDTO): Transaction {
+    return {
+      ...t,
+      date: new Date(t.date),
+      createdAt: new Date(t.createdAt),
+      updatedAt: new Date(t.updatedAt),
+    };
+  }
+  private buildParams(filters?: TransactionFilters): HttpParams {
+    let params = new HttpParams();
+    if (!filters) return params;
+    Object.entries(filters).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== '') params = params.set(k, String(v));
+    });
+    return params;
+  }
 
-    return this.http.get<TransactionResponse>(this.API_URL, { params });
+  // ---------- Queries ----------
+  getTransactions(filters?: TransactionFilters): Observable<TransactionResponse> {
+    const params = this.buildParams(filters);
+    return this.http.get<TransactionResponseDTO>(this.API, { params }).pipe(
+      map((r) => ({
+        ...r,
+        transactions: r.transactions.map((t) => this.fromDTO(t)),
+      }))
+    );
+  }
+
+  /** Convenience for dashboard “Recent Transactions” */
+  getRecentTransactions(limit = 8): Observable<Transaction[]> {
+    // Request first page with limit; also sort by date desc if your API supports it
+    const params: TransactionFilters = { page: 1, limit, sortBy: 'date', sortDir: 'desc' };
+    return this.getTransactions(params).pipe(
+      map((r) =>
+        [...r.transactions].sort(
+          (a, b) => b.date.getTime() - a.date.getTime()
+        ).slice(0, limit)
+      )
+    );
   }
 
   getTransaction(id: string): Observable<Transaction> {
-    return this.http.get<Transaction>(`${this.API_URL}/${id}`);
+    return this.http.get<TransactionDTO>(`${this.API}/${id}`).pipe(map(this.fromDTO.bind(this)));
   }
 
-  createTransaction(transaction: CreateTransactionRequest): Observable<{ message: string; transaction: Transaction }> {
-    return this.http.post<{ message: string; transaction: Transaction }>(this.API_URL, transaction);
+  // ---------- Commands ----------
+  createTransaction(payload: CreateTransactionRequest):
+    Observable<{ message: string; transaction: Transaction }> {
+    const body = { ...payload, date: this.toISO(payload.date) };
+    return this.http.post<{ message: string; transaction: TransactionDTO }>(this.API, body).pipe(
+      map((res) => ({ message: res.message, transaction: this.fromDTO(res.transaction) }))
+    );
   }
 
-  updateTransaction(id: string, transaction: UpdateTransactionRequest): Observable<{ message: string; transaction: Transaction }> {
-    return this.http.put<{ message: string; transaction: Transaction }>(`${this.API_URL}/${id}`, transaction);
+  updateTransaction(id: string, payload: UpdateTransactionRequest):
+    Observable<{ message: string; transaction: Transaction }> {
+    const body = { ...payload, date: this.toISO(payload.date) };
+    return this.http.put<{ message: string; transaction: TransactionDTO }>(`${this.API}/${id}`, body).pipe(
+      map((res) => ({ message: res.message, transaction: this.fromDTO(res.transaction) }))
+    );
   }
 
   deleteTransaction(id: string): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.API_URL}/${id}`);
+    return this.http.delete<{ message: string }>(`${this.API}/${id}`);
   }
 
   getTransactionSummary(startDate?: string, endDate?: string): Observable<TransactionSummary> {
-    const params: any = {};
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
-
-    return this.http.get<TransactionSummary>(`${this.API_URL}/summary/stats`, { params });
+    const params = this.buildParams({ startDate, endDate });
+    return this.http.get<TransactionSummary>(`${this.API}/summary/stats`, { params });
   }
 }

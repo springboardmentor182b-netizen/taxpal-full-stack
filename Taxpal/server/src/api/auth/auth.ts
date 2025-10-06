@@ -1,67 +1,66 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import User from '../../api/auth/User';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import User from './user.model';
 
-// ────────────────────────────────────────────────────────────────
-// Shared type for requests that carry authenticated user info
-// ────────────────────────────────────────────────────────────────
 export interface AuthedRequest extends Request {
-  user?: any;   // can be full user doc or { id: string }, depending on middleware
+  user?: {
+    id: string;
+    userId: string;
+    _id?: any;
+    name?: string;
+    email?: string;
+    country?: string;
+    income_bracket?: 'low' | 'middle' | 'high';
+  } & Record<string, any>;
 }
 
-// ────────────────────────────────────────────────────────────────
-// 1) Existing middleware – loads the full User document
-//    Use this when you need all user details on req.user
-// ────────────────────────────────────────────────────────────────
-export const authenticateToken = async (
-  req: AuthedRequest,
-  res: Response,
-  next: NextFunction
-) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
 
-  if (!token) {
-    return res.status(401).json({ message: 'Access token required' });
-  }
+function extractToken(req: Request): string | null {
+  const header = (req.headers['authorization'] || req.headers['Authorization']) as string | undefined;
+  if (header && /^Bearer\s+/i.test(header)) return header.split(' ')[1];
+  const cookie = (req as any).cookies?.token;
+  if (cookie) return cookie;
+  return null;
+}
+
+function getUserIdFromPayload(payload: JwtPayload | string): string | null {
+  if (typeof payload === 'string') return null;
+  return (payload.userId as string) || (payload.id as string) || (payload.sub as string) || null;
+}
+
+export const authenticateToken = async (req: AuthedRequest, res: Response, next: NextFunction) => {
+  const token = extractToken(req);
+  if (!token) { res.status(401).json({ message: 'Access token required' }); return; }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as any;
-    const user = await User.findById(decoded.userId).select('-password');
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const uid = getUserIdFromPayload(decoded);
+    if (!uid) { res.status(401).json({ message: 'Invalid token payload' }); return; }
 
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid token' });
-    }
+    const user = await User.findById(uid).select('-password').lean();
+    if (!user) { res.status(401).json({ message: 'Invalid token' }); return; }
 
-    req.user = user;
+    req.user = { ...user, id: String(user._id), userId: String(user._id) };
     next();
-  } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+  } catch {
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 };
 
-// ────────────────────────────────────────────────────────────────
-// 2) New lightweight middleware – attaches only { id }
-//    Use this when you only need the user’s ID for quick checks
-// ────────────────────────────────────────────────────────────────
-export function requireAuth(
-  req: AuthedRequest,
-  res: Response,
-  next: NextFunction
-) {
-  const header = req.headers.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : null;
-
-  if (!token) {
-    return res.status(401).json({ message: 'No token' });
-  }
+export function requireAuth(req: AuthedRequest, res: Response, next: NextFunction) {
+  const header = (req.headers['authorization'] || req.headers['Authorization']) as string | undefined;
+  const token = header?.startsWith('Bearer ') ? header.split(' ')[1] : undefined;
+  if (!token) { res.status(401).json({ message: 'No token' }); return; }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret') as { id: string; userId?: string };
-    // prefer decoded.userId if your JWT stores it that way
-    req.user = { id: decoded.id || decoded.userId };
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const uid = getUserIdFromPayload(decoded);
+    if (!uid) { res.status(401).json({ message: 'Invalid token payload' }); return; }
+
+    req.user = { id: String(uid), userId: String(uid) };
     next();
   } catch {
-    return res.status(401).json({ message: 'Invalid token' });
+    res.status(401).json({ message: 'Invalid or expired token' });
   }
 }

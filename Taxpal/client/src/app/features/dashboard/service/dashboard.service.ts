@@ -9,7 +9,7 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class DashboardService {
-  // If you use environment base URLs, swap this for environment.api + '/dashboard'
+  // Using Angular dev proxy: '/api' -> http://localhost:4000
   private readonly base = '/api/v1/dashboard';
 
   // Simple in-memory caches; invalidate() clears them
@@ -18,12 +18,13 @@ export class DashboardService {
 
   constructor(private http: HttpClient) {}
 
-  /** Clear cached responses (call this after adding/updating transactions/budgets). */
+  /** Clear cached responses (call this after adding/updating income/expense). */
   invalidate(): void {
     this.dashCache.clear();
     this.trendCache.clear();
   }
 
+  /** Cards & pie (keep if your UI shows them). */
   getDashboard(month?: number, year?: number, refresh = false): Observable<DashboardResponse> {
     const key = `dash:${year ?? 'cur'}-${month ?? 'cur'}`;
     if (!refresh && this.dashCache.has(key)) return this.dashCache.get(key)!;
@@ -40,7 +41,11 @@ export class DashboardService {
     return req$;
   }
 
-  getIncomeVsExpenses(period: TrendPeriod = 'month', refresh = false): Observable<IncomeVsExpensesResponse> {
+  /** Income vs Expenses bar chart data. */
+  getIncomeVsExpenses(
+    period: TrendPeriod = 'month',
+    refresh = false
+  ): Observable<IncomeVsExpensesResponse> {
     const key = `trend:${period}`;
     if (!refresh && this.trendCache.has(key)) return this.trendCache.get(key)!;
 
