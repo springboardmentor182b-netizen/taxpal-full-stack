@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { CommonModule, DatePipe } from '@angular/common';
 
 interface TaxReminder {
   title: string;
@@ -10,7 +11,9 @@ interface TaxReminder {
 @Component({
   selector: 'app-tax-calendar',
   templateUrl: './tax-calendar.component.html',
-  styleUrls: ['./tax-calendar.component.css']
+  styleUrls: ['./tax-calendar.component.css'],
+  standalone: true,
+  imports: [CommonModule, DatePipe]
 })
 export class TaxCalendarComponent implements OnInit {
   taxReminders: TaxReminder[] = [];

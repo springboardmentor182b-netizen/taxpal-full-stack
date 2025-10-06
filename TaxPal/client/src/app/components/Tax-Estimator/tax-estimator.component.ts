@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 
 interface TaxData {
   country: string;
@@ -15,6 +17,8 @@ interface TaxData {
 
 @Component({
   selector: 'app-tax-estimator',
+  standalone: true,
+  imports: [CommonModule, FormsModule, CurrencyPipe],
   templateUrl: './tax-estimator.component.html',
   styleUrls: ['./tax-estimator.component.css']
 })
