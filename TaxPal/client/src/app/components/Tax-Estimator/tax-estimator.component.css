@@ -1,0 +1,91 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+.dashboard-container {
+  min-height: calc(100vh - 80px);
+  background-color: #f9fafb;
+  padding: 3rem 1.5rem;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+.dashboard-placeholder {
+  background-color: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  padding: 2.5rem;
+}
+
+.placeholder-icon {
+  display: flex;
+  justify-content: center;
+  color: #3b82f6;
+  margin-bottom: 1rem;
+}
+
+.tax-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+label {
+  font-weight: 500;
+  color: #1f2937;
+  margin-bottom: 0.25rem;
+  display: block;
+}
+
+input, select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+}
+
+.calculate-btn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.calculate-btn:hover {
+  background-color: #2563eb;
+}
+
+.result-box {
+  margin-top: 2rem;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+}
