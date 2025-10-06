@@ -57,10 +57,12 @@ export class BudgetService {
     }
 
     // POST (Create) Operations
-    public async createBudget(data: { category: string, amount: number, month: string, description?: string, userId: string }): Promise<IBudgetResponse> {
+    public async createBudget(data: {
+        spent: number; category: string, amount: number, month: string, description?: string, userId: string 
+}): Promise<IBudgetResponse> {
         const newBudget = new Budget({
             ...data,
-            spent: 0, 
+            spent: data.spent ?? 0,
         });
         
         // Save the document

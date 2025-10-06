@@ -1,4 +1,3 @@
-<!-- Category Modal -->
 <div *ngIf="showModal" class="modal-overlay">
   <div class="modal-content">
 
@@ -10,24 +9,38 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button [class.active]="selectedTab==='Expense'" (click)="selectedTab='Expense'">
-        <span class="tab-symbol">−</span> Expense
+      <button [class.active]="selectedTab === 'Expense'" (click)="setTab('Expense')">
+        − Expense
       </button>
-      <button [class.active]="selectedTab==='Income'" (click)="selectedTab='Income'">
-        <span class="tab-symbol">+</span> Income
+      <button [class.active]="selectedTab === 'Income'" (click)="setTab('Income')">
+        + Income
       </button>
     </div>
 
-    <!-- Category List (scrollable) -->
+    <!-- Category List -->
     <ul class="category-list">
-      <li *ngFor="let cat of categories" [hidden]="cat.type !== selectedTab">
+      <li *ngFor="let cat of displayedCategories">
         <div class="cat-info">
           <span class="dot"></span>
           <span class="cat-name">{{ cat.name }}</span>
+          <span *ngIf="!cat._id" class="default-badge">Default</span>
         </div>
+
         <div class="actions">
-          <button (click)="editCategory(cat)" class="edit-btn" title="Edit">✎</button>
-          <button (click)="deleteCategory(cat)" class="delete-btn" title="Delete">🗑️</button>
+          <button 
+            (click)="editCategory(cat)" 
+            class="edit-btn" 
+            [disabled]="!cat._id"
+            [title]="!cat._id ? 'Default categories cannot be edited' : 'Edit'">
+            ✎
+          </button>
+          <button 
+            (click)="deleteCategory(cat)" 
+            class="delete-btn" 
+            [disabled]="!cat._id"
+            [title]="!cat._id ? 'Default categories cannot be deleted' : 'Delete'">
+            🗑️
+          </button>
         </div>
       </li>
     </ul>
@@ -36,12 +49,15 @@
     <form [formGroup]="categoryForm" (ngSubmit)="addOrUpdateCategory()" class="category-form">
       <input formControlName="name" placeholder="Category Name" />
       <select formControlName="type">
-        <option value="Income">Income</option>
-        <option value="Expense">Expense</option>
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
       </select>
+
       <div class="form-buttons">
         <button type="button" (click)="closeModal()" class="cancel-btn">Cancel</button>
-        <button type="submit" class="add-btn">{{ editingCategory ? 'Update' : 'Add' }}</button>
+        <button type="submit" class="add-btn">
+          {{ editingCategory ? 'Update' : 'Add' }}
+        </button>
       </div>
     </form>
 

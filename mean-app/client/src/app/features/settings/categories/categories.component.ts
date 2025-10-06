@@ -1,13 +1,8 @@
-import { Component, Input, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
-
-interface Category {
-  id: number;
-  name: string;
-  type: 'Income' | 'Expense';
-}
+import { CategoryService, Category } from '../../../services/category.service';
 
 @Component({
   selector: 'app-categories',
@@ -17,43 +12,70 @@ interface Category {
   styleUrls: ['./categories.component.css']
 })
 export class Categories implements OnInit {
-  @Input() open: boolean = false; 
+  @Input() open: boolean = false;
   showModal = false;
   selectedTab: 'Income' | 'Expense' = 'Expense';
 
-  categories: Category[] = [
-    { id: 1, name: 'Salary', type: 'Income' },
-    { id: 2, name: 'Freelancing', type: 'Income' },
-    { id: 3, name: 'Investments', type: 'Income' },
-    { id: 4, name: 'Rental Income', type: 'Income' },
-    { id: 5, name: 'Business Profit', type: 'Income' },
-    { id: 6, name: 'Rent', type: 'Expense' },
-    { id: 7, name: 'Utilities', type: 'Expense' },
-    { id: 8, name: 'Groceries', type: 'Expense' },
-    { id: 9, name: 'Transportation', type: 'Expense' },
-    { id: 10, name: 'Entertainment', type: 'Expense' }
+  /** 🔹 Default categories (always available) */
+  defaultCategories: Category[] = [
+    { name: 'Salary', type: 'income' },
+    { name: 'Freelancing', type: 'income' },
+    { name: 'Investments', type: 'income' },
+    { name: 'Rental Income', type: 'income' },
+    { name: 'Business Profit', type: 'income' },
+    { name: 'Rent', type: 'expense' },
+    { name: 'Utilities', type: 'expense' },
+    { name: 'Groceries', type: 'expense' },
+    { name: 'Transportation', type: 'expense' },
+    { name: 'Entertainment', type: 'expense' }
   ];
+
+  /** 🔹 User-created categories from backend */
+  userCategories: Category[] = [];
+
+  /** 🔹 Categories to display for current tab */
+  displayedCategories: Category[] = [];
 
   categoryForm: FormGroup;
   editingCategory: Category | null = null;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private categoryService: CategoryService) {
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
-      type: ['Income', Validators.required]
+      type: ['income', Validators.required] // backend expects lowercase
     });
   }
 
   ngOnInit() {
-    this.openModal(); // initial value
+    this.openModal();
+    this.loadUserCategories();
   }
 
- 
+  /** 🔹 Load backend categories */
+  loadUserCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (res) => {
+        this.userCategories = res.data;
+        this.filterCategories(); // show categories for selected tab
+      },
+      error: (err) => console.error('Error loading categories:', err)
+    });
+  }
 
+  /** 🔹 Filter categories based on selected tab */
+  filterCategories() {
+    const type = this.selectedTab.toLowerCase(); // 'income' or 'expense'
+    this.displayedCategories = [...this.defaultCategories, ...this.userCategories]
+      .filter(cat => cat.type === type);
+  }
+
+  /** 🔹 Switch tab */
   setTab(tab: 'Income' | 'Expense') {
     this.selectedTab = tab;
+    this.filterCategories();
   }
 
+  /** 🔹 Modal control */
   openModal() {
     this.showModal = true;
   }
@@ -61,29 +83,44 @@ export class Categories implements OnInit {
   closeModal() {
     this.showModal = false;
     this.editingCategory = null;
-    this.categoryForm.reset({ type: 'Income' });
+    this.categoryForm.reset({ type: 'income' });
   }
 
+  /** 🔹 Add or update category */
   addOrUpdateCategory() {
     if (this.categoryForm.invalid) return;
     const { name, type } = this.categoryForm.value;
 
-    if (this.editingCategory) {
-      this.editingCategory.name = name;
-      this.editingCategory.type = type;
+    if (this.editingCategory && this.editingCategory._id) {
+      // Update backend category
+      this.categoryService.updateCategory(this.editingCategory._id, { name, type }).subscribe({
+        next: () => this.loadUserCategories(),
+        error: (err) => console.error('Error updating category:', err)
+      });
     } else {
-      this.categories.push({ id: Date.now(), name, type });
+      // Add new category to backend
+      this.categoryService.addCategory({ name, type }).subscribe({
+        next: () => this.loadUserCategories(),
+        error: (err) => console.error('Error adding category:', err)
+      });
     }
     this.closeModal();
   }
 
+  /** 🔹 Edit only user-created category */
   editCategory(cat: Category) {
+    if (!cat._id) return; // prevent editing defaults
     this.editingCategory = cat;
     this.categoryForm.setValue({ name: cat.name, type: cat.type });
     this.openModal();
   }
 
+  /** 🔹 Delete only user-created category */
   deleteCategory(cat: Category) {
-    this.categories = this.categories.filter(c => c.id !== cat.id);
+    if (!cat._id) return; // prevent deleting defaults
+    this.categoryService.deleteCategory(cat._id).subscribe({
+      next: () => this.loadUserCategories(),
+      error: (err) => console.error('Error deleting category:', err)
+    });
   }
 }
