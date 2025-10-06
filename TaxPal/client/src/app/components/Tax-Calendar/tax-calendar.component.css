@@ -30,7 +30,7 @@ h1 {
 .dashboard-placeholder {
   background-color: white;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   padding: 2.5rem;
 }
 
@@ -71,4 +71,20 @@ h1 {
 .tag.payment {
   background-color: #dcfce7;
   color: #15803d;
+}
+.calculate-tax-btn {
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: #4f46e5;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.calculate-tax-btn:hover {
+  background-color: #4338ca;
 }

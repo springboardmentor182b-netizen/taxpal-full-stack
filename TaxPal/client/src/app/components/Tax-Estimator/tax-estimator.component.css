@@ -31,7 +31,7 @@ h1 {
 .dashboard-placeholder {
   background-color: #ffffff;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   padding: 2.5rem;
 }
 
@@ -61,7 +61,8 @@ label {
   display: block;
 }
 
-input, select {
+input,
+select {
   width: 100%;
   padding: 0.6rem;
   border: 1px solid #d1d5db;
@@ -88,4 +89,63 @@ input, select {
   border-radius: 0.5rem;
   padding: 1.5rem;
   text-align: center;
+}
+.dashboard-container {
+  max-width: 960px;
+  margin: auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 2rem;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.form-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.form-field input,
+.form-field select {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+.calculate-btn {
+  background-color: #0078d4;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.result-box {
+  margin-top: 2rem;
+  background-color: #f3f9ff;
+  padding: 1rem;
+  border-left: 4px solid #0078d4;
 }
