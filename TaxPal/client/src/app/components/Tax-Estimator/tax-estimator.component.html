@@ -1,121 +1,182 @@
 <div class="dashboard-container">
   <div class="dashboard-content">
     <section class="welcome-section">
-      <h1 class="title">🧾 Tax Estimator</h1>
+      <div class="section-header">
+        <div class="section-icon">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M4 17L10 11 4 5"></path>
+            <path d="M12 19L20 19"></path>
+          </svg>
+        </div>
+        <h1 class="title">Tax Estimator</h1>
+      </div>
       <p class="subtitle">Easily calculate your quarterly tax obligations</p>
     </section>
 
     <section class="calculator-section">
-      <h2 class="section-heading">📊 Quarterly Tax Calculator</h2>
-
-      <form class="tax-form" (ngSubmit)="calculateTax()">
-        <fieldset class="form-group">
-          <legend>Basic Information</legend>
-          <div class="form-grid">
-            <div class="form-field">
-              <label for="country">Country/Region</label>
-              <select [(ngModel)]="taxData.country" name="country" required>
-                <option value="United States">United States</option>
-                <option value="India">India</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="state">State/Province</label>
-              <input
-                type="text"
-                [(ngModel)]="taxData.state"
-                name="state"
-                placeholder="California"
-                required
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="status">Filing Status</label>
-              <select [(ngModel)]="taxData.status" name="status" required>
-                <option value="Single">Single</option>
-                <option value="Married">Married</option>
-              </select>
-            </div>
-
-            <div class="form-field">
-              <label for="quarter">Quarter</label>
-              <select [(ngModel)]="taxData.quarter" name="quarter" required>
-                <option value="Q1">Q1 (Jan–Mar)</option>
-                <option value="Q2">Q2 (Apr–Jun)</option>
-                <option value="Q3">Q3 (Jul–Sep)</option>
-                <option value="Q4">Q4 (Oct–Dec)</option>
-              </select>
-            </div>
-          </div>
-        </fieldset>
-
-        <fieldset class="form-group">
-          <legend>Financial Details</legend>
-          <div class="form-grid">
-            <div class="form-field">
-              <label for="income">Gross Income</label>
-              <input
-                type="number"
-                [(ngModel)]="taxData.income"
-                name="income"
-                placeholder="$ 0.00"
-                required
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="businessExpenses">Business Expenses</label>
-              <input
-                type="number"
-                [(ngModel)]="taxData.businessExpenses"
-                name="businessExpenses"
-                placeholder="$ 0.00"
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="retirement">Retirement Contributions</label>
-              <input
-                type="number"
-                [(ngModel)]="taxData.retirement"
-                name="retirement"
-                placeholder="$ 0.00"
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="healthInsurance">Health Insurance Premiums</label>
-              <input
-                type="number"
-                [(ngModel)]="taxData.healthInsurance"
-                name="healthInsurance"
-                placeholder="$ 0.00"
-              />
-            </div>
-
-            <div class="form-field">
-              <label for="homeOffice">Home Office Deduction</label>
-              <input
-                type="number"
-                [(ngModel)]="taxData.homeOffice"
-                name="homeOffice"
-                placeholder="$ 0.00"
-              />
-            </div>
-          </div>
-        </fieldset>
-
-        <div class="form-actions">
-          <button type="submit" class="calculate-btn">💡 Calculate Estimated Tax</button>
+      <div class="section-card">
+        <div class="card-header">
+          <h2 class="section-title">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+              <line x1="8" y1="21" x2="16" y2="21"></line>
+              <line x1="12" y1="17" x2="12" y2="21"></line>
+            </svg>
+            Quarterly Tax Calculator
+          </h2>
         </div>
 
-        <div class="result-box" *ngIf="estimatedTax">
-          <h3>📌 Tax Summary</h3>
-          <p><strong>Estimated Quarterly Tax:</strong> {{ estimatedTax | currency }}</p>
-        </div>
-      </form>
+        <form class="tax-form" (ngSubmit)="calculateTax()">
+          <fieldset class="form-group">
+            <legend>Basic Information</legend>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="country">Country/Region</label>
+                <select [(ngModel)]="taxData.country" name="country" required>
+                  <option value="United States">United States</option>
+                  <option value="India">India</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="state">State/Province</label>
+                <input
+                  type="text"
+                  [(ngModel)]="taxData.state"
+                  name="state"
+                  placeholder="California"
+                  required
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="status">Filing Status</label>
+                <select [(ngModel)]="taxData.status" name="status" required>
+                  <option value="Single">Single</option>
+                  <option value="Married">Married</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label for="quarter">Quarter</label>
+                <select [(ngModel)]="taxData.quarter" name="quarter" required>
+                  <option value="Q1">Q1 (Jan–Mar)</option>
+                  <option value="Q2">Q2 (Apr–Jun)</option>
+                  <option value="Q3">Q3 (Jul–Sep)</option>
+                  <option value="Q4">Q4 (Oct–Dec)</option>
+                </select>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="form-group">
+            <legend>Financial Details</legend>
+            <div class="form-grid">
+              <div class="form-field">
+                <label for="income">Gross Income</label>
+                <input
+                  type="number"
+                  [(ngModel)]="taxData.income"
+                  name="income"
+                  placeholder="$ 0.00"
+                  required
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="businessExpenses">Business Expenses</label>
+                <input
+                  type="number"
+                  [(ngModel)]="taxData.businessExpenses"
+                  name="businessExpenses"
+                  placeholder="$ 0.00"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="retirement">Retirement Contributions</label>
+                <input
+                  type="number"
+                  [(ngModel)]="taxData.retirement"
+                  name="retirement"
+                  placeholder="$ 0.00"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="healthInsurance">Health Insurance Premiums</label>
+                <input
+                  type="number"
+                  [(ngModel)]="taxData.healthInsurance"
+                  name="healthInsurance"
+                  placeholder="$ 0.00"
+                />
+              </div>
+
+              <div class="form-field">
+                <label for="homeOffice">Home Office Deduction</label>
+                <input
+                  type="number"
+                  [(ngModel)]="taxData.homeOffice"
+                  name="homeOffice"
+                  placeholder="$ 0.00"
+                />
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="form-actions">
+            <button type="submit" class="calculate-btn">Calculate Estimated Tax</button>
+          </div>
+
+          <div class="result-box" *ngIf="estimatedTax">
+            <div class="result-header">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+              </svg>
+              <h3>Tax Summary</h3>
+            </div>
+            <div class="result-content">
+              <p>
+                <strong>Estimated Quarterly Tax:</strong>
+                {{ estimatedTax | currency }}
+              </p>
+            </div>
+          </div>
+        </form>
+      </div>
     </section>
   </div>
 </div>
