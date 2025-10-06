@@ -1,0 +1,74 @@
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
+.dashboard-container {
+  min-height: calc(100vh - 80px);
+  background-color: #f9fafb;
+  padding: 3rem 1.5rem;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.welcome-section {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+}
+
+.dashboard-placeholder {
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  padding: 2.5rem;
+}
+
+.placeholder-icon {
+  display: flex;
+  justify-content: center;
+  color: #3b82f6;
+  margin-bottom: 1rem;
+}
+
+.calendar-item {
+  display: flex;
+  justify-content: space-between;
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.calendar-info strong {
+  color: #1f2937;
+}
+
+.tag {
+  padding: 0.3rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+
+.tag.reminder {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.tag.payment {
+  background-color: #dcfce7;
+  color: #15803d;
+}
