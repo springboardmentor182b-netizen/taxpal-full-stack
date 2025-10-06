@@ -30,7 +30,7 @@ export class BudgetController {
     public async createBudget(req: Request, res: Response): Promise<void> {
         try {
             // Note: userId is expected in the body here, but should come from the auth token for security
-            const { category, amount, month, description, userId } = req.body; 
+            const { category, amount, month, description,spent, userId } = req.body; 
 
             if (!category || !amount || !month || !userId) {
                 res.status(400).json({ message: 'Missing required fields' });
@@ -42,6 +42,7 @@ export class BudgetController {
                 amount: Number(amount), 
                 month,
                 description,
+                spent,
                 userId,
             });
 

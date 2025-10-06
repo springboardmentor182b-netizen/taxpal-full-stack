@@ -280,4 +280,9 @@ export class Dashboard implements OnInit {
       }
     });
   }
+  goToDashboard() {
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/dashboard']);
+    });
+  }
 }

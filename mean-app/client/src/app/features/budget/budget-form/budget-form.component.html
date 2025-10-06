@@ -1,8 +1,8 @@
-<div class="app-layout">
+<!-- <div class="app-layout"> -->
   <!-- Sidebar -->
-  <aside class="sidebar" [class.active]="sidebarActive" [class.collapsed]="collapsed">
+  <!-- <aside class="sidebar" [class.active]="sidebarActive" [class.collapsed]="collapsed"> -->
     <!-- Sidebar Top -->
-    <div class="sidebar-top">
+    <!-- <div class="sidebar-top">
       <div class="brand-row">
         <div class="brand">TaxPal</div>
         <button class="collapse-btn" title="Collapse sidebar" (click)="toggleCollapse()"
@@ -14,10 +14,10 @@
           </svg>
         </button>
       </div>
-    </div>
+    </div> -->
 
     <!-- Sidebar Nav -->
-    <nav class="nav">
+    <!-- <nav class="nav">
       <a class="nav-item" routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
         <span class="label">Dashboard</span>
       </a>
@@ -33,10 +33,10 @@
       <a class="nav-item" routerLink="/reports" routerLinkActive="active-link">
         <span class="label">Reports</span>
       </a>
-    </nav>
+    </nav> -->
 
     <!-- Sidebar Bottom -->
-    <div class="sidebar-bottom">
+    <!-- <div class="sidebar-bottom">
       <button class="action settings">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
           <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="white" stroke-width="2" />
@@ -57,7 +57,7 @@
         <button class="action logout" (click)="logout()">Logout</button>
       </div>
     </div>
-  </aside>
+  </aside> -->
 
   <!-- Main Content -->
   <div class="main-content">
@@ -178,4 +178,4 @@
   </div>
 
   <div class="overlay" *ngIf="sidebarActive" (click)="closeSidebarOverlay()"></div>
-</div>
+

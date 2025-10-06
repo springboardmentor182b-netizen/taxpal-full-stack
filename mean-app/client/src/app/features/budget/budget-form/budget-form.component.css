@@ -4,12 +4,12 @@
 
 /* 1. Overall Application Layout (Parent of Sidebar and Main Content) */
 /* This is the crucial fix for proper side-by-side layout */
-.app-layout {
+/* .app-layout {
     display: grid;
     grid-template-columns: 240px 1fr; /* Sidebar width (240px) | Main content (1fr) */
-    min-height: 100vh;
-    width: 100%;
-}
+    /* min-height: 100vh;
+    width: 100%; */
+
 
 /* Optional: Handle the collapsed state if needed on the layout */
 /* .app-layout.collapsed {
