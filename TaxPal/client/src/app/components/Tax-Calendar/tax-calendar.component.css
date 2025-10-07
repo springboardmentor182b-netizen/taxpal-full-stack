@@ -1,0 +1,608 @@
+.tax-calendar-container {
+  padding: 1.5rem;
+  background: #f9fafb;
+  min-height: calc(100vh - 80px);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.tax-calendar-container.dark {
+  background: #1a1a1a;
+  color: #f9fafb;
+}
+
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tax-calendar-container.dark .header-section {
+  background: #2d2d2d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #111827;
+}
+
+.tax-calendar-container.dark .page-title {
+  color: #f9fafb;
+}
+
+.title-icon {
+  color: #3b82f6;
+}
+
+.tax-calendar-container.dark .title-icon {
+  color: #60a5fa;
+}
+
+.page-title h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.header-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.theme-toggle-btn {
+  background: #f2f2f2;
+  color: #333;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tax-calendar-container.dark .theme-toggle-btn {
+  background: #3d3d3d;
+  color: #f9fafb;
+}
+
+.theme-toggle-btn:hover {
+  background: #e0e0e0;
+}
+
+.tax-calendar-container.dark .theme-toggle-btn:hover {
+  background: #4d4d4d;
+}
+
+.estimator-btn {
+  background-color: #3b82f6;
+  color: white;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.estimator-btn:hover {
+  background-color: #2563eb;
+}
+
+.calendar-section {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tax-calendar-container.dark .calendar-section {
+  background: #2d2d2d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.calendar-header-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.nav-btn {
+  background: #f3f4f6;
+  color: #111827;
+  border: none;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tax-calendar-container.dark .nav-btn {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.nav-btn:hover {
+  background: #e5e7eb;
+}
+
+.tax-calendar-container.dark .nav-btn:hover {
+  background: #4b5563;
+}
+
+.month-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  color: #111827;
+}
+
+.tax-calendar-container.dark .month-title {
+  color: #f9fafb;
+}
+
+/* Reduce calendar size to make it more compact */
+.calendar-grid {
+  width: 100%;
+}
+
+.weekday-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  margin-bottom: 0.5rem;
+}
+
+.weekday {
+  text-align: center;
+  font-weight: 600;
+  padding: 0.4rem;
+  color: #3b82f6;
+  font-size: 0.8rem;
+}
+
+.tax-calendar-container.dark .weekday {
+  color: #60a5fa;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background: #f3f4f6;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.tax-calendar-container.dark .calendar-days {
+  background: #374151;
+}
+
+.calendar-day {
+  background: white;
+  padding: 0.4rem;
+  min-height: 50px; /* Reduced height */
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.tax-calendar-container.dark .calendar-day {
+  background: #2d2d2d;
+  color: #f9fafb;
+}
+
+.calendar-day:hover {
+  background: #f9fafb;
+}
+
+.tax-calendar-container.dark .calendar-day:hover {
+  background: #374151;
+}
+
+.calendar-day.today {
+  background: #eff6ff;
+  color: #3b82f6;
+}
+
+.tax-calendar-container.dark .calendar-day.today {
+  background: #1e3a8a;
+  color: #60a5fa;
+}
+
+.calendar-day.other-month {
+  opacity: 0.5;
+}
+
+.calendar-day.selected {
+  background: #3b82f6;
+  color: white;
+}
+
+.calendar-day.has-events {
+  box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.calendar-day.event-deadline {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.calendar-day.event-reminder {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.calendar-day.event-payment {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.calendar-day.event-filing {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.calendar-day.priority-high.event-deadline {
+  background-color: rgba(220, 38, 38, 0.2);
+}
+
+.calendar-day.priority-high.event-reminder {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.calendar-day.priority-high.event-payment {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.calendar-day.priority-high.event-filing {
+  background-color: rgba(139, 92, 246, 0.2);
+}
+
+.day-number {
+  font-weight: 600;
+  font-size: 0.85rem; /* Smaller font size */
+}
+
+.event-indicators {
+  display: flex;
+  gap: 2px;
+  margin-top: 0.25rem; /* Reduced margin */
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin: 1px;
+}
+
+.event-dot.deadline-high {
+  background: #dc2626;
+}
+.event-dot.deadline-medium {
+  background: #f97316;
+}
+.event-dot.deadline-low {
+  background: #fbbf24;
+}
+.event-dot.payment-high {
+  background: #10b981;
+}
+.event-dot.payment-medium {
+  background: #34d399;
+}
+.event-dot.reminder-high {
+  background: #3b82f6;
+}
+.event-dot.reminder-medium {
+  background: #6366f1;
+}
+.event-dot.filing-high {
+  background: #8b5cf6;
+}
+.event-dot.filing-medium {
+  background: #a855f7;
+}
+
+.events-section,
+.upcoming-events {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tax-calendar-container.dark .events-section,
+.tax-calendar-container.dark .upcoming-events {
+  background: #2d2d2d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.events-section h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.tax-calendar-container.dark .events-section h3 {
+  color: #f9fafb;
+}
+
+.event-card {
+  background: #f8f9fa;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 0.8rem;
+  border-left: 3px solid;
+  transition: all 0.2s ease;
+}
+
+.tax-calendar-container.dark .event-card {
+  background: #3d3d3d;
+  color: #f9fafb;
+}
+
+.event-card.deadline-high {
+  border-left-color: #dc3545;
+}
+.event-card.deadline-medium {
+  border-left-color: #fd7e14;
+}
+.event-card.payment-high {
+  border-left-color: #28a745;
+}
+.event-card.payment-medium {
+  border-left-color: #20c997;
+}
+.event-card.reminder-high {
+  border-left-color: #007bff;
+}
+.event-card.reminder-medium {
+  border-left-color: #6f42c1;
+}
+.event-card.filing-high {
+  border-left-color: #6610f2;
+}
+.event-card.filing-medium {
+  border-left-color: #6c757d;
+}
+
+.event-card:hover {
+  background: #f2f2f2;
+}
+
+.tax-calendar-container.dark .event-card:hover {
+  background: #4d4d4d;
+}
+
+.event-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.event-type {
+  background: #e9ecef;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+.tax-calendar-container.dark .event-type {
+  background: #495057;
+  color: #f9fafb;
+}
+
+.upcoming-events {
+  background: white;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.tax-calendar-container.dark .upcoming-events {
+  background: #2d2d2d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.upcoming-events h3 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.tax-calendar-container.dark .upcoming-events h3 {
+  color: #f9fafb;
+}
+
+.upcoming-event {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.8rem;
+  margin-bottom: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.tax-calendar-container.dark .upcoming-event {
+  background: #3d3d3d;
+}
+
+.upcoming-event:hover {
+  background: #f2f2f2;
+}
+
+.tax-calendar-container.dark .upcoming-event:hover {
+  background: #4d4d4d;
+}
+
+.upcoming-event.reminder-high,
+.upcoming-event.reminder-medium,
+.upcoming-event.reminder-low {
+  border-left: 3px solid #007bff;
+}
+
+.event-date {
+  background: #4285f4;
+  color: white;
+  padding: 0.5rem;
+  border-radius: 4px;
+  text-align: center;
+  min-width: 50px;
+}
+
+.event-date .month {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.event-date .day {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.event-info {
+  flex: 1;
+}
+
+.event-info h4 {
+  margin: 0 0 0.3rem 0;
+  color: #333;
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.tax-calendar-container.dark .event-info h4 {
+  color: #f9fafb;
+}
+
+.event-info p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 0.85rem;
+}
+
+.tax-calendar-container.dark .event-info p {
+  color: #adb5bd;
+}
+
+.priority-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.priority-badge.high {
+  background: #dc3545;
+  color: white;
+}
+
+.priority-badge.medium {
+  background: #fd7e14;
+  color: white;
+}
+
+.priority-badge.low {
+  background: #ffc107;
+  color: #212529;
+}
+
+.no-events {
+  text-align: center;
+  padding: 1rem;
+  color: #6c757d;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .tax-calendar-container {
+    padding: 0.8rem;
+  }
+
+  .header-section {
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
+  }
+
+  .calendar-day {
+    min-height: 50px;
+    padding: 0.3rem;
+  }
+
+  .upcoming-event {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+/* In tax-calendar.component.css */
+.estimate-tax-btn {
+  padding: 0.75rem 1.25rem;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s ease;
+}
+
+.estimate-tax-btn:hover {
+  background-color: #2563eb;
+}
+
+.tax-calendar-container.dark .estimate-tax-btn {
+  background-color: #4f46e5;
+}
+
+.tax-calendar-container.dark .estimate-tax-btn:hover {
+  background-color: #4338ca;
+}

@@ -1,0 +1,155 @@
+<div class="dashboard-container">
+  <div class="dashboard-content">
+    <div class="tax-calendar-container">
+      <!-- Calendar section -->
+      <div class="calendar-section">
+        <div class="calendar-header-wrapper">
+          <div class="calendar-header">
+            <button class="nav-btn" (click)="previousMonth()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="15,18 9,12 15,6"></polyline>
+              </svg>
+            </button>
+            <h2 class="month-title">{{ getMonthName() }}</h2>
+            <button class="nav-btn" (click)="nextMonth()">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="9,18 15,12 9,6"></polyline>
+              </svg>
+            </button>
+          </div>
+
+          <!-- Estimate Tax button -->
+          <button class="estimate-tax-btn" (click)="estimateTax()">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              ></path>
+              <line x1="12" y1="6" x2="12" y2="18"></line>
+              <line x1="8" y1="10" x2="8" y2="14"></line>
+              <line x1="16" y1="10" x2="16" y2="14"></line>
+            </svg>
+            Estimate Tax
+          </button>
+        </div>
+
+        <div class="calendar-grid">
+          <div class="weekday-header">
+            <div class="weekday">Sun</div>
+            <div class="weekday">Mon</div>
+            <div class="weekday">Tue</div>
+            <div class="weekday">Wed</div>
+            <div class="weekday">Thu</div>
+            <div class="weekday">Fri</div>
+            <div class="weekday">Sat</div>
+          </div>
+
+          <div class="calendar-days">
+            <div
+              *ngFor="let day of getDaysInMonth(currentMonth)"
+              class="calendar-day"
+              [ngClass]="{
+                today: isToday(day),
+                'other-month': !isCurrentMonth(day),
+                'has-events': getEventsForDate(day).length > 0,
+                'event-deadline': hasEventType(day, 'deadline'),
+                'event-reminder': hasEventType(day, 'reminder'),
+                'event-payment': hasEventType(day, 'payment'),
+                'event-filing': hasEventType(day, 'filing'),
+                'priority-high': hasEventPriority(day, 'high'),
+                'priority-medium': hasEventPriority(day, 'medium'),
+                'priority-low': hasEventPriority(day, 'low'),
+                selected: selectedDate && selectedDate.toDateString() === day.toDateString()
+              }"
+              (click)="selectDate(day)"
+            >
+              <span class="day-number">{{ day.getDate() }}</span>
+              <div class="event-indicators" *ngIf="getEventsForDate(day).length > 0">
+                <span
+                  *ngFor="let event of getEventsForDate(day)"
+                  class="event-dot"
+                  [ngClass]="event.type + '-' + event.priority"
+                  [title]="event.title"
+                ></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events section -->
+      <div class="events-section" *ngIf="selectedDate">
+        <h3>Events for {{ selectedDate | date : 'fullDate' }}</h3>
+        <div class="events-list">
+          <div *ngIf="getEventsForDate(selectedDate).length === 0" class="no-events">
+            No tax events scheduled for this date
+          </div>
+          <div
+            *ngFor="let event of getEventsForDate(selectedDate)"
+            class="event-card"
+            [ngClass]="event.type + '-' + event.priority"
+          >
+            <div class="event-header">
+              <h4>{{ event.title }}</h4>
+              <span class="event-type">{{ event.type | titlecase }}</span>
+            </div>
+            <p>{{ event.description }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Upcoming events section -->
+      <div class="upcoming-events">
+        <h3>Upcoming Tax Events</h3>
+        <div class="upcoming-list">
+          <div
+            *ngFor="let event of taxEvents | slice : 0 : 5"
+            class="upcoming-event"
+            [ngClass]="event.type + '-' + event.priority"
+          >
+            <div class="event-date">
+              <span class="month">{{ event.date | date : 'MMM' }}</span>
+              <span class="day">{{ event.date | date : 'd' }}</span>
+            </div>
+            <div class="event-info">
+              <h4>{{ event.title }}</h4>
+              <p>{{ event.description }}</p>
+            </div>
+            <div class="event-priority">
+              <span class="priority-badge" [ngClass]="event.priority">{{ event.priority }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

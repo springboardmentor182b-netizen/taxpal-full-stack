@@ -46,7 +46,8 @@ export class App implements OnInit {
                          url.includes('/transactions') ||
                          url.includes('/budget') ||
                          url.includes('/reports') ||
-                         url.includes('/tax-estimator');
+                         url.includes('/tax-estimator') ||
+                         url.includes('/tax-calendar'); // Add tax-calendar to the profile paths
   }
   
   shouldShowMainNavbar(): boolean {
@@ -62,7 +63,15 @@ export class App implements OnInit {
   }
   
   private isUserProfilePath(path: string): boolean {
-    const userPaths = ['/user-profile', '/profile-settings', '/transactions', '/budget', '/reports', '/tax-estimator'];
+    const userPaths = [
+      '/user-profile', 
+      '/profile-settings', 
+      '/transactions', 
+      '/budget', 
+      '/reports', 
+      '/tax-estimator',
+      '/tax-calendar'  // Add tax-calendar to the userPaths array
+    ];
     return userPaths.some(userPath => path.startsWith(userPath));
   }
 }
