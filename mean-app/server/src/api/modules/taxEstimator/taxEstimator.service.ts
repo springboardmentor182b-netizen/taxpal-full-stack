@@ -1,5 +1,5 @@
 import TaxEstimate, { ITaxEstimate } from "./taxEstimator.model";
-
+import * as reminderService from "../taxRemainders/taxReminder.service";
 // Tax calculation logic
 export const calculateEstimatedTax = (data: Partial<ITaxEstimate>): number => {
   const {
@@ -34,6 +34,7 @@ const getDueDateForQuarter = (quarter: string): Date => {
       return new Date(); // fallback: today
   }
 };
+
 export const createEstimate = async (
   data: Partial<ITaxEstimate>
 ): Promise<ITaxEstimate> => {
@@ -41,14 +42,23 @@ export const createEstimate = async (
   const due_date = data.quarter ? getDueDateForQuarter(data.quarter) : undefined;
 
   const newEstimate = new TaxEstimate({ ...data, estimated_tax, due_date });
-  return await newEstimate.save();
+  const savedEstimate = await newEstimate.save();
+
+  // ✅ Automatically generate reminders for the entire year
+  if (data.user_id) {
+    const year = new Date().getFullYear();
+    await reminderService.generateQuarterlyReminders(
+      data.user_id.toString(),
+      estimated_tax , // assuming this quarter represents 1/4th of total
+      year
+    );
+  }
+
+  return savedEstimate;
 };
-
-
 export const getEstimates = async (): Promise<ITaxEstimate[]> => {
   return await TaxEstimate.find();
 };
-
 export const getEstimateById = async (
   id: string
 ): Promise<ITaxEstimate | null> => {
