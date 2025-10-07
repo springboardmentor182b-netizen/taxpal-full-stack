@@ -1,0 +1,172 @@
+/* === Base / Layout (match modal+form scheme) ======================= */
+.list-shell {
+  padding: 16px;
+  max-width: 980px;
+  color: #0f172a;                 /* base text */
+}
+
+/* Header */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eef2f7;
+  padding-bottom: 12px;
+}
+.list-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #656ed3;                 /* purple title */
+  letter-spacing: -0.02em;
+}
+
+/* Header actions + filters */
+.actions { display: flex; align-items: center; gap: 10px; }
+.filters { display: flex; align-items: center; gap: 8px; }
+
+/* Inputs in filters → match form inputs */
+.filters input[type="month"],
+.filters select {
+  appearance: none;
+  width: auto;
+  padding: 10px 12px;
+  border: 2px solid black;        /* bold black border */
+  border-radius: 8px;
+  font-size: 14px;
+  background: #e8e9ec;            /* gray input bg */
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.filters select { padding-right: 36px; }
+.filters input[type="month"]:focus,
+.filters select:focus {
+  border-color: #8B7FF7;          /* purple focus */
+  box-shadow: 0 0 0 3px rgba(139, 127, 247, 0.10);
+}
+
+/* === Table ========================================================= */
+.table-wrap {
+  overflow: auto;
+  background: #ffffff;            /* white card bg */
+  border-radius: 16px;            /* match modal radius */
+  border: none;                   /* remove thin border */
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.10),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04); /* modal-like shadows */
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table th, .table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.table thead th {
+  background: #f8fafc;
+  text-align: left;
+  font-weight: 600;
+  color: #111113;
+}
+.table tbody tr:hover {
+  background: #f9fafb;
+}
+.table .num { text-align: right; }
+.table .w-actions { width: 140px; }
+
+/* Empty state + Loading */
+.empty {
+  text-align: center;
+  color: #494b50;
+  padding: 24px 0;
+}
+.loading {
+  padding: 12px;
+  color: #475569;
+}
+
+/* === Buttons (match modal scheme) ================================= */
+.btn {
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  min-width: 90px;
+  transition: all 0.2s ease;
+}
+.btn-sm {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* Primary */
+.btn-primary {
+  background: #656ed3;            /* purple */
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background: #656ed3;
+  transform: translateY(-1px);
+}
+.btn-primary:disabled {
+  background: #656ed3;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Ghost (neutral) */
+.btn-ghost {
+  background: #F3F4F6;
+  color: black;
+}
+.btn-ghost:hover { background: #E5E7EB; }
+
+/* Outline (optional) */
+.btn-outline {
+  background: #ffffff;
+  color: #0f172a;
+  border: 2px solid black;
+}
+.btn-outline:hover { background: #F3F4F6; }
+
+/* Danger */
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+.btn-danger:hover { filter: brightness(0.95); }
+
+/* === Modal (reuse dashboard modal, aligned to form scheme) ========= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+}
+.modal-shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.modal-content {
+  width: min(860px, 92vw);        /* align with form max width */
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  padding: 16px;                  /* inner spacing to match list shell */
+}
+
+/* === Snackbars (reuse) ============================================ */
+.snack-success { background: #155724; color: #fff; }
+.snack-error   { background: #721c24; color: #fff; }

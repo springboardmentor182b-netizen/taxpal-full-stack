@@ -5,10 +5,11 @@ import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 // ✅ Standalone components
-import { BudgetsComponent } from '../../budgets/component/budgets.component';
+// REMOVED: import { BudgetsComponent } from '../../budgets/component/budgets.component';
+import { BudgetsListComponent } from '../../budgets/component/budgets-list.component';
 import { IncomeModalComponent } from '../../auth/components/income/income';
 import { ExpenseModalComponent } from '../../auth/components/expense/expense';
-import { TaxEstimatorComponent } from '../../tax/components/tax-estimator/tax-estimator.component'; // <-- NEW
+import { TaxEstimatorComponent } from '../../tax/components/tax-estimator/tax-estimator.component';
 
 import { DashboardService } from '../../dashboard/service/dashboard.service';
 import { ExpenseService } from '../../../core/services/expense.service';
@@ -49,8 +50,8 @@ type BudgetModel = {
     FormsModule,
     IncomeModalComponent,
     ExpenseModalComponent,
-    BudgetsComponent,
-    TaxEstimatorComponent, // <-- NEW
+    BudgetsListComponent,   // ✅ use the new list component
+    TaxEstimatorComponent,
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css'],
@@ -59,7 +60,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   showIncome = false;
   showExpense = false;
   showBudget = false;            // controls the Budget modal
-  showTaxEstimator = false;      // <-- NEW: controls inline tax estimator
+  showTaxEstimator = false;      // inline tax estimator
 
   incomes: any[] = [];
   expenses: any[] = [];
@@ -109,7 +110,6 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   closeTaxEstimator() {
     if (!this.showTaxEstimator) return;
     this.showTaxEstimator = false;
-    // Wait for view to re-render dashboard, then (re)build charts
     requestAnimationFrame(() => this.refreshDashboard());
   }
 

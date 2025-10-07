@@ -1,0 +1,63 @@
+<div class="list-shell">
+  <header class="list-header">
+    <h2>Budgets</h2>
+
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" (click)="clearFilters()">Clear</button>
+      <div class="filters">
+        <input type="month" [(ngModel)]="month" (change)="fetch()" />
+        <select [(ngModel)]="category" (change)="fetch()">
+          <option value="">All categories</option>
+          <option>Groceries</option>
+          <option>Rent</option>
+          <option>Utilities</option>
+          <option>Transport</option>
+          <option>Entertainment</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <button type="button" class="btn btn-primary" (click)="openForm()">+ New Budget</button>
+    </div>
+  </header>
+
+  <div class="table-wrap" *ngIf="!loading; else loadingTpl">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Category</th>
+          <th class="num">Amount</th>
+          <th>Description</th>
+          <th class="w-actions">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- ✅ trackBy uses component method -->
+        <tr *ngFor="let r of rows; trackBy: trackById">
+          <td>{{ r.month }}</td>
+          <td>{{ r.category }}</td>
+          <td class="num">$ {{ r.amount | number:'1.2-2' }}</td>
+          <td>{{ r.description || '—' }}</td>
+          <td class="w-actions">
+            <button class="btn btn-danger btn-sm" (click)="delete(r)">Delete</button>
+          </td>
+        </tr>
+        <tr *ngIf="!rows.length">
+          <td colspan="5" class="empty">No budgets yet. Click “New Budget”.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Loading budgets…</div>
+  </ng-template>
+
+  <!-- Inline create form (re-using your existing component) -->
+  <div class="modal-backdrop" *ngIf="showForm" (click)="onFormClosed()"></div>
+  <div class="modal-shell" *ngIf="showForm" (click)="onFormClosed()" tabindex="-1">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-budgets [embedded]="true" (close)="onFormClosed()"></app-budgets>
+    </div>
+  </div>
+</div>

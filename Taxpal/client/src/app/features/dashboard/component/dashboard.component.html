@@ -207,18 +207,18 @@
   </ng-template>
 </div>
 
-<!-- ===== Budget Modal (same tab) ===== -->
+<!-- ===== Budget Modal (same tab) — now shows the LIST component ===== -->
 <div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
 <div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
   <div class="modal-content" (click)="$event.stopPropagation()">
-    <app-budgets [embedded]="true" (close)="closeBudget()"></app-budgets>
+    <app-budgets-list></app-budgets-list>
   </div>
 </div>
 
 <app-income-modal
   [isOpen]="showIncome"
-  (closeModal)="closeIncome()"
-  (save)="onIncomeSave($event)">
+  (closeModal)="closeIncome()
+  " (save)="onIncomeSave($event)">
 </app-income-modal>
 
 <app-expense-modal
