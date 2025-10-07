@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-// Import the ProfileNavbarComponent
-import { ProfileNavbarComponent } from '../../components/navbar/profile-navbar.component';
 
 interface TaxEvent {
   date: Date;
@@ -17,8 +15,8 @@ interface TaxEvent {
   templateUrl: './tax-calendar.component.html',
   styleUrls: ['./tax-calendar.component.css'], // Changed from .scss to .css
   standalone: true,
-  // Add ProfileNavbarComponent to the imports array
-  imports: [CommonModule, ProfileNavbarComponent],
+  // Remove ProfileNavbarComponent from imports since it's not used in the template
+  imports: [CommonModule],
 })
 export class TaxCalendarComponent implements OnInit {
   // Rest of your component code remains the same...
@@ -244,5 +242,17 @@ export class TaxCalendarComponent implements OnInit {
         priority: 'medium',
       },
     ];
+  }
+
+  hasEventType(date: Date, eventType: string): boolean {
+    return this.taxEvents.some(
+      (event) => event.date.toDateString() === date.toDateString() && event.type === eventType
+    );
+  }
+
+  hasEventPriority(date: Date, priority: string): boolean {
+    return this.taxEvents.some(
+      (event) => event.date.toDateString() === date.toDateString() && event.priority === priority
+    );
   }
 }

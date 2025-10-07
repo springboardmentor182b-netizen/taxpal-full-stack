@@ -117,11 +117,17 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
 }
 
-.calendar-header {
+.calendar-header-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .nav-btn {
@@ -240,6 +246,42 @@
   color: white;
 }
 
+.calendar-day.has-events {
+  box-shadow: inset 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.calendar-day.event-deadline {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.calendar-day.event-reminder {
+  background-color: rgba(59, 130, 246, 0.1);
+}
+
+.calendar-day.event-payment {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.calendar-day.event-filing {
+  background-color: rgba(139, 92, 246, 0.1);
+}
+
+.calendar-day.priority-high.event-deadline {
+  background-color: rgba(220, 38, 38, 0.2);
+}
+
+.calendar-day.priority-high.event-reminder {
+  background-color: rgba(59, 130, 246, 0.2);
+}
+
+.calendar-day.priority-high.event-payment {
+  background-color: rgba(16, 185, 129, 0.2);
+}
+
+.calendar-day.priority-high.event-filing {
+  background-color: rgba(139, 92, 246, 0.2);
+}
+
 .day-number {
   font-weight: 600;
   font-size: 0.85rem; /* Smaller font size */
@@ -254,9 +296,10 @@
 }
 
 .event-dot {
-  width: 4px; /* Smaller dots */
-  height: 4px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
+  margin: 1px;
 }
 
 .event-dot.deadline-high {
@@ -538,25 +581,28 @@
 }
 /* In tax-calendar.component.css */
 .estimate-tax-btn {
-  margin-top: 1rem;
   padding: 0.75rem 1.25rem;
-  background-color: #2563eb;
+  background-color: #3b82f6;
   color: white;
   border: none;
-  border-radius: 0.375rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s ease;
 }
 
 .estimate-tax-btn:hover {
-  background-color: #1d4ed8;
+  background-color: #2563eb;
 }
 
-.estimate-tax-btn svg {
-  width: 18px;
-  height: 18px;
+.tax-calendar-container.dark .estimate-tax-btn {
+  background-color: #4f46e5;
+}
+
+.tax-calendar-container.dark .estimate-tax-btn:hover {
+  background-color: #4338ca;
 }
