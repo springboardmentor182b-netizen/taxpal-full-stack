@@ -1,0 +1,78 @@
+import mongoose, { Schema, Document } from "mongoose";
+import { ReportType, ReportPeriod, ReportFormat, ReportStatus, IReport } from "./report.types";
+
+export interface IReportDocument extends Omit<IReport, "_id">, Document {}
+
+const reportSchema = new Schema<IReportDocument>(
+  {
+    userId: {
+      type: String,
+      required: [true, "User ID is required"],
+      index: true
+    },
+    reportType: {
+      type: String,
+      enum: Object.values(ReportType),
+      required: [true, "Report type is required"]
+    },
+    period: {
+      type: String,
+      enum: Object.values(ReportPeriod),
+      required: [true, "Period is required"]
+    },
+    format: {
+      type: String,
+      enum: Object.values(ReportFormat),
+      required: [true, "Format is required"],
+      default: ReportFormat.PDF
+    },
+    status: {
+      type: String,
+      enum: Object.values(ReportStatus),
+      default: ReportStatus.PENDING
+    },
+    reportData: {
+      summary: {
+        totalIncome: Number,
+        totalExpense: Number,
+        netIncome: Number,
+        taxLiability: Number
+      },
+      details: [Schema.Types.Mixed],
+      charts: [Schema.Types.Mixed],
+      period: {
+        startDate: Date,
+        endDate: Date
+      }
+    },
+    customPeriod: {
+      startDate: Date,
+      endDate: Date
+    },
+    generatedAt: {
+      type: Date
+    },
+    fileUrl: {
+      type: String
+    },
+    fileName: {
+      type: String
+    },
+    errorMessage: {
+      type: String
+    }
+  },
+  {
+    timestamps: true,
+    collection: "reports"
+  }
+);
+
+
+reportSchema.index({ userId: 1, createdAt: -1 });
+reportSchema.index({ status: 1 });
+
+const Report =
+  mongoose.models.Report || mongoose.model<IReportDocument>("Report", reportSchema);
+  
+export default Report;
