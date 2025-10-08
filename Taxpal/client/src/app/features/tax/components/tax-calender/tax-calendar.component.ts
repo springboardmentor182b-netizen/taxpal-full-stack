@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
+import { Router } from '@angular/router';
 
 type TaxType = 'reminder' | 'payment';
 
@@ -23,6 +24,8 @@ type GroupedSection = {
   styleUrls: ['./tax-calendar.component.css']
 })
 export class TaxCalendarComponent {
+  constructor(private router: Router) {}
+
   // ✅ Sample data (edit/replace with your API results)
   items: TaxItem[] = [
     {
@@ -71,5 +74,13 @@ export class TaxCalendarComponent {
 
   badgeClass(t: TaxType) {
     return t === 'reminder' ? 'badge badge--reminder' : 'badge badge--payment';
+  }
+
+  onClose() {
+    this.router.navigate(['/dashboard']);
+  }
+
+  goToEstimator() {
+    this.router.navigate(['/tax-estimator']);
   }
 }

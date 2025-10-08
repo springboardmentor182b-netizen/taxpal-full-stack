@@ -1,6 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-tax-estimator',
@@ -10,7 +11,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
   styleUrls: ['./tax-estimator.component.css']
 })
 export class TaxEstimatorComponent implements OnInit {
-  @Output() close = new EventEmitter<void>();  // ✅ let parent close the view
+  @Output() close = new EventEmitter<void>();  // kept for backwards-compat if used inline
   form: FormGroup;
 
   // dropdown data
@@ -36,7 +37,7 @@ export class TaxEstimatorComponent implements OnInit {
   // summary (right card)
   summary = { gross: 0, deductions: 0, taxable: 0, estimatedTax: 0 };
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private router: Router) {
     this.form = this.fb.group({
       country: ['United States', Validators.required],
       state: ['California', Validators.required],
@@ -62,7 +63,8 @@ export class TaxEstimatorComponent implements OnInit {
   }
 
   onClose(): void {
-    this.close.emit(); // ✅ bubble up to dashboard
+    this.close.emit(); // for any inline parent still listening
+    this.router.navigate(['/tax-calendar']); // route back to calendar
   }
 
   calc(): void {

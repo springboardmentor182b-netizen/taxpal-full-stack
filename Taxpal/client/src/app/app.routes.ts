@@ -2,7 +2,6 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
-  // Default: go to login
   { path: '', redirectTo: 'login', pathMatch: 'full' },
 
   // Public
@@ -51,7 +50,7 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // ✅ NEW: Tax Calendar page
+  // ✅ Tax Calendar page
   {
     path: 'tax-calendar',
     loadComponent: () =>
