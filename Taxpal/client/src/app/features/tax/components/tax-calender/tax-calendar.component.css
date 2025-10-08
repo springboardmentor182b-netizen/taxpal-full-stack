@@ -70,6 +70,21 @@
   }
 }
 
+/* Only color the Calculate Tax button on this page */
+:host .btn-calc-tax {
+  background-color: #656ed3;
+  border-color: #656ed3;
+  color: #fff;
+}
+
+:host .btn-calc-tax:hover { filter: brightness(0.95); }
+:host .btn-calc-tax:active { filter: brightness(0.9); }
+:host .btn-calc-tax:focus-visible {
+  outline: 2px solid #3e47b8; /* accessible focus ring */
+  outline-offset: 2px;
+}
+
+
 .calendar {
   max-width: 920px;
   margin: 0 auto;               /* already inside .form-card */

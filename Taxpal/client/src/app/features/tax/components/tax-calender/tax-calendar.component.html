@@ -9,11 +9,28 @@
     <!-- Card-like content area (same as Budgets form card) -->
     <section class="form-section">
       <div class="form-card">
+        <!-- Card header with actions -->
+        <div class="form-card-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
+          <h2 class="form-card-title" style="margin:0;">Quarterly Schedule</h2>
+
+          <div style="display:flex; align-items:center; gap:8px; ">
+            <button type="button" class="btn btn-primary btn-calc-tax" (click)="goToEstimator()">
+              Calculate Tax
+            </button>
+            <button
+              type="button"
+              class="icon-btn"
+              aria-label="Close tax calendar"
+              (click)="onClose()">
+              <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 6l12 12M18 6l-12 12" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
         <!-- Your calendar content -->
         <div class="calendar">
-          <!-- (Optional) keep a small section title if you want -->
-          <!-- <h2 class="calendar__title">Tax Calendar</h2> -->
-
           <ng-container *ngFor="let section of sections">
             <div class="calendar__month">{{ section.monthLabel }}</div>
 
