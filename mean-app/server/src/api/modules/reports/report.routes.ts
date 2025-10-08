@@ -1,7 +1,6 @@
-
-
 import { Router } from "express";
 import reportController from "./report.controller";
+import { auth } from "../../middlewares/auth"; 
 
 const router = Router();
 
@@ -11,65 +10,16 @@ const router = Router();
  *   post:
  *     summary: Generate a new financial report
  *     tags: [Reports]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - reportType
- *               - period
- *             properties:
- *               reportType:
- *                 type: string
- *                 enum: [Income Statement, Expense Report, Tax Summary, Budget Analysis, Cash Flow Statement]
- *               period:
- *                 type: string
- *                 enum: [Current Month, Last Month, Current Quarter, Last Quarter, Current Year, Last Year, Custom]
- *               format:
- *                 type: string
- *                 enum: [PDF, Excel, CSV]
- *                 default: PDF
- *               customPeriod:
- *                 type: object
- *                 properties:
- *                   startDate:
- *                     type: string
- *                     format: date
- *                   endDate:
- *                     type: string
- *                     format: date
- *     responses:
- *       201:
- *         description: Report generation started
- *       400:
- *         description: Validation error
  */
-router.post("/generate", reportController.generateReport);
-
+router.post("/generate", auth, reportController.generateReport); 
 /**
  * @swagger
  * /api/v1/reports:
  *   get:
  *     summary: Get all reports for user
  *     tags: [Reports]
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: limit
- *         schema:
- *           type: integer
- *           default: 10
- *     responses:
- *       200:
- *         description: List of reports
  */
-router.get("/", reportController.getReports);
+router.get("/", auth, reportController.getReports);
 
 /**
  * @swagger
@@ -77,11 +27,8 @@ router.get("/", reportController.getReports);
  *   get:
  *     summary: Get report statistics
  *     tags: [Reports]
- *     responses:
- *       200:
- *         description: Report statistics
  */
-router.get("/stats", reportController.getStats);
+router.get("/stats", auth, reportController.getStats); 
 
 /**
  * @swagger
@@ -89,19 +36,8 @@ router.get("/stats", reportController.getStats);
  *   get:
  *     summary: Get report by ID
  *     tags: [Reports]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Report details
- *       404:
- *         description: Report not found
  */
-router.get("/:id", reportController.getReportById);
+router.get("/:id", auth, reportController.getReportById); 
 
 /**
  * @swagger
@@ -109,19 +45,8 @@ router.get("/:id", reportController.getReportById);
  *   delete:
  *     summary: Delete a report
  *     tags: [Reports]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Report deleted
- *       404:
- *         description: Report not found
  */
-router.delete("/:id", reportController.deleteReport);
+router.delete("/:id", auth, reportController.deleteReport); 
 
 /**
  * @swagger
@@ -129,18 +54,7 @@ router.delete("/:id", reportController.deleteReport);
  *   get:
  *     summary: Download report file
  *     tags: [Reports]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *     responses:
- *       200:
- *         description: Download URL
- *       404:
- *         description: Report not found
  */
-router.get("/download/:id", reportController.downloadReport);
+router.get("/download/:id", auth, reportController.downloadReport); 
 
 export default router;

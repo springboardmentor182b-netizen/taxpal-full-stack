@@ -10,7 +10,7 @@ class ReportController {
     try {
       const { reportType, period, format = ReportFormat.PDF, customPeriod } = req.body;
 
-     
+    
       if (!reportType || !Object.values(ReportType).includes(reportType)) {
         return res.status(400).json({
           success: false,
@@ -44,8 +44,14 @@ class ReportController {
         }
       }
 
-     
-      const userId = (req as any).user?.id || "674e62d3bdd9d1bfd3edb87c";
+      const userId = (req as any).user?.id || (req as any).user?._id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required. Please login to generate reports."
+        });
+      }
 
       const report = await reportService.createReport({
         userId,
@@ -69,10 +75,19 @@ class ReportController {
     }
   }
 
- 
+
   async getReports(req: Request, res: Response): Promise<Response> {
     try {
-      const userId = (req as any).user?.id || "674e62d3bdd9d1bfd3edb87c";
+     
+      const userId = (req as any).user?.id || (req as any).user?._id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required"
+        });
+      }
+
       const page = parseInt(req.query.page as string) || 1;
       const limit = parseInt(req.query.limit as string) || 10;
 
@@ -92,11 +107,20 @@ class ReportController {
     }
   }
 
- 
+  
   async getReportById(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id || "674e62d3bdd9d1bfd3edb87c";
+      
+      
+      const userId = (req as any).user?.id || (req as any).user?._id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required"
+        });
+      }
 
       if (!id || id.length !== 24) {
         return res.status(400).json({
@@ -131,7 +155,15 @@ class ReportController {
   async deleteReport(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id || "674e62d3bdd9d1bfd3edb87c";
+      
+      const userId = (req as any).user?.id || (req as any).user?._id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required"
+        });
+      }
 
       if (!id || id.length !== 24) {
         return res.status(400).json({
@@ -162,11 +194,20 @@ class ReportController {
     }
   }
 
- 
+  // Download report
   async downloadReport(req: Request, res: Response): Promise<Response> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.id || "674e62d3bdd9d1bfd3edb87c";
+      
+     
+      const userId = (req as any).user?.id || (req as any).user?._id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required"
+        });
+      }
 
       const report = await reportService.getReportById(id, userId);
 
@@ -201,10 +242,19 @@ class ReportController {
     }
   }
 
- 
+  
   async getStats(req: Request, res: Response): Promise<Response> {
     try {
-      const userId = (req as any).user?.id || "674e62d3bdd9d1bfd3edb87c";
+    
+      const userId = (req as any).user?.id || (req as any).user?._id;
+      
+      if (!userId) {
+        return res.status(401).json({
+          success: false,
+          message: "Authentication required"
+        });
+      }
+
       const stats = await reportService.getReportStats(userId);
 
       return res.status(200).json({

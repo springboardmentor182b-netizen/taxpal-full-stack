@@ -1,7 +1,8 @@
-
+// server/src/api/modules/reports/report.service.ts (FIXED VERSION)
 
 import Report, { IReportDocument } from "./report.model";
 import { ReportType, ReportPeriod, ReportFormat, ReportStatus } from "./report.types";
+
 
 class ReportService {
   
@@ -67,7 +68,6 @@ class ReportService {
     startDate: Date,
     endDate: Date
   ) {
-    
     const reportData: any = {
       period: { startDate, endDate },
       summary: {},
@@ -75,52 +75,68 @@ class ReportService {
       charts: []
     };
 
-    switch (reportType) {
-      case ReportType.INCOME_STATEMENT:
-        reportData.summary = { totalIncome: 50000, totalExpense: 30000, netIncome: 20000 };
-        reportData.details = [
-          { category: "Salary", amount: 40000, date: new Date() },
-          { category: "Freelance", amount: 10000, date: new Date() }
-        ];
-        break;
+    try {
+      switch (reportType) {
+        case ReportType.INCOME_STATEMENT:
+         
+          reportData.summary = {
+            totalIncome: 0,
+            totalExpense: 0,
+            netIncome: 0,
+            message: "No income data found for this period"
+          };
+          break;
 
-      case ReportType.EXPENSE_REPORT:
-        reportData.summary = { totalExpense: 30000 };
-        reportData.details = [
-          { category: "Rent", amount: 12000, date: new Date() },
-          { category: "Food", amount: 8000, date: new Date() },
-          { category: "Transport", amount: 7000, date: new Date() },
-          { category: "Utilities", amount: 3000, date: new Date() }
-        ];
-        break;
+        case ReportType.EXPENSE_REPORT:
+         
+          reportData.summary = {
+            totalExpense: 0,
+            message: "No expense data found for this period"
+          };
+          break;
 
-      case ReportType.TAX_SUMMARY:
-        reportData.summary = {
-          totalIncome: 50000,
-          totalExpense: 30000,
-          taxableIncome: 20000,
-          taxLiability: 3000
-        };
-        break;
+        case ReportType.TAX_SUMMARY:
+        
+          reportData.summary = {
+            totalIncome: 0,
+            totalExpense: 0,
+            taxableIncome: 0,
+            taxLiability: 0,
+            message: "No data found for tax calculation"
+          };
+          break;
 
-      case ReportType.BUDGET_ANALYSIS:
-        reportData.summary = { totalBudget: 35000, totalSpent: 30000, remaining: 5000 };
-        break;
+        case ReportType.BUDGET_ANALYSIS:
+        
+          reportData.summary = {
+            totalBudget: 0,
+            totalSpent: 0,
+            remaining: 0,
+            message: "No budget data found"
+          };
+          break;
 
-      case ReportType.CASH_FLOW:
-        reportData.summary = {
-          openingBalance: 10000,
-          totalIncome: 50000,
-          totalExpense: 30000,
-          closingBalance: 30000
-        };
-        break;
+        case ReportType.CASH_FLOW:
+        
+          reportData.summary = {
+            openingBalance: 0,
+            totalIncome: 0,
+            totalExpense: 0,
+            netCashFlow: 0,
+            closingBalance: 0,
+            message: "No cash flow data found"
+          };
+          break;
+      }
+
+      return reportData;
+    } catch (error: any) {
+      console.error("Error generating report data:", error);
+      throw new Error(`Failed to generate report data: ${error.message}`);
     }
-
-    return reportData;
   }
 
-  
+ 
   private async processReportGeneration(
     reportId: string,
     userId: string,
@@ -144,6 +160,7 @@ class ReportService {
         fileUrl
       });
     } catch (error: any) {
+      console.error("Report generation error:", error);
       await Report.findByIdAndUpdate(reportId, {
         status: ReportStatus.FAILED,
         errorMessage: error.message
@@ -180,7 +197,7 @@ class ReportService {
     }
   }
 
-  
+  // Get all user reports with pagination
   async getUserReports(userId: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
 
@@ -203,7 +220,7 @@ class ReportService {
     };
   }
 
- 
+  // Get report by ID
   async getReportById(reportId: string, userId: string): Promise<IReportDocument | null> {
     return await Report.findOne({ _id: reportId, userId });
   }
