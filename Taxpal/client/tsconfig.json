@@ -1,4 +1,3 @@
-/* tsconfig.json */
 {
   "compileOnSave": false,
   "compilerOptions": {
@@ -15,13 +14,21 @@
 
     "target": "ES2022",
     "module": "ESNext",
-    "moduleResolution": "bundler",        // <-- fix for TS5098
+    "moduleResolution": "bundler",
 
     "lib": ["ES2022", "DOM"],
     "types": ["node"],
 
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+
+    /* ✅ added */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@/app/*": ["src/app/*"],
+      "src/*": ["src/*"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
