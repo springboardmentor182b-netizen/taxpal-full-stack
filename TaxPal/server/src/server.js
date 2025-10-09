@@ -28,6 +28,7 @@ const userRoutes        = require('./apis/user/user.routes');
 const authRoutes        = require('./apis/auth/auth');
 const categoriesRoutes  = require('./apis/Categories/categoriesRoutes');
 const budgetRoutes      = require('./apis/budget/budget.route');
+const financialReportRoutes = require('./apis/financialreports/financialReport.routes');
 
 // Mount routes
 app.use('/api/dashboard', dashboardRoutes);
@@ -36,6 +37,7 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/budget', budgetRoutes);
+app.use('/api/financialReports', financialReportRoutes);
 
 // Root route
 app.get('/', (req, res) => {
