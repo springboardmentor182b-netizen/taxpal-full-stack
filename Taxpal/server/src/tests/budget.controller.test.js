@@ -1,9 +1,5 @@
-import { budgetController } from '../api/budget/budget.controller';
-import { budgetService } from '../api/budget/budget.service';
-import type { Request, Response } from 'express';
-
+// Mock the service FIRST so it's in place before requiring the controller
 jest.mock('./budget.service', () => ({
-  __esModule: true,
   budgetService: {
     create: jest.fn(),
     findAll: jest.fn(),
@@ -13,38 +9,37 @@ jest.mock('./budget.service', () => ({
   },
 }));
 
-function mockReq(
-  body: any = {},
-  query: any = {},
-  headers: Record<string, string> = {},
-  user?: any
-): Request {
+// Now require the modules under test (CJS require works with TS compiled to CJS)
+const { budgetController } = require('./budget.controller');
+const { budgetService } = require('./budget.service');
+
+function mockReq(body = {}, query = {}, headers = {}, user) {
+  // make headers case-insensitive
+  const H = {};
+  Object.keys(headers || {}).forEach((k) => (H[k.toLowerCase()] = headers[k]));
   return {
     body,
     query,
-    headers,
-    header(name: string) {
-      const k = name.toLowerCase();
-      const found =
-        (headers as any)[k] ??
-        (headers as any)[name] ??
-        (headers as any)[name.toLowerCase()];
-      return found as any;
+    headers: H,
+    header(name) {
+      return H[String(name).toLowerCase()];
     },
-    params: {} as any,
-    user
-  } as any as Request;
+    params: {},
+    user,
+  };
 }
 
-function mockRes(): Response & { statusCode: number; body: any } {
-  const res: any = {
+function mockRes() {
+  const res = {
     statusCode: 200,
     body: undefined,
-    status: jest.fn(function (this: any, code: number) {
-      this.statusCode = code; return this;
+    status: jest.fn(function (code) {
+      this.statusCode = code;
+      return this;
     }),
-    json: jest.fn(function (this: any, payload: any) {
-      this.body = payload; return this;
+    json: jest.fn(function (payload) {
+      this.body = payload;
+      return this;
     }),
   };
   return res;
@@ -55,7 +50,7 @@ describe('budgetController', () => {
 
   describe('create', () => {
     test('201 on success, passes sanitized payload to service', async () => {
-      (budgetService.create as jest.Mock).mockResolvedValue({ _id: 'new' });
+      budgetService.create.mockResolvedValue({ _id: 'new' });
 
       const req = mockReq(
         { category: '  Food ', amount: '1500', month: '2025-10', description: '  hello ' },
@@ -72,7 +67,7 @@ describe('budgetController', () => {
         amount: 1500,
         month: '2025-10',
         monthStart: undefined,
-        description: 'hello'
+        description: 'hello',
       });
       expect(res.status).toHaveBeenCalledWith(201);
       expect(res.json).toHaveBeenCalledWith({ _id: 'new' });
@@ -90,7 +85,7 @@ describe('budgetController', () => {
     });
 
     test('409 when service throws duplicate (code 11000)', async () => {
-      (budgetService.create as jest.Mock).mockRejectedValue({ code: 11000 });
+      budgetService.create.mockRejectedValue({ code: 11000 });
 
       const req = mockReq({ category: 'Rent', amount: 100, month: '2025-10' });
       const res = mockRes();
@@ -104,9 +99,9 @@ describe('budgetController', () => {
 
   describe('list', () => {
     test('forwards filters to service and responds with array', async () => {
-      (budgetService.findAll as jest.Mock).mockResolvedValue([{ _id: 'a' }]);
+      budgetService.findAll.mockResolvedValue([{ _id: 'a' }]);
 
-      const req = mockReq({}, { month: '2025-10', category: 'Rent', limit: '5', skip: '2' } as any);
+      const req = mockReq({}, { month: '2025-10', category: 'Rent', limit: '5', skip: '2' });
       const res = mockRes();
 
       await budgetController.list(req, res);
@@ -116,7 +111,7 @@ describe('budgetController', () => {
         month: '2025-10',
         category: 'Rent',
         limit: 5,
-        skip: 2
+        skip: 2,
       });
       expect(res.json).toHaveBeenCalledWith([{ _id: 'a' }]);
     });
@@ -124,9 +119,9 @@ describe('budgetController', () => {
 
   describe('getOne', () => {
     test('404 when not found', async () => {
-      (budgetService.getById as jest.Mock).mockResolvedValue(null);
+      budgetService.getById.mockResolvedValue(null);
 
-      const req = mockReq(); (req as any).params = { id: 'x' };
+      const req = mockReq(); req.params = { id: 'x' };
       const res = mockRes();
 
       await budgetController.getOne(req, res);
@@ -136,9 +131,9 @@ describe('budgetController', () => {
     });
 
     test('200 when found', async () => {
-      (budgetService.getById as jest.Mock).mockResolvedValue({ _id: 'ok' });
+      budgetService.getById.mockResolvedValue({ _id: 'ok' });
 
-      const req = mockReq(); (req as any).params = { id: 'x' };
+      const req = mockReq(); req.params = { id: 'x' };
       const res = mockRes();
 
       await budgetController.getOne(req, res);
@@ -148,31 +143,31 @@ describe('budgetController', () => {
 
   describe('update', () => {
     test('200 with updated; 404 if null', async () => {
-      (budgetService.update as jest.Mock).mockResolvedValue({ _id: 'upd' });
+      budgetService.update.mockResolvedValue({ _id: 'upd' });
 
-      const req = mockReq({ category: 'New' }); (req as any).params = { id: 'x' };
+      const req = mockReq({ category: 'New' }); req.params = { id: 'x' };
       const res = mockRes();
 
       await budgetController.update(req, res);
       expect(res.json).toHaveBeenCalledWith({ _id: 'upd' });
 
-      (budgetService.update as jest.Mock).mockResolvedValue(null);
+      budgetService.update.mockResolvedValue(null);
       const res2 = mockRes();
       await budgetController.update(req, res2);
       expect(res2.status).toHaveBeenCalledWith(404);
     });
 
     test('maps duplicate to 409 and validation to 400', async () => {
-      const req = mockReq({}); (req as any).params = { id: 'x' };
+      const req = mockReq({}); req.params = { id: 'x' };
 
-      (budgetService.update as jest.Mock).mockRejectedValue({ code: 11000 });
+      budgetService.update.mockRejectedValue({ code: 11000 });
       const res409 = mockRes();
       await budgetController.update(req, res409);
       expect(res409.status).toHaveBeenCalledWith(409);
 
-      (budgetService.update as jest.Mock).mockRejectedValue({
+      budgetService.update.mockRejectedValue({
         name: 'ValidationError',
-        errors: { x: { message: 'bad' } }
+        errors: { x: { message: 'bad' } },
       });
       const res400 = mockRes();
       await budgetController.update(req, res400);
@@ -183,15 +178,15 @@ describe('budgetController', () => {
 
   describe('remove', () => {
     test('200 {ok:true} when removed; 404 otherwise', async () => {
-      (budgetService.remove as jest.Mock).mockResolvedValue(true);
+      budgetService.remove.mockResolvedValue(true);
 
-      const req = mockReq(); (req as any).params = { id: 'x' };
+      const req = mockReq(); req.params = { id: 'x' };
       const res = mockRes();
 
       await budgetController.remove(req, res);
       expect(res.json).toHaveBeenCalledWith({ ok: true });
 
-      (budgetService.remove as jest.Mock).mockResolvedValue(false);
+      budgetService.remove.mockResolvedValue(false);
       const res2 = mockRes();
       await budgetController.remove(req, res2);
       expect(res2.status).toHaveBeenCalledWith(404);
