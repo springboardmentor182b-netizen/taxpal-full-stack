@@ -1,3 +1,5 @@
+
+
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -9,9 +11,8 @@ import dashboardRoutes from "./api/modules/dashboard/dashboard.routes";
 import categoriesRoutes from "./api/modules/categories/category.routes";
 import taxEstimatorRoutes from "./api/modules/taxEstimator/taxEstimator.route";
 import taxRemindersRoutes from "./api/modules/taxRemainders/taxReminder.routes";
-
 import budgetRoutes from "./api/modules/budget/budget.routes";
-
+import reportRoutes from "./api/modules/reports/report.routes";
 
 const app = express();
 app.use(
@@ -26,18 +27,18 @@ app.use(bodyParser.json());
 app.use(express.json());
 setupSwagger(app);
 
-// Routes
+
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/categories", categoriesRoutes);
 app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
-app.use("/api/v1/tax-reminders",taxRemindersRoutes)
+app.use("/api/v1/tax-reminders", taxRemindersRoutes);
+app.use("/api/v1/budgets", budgetRoutes);
+app.use("/api/v1/reports", reportRoutes); 
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 
-app.use("/api/v1/budgets", budgetRoutes);
 
-// Root route
 app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");
 });
