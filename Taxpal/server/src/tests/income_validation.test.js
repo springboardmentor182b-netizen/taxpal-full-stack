@@ -134,3 +134,4 @@ describe("🧾 Income Validation - Mongoose Model", () => {
     await expect(invalidTypeAmount.save()).rejects.toThrow();
   });
 });
+
