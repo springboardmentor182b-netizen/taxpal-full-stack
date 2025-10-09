@@ -189,7 +189,7 @@ export class CategoriesComponent implements OnInit {
   }
 
   addCategory(type: 'income' | 'expense') {
-    const newCategory = { name: '' };
+    const newCategory = { name: '' }; // Start with empty name instead of "New Category"
 
     if (type === 'income') {
       this.incomeCategories.push(newCategory);
@@ -199,13 +199,13 @@ export class CategoriesComponent implements OnInit {
 
     // Focus on the newly added category input
     setTimeout(() => {
-      const elements = document.querySelectorAll(
-        `.${type}-categories .category-item:last-child input`
-      );
-      if (elements.length > 0) {
-        const inputElement = elements[0] as HTMLInputElement;
-        inputElement.focus();
-        inputElement.select();
+      const containers = document.querySelectorAll(`.${type}-categories .category-item`);
+      if (containers.length > 0) {
+        const lastContainer = containers[containers.length - 1];
+        const input = lastContainer.querySelector('input');
+        if (input) {
+          input.focus();
+        }
       }
     }, 50);
   }
@@ -223,8 +223,35 @@ export class CategoriesComponent implements OnInit {
     this.successMsg = '';
     this.errorMsg = '';
 
-    // Start loading state
-    this.loading = true;
+    // Check for empty category names
+    const emptyIncomeCategories = this.incomeCategories.filter((cat) => !cat.name || cat.name.trim() === '');
+    const emptyExpenseCategories = this.expenseCategories.filter((cat) => !cat.name || cat.name.trim() === '');
+
+    // If there are any empty categories, show error and mark those categories
+    if (emptyIncomeCategories.length > 0 || emptyExpenseCategories.length > 0) {
+      this.errorMsg = 'Category name is required. Please provide name for the entered category.';
+
+      // Highlight the empty categories with a CSS class for visual feedback
+      setTimeout(() => {
+        const emptyInputs = document.querySelectorAll(
+          '.category-name input:not([value]), .category-name input[value=""]'
+        );
+        emptyInputs.forEach((input) => {
+          input.classList.add('input-error');
+
+          // Add event listener to remove the error class when the user starts typing
+          input.addEventListener(
+            'input',
+            function(this: HTMLInputElement) {
+              this.classList.remove('input-error');
+            },
+            { once: true }
+          );
+        });
+      }, 100);
+
+      return; // Prevent form submission
+    }
 
     // Check for duplicate categories before saving
     const incomeDuplicates = this.findDuplicateCategories(this.incomeCategories);
@@ -246,12 +273,15 @@ export class CategoriesComponent implements OnInit {
       return;
     }
 
-    // Filter out empty category names and "New Category" default names
+    // Start loading state
+    this.loading = true;
+
+    // Filter out "New Category" default names but keep all valid names now that we've checked
     this.incomeCategories = this.incomeCategories.filter(
-      (cat) => cat.name.trim() !== '' && cat.name.trim().toLowerCase() !== 'new category'
+      (cat) => cat.name.trim().toLowerCase() !== 'new category'
     );
     this.expenseCategories = this.expenseCategories.filter(
-      (cat) => cat.name.trim() !== '' && cat.name.trim().toLowerCase() !== 'new category'
+      (cat) => cat.name.trim().toLowerCase() !== 'new category'
     );
 
     // Get user ID and name from localStorage
