@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { CategoryService, Category } from './category.service';
+import { CategoryService, Category } from '../../core/services/category.service';
 
 @Component({
   selector: 'app-settings-categories',

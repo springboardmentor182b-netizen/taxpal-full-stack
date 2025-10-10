@@ -95,8 +95,8 @@
         </select>
       </div>
       <button class="btn-add" (click)="handleAddCategory()" [disabled]="isLoading || !categoryName.trim()">
-  {{ isLoading ? 'Processing...' : (isEditing ? 'Update Category' : 'Add Category') }}
-</button>
+        {{ isLoading ? 'Processing...' : (isEditing ? 'Update Category' : 'Add Category') }}
+      </button>
 
       <button *ngIf="isEditing" class="btn-cancel" (click)="cancelEdit()" [disabled]="isLoading">
         Cancel
