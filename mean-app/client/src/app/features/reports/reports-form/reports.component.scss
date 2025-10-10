@@ -1,0 +1,278 @@
+:host {
+    display: block;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* Root layout */
+.dashboard-root {
+    display: flex;
+    min-height: 100vh;
+    background: #f6f8fa;
+    position: relative;
+}
+
+/* Overlay when mobile sidebar open */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 850;
+}
+
+/* Hamburger */
+.hamburger {
+    display: none;
+    position: fixed;
+    left: 18px;
+    top: 18px;
+    z-index: 1100;
+    background: #10b981;
+    border: none;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 6px 18px rgba(16, 25, 30, 0.08);
+    cursor: pointer;
+}
+
+/* Sidebar */
+.sidebar {
+    width: 240px;
+    background: linear-gradient(180deg, #2fa79a 0%, #1f776e 100%);
+    color: #fff;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 14px;
+    transition: all 0.28s cubic-bezier(.2, .9, .2, 1);
+    border-radius: 0 12px 12px 0;
+    position: relative;
+    z-index: 900;
+}
+
+/* Active overlay state (for small screens) */
+.sidebar.active {
+    transform: translateX(0);
+}
+
+/* collapsed (icons-only) */
+.sidebar.collapsed {
+    width: 88px;
+    padding-left: 14px;
+    padding-right: 12px;
+}
+
+/* brand + collapse button */
+.sidebar-top .brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.brand {
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.collapse-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #fff;
+    padding: 8px;
+    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+/* nav */
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 8px;
+    border-radius: 10px;
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.nav-item.active,
+.nav-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.label {
+    white-space: nowrap;
+}
+
+/* hide labels when collapsed */
+.sidebar.collapsed .label {
+    display: none;
+}
+
+.sidebar.collapsed .brand {
+    display: none;
+}
+
+.sidebar.collapsed .collapse-btn {
+    display: none;
+}
+
+/* bottom profile */
+.sidebar-bottom {
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+
+.meta .name {
+    font-weight: 600;
+}
+
+.meta .email {
+    font-size: 13px;
+    opacity: 0.85;
+}
+
+/* actions (settings/logout) */
+.sidebar-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.action {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-weight: 600;
+}
+
+.action.logout {
+    background: rgba(239, 68, 68, 0.08);
+    color: #ff7b7b;
+}
+
+.reports-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+}
+
+.subtitle {
+    color: gray;
+    margin-bottom: 15px;
+}
+
+.card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.report-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+.form-group label {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+select {
+    padding: 6px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.reset-btn,
+.generate-btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.reset-btn {
+    background: #f0f0f0;
+}
+
+.generate-btn {
+    background: #007bff;
+    color: white;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.no-results {
+    text-align: center;
+    color: gray;
+}

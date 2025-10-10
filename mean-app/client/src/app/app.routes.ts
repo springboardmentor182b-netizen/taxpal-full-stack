@@ -71,5 +71,12 @@ export const routes: Routes = [
  
   
   // Wildcard route - redirect to login for any unknown routes
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '/login' },
+  {
+  path: 'reports',
+  loadComponent: () =>
+    import('./features/reports/reports-form/reports.component').then(
+      m => m.ReportsComponent
+    )
+},
 ];
