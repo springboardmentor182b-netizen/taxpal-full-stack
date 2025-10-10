@@ -46,7 +46,7 @@ export const routes: Routes = [
   {
     path: 'settings/categories',
     loadComponent: () =>
-      import('./features/settings.categories API Integration/settings.categories')
+      import('./features/settings.categories/settings.categories')
         .then(m => m.SettingsCategoriesComponent),
     canActivate: [authGuard]
   },
