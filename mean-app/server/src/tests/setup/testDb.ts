@@ -14,7 +14,7 @@ export const setupTestDb = async (): Promise<void> => {
       await mongoose.connection.close(true);
     }
 
-    const mongoUri = process.env.MONGODB_URI;
+    const mongoUri = process.env.MONGO_URI;
     
     if (!mongoUri) {
       throw new Error('MONGODB_URI is not defined in .env.test');
