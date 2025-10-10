@@ -41,6 +41,16 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
+  // ✅ Settings → Categories
+  { path: 'settings', redirectTo: 'settings/categories', pathMatch: 'full' },
+  {
+    path: 'settings/categories',
+    loadComponent: () =>
+      import('./features/settings.categories/settings.categories')
+        .then(m => m.SettingsCategoriesComponent),
+    canActivate: [authGuard]
+  },
+
   // ✅ Tax Estimator page
   {
     path: 'tax-estimator',
