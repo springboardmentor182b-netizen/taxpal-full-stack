@@ -10,7 +10,13 @@ import expenseRoutes from "./api/modules/expense/expense.routes";
 import dashboardRoutes from "./api/modules/dashboard/dashboard.routes";
 import categoriesRoutes from "./api/modules/categories/category.routes";
 import taxEstimatorRoutes from "./api/modules/taxEstimator/taxEstimator.route";
+<<<<<<< HEAD
 import taxRemindersRoutes from "./api/modules/taxRemainders/taxReminder.routes";
+=======
+import reportExportRoutes from "./api/modules/reportexport/reportexport.routes"; 
+
+
+>>>>>>> 69efaea7 (export/download api)
 import budgetRoutes from "./api/modules/budget/budget.routes";
 import reportRoutes from "./api/modules/reports/report.routes";
 
@@ -39,6 +45,11 @@ app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 
 
+<<<<<<< HEAD
+=======
+app.use("/api/v1/reportexports", reportExportRoutes );  
+// Root route
+>>>>>>> 69efaea7 (export/download api)
 app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");
 });
