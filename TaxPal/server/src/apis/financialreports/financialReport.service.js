@@ -2,6 +2,85 @@ const FinancialReport = require('./financialReport.model');
 const { generateReportFile } = require('./reportFileGenerator');
 
 exports.generateReport = async function(data) {
+    if (data.format === 'data') {
+        // Fetch real transaction data from database
+        const Transaction = require('../incomeExpenseapi/TransactionModel');
+        const year = parseInt(data.period);
+        const startDate = new Date(year, 0, 1); // January 1st of the year
+        const endDate = new Date(year + 1, 0, 1); // January 1st of next year
+
+        // Get all transactions for the user in the specified year
+        const transactions = await Transaction.find({
+            userId: data.userId,
+            date: { $gte: startDate, $lt: endDate }
+        }).sort({ date: 1 });
+
+        const months = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        const monthlyReports = months.map((month, index) => {
+            // Filter transactions for this month
+            const monthTransactions = transactions.filter(tx => {
+                const txDate = new Date(tx.date);
+                return txDate.getMonth() === index;
+            });
+
+            const income = monthTransactions
+                .filter(tx => tx.type === 'income')
+                .reduce((sum, tx) => sum + tx.amount, 0);
+
+            const expenses = monthTransactions
+                .filter(tx => tx.type === 'expense')
+                .reduce((sum, tx) => sum + tx.amount, 0);
+
+            const netIncome = income - expenses;
+            const transactionCount = monthTransactions.length;
+            const avgSize = transactionCount > 0 ? (income + expenses) / transactionCount : 0;
+
+            // Mock budget usage and rating for now (can be enhanced later)
+            const budgetUsage = Math.random() * 40 + 60;
+            const budget = 7500;
+            const rating = netIncome > 0 ? 'Excellent' : 'Good';
+
+            return {
+                month,
+                income,
+                expenses,
+                netIncome,
+                transactions: transactionCount,
+                avgSize: Math.round(avgSize),
+                budgetUsage: Math.round(budgetUsage),
+                budget,
+                rating
+            };
+        });
+
+        const totalIncome = monthlyReports.reduce((sum, m) => sum + m.income, 0);
+        const totalExpenses = monthlyReports.reduce((sum, m) => sum + m.expenses, 0);
+        const netSavings = totalIncome - totalExpenses;
+        const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : 0;
+
+        const yearSummary = {
+            totalIncome,
+            totalExpenses,
+            netSavings,
+            savingsRate
+        };
+
+        const yearlyReport = { ...yearSummary, savingRate: savingsRate };
+
+        return {
+            success: true,
+            monthlyReports,
+            yearSummary,
+            yearlyReport
+        };
+    }
+
+    // Original file generation logic
+    const { generateReportFile } = require('./reportFileGenerator');
     const filePath = await generateReportFile(data);
     const report = new FinancialReport({
         ...data,

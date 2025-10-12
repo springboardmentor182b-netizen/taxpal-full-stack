@@ -2,8 +2,8 @@ const Budget = require("./budget.model");
 
 class BudgetService {
     // Create a new budget
-    async createBudget({ user_id, category, limit, month }) {
-        const budget = new Budget({ user_id, category, limit, month });
+    async createBudget({ user_id, amount, category, date, description }) {
+        const budget = new Budget({ user_id, amount, category, date, description });
         return await budget.save();
     }
 
@@ -13,10 +13,10 @@ class BudgetService {
     }
 
     // Update budget by id and user
-    async updateBudget(id, user_id, { category, limit, month }) {
+    async updateBudget(id, user_id, { amount, category, date, description }) {
         return await Budget.findOneAndUpdate(
             { _id: id, user_id },
-            { category, limit, month },
+            { amount, category, date, description },
             { new: true }
         );
     }
