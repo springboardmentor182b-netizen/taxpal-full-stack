@@ -82,7 +82,6 @@ export class Dashboard implements OnInit {
     }
 
     this.currentUser = JSON.parse(userData);
-    // Null-safe
     if (this.currentUser) {
       this.setUserInitials(this.currentUser.fullName);
     }
@@ -194,17 +193,22 @@ export class Dashboard implements OnInit {
 
   // Navigation
   goToDashboard(): void {
-    this.router.navigate(['/features/dashboard']); // Adjust route as needed
+    this.router.navigate(['/features/dashboard']);
   }
 
   logout() {
     this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/login']),
-      error: () => this.router.navigate(['/login'])
+      next: () => {
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        console.error('Logout error:', err);
+        this.router.navigate(['/login']);
+      }
     });
   }
 
-  // Chart & transaction logic
+  // Chart logic
   updateCharts() {
     const now = new Date();
     const filteredTransactions = this.transactions.filter(tx => {
@@ -217,13 +221,11 @@ export class Dashboard implements OnInit {
     this.monthlyIncome = filteredTransactions.filter(tx => tx.type === 'Income').reduce((sum, t) => sum + (t.amount || 0), 0);
     this.monthlyExpenses = filteredTransactions.filter(tx => tx.type === 'Expense').reduce((sum, t) => sum + (t.amount || 0), 0);
 
-    // Bar chart
     this.barChartData = {
       ...this.barChartData,
       datasets: [{ ...this.barChartData.datasets[0], data: [this.monthlyIncome, this.monthlyExpenses] }]
     };
 
-    // Pie chart
     const expenseTransactions = filteredTransactions.filter(tx => tx.type === 'Expense');
     const categoryMap: Record<string, number> = {};
     expenseTransactions.forEach(tx => {
@@ -250,7 +252,9 @@ export class Dashboard implements OnInit {
       datasets: [{ ...this.pieChartData.datasets[0], data: categoryData, backgroundColor: bgColors }]
     };
 
-    this.savingsRate = this.monthlyIncome ? ((this.monthlyIncome - this.monthlyExpenses) / this.monthlyIncome) * 100 : 0;
+    this.savingsRate = this.monthlyIncome
+      ? ((this.monthlyIncome - this.monthlyExpenses) / this.monthlyIncome) * 100
+      : 0;
   }
 
   onPeriodChange(period: 'month' | 'quarter' | 'year') {

@@ -53,15 +53,17 @@ export class BudgetService {
         });
     }
 
-    // POST (Create) Operations
-    public async createBudget(data: { category: string, amount: number, month: string, description?: string, userId: string }): Promise<IBudgetResponse> {
-        const newBudget = new Budget({
-            ...data,
-            spent: 0, 
-        });
-        
-        // Save the document
-        const savedDoc = await newBudget.save();
+    // POST (Create) Operations
+    public async createBudget(data: {
+        spent: number; category: string, amount: number, month: string, description?: string, userId: string 
+}): Promise<IBudgetResponse> {
+        const newBudget = new Budget({
+            ...data,
+            spent: data.spent ?? 0,
+        });
+        
+        // Save the document
+        const savedDoc = await newBudget.save();
 
         // Get the plain object representation to return
         const savedBudget = savedDoc.toObject();

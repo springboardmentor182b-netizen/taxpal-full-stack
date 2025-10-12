@@ -16,7 +16,6 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),  // Use the imported routes
     provideHttpClient(withInterceptorsFromDi()),
-    
     importProvidersFrom(
       BrowserModule,
       CommonModule,

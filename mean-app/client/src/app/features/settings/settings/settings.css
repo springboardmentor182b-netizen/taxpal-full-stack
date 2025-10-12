@@ -1,0 +1,68 @@
+/* General Container */
+.settings-container {
+  display: flex;
+  height: 100vh;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f0f4f8;
+}
+
+/* Sidebar */
+.settings-menu {
+  width: 280px;
+  background: #ffffff;
+  padding: 25px 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+  border-radius: 0 15px 15px 0;
+}
+.menu-title {
+  font-size: 22px;
+  color: #008080;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+.title {
+  font-size: 10px;
+  color: #008080;
+  margin-bottom: 25px;
+  font-weight: bold;
+}
+
+.settings-menu ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.settings-menu li {
+  margin-bottom: 18px;
+}
+.settings-menu a {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: #444;
+  font-weight: 500;
+  transition: all 0.3s;
+}
+.settings-menu a.active {
+  background: #008080;
+  color: #fff;
+}
+.settings-menu a:hover {
+  background: #e0f7f1;
+  color: #008080;
+}
+.settings-menu .icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  stroke: currentColor;
+}
+
+
+/* Right Content */
+.settings-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+}

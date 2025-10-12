@@ -38,25 +38,26 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Get return URL from route parameters or default to dashboard
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+  
     // Check if user is already logged in
     if (this.authService.isAuthenticated()) {
       this.router.navigate([this.returnUrl]);
       return;
     }
-
-    // Get return URL from route parameters or default to dashboard
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
-    
+  
     const message = this.route.snapshot.queryParams['message'];
     if (message) {
       this.successMessage = decodeURIComponent(message);
     }
-
+  
     // Subscribe to loading state
     this.authService.isLoading$
       .pipe(takeUntil(this.destroy$))
       .subscribe(loading => this.isLoading = loading);
   }
+  
 
   ngOnDestroy(): void {
     this.destroy$.next();
