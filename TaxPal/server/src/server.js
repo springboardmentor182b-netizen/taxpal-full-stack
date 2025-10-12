@@ -29,6 +29,7 @@ const authRoutes        = require('./apis/auth/auth');
 const categoriesRoutes  = require('./apis/Categories/categoriesRoutes');
 const budgetRoutes      = require('./apis/budget/budget.route');
 const financialReportRoutes = require('./apis/financialreports/financialReport.routes');
+const exportRoutes     = require('./apis/Export or download/export.route');
 
 // Mount routes
 app.use('/api/dashboard', dashboardRoutes);
@@ -38,6 +39,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoriesRoutes);
 app.use('/api/budget', budgetRoutes);
 app.use('/api/financialReports', financialReportRoutes);
+app.use('/api/exports', exportRoutes);
 
 // Root route
 app.get('/', (req, res) => {
