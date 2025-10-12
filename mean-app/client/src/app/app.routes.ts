@@ -32,7 +32,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
   },
   
-
+{
+  path: 'tax-estimator',
+  loadComponent: () =>
+    import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
+      .then(m => m.TaxEstimatorFormComponent)
+},
   // Legacy route redirects (for backwards compatibility)
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
