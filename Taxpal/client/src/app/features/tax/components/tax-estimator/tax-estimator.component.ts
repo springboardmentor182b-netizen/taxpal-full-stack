@@ -3,41 +3,36 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
+import {
+  TaxEstimatorService,
+  EstimatorInput,
+  TaxSummary,
+} from '@/app/core/services/tax-estimator.service';
+
 @Component({
   selector: 'app-tax-estimator',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './tax-estimator.component.html',
-  styleUrls: ['./tax-estimator.component.css']
+  styleUrls: ['./tax-estimator.component.css'],
 })
 export class TaxEstimatorComponent implements OnInit {
-  @Output() close = new EventEmitter<void>();  // kept for backwards-compat if used inline
+  @Output() close = new EventEmitter<void>();
+
   form: FormGroup;
 
-  // dropdown data
-  countries = ['United States', 'India', 'Canada'];
-  statesByCountry: Record<string, string[]> = {
-    'United States': ['California', 'New York', 'Texas', 'Florida'],
-    India: ['Gujarat', 'Maharashtra', 'Karnataka', 'Delhi'],
-    Canada: ['Ontario', 'Quebec', 'British Columbia', 'Alberta'],
-  };
-  filingStatuses = [
-    'Single',
-    'Married Filing Jointly',
-    'Married Filing Separately',
-    'Head of Household',
-  ];
-  quarters = [
-    { id: 'Q1', label: 'Q1 (Jan–Mar 2025)' },
-    { id: 'Q2', label: 'Q2 (Apr–Jun 2025)' },
-    { id: 'Q3', label: 'Q3 (Jul–Sep 2025)' },
-    { id: 'Q4', label: 'Q4 (Oct–Dec 2025)' },
-  ];
+  countries: string[] = [];
+  statesByCountry: Record<string, string[]> = {};
+  filingStatuses: string[] = [];
+  quarters: { id: 'Q1' | 'Q2' | 'Q3' | 'Q4'; label: string }[] = [];
 
-  // summary (right card)
-  summary = { gross: 0, deductions: 0, taxable: 0, estimatedTax: 0 };
+  summary: TaxSummary = { gross: 0, deductions: 0, taxable: 0, estimatedTax: 0 };
 
-  constructor(private fb: FormBuilder, private router: Router) {
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private taxSvc: TaxEstimatorService
+  ) {
     this.form = this.fb.group({
       country: ['United States', Validators.required],
       state: ['California', Validators.required],
@@ -52,6 +47,12 @@ export class TaxEstimatorComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // load dropdown data from service
+    this.countries = this.taxSvc.getCountries();
+    this.statesByCountry = this.taxSvc.getStatesByCountry();
+    this.filingStatuses = this.taxSvc.getFilingStatuses();
+    this.quarters = this.taxSvc.getQuarters(2025);
+
     // keep state in-sync with country
     this.form.get('country')!.valueChanges.subscribe((c: string) => {
       const states = this.statesByCountry[c] || [];
@@ -63,30 +64,13 @@ export class TaxEstimatorComponent implements OnInit {
   }
 
   onClose(): void {
-    this.close.emit(); // for any inline parent still listening
-    this.router.navigate(['/tax-calendar']); // route back to calendar
+    this.close.emit();
+    this.router.navigate(['/tax-calendar']);
   }
 
   calc(): void {
-    const v = this.form.value;
-
-    const gross = this.num(v.grossIncome);
-    const deductions =
-      this.num(v.businessExpenses) +
-      this.num(v.retirement) +
-      this.num(v.health) +
-      this.num(v.homeOffice);
-
-    const taxable = Math.max(0, gross - deductions);
-
-    // Illustrative rate (demo only)
-    let rate = 0.2;
-    if (v.country === 'United States') rate = 0.25;
-    if (v.country === 'India') rate = 0.15;
-    if (v.country === 'Canada') rate = 0.18;
-
-    const estimatedTax = taxable * rate;
-    this.summary = { gross, deductions, taxable, estimatedTax };
+    const v = this.form.value as EstimatorInput;
+    this.summary = this.taxSvc.calculateEstimate(v);
   }
 
   asCurrency(n: number): string {
@@ -97,10 +81,5 @@ export class TaxEstimatorComponent implements OnInit {
     return isFinite(n)
       ? n.toLocaleString(undefined, { style: 'currency', currency: code, maximumFractionDigits: 2 })
       : '—';
-  }
-
-  private num(x: any): number {
-    const n = Number(x);
-    return isNaN(n) ? 0 : n;
   }
 }

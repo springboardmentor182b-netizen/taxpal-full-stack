@@ -1,75 +1,32 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Router } from '@angular/router';
 
-type TaxType = 'reminder' | 'payment';
-
-type TaxItem = {
-  title: string;
-  date: string | Date;      // ISO string or Date
-  note?: string;            // subtitle/description line
-  type: TaxType;            // badge
-};
-
-type GroupedSection = {
-  monthLabel: string;       // e.g., "June 2025"
-  items: TaxItem[];
-};
+import {
+  TaxCalendarService,
+  TaxCalendarItem,
+  TaxCalendarSection,
+  TaxType,
+} from '@/app/core/services/tax-calendar.service';
 
 @Component({
   selector: 'app-tax-calendar',
   standalone: true,
   imports: [CommonModule, DatePipe, NgFor, NgIf],
   templateUrl: './tax-calendar.component.html',
-  styleUrls: ['./tax-calendar.component.css']
+  styleUrls: ['./tax-calendar.component.css'],
 })
-export class TaxCalendarComponent {
-  constructor(private router: Router) {}
+export class TaxCalendarComponent implements OnInit {
+  constructor(private router: Router, private calendarSvc: TaxCalendarService) {}
 
-  // ✅ Sample data (edit/replace with your API results)
-  items: TaxItem[] = [
-    {
-      title: 'Reminder: Q2 Estimated Tax Payment',
-      date: '2025-06-01',
-      note: 'Reminder for upcoming q2 estimated tax payment due on Jun 15, 2025',
-      type: 'reminder'
-    },
-    {
-      title: 'Q2 Estimated Tax Payment',
-      date: '2025-06-15',
-      note: 'Second quarter estimated tax payment due',
-      type: 'payment'
-    },
-    {
-      title: 'Reminder: Q3 Estimated Tax Payment',
-      date: '2025-09-01',
-      note: 'Reminder for upcoming q3 estimated tax payment due on Sep 15, 2025',
-      type: 'reminder'
-    },
-    {
-      title: 'Q3 Estimated Tax Payment',
-      date: '2025-09-15',
-      note: 'Third quarter estimated tax payment due',
-      type: 'payment'
-    }
-  ];
+  items: TaxCalendarItem[] = [];
 
-  // 👉 groups items by Month Year while preserving chronological order
-  get sections(): GroupedSection[] {
-    // sort by date ascending
-    const sorted = [...this.items].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    );
+  ngOnInit(): void {
+    this.calendarSvc.getItems().subscribe((items) => (this.items = items));
+  }
 
-    const buckets = new Map<string, TaxItem[]>();
-    sorted.forEach(it => {
-      const d = new Date(it.date);
-      const label = d.toLocaleString(undefined, { month: 'long', year: 'numeric' }); // "June 2025"
-      if (!buckets.has(label)) buckets.set(label, []);
-      buckets.get(label)!.push(it);
-    });
-
-    return Array.from(buckets.entries()).map(([monthLabel, items]) => ({ monthLabel, items }));
+  get sections(): TaxCalendarSection[] {
+    return this.calendarSvc.groupByMonth(this.items);
   }
 
   badgeClass(t: TaxType) {
