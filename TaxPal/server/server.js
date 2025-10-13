@@ -1,5 +1,6 @@
 // Import routes
 const userRoutes = require('./routes/user');
+const taxEstimatorRoutes = require('./routes/taxEstimator');
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -21,6 +22,7 @@ mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/taxpal')
 
 // Use routes
 app.use('/api/users', userRoutes);
+app.use('/api/tax-estimator', taxEstimatorRoutes);
 
 // Route debugging middleware
 app.use((req, res, next) => {
