@@ -1,0 +1,22 @@
+<div class="export-dropdown">
+  <div class="action-buttons">
+    <button class="btn btn-outline-dark" (click)="goBack()">
+      🔙 Back
+    </button>
+
+    <button class="btn btn-outline-secondary" (click)="printPage()">
+      🖨️ Print
+    </button>
+
+    <div class="dropdown-wrapper">
+      <button class="btn btn-outline-primary" (click)="toggleMenu()">
+        ⬇️ Download
+      </button>
+
+      <div class="dropdown-menu" *ngIf="menuOpen">
+        <button (click)="exportAsCSV()">📊 Export as CSV</button>
+        <button (click)="exportAsPDF()">📄 Export as PDF</button>
+      </div>
+    </div>
+  </div>
+</div>
