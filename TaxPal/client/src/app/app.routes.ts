@@ -4,6 +4,7 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { ProfileSettingsComponent } from './components/profile-settings/profile-settings.component';
 import { TaxEstimatorComponent } from './components/Tax-Estimator/tax-estimator.component';
 import { TaxCalendarComponent } from './components/Tax-Calendar/tax-calendar.component';
+import { ExportDownloadComponent } from './components/export-download/export-download.component';
 
 // Define the routes
 export const routes: Routes = [
@@ -26,13 +27,18 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/budget/budget.component').then((m) => m.BudgetComponent),
   },
-  { path: 'reports', component: UserProfileComponent },
+  { path: 'reports', loadComponent: () => import('./components/export-download/export-download.component').then(m => m.ExportDownloadComponent) },
 
   // Tax Estimator route
   {
     path: 'tax-estimator',
     component: TaxEstimatorComponent,
     title: 'Tax Estimator - TaxPal',
+  },
+  {
+    path: 'reports',
+    component: ExportDownloadComponent,
+    title: 'Export Reports - TaxPal',
   },
 
   // Tax Calendar route
