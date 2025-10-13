@@ -13,6 +13,9 @@ import taxEstimatorRoutes from "./api/modules/taxEstimator/taxEstimator.route";
 import taxRemindersRoutes from "./api/modules/taxRemainders/taxReminder.routes";
 import budgetRoutes from "./api/modules/budget/budget.routes";
 import reportRoutes from "./api/modules/reports/report.routes";
+import reportExportRoutes from "./api/modules/export_download/reportexport.routes";
+
+
 
 const app = express();
 app.use(
@@ -34,6 +37,7 @@ app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
 app.use("/api/v1/tax-reminders", taxRemindersRoutes);
 app.use("/api/v1/budgets", budgetRoutes);
 app.use("/api/v1/reports", reportRoutes); 
+app.use("/api/v1/reportexports", reportExportRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
