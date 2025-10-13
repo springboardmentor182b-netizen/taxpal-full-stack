@@ -18,7 +18,7 @@ export async function generate(req: Request, res: Response) {
       period: report.period,
       report_type: report.report_type,
       file_path: report.file_path,
-      download_url: `/api/v1/reportexport/download/${report._id}`,
+      download_url: `/api/v1/reportexports/download/${report._id}`,
     });
   } catch (err) {
     console.error('Error generating report:', err);
