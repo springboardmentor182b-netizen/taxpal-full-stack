@@ -1,0 +1,38 @@
+/* Tax Estimator Component Styles
+  Using SCSS syntax, although only plain CSS features are used here, 
+  as most complex styling is handled by Tailwind utility classes in the HTML.
+*/
+
+:host {
+  /* Ensure the component takes up full width/height when placed in a parent container */
+  display: block;
+}
+
+/* Base style reset for all elements within the component */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Custom focus style for better accessibility if not using Tailwind's default focus rings.
+  Tailwind handles most of this, but it's good practice to ensure inputs are clear.
+*/
+input:focus, select:focus, button:focus {
+  outline: 2px solid #3b82f6; /* Blue-500 */
+  outline-offset: 2px;
+}
+
+/* Specific styling for the estimate value to ensure visual weight */
+.text-3xl.font-extrabold.text-blue-600 {
+  letter-spacing: -0.05em;
+}
+
+/* If you decide to hide the spinner in webkit browsers (like Chrome/Safari)
+  for number inputs, you can uncomment this block:
+*/
+/*
+input[type='number']::-webkit-inner-spin-button, 
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+*/
