@@ -1,14 +1,12 @@
-// server/src/server.ts
-
 // ---------- 1) Load .env BEFORE anything else ----------
 import path from 'path';
 import fs from 'fs';
 import dotenv from 'dotenv';
 
 const candidates = [
-  path.resolve(process.cwd(), '.env'),       // when running with cwd=server
-  path.resolve(__dirname, '../.env'),        // /server/.env
-  path.resolve(__dirname, '../../.env'),     // repo-root/.env
+  path.resolve(process.cwd(), '.env'),
+  path.resolve(__dirname, '../.env'),
+  path.resolve(__dirname, '../../.env'),
 ];
 
 let loaded = false;
@@ -32,8 +30,10 @@ import authRoutes from './api/auth/auth.routes';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
 import dashboardRoutes from './api/dashboard/dashboard-routes';
-// ✅ Budgets
 import budgetsRoutes from './api/budget/budget.routes';
+
+// ✅ ADD THIS: Categories router
+import categoriesRoutes from './api/Categories/category.routes';
 
 // ---------- 3) App setup ----------
 const app = express();
@@ -72,7 +72,10 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
-app.use('/api/v1/budgets', budgetsRoutes); 
+app.use('/api/v1/budgets', budgetsRoutes);
+
+// ✅ ADD THIS LINE: mount categories at /api/v1/categories
+app.use('/api/v1/categories', categoriesRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

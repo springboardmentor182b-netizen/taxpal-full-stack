@@ -1,0 +1,170 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { CategoryService, Category } from '@/app/core/services/category.service';
+
+@Component({
+  selector: 'app-settings-categories',
+  standalone: true,
+  imports: [CommonModule, FormsModule, HttpClientModule],
+  templateUrl: './settings.categories.html',
+  styleUrls: ['./settings.categories.css'],
+  encapsulation: ViewEncapsulation.None
+})
+export class SettingsCategoriesComponent implements OnInit {
+  categories: Category[] = [];
+
+  categoryName = '';
+  categoryType: 'expense' | 'income' = 'expense';
+
+  isEditing = false;
+  currentEditId: string | null = null;
+
+  isLoading = false;
+  error = '';
+  private isOffline = false;
+
+  constructor(private categoryService: CategoryService) {}
+
+  ngOnInit() { this.loadCategories(); }
+
+  // ===== Load =====
+  loadCategories(): void {
+    this.isLoading = true;
+    this.error = '';
+    this.categoryService.getCategories().subscribe({
+      next: (cats) => {
+        this.categories = cats ?? [];
+        this.isOffline = false;
+        this.isLoading = false;
+      },
+      error: () => {
+        this.error = 'Server not reachable — showing local categories.';
+        this.isOffline = true;
+        this.seedLocal();
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // ===== Add / Update =====
+  handleAddCategory(): void {
+    const name = this.categoryName.trim();
+    if (!name) { alert('Please enter a category name'); return; }
+    if (this.isEditing && this.currentEditId) {
+      this.updateCategory(this.currentEditId, name, this.categoryType);
+    } else {
+      this.addNewCategory(name, this.categoryType);
+    }
+  }
+
+  private addNewCategory(name: string, type: 'expense' | 'income'): void {
+    this.isLoading = true;
+
+    if (this.isOffline) {
+      this.categories = [...this.categories, { _id: this.genId(), name, type }];
+      this.resetForm(); this.isLoading = false; return;
+    }
+
+    this.categoryService.createCategory({ name, type }).subscribe({
+      next: () => { this.loadCategories(); this.resetForm(); this.isLoading = false; },
+      error: () => {
+        this.isOffline = true;
+        this.error = 'Server not reachable — saved locally for now.';
+        this.categories = [...this.categories, { _id: this.genId(), name, type }];
+        this.resetForm(); this.isLoading = false;
+      }
+    });
+  }
+
+  private updateCategory(id: string, name: string, type: 'expense' | 'income'): void {
+    this.isLoading = true;
+
+    if (this.isOffline) {
+      this.categories = this.categories.map(c => c._id === id ? ({ ...c, name, type }) : c);
+      this.cancelEdit(); this.isLoading = false; return;
+    }
+
+    this.categoryService.updateCategory(id, { name, type }).subscribe({
+      next: () => { this.loadCategories(); this.cancelEdit(); this.isLoading = false; },
+      error: () => {
+        this.isOffline = true;
+        this.error = 'Server not reachable — updated locally for now.';
+        this.categories = this.categories.map(c => c._id === id ? ({ ...c, name, type }) : c);
+        this.cancelEdit(); this.isLoading = false;
+      }
+    });
+  }
+
+  // ===== Delete =====
+  deleteCategory(id: string): void {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+    this.isLoading = true;
+
+    if (this.isOffline) {
+      this.categories = this.categories.filter(c => c._id !== id);
+      this.isLoading = false; return;
+    }
+
+    this.categoryService.deleteCategory(id).subscribe({
+      next: () => { this.loadCategories(); this.isLoading = false; },
+      error: () => {
+        this.isOffline = true;
+        this.error = 'Server not reachable — deleted locally for now.';
+        this.categories = this.categories.filter(c => c._id !== id);
+        this.isLoading = false;
+      }
+    });
+  }
+
+  // ===== Edit helpers =====
+  startEdit(id: string): void {
+    if (this.isEditing) this.cancelEdit();
+    const cat = this.categories.find(c => c._id === id);
+    if (!cat) return;
+
+    this.isEditing = true;
+    this.currentEditId = id;
+    this.categoryName = cat.name;
+    this.categoryType = cat.type;
+
+    setTimeout(() => {
+      document.querySelector('.add-category-form')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      (document.getElementById('category-name') as HTMLInputElement | null)?.focus();
+    }, 0);
+  }
+
+  cancelEdit(): void {
+    this.isEditing = false;
+    this.currentEditId = null;
+    this.resetForm();
+  }
+
+  private resetForm(): void {
+    this.categoryName = '';
+    this.categoryType = 'expense';
+  }
+
+  // ===== Local seed & utils =====
+  private seedLocal(): void {
+    const seed: Omit<Category, '_id'>[] = [
+      { name: 'Business Expenses', type: 'expense' },
+      { name: 'Office Rent', type: 'expense' },
+      { name: 'Software Subscriptions', type: 'expense' },
+      { name: 'Side income', type: 'income' },
+      { name: 'Salary', type: 'income' }
+    ];
+    this.categories = seed.map((c, i) => ({ ...c, _id: String(i + 1) }));
+  }
+
+  private genId(): string {
+    const v4 = (globalThis as any)?.crypto?.randomUUID?.();
+    return v4 ? v4 : `tmp_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+  }
+
+  // View helpers
+  getExpenseCategories(): Category[] { return this.categories.filter(c => c.type === 'expense'); }
+  getIncomeCategories(): Category[] { return this.categories.filter(c => c.type === 'income'); }
+  trackById(_i: number, c: Category) { return (c as any)._id || `${c.name}:${c.type}`; }
+}

@@ -1,21 +1,13 @@
-import { Category, ICategory } from "../models/category.model";
+import { Category, ICategory } from './category.model';
 
-// Create category
-export const createCategory = async (data: Partial<ICategory>) => {
-  return await Category.create(data);
-};
+export const createCategory = async (data: Partial<ICategory>) =>
+  Category.create(data);
 
-// Get all categories (no user filter)
-export const getCategories = async () => {
-  return await Category.find();
-};
+export const getCategories = async () =>
+  Category.find();
 
-// Update category by id
-export const updateCategory = async (id: string, data: Partial<ICategory>) => {
-  return await Category.findByIdAndUpdate(id, data, { new: true });
-};
+export const updateCategory = async (id: string, data: Partial<ICategory>) =>
+  Category.findByIdAndUpdate(id, data, { new: true });
 
-// Delete category by id
-export const deleteCategory = async (id: string) => {
-  return await Category.findByIdAndDelete(id);
-};
+export const deleteCategory = async (id: string) =>
+  Category.findByIdAndDelete(id);
