@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { TaxService } from '../../services/tax.service';
 
 interface TaxData {
   country: string;
@@ -20,7 +21,7 @@ interface TaxData {
   standalone: true,
   imports: [CommonModule, FormsModule, CurrencyPipe],
   templateUrl: './tax-estimator.component.html',
-  styleUrls: ['./tax-estimator.component.css']
+  styleUrls: ['./tax-estimator.component.css'],
 })
 export class TaxEstimatorComponent {
   taxData: TaxData = {
@@ -32,25 +33,49 @@ export class TaxEstimatorComponent {
     businessExpenses: 0,
     retirement: 0,
     healthInsurance: 0,
-    homeOffice: 0
+    homeOffice: 0,
   };
 
   estimatedTax: number | null = null;
+  isCalculating = false;
+  errorMessage: string | null = null;
+  calculationComplete = false;
 
-  constructor(private http: HttpClient) {}
+  constructor(private taxService: TaxService, private router: Router) {}
 
   calculateTax() {
-    // Later replace this mock with actual API
-    const apiUrl = 'https://api.example.com/calculate-tax';
+    this.isCalculating = true;
+    this.errorMessage = null;
 
-    // For now, do a local calculation
-    const deductions = this.taxData.businessExpenses + this.taxData.retirement + this.taxData.healthInsurance + this.taxData.homeOffice;
-    const taxable = this.taxData.income - deductions;
-    this.estimatedTax = taxable * 0.15;
+    // Create the request payload
+    const requestData = {
+      userId: 'default-user',
+      income: Number(this.taxData.income),
+      businessExpenses: Number(this.taxData.businessExpenses),
+      retirement: Number(this.taxData.retirement),
+      healthInsurance: Number(this.taxData.healthInsurance),
+      homeOffice: Number(this.taxData.homeOffice),
+      filingStatus: this.taxData.status.toLowerCase(),
+      state: this.taxData.state.toUpperCase(),
+      quarter: this.taxData.quarter,
+    };
 
-    // Example API call for future use
-    // this.http.post(apiUrl, this.taxData).subscribe((res: any) => {
-    //   this.estimatedTax = res.estimatedTax;
-    // });
+    this.taxService.calculateTax(requestData).subscribe({
+      next: (response) => {
+        console.log('Tax calculation response:', response);
+        this.estimatedTax = response.totalTax;
+        this.isCalculating = false;
+        this.calculationComplete = true;
+      },
+      error: (error) => {
+        console.error('Error calculating tax:', error);
+        this.errorMessage = 'Unable to calculate tax. Please try again later.';
+        this.isCalculating = false;
+      },
+    });
+  }
+
+  viewCalendar() {
+    this.router.navigate(['/tax-calendar']);
   }
 }

@@ -146,7 +146,13 @@
           </fieldset>
 
           <div class="form-actions">
-            <button type="submit" class="calculate-btn">Calculate Estimated Tax</button>
+            <button type="submit" class="calculate-btn" [disabled]="isCalculating">
+              {{ isCalculating ? 'Calculating...' : 'Calculate Estimated Tax' }}
+            </button>
+          </div>
+
+          <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
           </div>
 
           <div class="result-box" *ngIf="estimatedTax">
@@ -173,6 +179,26 @@
                 <strong>Estimated Quarterly Tax:</strong>
                 {{ estimatedTax | currency }}
               </p>
+
+              <div class="calendar-reminder" *ngIf="calculationComplete">
+                <p class="reminder-text">A tax payment reminder has been added to your calendar.</p>
+                <button type="button" class="view-calendar-btn" (click)="viewCalendar()">
+                  View in Calendar
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <path d="M9 18l6-6-6-6"></path>
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </form>

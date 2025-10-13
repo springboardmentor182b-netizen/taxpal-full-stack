@@ -1,83 +1,25 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-
-interface TaxEvent {
-  date: Date;
-  title: string;
-  description: string;
-  type: 'deadline' | 'reminder' | 'payment' | 'filing';
-  priority: 'high' | 'medium' | 'low';
-}
+import { TaxService, TaxEvent } from '../../services/tax.service';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tax-calendar',
   templateUrl: './tax-calendar.component.html',
-  styleUrls: ['./tax-calendar.component.css'], // Changed from .scss to .css
+  styleUrls: ['./tax-calendar.component.css'],
   standalone: true,
-  // Remove ProfileNavbarComponent from imports since it's not used in the template
   imports: [CommonModule],
 })
-export class TaxCalendarComponent implements OnInit {
-  // Rest of your component code remains the same...
+export class TaxCalendarComponent implements OnInit, OnDestroy {
   isDarkMode = false;
   currentDate = new Date();
   selectedDate: Date | null = null;
   currentMonth = new Date();
+  taxEvents: TaxEvent[] = [];
+  private eventsSubscription: Subscription | null = null;
 
-  taxEvents: TaxEvent[] = [
-    {
-      date: new Date(2025, 3, 15), // April 15, 2025
-      title: 'Tax Return Filing Deadline',
-      description: 'Federal income tax returns are due',
-      type: 'deadline',
-      priority: 'high',
-    },
-    {
-      date: new Date(2025, 0, 31), // January 31, 2025
-      title: 'Form W-2 Deadline',
-      description: 'Employers must provide W-2 forms to employees',
-      type: 'deadline',
-      priority: 'medium',
-    },
-    {
-      date: new Date(2025, 2, 15), // March 15, 2025
-      title: 'S-Corp Tax Return Due',
-      description: 'S-Corporation tax returns are due',
-      type: 'deadline',
-      priority: 'medium',
-    },
-    {
-      date: new Date(2025, 5, 15), // June 15, 2025
-      title: 'Quarterly Payment Due',
-      description: '2nd quarter estimated tax payment',
-      type: 'payment',
-      priority: 'high',
-    },
-    {
-      date: new Date(2025, 3, 1), // April 1, 2025
-      title: 'Tax Return Reminder',
-      description: 'Remember to gather all documents for tax filing',
-      type: 'reminder',
-      priority: 'medium',
-    },
-    {
-      date: new Date(2025, 8, 1), // September 1, 2025
-      title: 'Q3 Tax Planning',
-      description: 'Review Q3 financials for tax planning',
-      type: 'reminder',
-      priority: 'low',
-    },
-    {
-      date: new Date(2025, 11, 15), // December 15, 2025
-      title: 'Year-End Tax Planning',
-      description: 'Schedule year-end tax planning session',
-      type: 'reminder',
-      priority: 'high',
-    },
-  ];
-
-  constructor(private router: Router) {
+  constructor(private router: Router, private taxService: TaxService) {
     // Initialize dark mode from localStorage if available
     const storedTheme = localStorage.getItem('darkMode');
     this.isDarkMode = storedTheme ? JSON.parse(storedTheme) : false;
@@ -92,6 +34,21 @@ export class TaxCalendarComponent implements OnInit {
       if (this.isDarkMode) {
         document.body.classList.add('dark-theme');
       }
+    }
+
+    // Subscribe to tax events from the service
+    this.eventsSubscription = this.taxService.taxEvents$.subscribe((events) => {
+      if (events && events.length > 0) {
+        this.taxEvents = events;
+      } else {
+        this.loadTaxEvents();
+      }
+    });
+  }
+
+  ngOnDestroy() {
+    if (this.eventsSubscription) {
+      this.eventsSubscription.unsubscribe();
     }
   }
 
@@ -190,58 +147,18 @@ export class TaxCalendarComponent implements OnInit {
   }
 
   loadTaxEvents(): void {
-    // Mock tax events data - in a real application, this would come from a service
-    this.taxEvents = [
-      {
-        title: 'Quarterly Estimated Tax Payment',
-        date: new Date(new Date().getFullYear(), 3, 15), // April 15
-        description: 'First quarter estimated tax payment due for self-employed individuals.',
-        type: 'payment',
-        priority: 'high',
+    this.taxService.getTaxReminders().subscribe({
+      next: (events) => {
+        // Convert string dates to Date objects
+        this.taxEvents = events.map((event) => ({
+          ...event,
+          date: new Date(event.date),
+        }));
       },
-      {
-        title: 'Form 1040-ES Filing',
-        date: new Date(new Date().getFullYear(), 3, 15), // April 15
-        description: 'Deadline to file Form 1040-ES for quarterly estimated taxes.',
-        type: 'filing',
-        priority: 'medium',
+      error: (error) => {
+        console.error('Error loading tax events:', error);
       },
-      {
-        title: 'Tax Extension Deadline',
-        date: new Date(new Date().getFullYear(), 9, 15), // October 15
-        description: 'Extended deadline for filing individual income tax returns.',
-        type: 'deadline',
-        priority: 'high',
-      },
-      {
-        title: 'Annual Tax Return Due',
-        date: new Date(new Date().getFullYear(), 3, 15), // April 15
-        description: 'Federal income tax return filing deadline for individuals.',
-        type: 'filing',
-        priority: 'high',
-      },
-      {
-        title: 'Second Quarter Estimated Taxes',
-        date: new Date(new Date().getFullYear(), 5, 15), // June 15
-        description: 'Second quarter estimated tax payment due.',
-        type: 'payment',
-        priority: 'medium',
-      },
-      {
-        title: 'Third Quarter Estimated Taxes',
-        date: new Date(new Date().getFullYear(), 8, 15), // September 15
-        description: 'Third quarter estimated tax payment due.',
-        type: 'payment',
-        priority: 'medium',
-      },
-      {
-        title: 'Fourth Quarter Estimated Taxes',
-        date: new Date(new Date().getFullYear() + 1, 0, 15), // January 15 of next year
-        description: 'Fourth quarter estimated tax payment due.',
-        type: 'payment',
-        priority: 'medium',
-      },
-    ];
+    });
   }
 
   hasEventType(date: Date, eventType: string): boolean {
