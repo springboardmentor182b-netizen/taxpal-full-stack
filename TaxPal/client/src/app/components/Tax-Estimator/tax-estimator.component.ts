@@ -60,6 +60,8 @@ export class TaxEstimatorComponent {
       quarter: this.taxData.quarter,
     };
 
+    console.log('Sending tax calculation request:', requestData);
+
     this.taxService.calculateTax(requestData).subscribe({
       next: (response) => {
         console.log('Tax calculation response:', response);

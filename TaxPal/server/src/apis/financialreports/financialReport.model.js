@@ -1,12 +1,47 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const FinancialReportSchema = new mongoose.Schema({
-    userId: { type: String, required: true },
-    reportType: { type: String, required: true },
-    period: { type: String, required: true },
-    format: { type: String, required: true },
-    filePath: { type: String, required: true },
-    createdAt: { type: Date, default: Date.now }
+/**
+ * Financial Report Schema
+ */
+const financialReportSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  reportType: {
+    type: String,
+    enum: ["income", "expense", "tax", "summary"],
+    required: true,
+  },
+  dateRange: {
+    start: {
+      type: Date,
+      required: true,
+    },
+    end: {
+      type: Date,
+      required: true,
+    },
+  },
+  data: {
+    type: mongoose.Schema.Types.Mixed,
+    required: true,
+  },
+  format: {
+    type: String,
+    enum: ["pdf", "csv", "excel"],
+    default: "pdf",
+  },
+  filePath: String,
+  generatedAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-module.exports = mongoose.model('FinancialReport', FinancialReportSchema);
+const FinancialReport = mongoose.model(
+  "FinancialReport",
+  financialReportSchema
+);
+
+module.exports = FinancialReport;

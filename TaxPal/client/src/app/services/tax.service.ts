@@ -27,21 +27,26 @@ export interface TaxEstimateResponse {
   providedIn: 'root',
 })
 export class TaxService {
-  private apiUrl = 'http://localhost:3000/api/TaxEstimator';
+  // Update API URL to point directly to your running server
+  private apiUrl = 'http://localhost:3000/api/TaxEstimator/events';
   private taxEventsSubject = new BehaviorSubject<TaxEvent[]>([]);
   taxEvents$ = this.taxEventsSubject.asObservable();
 
   constructor(private http: HttpClient) {
     this.loadInitialEvents();
+    console.log('TaxService initialized with API URL:', this.apiUrl);
   }
 
   getTaxReminders(): Observable<TaxEvent[]> {
-    return this.http.get<TaxEvent[]>(`${this.apiUrl}/events`);
+    console.log('Fetching tax reminders from:', `${this.apiUrl}/events`);
+    return this.http
+      .get<TaxEvent[]>(`${this.apiUrl}/events`)
+      .pipe(tap((events) => console.log('Received tax events:', events)));
   }
 
   // Make sure tax estimator calls the correct API endpoint
   calculateTax(data: any): Observable<TaxEstimateResponse> {
-    console.log('Sending tax calculation request to:', `${this.apiUrl}/calculate`);
+    console.log('Sending tax calculation request to:', `${this.apiUrl}/calculate`, data);
     return this.http.post<TaxEstimateResponse>(`${this.apiUrl}/calculate`, data).pipe(
       tap((response) => {
         console.log('Received tax calculation response:', response);
