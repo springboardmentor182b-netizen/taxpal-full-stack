@@ -1,54 +1,32 @@
-const BudgetService = require("./budget.service");
-const budgetService = new BudgetService();
+const mongoose = require("mongoose");
 
-// Create a new budget
-exports.createBudget = async (req, res) => {
-  try {
-    const budget = await budgetService.createBudget({
-      user_id: req.user?._id || req.body.user_id, // support both cases
-      ...req.body,
-    });
-    res.status(201).json(budget);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to create budget", error });
-  }
-};
+// Define budget schema
+const budgetSchema = new mongoose.Schema({
+  userId: {
+    type: String,
+    required: true,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
+  date: {
+    type: Date,
+    default: Date.now,
+  },
+  type: {
+    type: String,
+    enum: ["income", "expense"],
+    required: true,
+  },
+  description: String,
+});
 
-// Get all budgets
-exports.getBudgets = async (req, res) => {
-  try {
-    const budgets = await budgetService.getBudgetsByUser(req.user._id);
-    res.json(budgets);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to fetch budgets", error });
-  }
-};
+// Create budget model
+const Budget = mongoose.model("Budget", budgetSchema);
 
-// Update budget
-exports.updateBudget = async (req, res) => {
-  try {
-    const budget = await budgetService.updateBudget(
-      req.params.id,
-      req.user._id,
-      req.body
-    );
-    if (!budget) return res.status(404).json({ message: "Budget not found" });
-    res.json(budget);
-  } catch (error) {
-    res.status(500).json({ message: "Failed to update budget", error });
-  }
-};
-
-// Delete budget
-exports.deleteBudget = async (req, res) => {
-  try {
-    const budget = await budgetService.deleteBudget(
-      req.params.id,
-      req.user._id
-    );
-    if (!budget) return res.status(404).json({ message: "Budget not found" });
-    res.json({ message: "Budget deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete budget", error });
-  }
-};
+module.exports = Budget;
