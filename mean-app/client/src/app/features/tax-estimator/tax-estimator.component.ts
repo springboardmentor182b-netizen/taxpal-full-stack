@@ -20,7 +20,7 @@ interface EstimatedTaxData {
   standalone: true,
   imports: [CommonModule, FormsModule, CurrencyPipe],
   templateUrl: './tax-estimator.component.html',
-  styleUrls: ['./tax-estimator.component.css'] // ✅ Fixed property name
+  styleUrls: ['./tax-estimator.component.css']
 })
 export class TaxEstimatorComponent {
   taxInputs = signal<TaxInputs>({
@@ -34,22 +34,28 @@ export class TaxEstimatorComponent {
   isCalculating = signal(false);
   errorMessage = signal('');
 
+  quarters = [
+    { name: 'Q1', range: 'Jan – Mar 2025', dueDate: 'April 15, 2025' },
+    { name: 'Q2', range: 'Apr – Jun 2025', dueDate: 'June 15, 2025' },
+    { name: 'Q3', range: 'Jul – Sep 2025', dueDate: 'September 15, 2025' },
+    { name: 'Q4', range: 'Oct – Dec 2025', dueDate: 'January 15, 2026' }
+  ];
+
   private async fetchWithRetry(url: string, options: RequestInit, maxRetries = 5): Promise<any> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
       try {
         const response = await fetch(url, options);
         if (!response.ok) {
-          const errorBody = await response.json().catch(() => ({ message: 'Unknown server error or network issue.' }));
-          throw new Error(errorBody.message || `HTTP error! Status: ${response.status}`);
+          const errorBody = await response.json().catch(() => ({ message: 'Unknown server error' }));
+          throw new Error(errorBody.message || `HTTP ${response.status}`);
         }
         return await response.json();
       } catch (error: any) {
         if (attempt === maxRetries - 1) throw error;
-        const delay = Math.pow(2, attempt) * 1000;
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));
       }
     }
-    throw new Error('Fetch failed after maximum retries.');
+    throw new Error('Fetch failed after retries.');
   }
 
   async calculateTax(): Promise<void> {
@@ -59,7 +65,7 @@ export class TaxEstimatorComponent {
 
     const inputs = this.taxInputs();
     if (!inputs.annualGrossIncome || inputs.annualGrossIncome <= 0) {
-      this.errorMessage.set('Please enter a valid annual gross income greater than zero.');
+      this.errorMessage.set('Please enter a valid annual gross income.');
       this.isCalculating.set(false);
       return;
     }
@@ -80,8 +86,7 @@ export class TaxEstimatorComponent {
 
       this.estimatedTaxData.set(result);
     } catch (error: any) {
-      console.error('Tax Calculation Failed:', error);
-      this.errorMessage.set(`Calculation failed. Server response: ${error.message || 'Check network connection and backend API status.'}`);
+      this.errorMessage.set(`Calculation failed: ${error.message}`);
     } finally {
       this.isCalculating.set(false);
     }
