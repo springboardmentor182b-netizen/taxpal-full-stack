@@ -3,35 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FormsModule } from '@angular/forms';
-
+import { REPORT_TYPES, REPORT_FORMATS, REPORT_PERIODS } from '../../constants/report-options.constants';
 
 @Component({
   selector: 'app-export-download',
   standalone: true,
-  imports: [CommonModule,NavbarComponent, FormsModule],
+  imports: [CommonModule, NavbarComponent, FormsModule],
   templateUrl: './export-download.component.html',
   styleUrls: ['./export-download.component.css']
 })
 export class ExportDownloadComponent {
-  reportTypes: string[] = [
-    'Income Statement',
-    'Balance Sheet',
-    'Cash Flow Statement',
-    'Tax Summary',
-    'Expense Report'
-  ];
-
-  formats: string[] = ['PDF', 'CSV'];
-
-  periods: string[] = [
-    'Current Month',
-    'Last Month',
-    'Current Quarter',
-    'Last Quarter',
-    'Current Year',
-    'Last Year',
-    'Custom Range'
-  ];
+  reportTypes = REPORT_TYPES;
+  formats = REPORT_FORMATS;
+  periods = REPORT_PERIODS;
 
   selectedReport = this.reportTypes[0];
   selectedFormat = this.formats[0];
