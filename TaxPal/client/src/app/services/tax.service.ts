@@ -39,9 +39,12 @@ export class TaxService {
     return this.http.get<TaxEvent[]>(`${this.apiUrl}/events`);
   }
 
+  // Make sure tax estimator calls the correct API endpoint
   calculateTax(data: any): Observable<TaxEstimateResponse> {
+    console.log('Sending tax calculation request to:', `${this.apiUrl}/calculate`);
     return this.http.post<TaxEstimateResponse>(`${this.apiUrl}/calculate`, data).pipe(
       tap((response) => {
+        console.log('Received tax calculation response:', response);
         // Create a payment reminder for the estimated tax
         this.addTaxPaymentReminder(data, response.totalTax);
       })
