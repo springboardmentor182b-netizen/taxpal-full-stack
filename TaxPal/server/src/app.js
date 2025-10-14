@@ -3,8 +3,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-// Import the tax estimator controller
-const taxEstimateController = require("./apis/TaxEstimator/taxestimate.controller");
 
 const app = express();
 
@@ -17,13 +15,129 @@ app.use(
   })
 );
 
-app.use(bodyParser.json());
+// Parse JSON request bodies with increased limit
+app.use(bodyParser.json({ limit: "10mb" }));
+app.use(bodyParser.urlencoded({ extended: true, limit: "10mb" }));
 
 // Request logging middleware
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-  console.log("Request body:", req.body);
+  if (req.method === "POST" && req.body) {
+    console.log("Request body:", JSON.stringify(req.body, null, 2));
+  }
   next();
+});
+
+// IMPORTANT: The endpoint must match exactly what the client is calling
+app.post("/api/TaxEstimator/calculate", (req, res) => {
+  try {
+    console.log("Processing tax calculation request");
+    const taxData = req.body;
+
+    // Basic validation
+    if (!taxData) {
+      console.error("Missing request body");
+      return res.status(400).json({
+        success: false,
+        message: "Missing request data",
+      });
+    }
+
+    // Extract values with defaults to avoid NaN issues
+    const income = Number(taxData.income) || 0;
+    const businessExpenses = Number(taxData.businessExpenses) || 0;
+    const retirement = Number(taxData.retirement) || 0;
+    const healthInsurance = Number(taxData.healthInsurance) || 0;
+    const homeOffice = Number(taxData.homeOffice) || 0;
+    const filingStatus = taxData.filingStatus?.toLowerCase() || "single";
+    const state = taxData.state?.toUpperCase() || "";
+
+    console.log(
+      `Income: ${income}, Filing Status: ${filingStatus}, State: ${state}`
+    );
+
+    // Calculate total deductions
+    const totalDeductions =
+      businessExpenses + retirement + healthInsurance + homeOffice;
+    const taxableIncome = Math.max(0, income - totalDeductions);
+
+    // Simple federal tax calculation based on 2023 brackets for single filers
+    let federalTax = 0;
+    if (filingStatus === "single") {
+      if (taxableIncome <= 11000) {
+        federalTax = taxableIncome * 0.1;
+      } else if (taxableIncome <= 44725) {
+        federalTax = 1100 + (taxableIncome - 11000) * 0.12;
+      } else if (taxableIncome <= 95375) {
+        federalTax = 5147 + (taxableIncome - 44725) * 0.22;
+      } else if (taxableIncome <= 182100) {
+        federalTax = 16290 + (taxableIncome - 95375) * 0.24;
+      } else if (taxableIncome <= 231250) {
+        federalTax = 37104 + (taxableIncome - 182100) * 0.32;
+      } else if (taxableIncome <= 578125) {
+        federalTax = 52832 + (taxableIncome - 231250) * 0.35;
+      } else {
+        federalTax = 174238.25 + (taxableIncome - 578125) * 0.37;
+      }
+    } else if (filingStatus === "married") {
+      // Simplified married tax brackets
+      if (taxableIncome <= 22000) {
+        federalTax = taxableIncome * 0.1;
+      } else if (taxableIncome <= 89450) {
+        federalTax = 2200 + (taxableIncome - 22000) * 0.12;
+      } else if (taxableIncome <= 190750) {
+        federalTax = 10294 + (taxableIncome - 89450) * 0.22;
+      } else {
+        federalTax = 32580 + (taxableIncome - 190750) * 0.24;
+      }
+    }
+
+    // Simple state tax calculation
+    const stateRates = {
+      CA: 0.093,
+      NY: 0.085,
+      TX: 0,
+      FL: 0,
+      NJ: 0.0637,
+      PA: 0.0307,
+      // Add more states as needed
+    };
+
+    const stateRate = stateRates[state] || 0.05; // Default to 5%
+    const stateTax = taxableIncome * stateRate;
+
+    // Self-employment tax calculation (15.3% of taxable income)
+    const selfEmploymentTax = taxableIncome * 0.153;
+
+    // Calculate total tax and effective tax rate
+    const totalTax = federalTax + stateTax + selfEmploymentTax;
+    const effectiveTaxRate = income > 0 ? (totalTax / income) * 100 : 0;
+
+    // Format result
+    const result = {
+      taxableIncome: parseFloat(taxableIncome.toFixed(2)),
+      totalDeductions: parseFloat(totalDeductions.toFixed(2)),
+      totalTax: parseFloat(totalTax.toFixed(2)),
+      effectiveTaxRate: parseFloat(effectiveTaxRate.toFixed(2)),
+      breakdown: {
+        federalTax: parseFloat(federalTax.toFixed(2)),
+        stateTax: parseFloat(stateTax.toFixed(2)),
+        selfEmploymentTax: parseFloat(selfEmploymentTax.toFixed(2)),
+      },
+    };
+
+    console.log("Tax calculation result:", JSON.stringify(result, null, 2));
+
+    // Send successful response
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Error in tax calculation:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Error calculating tax estimate",
+      error: error.message,
+    });
+  }
 });
 
 // Test route
@@ -31,84 +145,7 @@ app.get("/", (req, res) => {
   res.json({ status: "success", message: "TaxPal API is running" });
 });
 
-// Tax Estimator routes - Make sure these match what the Angular client expects
-app.post("/api/TaxEstimator/calculate", (req, res) => {
-  try {
-    // Extract data from request body
-    const taxData = req.body;
-    console.log("Received tax calculation request:", taxData);
-
-    // Basic validation
-    if (!taxData || typeof taxData.income === "undefined") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid request data - income is required",
-      });
-    }
-
-    // Simple tax calculation (replace with actual calculation)
-    const income = Number(taxData.income) || 0;
-    const businessExpenses = Number(taxData.businessExpenses) || 0;
-    const retirement = Number(taxData.retirement) || 0;
-    const healthInsurance = Number(taxData.healthInsurance) || 0;
-    const homeOffice = Number(taxData.homeOffice) || 0;
-
-    // Calculate deductions
-    const totalDeductions =
-      businessExpenses + retirement + healthInsurance + homeOffice;
-    const taxableIncome = Math.max(0, income - totalDeductions);
-
-    // Simple tax rate based on income
-    let federalTax = 0;
-    if (taxableIncome <= 10000) federalTax = taxableIncome * 0.1;
-    else if (taxableIncome <= 40000)
-      federalTax = 1000 + (taxableIncome - 10000) * 0.15;
-    else if (taxableIncome <= 80000)
-      federalTax = 5500 + (taxableIncome - 40000) * 0.25;
-    else federalTax = 15500 + (taxableIncome - 80000) * 0.3;
-
-    // Mock state tax
-    const stateTax = taxableIncome * 0.05;
-
-    // Mock self employment tax
-    const selfEmploymentTax = taxableIncome * 0.15;
-
-    // Calculate total tax
-    const totalTax = federalTax + stateTax + selfEmploymentTax;
-
-    // Calculate effective tax rate
-    const effectiveTaxRate = income > 0 ? (totalTax / income) * 100 : 0;
-
-    const result = {
-      taxableIncome,
-      totalDeductions,
-      totalTax,
-      effectiveTaxRate,
-      breakdown: {
-        federalTax,
-        stateTax,
-        selfEmploymentTax,
-      },
-    };
-
-    console.log("Calculated tax result:", result);
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error("Error calculating tax:", error);
-    res.status(500).json({
-      success: false,
-      message: "Error calculating tax",
-      error: error.message,
-    });
-  }
-});
-app.post("/api/TaxEstimator/save", taxEstimateController.saveTaxEstimate);
-app.get(
-  "/api/TaxEstimator/user/:userId",
-  taxEstimateController.getUserTaxEstimates
-);
-
-// Tax Events API endpoint
+// Tax Events API endpoints
 app.get("/api/TaxEstimator/events", (req, res) => {
   console.log("Fetching tax events");
 
@@ -184,8 +221,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
   console.log("Available API endpoints:");
   console.log("- POST /api/TaxEstimator/calculate");
-  console.log("- POST /api/TaxEstimator/save");
-  console.log("- GET  /api/TaxEstimator/user/:userId");
   console.log("- GET  /api/TaxEstimator/events");
   console.log("- POST /api/TaxEstimator/events");
   console.log("=".repeat(50));

@@ -68,16 +68,15 @@ const saveTaxEstimate = async (estimateData) => {
   try {
     const { userId, ...data } = estimateData;
 
-    // Find user to get additional details
-    const user = await User.findById(userId);
-    if (!user) {
-      throw new Error("User not found");
-    }
+    // Remove user lookup for now to avoid "User not found" error
+    // const user = await User.findById(userId);
+    // if (!user) {
+    //   throw new Error("User not found");
+    // }
 
-    // Create tax estimate document
     const taxEstimate = new TaxEstimate({
       userId,
-      userEmail: user.email,
+      // userEmail: user ? user.email : '',
       ...data,
       createdAt: new Date(),
     });

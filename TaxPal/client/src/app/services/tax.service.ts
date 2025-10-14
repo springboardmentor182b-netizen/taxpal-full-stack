@@ -27,8 +27,8 @@ export interface TaxEstimateResponse {
   providedIn: 'root',
 })
 export class TaxService {
-  // Update API URL to point directly to your running server
-  private apiUrl = 'http://localhost:3000/api/TaxEstimator/events';
+  // Fix: Use the correct base API URL
+  private apiUrl = 'http://localhost:3000/api/TaxEstimator';
   private taxEventsSubject = new BehaviorSubject<TaxEvent[]>([]);
   taxEvents$ = this.taxEventsSubject.asObservable();
 
