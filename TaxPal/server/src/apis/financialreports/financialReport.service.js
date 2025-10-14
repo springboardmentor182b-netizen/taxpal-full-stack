@@ -1,8 +1,18 @@
 const FinancialReport = require('./financialReport.model');
 const { generateReportFile } = require('./reportFileGenerator');
+const {
+    REPORT_FORMAT_DATA,
+    TRANSACTION_TYPE_INCOME,
+    TRANSACTION_TYPE_EXPENSE,
+    MONTHS,
+    RATING_EXCELLENT,
+    RATING_GOOD,
+    SUCCESS,
+    REPORT_NOT_FOUND
+} = require('./constants');
 
 exports.generateReport = async function(data) {
-    if (data.format === 'data') {
+    if (data.format === REPORT_FORMAT_DATA) {
         // Fetch real transaction data from database
         const Transaction = require('../incomeExpenseapi/TransactionModel');
         const year = parseInt(data.period);
@@ -15,10 +25,7 @@ exports.generateReport = async function(data) {
             date: { $gte: startDate, $lt: endDate }
         }).sort({ date: 1 });
 
-        const months = [
-            'January', 'February', 'March', 'April', 'May', 'June',
-            'July', 'August', 'September', 'October', 'November', 'December'
-        ];
+        const months = MONTHS;
 
         const monthlyReports = months.map((month, index) => {
             // Filter transactions for this month
@@ -28,11 +35,11 @@ exports.generateReport = async function(data) {
             });
 
             const income = monthTransactions
-                .filter(tx => tx.type === 'income')
+                .filter(tx => tx.type === TRANSACTION_TYPE_INCOME)
                 .reduce((sum, tx) => sum + tx.amount, 0);
 
             const expenses = monthTransactions
-                .filter(tx => tx.type === 'expense')
+                .filter(tx => tx.type === TRANSACTION_TYPE_EXPENSE)
                 .reduce((sum, tx) => sum + tx.amount, 0);
 
             const netIncome = income - expenses;
@@ -42,7 +49,7 @@ exports.generateReport = async function(data) {
             // Mock budget usage and rating for now (can be enhanced later)
             const budgetUsage = Math.random() * 40 + 60;
             const budget = 7500;
-            const rating = netIncome > 0 ? 'Excellent' : 'Good';
+            const rating = netIncome > 0 ? RATING_EXCELLENT : RATING_GOOD;
 
             return {
                 month,
@@ -72,7 +79,7 @@ exports.generateReport = async function(data) {
         const yearlyReport = { ...yearSummary, savingRate: savingsRate };
 
         return {
-            success: true,
+            [SUCCESS]: true,
             monthlyReports,
             yearSummary,
             yearlyReport
@@ -80,7 +87,6 @@ exports.generateReport = async function(data) {
     }
 
     // Original file generation logic
-    const { generateReportFile } = require('./reportFileGenerator');
     const filePath = await generateReportFile(data);
     const report = new FinancialReport({
         ...data,
@@ -96,6 +102,6 @@ exports.listReports = async function(userId) {
 
 exports.getReportFilePath = async function(id) {
     const report = await FinancialReport.findById(id).exec();
-    if (!report) throw new Error('Report not found');
+    if (!report) throw new Error(REPORT_NOT_FOUND);
     return report.filePath;
 };
