@@ -1,5 +1,3 @@
-
-
 import { Request, Response } from "express";
 import reportService from "./report.service";
 import { ReportType, ReportPeriod, ReportFormat } from "./report.types";

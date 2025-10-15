@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -37,7 +35,7 @@ app.use("/api/v1/reports", reportRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
-
+app.use("/api/v1/reports", reportRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");
