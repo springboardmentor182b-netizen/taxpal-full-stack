@@ -1,0 +1,81 @@
+<!-- Main Content -->
+<div class="reports-container">
+  <h2>Financial Reports</h2>
+  <p class="subtitle">Generate and download your financial reports</p>
+
+  <div class="generate-report card">
+    <h3>Generate Report</h3>
+    <form (ngSubmit)="addReport()" class="report-form">
+      <div class="form-group">
+        <label for="reportType">Report Type</label>
+        <select id="reportType" [ngModel]="newReport().reportType" (ngModelChange)="updateNewReportType($event)"
+          name="reportType" required>
+          <option value="Income Statement">Income Statement</option>
+          <option value="Expense Report">Expense Report</option>
+          <option value="Tax Summary">Tax Summary</option>
+          <option value="Budget Analysis">Budget Analysis</option>
+          <option value="Cash Flow Statement">Cash Flow Statement</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="period">Period</label>
+        <select id="period" [ngModel]="newReport().reportPeriod" (ngModelChange)="updateNewReportPeriod($event)"
+          name="period" required>
+          <option value="Current Month">Current Month</option>
+          <option value="Last Month">Last Month</option>
+          <option value="Current Quarter">Current Quarter</option>
+          <option value="Last Quarter">Last Quarter</option>
+          <option value="Current Year">Current Year</option>
+          <option value="Last Year">Last Year</option>
+          <option value="Custom">Custom</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="format">Format</label>
+        <select id="format" [ngModel]="newReport().format" (ngModelChange)="updateNewReportFormat($event)" name="format"
+          required>
+          <option value="PDF">PDF</option>
+          <option value="Excel">Excel</option>
+          <option value="CSV">CSV</option>
+        </select>
+      </div>
+
+      <div class="buttons">
+        <button type="reset" class="reset-btn" (click)="resetForm()">Reset</button>
+        <button type="submit" class="generate-btn">Generate Report</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="recent-reports card">
+    <h3>Recent Reports</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Report Name</th>
+          <th>Generated</th>
+          <th>Period</th>
+          <th>Format</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="recentReports.length === 0">
+          <td colspan="5" class="no-results">No results.</td>
+        </tr>
+        <tr *ngFor="let report of recentReports">
+          <td>{{ report.reportType }}</td>
+          <!-- <td>{{ report.generatedAt | date:'short' }}</td> -->
+          <td>
+            {{ report.generatedAt ? (report.generatedAt | date:'short') : report.status }}
+          </td>
+          <td>{{ report.period }}</td>
+          <td>{{ report.format }}</td>
+          <td><button (click)="downloadReport(report)">Download</button></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

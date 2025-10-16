@@ -61,6 +61,12 @@ export class MainLayout {
     });
   }
 
+  goToReports() {
+    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
+      this.router.navigate(['/reports']);
+    });
+  }
+
   goToSettings() {
     this.router.navigate(['/settings']);
   }

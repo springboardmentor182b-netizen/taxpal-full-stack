@@ -30,6 +30,13 @@ export const routes: Routes = [
     path: 'dashboard-form', 
     loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
   },
+  {
+  path: 'reports',
+  loadComponent: () =>
+    import('./features/reports/reports-form/reports.component').then(
+      m => m.ReportsComponent
+    )
+},
   { 
     path: 'budgets', 
     loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
@@ -78,5 +85,7 @@ export const routes: Routes = [
  
   
   // Wildcard route - redirect to login for any unknown routes
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '/login' },
+  
+
 ];
