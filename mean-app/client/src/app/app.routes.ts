@@ -41,6 +41,12 @@ export const routes: Routes = [
     path: 'budgets', 
     loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
   },
+    {
+    path: 'tax-estimator',   // ✅ Added route
+    loadComponent: () =>
+      import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
+        .then(m => m.TaxEstimatorFormComponent)
+  },
   {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
