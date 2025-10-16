@@ -1,6 +1,6 @@
 .dashboard-container {
   min-height: calc(100vh - 80px);
-  background-color: #f9fafb;
+  background-color: var(--bg-secondary);
   padding: 3rem 1.5rem;
   transition: background-color 0.3s ease;
 }
@@ -18,19 +18,19 @@
 h1 {
   font-size: 2rem;
   font-weight: 700;
-  color: #111827;
+  color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
 .subtitle {
   font-size: 1.1rem;
-  color: #6b7280;
+  color: var(--text-secondary);
   max-width: 600px;
   margin: 0 auto;
 }
 
 .dashboard-placeholder {
-  background-color: white;
+  background-color: var(--bg-primary);
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   padding: 4rem 2rem;
@@ -43,20 +43,60 @@ h1 {
   display: flex;
   justify-content: center;
   margin-bottom: 2rem;
-  color: #3b82f6;
+  color: var(--accent-primary);
 }
 
 h2 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-primary);
   margin-bottom: 1rem;
 }
 
-.dashboard-placeholder p {
-  color: #6b7280;
-  max-width: 500px;
-  margin: 0 auto;
+.transactions-section {
+  background-color: var(--bg-primary);
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  overflow-x: auto;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.transactions-table th {
+  background-color: var(--bg-secondary);
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.transactions-table td {
+  color: var(--text-secondary);
+}
+
+.income {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.expense {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-secondary);
 }
 
 /* Dark mode styles */

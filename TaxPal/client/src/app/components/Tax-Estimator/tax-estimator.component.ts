@@ -1,7 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { DarkModeService } from '../../core/services/dark-mode.service';
+import { NavbarComponent } from '../navbar/navbar.component';
 
 interface TaxData {
   country: string;
@@ -18,11 +21,11 @@ interface TaxData {
 @Component({
   selector: 'app-tax-estimator',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe],
+  imports: [CommonModule, FormsModule, CurrencyPipe, NavbarComponent],
   templateUrl: './tax-estimator.component.html',
   styleUrls: ['./tax-estimator.component.css']
 })
-export class TaxEstimatorComponent {
+export class TaxEstimatorComponent implements OnInit, OnDestroy {
   taxData: TaxData = {
     country: 'United States',
     state: '',
@@ -36,8 +39,20 @@ export class TaxEstimatorComponent {
   };
 
   estimatedTax: number | null = null;
+  isDarkMode: boolean = false;
+  private darkModeSubscription: Subscription = new Subscription();
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private darkModeService: DarkModeService) {}
+
+  ngOnInit() {
+    this.darkModeSubscription = this.darkModeService.darkMode$.subscribe(isDark => {
+      this.isDarkMode = isDark;
+    });
+  }
+
+  ngOnDestroy() {
+    this.darkModeSubscription.unsubscribe();
+  }
 
   calculateTax() {
     // Later replace this mock with actual API
