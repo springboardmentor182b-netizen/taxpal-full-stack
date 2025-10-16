@@ -1,3 +1,5 @@
+/*add css files */
+
 :host {
     display: block;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -9,7 +11,9 @@
     min-height: 100vh;
     background: #f6f8fa;
     position: relative;
+
 }
+
 
 /* Overlay when mobile sidebar open */
 .overlay {
@@ -176,7 +180,6 @@
     gap: 8px;
     margin-top: 6px;
 }
-
 .action {
     display: flex;
     align-items: center;
@@ -189,22 +192,18 @@
     color: #fff;
     font-weight: 600;
 }
-
 .action.logout {
     background: rgba(239, 68, 68, 0.08);
     color: #ff7b7b;
 }
-
 .reports-container {
     padding: 20px;
     font-family: Arial, sans-serif;
 }
-
 .subtitle {
     color: gray;
     margin-bottom: 15px;
 }
-
 .card {
     background: #fff;
     padding: 15px;
@@ -251,11 +250,12 @@ select {
 }
 
 .reset-btn {
-    background: #f0f0f0;
+    background: #2fa79a;
+    color: white;
 }
 
 .generate-btn {
-    background: #007bff;
+    background: #10b981;
     color: white;
 }
 

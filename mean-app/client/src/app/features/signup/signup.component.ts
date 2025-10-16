@@ -12,6 +12,7 @@ import { AuthService } from '../auth.service';
   templateUrl: './signup.component.html',
   styleUrls: ['./signup.component.css']
 })
+
 export class SignupComponent implements OnInit, OnDestroy {
   signupForm: FormGroup;
   isLoading: boolean = false;

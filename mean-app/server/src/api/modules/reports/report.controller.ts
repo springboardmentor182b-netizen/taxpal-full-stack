@@ -242,6 +242,8 @@ class ReportController {
   //   }
   // }
 
+  //new
+  
   async downloadReport(req: Request, res: Response): Promise<Response | void> {
   try {
     const { id } = req.params;

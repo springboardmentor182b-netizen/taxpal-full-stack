@@ -251,6 +251,7 @@
 
 
 // server/src/api/modules/reports/report.service.ts
+//new
 
 import Report, { IReportDocument } from "./report.model";
 import { ReportType, ReportPeriod, ReportFormat, ReportStatus } from "./report.types";
@@ -267,7 +268,7 @@ class ReportService {
     const now = new Date();
     let startDate: Date;
     let endDate: Date = new Date(now);
-    
+
     switch (period) {
       case ReportPeriod.CURRENT_MONTH:
         startDate = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -330,6 +331,7 @@ class ReportService {
       details: [],
       charts: []
     };
+
 
     try {
       switch (reportType) {

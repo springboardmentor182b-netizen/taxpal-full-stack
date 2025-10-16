@@ -1,102 +1,364 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';   
-import { FormsModule } from '@angular/forms';     
-import { RouterModule, Router } from '@angular/router';  // ✅ Import RouterModule + Router
+// import { Component, signal, WritableSignal, ChangeDetectionStrategy, OnInit } from '@angular/core';
+// import { CommonModule } from '@angular/common';
+// import { FormsModule } from '@angular/forms';
+// import { RouterModule, Router } from '@angular/router';
+// import { AuthService, User } from '../../../features/auth.service';
+// import { ReportsService } from '../../../services/reports.service';
+
+// export interface Report {
+//   _id?: string;
+//   reportType: string;
+//   reportPeriod: string;
+//   period?: string;
+//   format: string;
+//   requestedBy?: string;
+//   createdAt?: string;
+//   status?: string;
+//   downloadUrl?: string;
+//   generatedAt?: string;
+//   fileName?: string;
+//   fileUrl?: string;
+//   errorMessage?: string;
+// }
+
+// @Component({
+//   selector: 'app-reports',
+//   standalone: true,
+//   imports: [CommonModule, FormsModule, RouterModule],
+//   templateUrl: './reports.component.html',
+//   styleUrls: ['./reports.component.scss'],
+//   changeDetection: ChangeDetectionStrategy.OnPush
+// })
+// export class ReportsComponent implements OnInit {
+//   public isFormVisible = signal(false);
+
+//   public newReport: WritableSignal<{
+//     reportType: string | null;
+//     reportPeriod: string | null;
+//     format: string;
+//     customPeriod?: { startDate: Date; endDate: Date };
+//   }> = signal({
+//     reportType: null,
+//     reportPeriod: null,
+//     format: 'PDF'
+//   });
+
+//   recentReports: Report[] = [];
+
+//   userInitials = '';
+//   currentUser: User = { id: '', fullName: '', email: '', username: '' };
+
+//   constructor(
+//     private reportsService: ReportsService,
+//     private authService: AuthService,
+//     private router: Router
+//   ) {}
+
+//   ngOnInit(): void {
+//     this.loadCurrentUser();
+//   }
+
+//   loadCurrentUser(): void {
+//     const user = this.authService.getCurrentUser();
+//     if (user) {
+//       this.currentUser = user;
+//       this.setUserInitials(user.fullName);
+//       this.fetchReports();
+//     } else {
+//       this.router.navigate(['/login']);
+//     }
+//   }
+
+//   private setUserInitials(fullName: string | null | undefined) {
+//     if (!fullName) {
+//       this.userInitials = '';
+//       return;
+//     }
+//     const names = fullName.trim().split(' ');
+//     this.userInitials = names.length === 1
+//       ? names[0].charAt(0).toUpperCase()
+//       : names[0].charAt(0).toUpperCase() + names[names.length - 1].charAt(0).toUpperCase();
+//   }
+
+//   fetchReports(): void {
+//     if (!this.currentUser.id) return;
+
+//     this.reportsService.getReports(this.currentUser.id).subscribe({
+//       next: (res) => this.recentReports = res || [],
+//       error: (err) => {
+//         console.error('Error fetching reports:', err);
+//         this.recentReports = [];
+//       }
+//     });
+//   }
+
+// generateReport(): void {
+//   const formData = this.newReport();
+
+//   if (!formData.reportType || !formData.reportPeriod) {
+//     console.error('Please fill in report type and period');
+//     return;
+//   }
+
+//   if (!this.currentUser.id) {
+//     console.error('User not logged in');
+//     return;
+//   }
+//    const payload = {
+//     reportType: formData.reportType,
+//     period: formData.reportPeriod,
+//     format: formData.format,
+//     customPeriod: formData.customPeriod
+//   };
+
+//   // const payload: any = {
+//   //   title: formData.reportType,                       
+//   //   content: `Report for ${formData.reportPeriod}`,   
+//   //   dashboard: 'Financial Dashboard',                 
+//   //   user: this.currentUser.id,                       
+//   //   reportType: formData.reportType,
+//   //   period: formData.reportPeriod,
+//   //   format: formData.format
+//   // };
+
+//   console.log('Payload for report generation:', payload);
+//    //test
+//   if (formData.reportPeriod === 'Custom' && (formData as any).customPeriod) {
+//     payload.customPeriod = (formData as any).customPeriod;
+//   }
+
+//   console.log('Payload for report generation:', payload);
+
+//   this.reportsService.generateReport(payload).subscribe({
+//     next: (res: any) => {
+//       console.log('Report generation started:', res);
+//       if (res.success && res.data) {
+//         this.recentReports.push(res.data);
+//       }
+//       this.resetForm();
+//       this.isFormVisible.set(false);
+//     },
+//     error: (err) => console.error('Error generating report:', err)
+//   });
+// }
+
+
+//   resetForm(): void {
+//     this.newReport.set({ reportType: null, reportPeriod: null, format: 'PDF' });
+//   }
+
+//   downloadReport(report: Report): void {
+//     if (!report._id || !report.format) return;
+
+//     this.reportsService.downloadReport(report._id, report.format).subscribe({
+//       next: (blob) => {
+//         const url = window.URL.createObjectURL(blob);
+//         const a = document.createElement('a');
+//         a.href = url;
+//         a.download = `${report.reportType}_${report._id}.${report.format.toLowerCase()}`;
+//         a.click();
+//         window.URL.revokeObjectURL(url);
+//       },
+//       error: (err) => console.error('Download failed:', err)
+//     });
+//   }
+
+//   addReport(): void {
+//     this.generateReport();
+//   }
+
+//   updateNewReportType(value: string | null) {
+//     this.newReport.set({ ...this.newReport(), reportType: value });
+//   }
+
+//   updateNewReportPeriod(value: string | null) {
+//     this.newReport.set({ ...this.newReport(), reportPeriod: value });
+//   }
+
+//   updateNewReportFormat(value: string | null) {
+//     this.newReport.set({ ...this.newReport(), format: value || 'PDF' });
+//   }
+// }
+
+import { Component, signal, WritableSignal, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterModule, Router } from '@angular/router';
+import { AuthService, User } from '../../../features/auth.service';
+import { ReportsService } from '../../../services/reports.service';
+
+export interface Report {
+  _id?: string;
+  reportType: string;
+  period: string;
+  format: string;
+  status?: string;
+  createdAt?: string;
+  generatedAt?: string;
+  fileUrl?: string;
+  fileName?: string;
+  errorMessage?: string;
+}
 
 @Component({
   selector: 'app-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],  // ✅ Added RouterModule
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './reports.component.html',
-  styleUrls: ['./reports.component.scss']
+  styleUrls: ['./reports.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ReportsComponent {
-  // Sidebar & UI states
-  sidebarActive = false;
-  collapsed = false;
+export class ReportsComponent implements OnInit {
+  public isFormVisible = signal(false);
 
-  // Form fields
-  reportType: string = 'Income Statement';
-  period: string = 'Current Month';
-  format: string = 'PDF';
+  public newReport: WritableSignal<{
+    reportType: string | null;
+    reportPeriod: string | null;
+    format: string;
+    customPeriod?: { startDate: Date; endDate: Date };
+  }> = signal({
+    reportType: null,
+    reportPeriod: null,
+    format: 'PDF'
+  });
 
-  // Mock user (for sidebar)
-  currentUser = {
-    fullName: 'Pavithra Yelluri',
-    email: 'pavithra@example.com'
+  recentReports: Report[] = [];
+  userInitials = '';
+  currentUser: User = { id: '', fullName: '', email: '', username: '' };
+
+  constructor(
+    private reportsService: ReportsService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.loadCurrentUser();
+  }
+
+  loadCurrentUser(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.currentUser = user;
+      this.setUserInitials(user.fullName);
+      this.fetchReports();
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  private setUserInitials(fullName: string | null | undefined): void {
+  if (!fullName) {
+    this.userInitials = "";
+    return;
+  }
+
+  const parts = fullName.trim().split(" ");
+  this.userInitials = parts
+    .map(p => p.charAt(0).toUpperCase())
+    .join("");
+}
+
+  fetchReports(): void {
+    if (!this.currentUser.id) return;
+    this.reportsService.getReports(this.currentUser.id).subscribe({
+      next: (res) => (this.recentReports = res || []),
+      error: (err) => {
+        console.error('Error fetching reports:', err);
+        this.recentReports = [];
+      }
+    });
+  }
+
+ generateReport(): void {
+  const formData = this.newReport();
+
+  if (!formData.reportType || !formData.reportPeriod) {
+    console.error('Please fill in report type and period');
+    return;
+  }
+
+  if (!this.currentUser.id) {
+    console.error('User not logged in');
+    return;
+  }
+
+  const payload: any = {
+    userId: this.currentUser.id,
+    reportType: formData.reportType,
+    period: formData.reportPeriod,
+    format: formData.format
   };
-  get userInitials() {
-    return this.currentUser.fullName
-      .split(' ')
-      .map(n => n[0])
-      .join('')
-      .toUpperCase();
+
+  if (formData.reportPeriod === 'Custom' && formData.customPeriod) {
+    payload.customPeriod = formData.customPeriod;
   }
 
-  // Recent reports list
-  recentReports: any[] = [];
+  console.log('Payload for report generation:', payload);
 
-  constructor(private router: Router) {}
+  this.reportsService.generateReport(payload).subscribe({
+    next: (res: any) => {
+      console.log('Report generation started:', res);
+      if (res.success && res.data) {
+        this.recentReports.unshift(res.data); // add new report at top
+      }
+      this.resetForm();
+      this.isFormVisible.set(false);
+    },
+    error: (err) => console.error('Error generating report:', err)
+});
+}
 
-  // 🔹 Sidebar toggle
-  toggleSidebar() {
-    this.sidebarActive = !this.sidebarActive;
+  resetForm(): void {
+    this.newReport.set({ reportType: null, reportPeriod: null, format: 'PDF' });
   }
 
-  // 🔹 Collapse sidebar
-  toggleCollapse() {
-    this.collapsed = !this.collapsed;
+  // downloadReport(report: Report): void {
+  //   if (!report._id || !report.format) return;
+
+  //   this.reportsService.downloadReport(report._id, report.format).subscribe({
+  //     next: (blob) => {
+  //       const url = window.URL.createObjectURL(blob);
+  //       const a = document.createElement('a');
+  //       a.href = url;
+  //       a.download = `${report.reportType}_${report._id}.${report.format.toLowerCase()}`;
+  //       a.click();
+  //       window.URL.revokeObjectURL(url);
+  //     },
+  //     error: (err) => console.error('Download failed:', err)
+  //   });
+  // }
+
+  downloadReport(report: Report): void {
+  if (!report._id || !report.format) return;
+
+  this.reportsService.downloadReport(report._id, report.format).subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = report.fileName || `${report.reportType}.${report.format.toLowerCase()}`;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err) => console.error('Download failed:', err)
+  });
+}
+
+
+  addReport(): void {
+    this.generateReport();
   }
 
-  // 🔹 Close overlay when clicked outside
-  closeSidebarOverlay() {
-    this.sidebarActive = false;
+  updateNewReportType(value: string | null) {
+    this.newReport.set({ ...this.newReport(), reportType: value });
   }
 
-  // 🔹 Navigate to dashboard
-  goToDashboard() {
-    this.router.navigate(['/dashboard']);
+  updateNewReportPeriod(value: string | null) {
+    this.newReport.set({ ...this.newReport(), reportPeriod: value });
   }
 
-  // 🔹 Logout simulation
-  logout() {
-    alert('You have been logged out!');
-    this.router.navigate(['/login']);
-  }
-
-  // 🔹 Generate new report
-  generateReport() {
-    const report = {
-      name: this.reportType,
-      generated: new Date().toLocaleString(),
-      period: this.period,
-      format: this.format
-    };
-    this.recentReports.push(report);
-  }
-
-  // 🔹 Reset form fields
-  resetForm() {
-    this.reportType = 'Income Statement';
-    this.period = 'Current Month';
-    this.format = 'PDF';
-  }
-
-  // 🔹 Simulate report download
-  downloadReport(report: any) {
-    console.log('Downloading report:', report);
-
-    const dataStr =
-      'data:text/json;charset=utf-8,' +
-      encodeURIComponent(JSON.stringify(report, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute('href', dataStr);
-    downloadAnchorNode.setAttribute(
-      'download',
-      `${report.name}_${Date.now()}.json`
-    );
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
+  updateNewReportFormat(value: string | null) {
+    this.newReport.set({ ...this.newReport(), format: value || 'PDF' });
   }
 }

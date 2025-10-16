@@ -6,10 +6,12 @@ describe('ExpensesForm', () => {
   let component: ExpensesForm;
   let fixture: ComponentFixture<ExpensesForm>;
 
-  beforeEach(async () => {
+  beforeEach(async () =>
+    {
     await TestBed.configureTestingModule({
       imports: [ExpensesForm]
     })
+
     .compileComponents();
 
     fixture = TestBed.createComponent(ExpensesForm);
@@ -21,3 +23,9 @@ describe('ExpensesForm', () => {
     expect(component).toBeTruthy();
   });
 });
+
+
+
+
+
+
