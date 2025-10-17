@@ -1,74 +1,22 @@
-/**
- * Tax Estimator Controller
- * Handles API request/response logic for tax estimate operations
- */
+const taxEstimateService = require("./taxestimate.service");
 
-// Import service
-const taxEstimateService = require('./taxestimate.service');
-
-/**
- * Calculate estimated taxes
- */
-const calculateTax = async (req, res) => {
+exports.calculateTax = async (req, res) => {
   try {
     const taxData = req.body;
     const result = await taxEstimateService.calculateTaxEstimate(taxData);
-    return res.status(200).json(result);
-  } catch (error) {
-    console.error('Error in tax calculation:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error calculating tax estimate',
-      error: error.message 
-    });
+    res.status(200).json(result);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error calculating tax estimate" });
   }
 };
 
-/**
- * Save tax estimate for user
- */
-const saveTaxEstimate = async (req, res) => {
+exports.getReminders = async (req, res) => {
   try {
-    const estimateData = req.body;
-    const result = await taxEstimateService.saveTaxEstimate(estimateData);
-    return res.status(201).json({
-      success: true,
-      message: 'Tax estimate saved successfully',
-      data: result
-    });
-  } catch (error) {
-    console.error('Error saving tax estimate:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error saving tax estimate',
-      error: error.message 
-    });
+    const reminders = await taxEstimateService.getTaxReminders();
+    res.status(200).json(reminders);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Error fetching tax reminders" });
   }
-};
-
-/**
- * Get tax estimates for a user
- */
-const getUserTaxEstimates = async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const estimates = await taxEstimateService.getTaxEstimatesByUserId(userId);
-    return res.status(200).json({
-      success: true,
-      data: estimates
-    });
-  } catch (error) {
-    console.error('Error retrieving tax estimates:', error);
-    return res.status(500).json({ 
-      success: false, 
-      message: 'Error retrieving tax estimates',
-      error: error.message 
-    });
-  }
-};
-
-module.exports = {
-  calculateTax,
-  saveTaxEstimate,
-  getUserTaxEstimates
 };

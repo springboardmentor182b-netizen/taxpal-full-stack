@@ -1,51 +1,36 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { TaxService } from '../../services/tax.service'; // ✅ adjust path if needed
 import { Subscription } from 'rxjs';
 import { DarkModeService } from '../../core/services/dark-mode.service';
-import { NavbarComponent } from '../navbar/navbar.component';
-
-interface TaxData {
-  country: string;
-  state: string;
-  status: string;
-  quarter: string;
-  income: number;
-  businessExpenses: number;
-  retirement: number;
-  healthInsurance: number;
-  homeOffice: number;
-}
 
 @Component({
   selector: 'app-tax-estimator',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe, NavbarComponent],
   templateUrl: './tax-estimator.component.html',
-  styleUrls: ['./tax-estimator.component.css']
+  styleUrls: ['./tax-estimator.component.css'],
 })
 export class TaxEstimatorComponent implements OnInit, OnDestroy {
-  taxData: TaxData = {
+  taxData = {
     country: 'United States',
     state: '',
-    status: 'Single',
-    quarter: 'Q2',
+    status: 'single',
+    quarter: 'Q1',
     income: 0,
     businessExpenses: 0,
     retirement: 0,
     healthInsurance: 0,
-    homeOffice: 0
+    homeOffice: 0,
+    userId: '6711abcd1234ef5678901234', // replace with logged-in user ID
   };
 
-  estimatedTax: number | null = null;
-  isDarkMode: boolean = false;
-  private darkModeSubscription: Subscription = new Subscription();
+  estimatedTax: any = null;
+  isDarkMode = false;
+  private darkModeSubscription!: Subscription;
 
-  constructor(private http: HttpClient, private darkModeService: DarkModeService) {}
+  constructor(private taxService: TaxService, private darkModeService: DarkModeService) {}
 
   ngOnInit() {
-    this.darkModeSubscription = this.darkModeService.darkMode$.subscribe(isDark => {
+    this.darkModeSubscription = this.darkModeService.darkMode$.subscribe((isDark) => {
       this.isDarkMode = isDark;
     });
   }
@@ -55,17 +40,14 @@ export class TaxEstimatorComponent implements OnInit, OnDestroy {
   }
 
   calculateTax() {
-    // Later replace this mock with actual API
-    const apiUrl = 'https://api.example.com/calculate-tax';
-
-    // For now, do a local calculation
-    const deductions = this.taxData.businessExpenses + this.taxData.retirement + this.taxData.healthInsurance + this.taxData.homeOffice;
-    const taxable = this.taxData.income - deductions;
-    this.estimatedTax = taxable * 0.15;
-
-    // Example API call for future use
-    // this.http.post(apiUrl, this.taxData).subscribe((res: any) => {
-    //   this.estimatedTax = res.estimatedTax;
-    // });
+    this.taxService.calculateTax(this.taxData).subscribe({
+      next: (res) => {
+        this.estimatedTax = res;
+        console.log('✅ Tax calculated:', res);
+      },
+      error: (err) => {
+        console.error('❌ Tax calculation failed:', err);
+      },
+    });
   }
 }

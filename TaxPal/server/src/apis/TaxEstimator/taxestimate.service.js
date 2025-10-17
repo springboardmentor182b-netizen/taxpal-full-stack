@@ -1,5 +1,5 @@
-const TaxEstimate = require('../../models/TaxEstimate');
-const User = require('../../models/User');
+const TaxEstimate = require("../../../models/TaxEstimate");
+const User = require("../../../models/User");
 
 /**
  * Calculate and save tax estimate based on input data
@@ -13,28 +13,28 @@ const calculateTaxEstimate = async (taxData) => {
       healthInsurance,
       homeOffice,
       userId,
-      filingStatus
+      filingStatus,
     } = taxData;
 
     // Validate required data
     if (!income || !userId) {
-      throw new Error('Income and user ID are required');
+      throw new Error("Income and user ID are required");
     }
 
     // Calculate deductions
-    const totalDeductions = 
+    const totalDeductions =
       parseFloat(businessExpenses || 0) +
       parseFloat(retirement || 0) +
       parseFloat(healthInsurance || 0) +
       parseFloat(homeOffice || 0);
 
     const taxableIncome = Math.max(0, parseFloat(income) - totalDeductions);
-    
+
     // Calculate tax components
     const taxBreakdown = {
       federalTax: calculateFederalTax(taxableIncome, filingStatus),
       stateTax: calculateStateTax(taxableIncome, taxData.state),
-      selfEmploymentTax: calculateSelfEmploymentTax(taxableIncome)
+      selfEmploymentTax: calculateSelfEmploymentTax(taxableIncome),
     };
 
     const totalTax = Object.values(taxBreakdown).reduce((a, b) => a + b, 0);
@@ -45,7 +45,7 @@ const calculateTaxEstimate = async (taxData) => {
       totalDeductions,
       totalTax,
       effectiveTaxRate,
-      breakdown: taxBreakdown
+      breakdown: taxBreakdown,
     };
   } catch (error) {
     throw new Error(`Tax calculation error: ${error.message}`);
@@ -58,11 +58,11 @@ const calculateTaxEstimate = async (taxData) => {
 const saveTaxEstimate = async (estimateData) => {
   try {
     const { userId, ...data } = estimateData;
-    
+
     // Find user to get additional details
     const user = await User.findById(userId);
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     // Create tax estimate document
@@ -70,7 +70,7 @@ const saveTaxEstimate = async (estimateData) => {
       userId,
       userEmail: user.email,
       ...data,
-      createdAt: new Date()
+      createdAt: new Date(),
     });
 
     // Save to database
@@ -86,13 +86,11 @@ const saveTaxEstimate = async (estimateData) => {
 const getTaxEstimatesByUserId = async (userId) => {
   try {
     if (!userId) {
-      throw new Error('User ID is required');
+      throw new Error("User ID is required");
     }
 
     // Get estimates from database
-    return await TaxEstimate.find({ userId })
-      .sort({ createdAt: -1 })
-      .lean();
+    return await TaxEstimate.find({ userId }).sort({ createdAt: -1 }).lean();
   } catch (error) {
     throw new Error(`Failed to retrieve tax estimates: ${error.message}`);
   }
@@ -101,17 +99,17 @@ const getTaxEstimatesByUserId = async (userId) => {
 /**
  * Helper function to calculate federal tax based on 2023 tax brackets
  */
-const calculateFederalTax = (taxableIncome, filingStatus = 'single') => {
+const calculateFederalTax = (taxableIncome, filingStatus = "single") => {
   const brackets = {
     single: [
-      { threshold: 0, rate: 0.10 },
+      { threshold: 0, rate: 0.1 },
       { threshold: 11000, rate: 0.12 },
       { threshold: 44725, rate: 0.22 },
       { threshold: 95375, rate: 0.24 },
       { threshold: 182100, rate: 0.32 },
       { threshold: 231250, rate: 0.35 },
-      { threshold: 578125, rate: 0.37 }
-    ]
+      { threshold: 578125, rate: 0.37 },
+    ],
   };
 
   let tax = 0;
@@ -120,12 +118,13 @@ const calculateFederalTax = (taxableIncome, filingStatus = 'single') => {
   for (let i = 0; i < applicableBrackets.length; i++) {
     const currentBracket = applicableBrackets[i];
     const nextBracket = applicableBrackets[i + 1];
-    
+
     if (taxableIncome > currentBracket.threshold) {
-      const bracketIncome = nextBracket 
-        ? Math.min(taxableIncome, nextBracket.threshold) - currentBracket.threshold
+      const bracketIncome = nextBracket
+        ? Math.min(taxableIncome, nextBracket.threshold) -
+          currentBracket.threshold
         : taxableIncome - currentBracket.threshold;
-        
+
       tax += bracketIncome * currentBracket.rate;
     }
   }
@@ -133,13 +132,13 @@ const calculateFederalTax = (taxableIncome, filingStatus = 'single') => {
   return tax;
 };
 
-const calculateStateTax = (taxableIncome, state = '') => {
+const calculateStateTax = (taxableIncome, state = "") => {
   // Implementation would vary by state
   // This is a simplified example using a flat rate
   const stateRates = {
-    'CA': 0.093,
-    'NY': 0.085,
-    'TX': 0,
+    CA: 0.093,
+    NY: 0.085,
+    TX: 0,
     // Add more states as needed
   };
 
@@ -152,7 +151,8 @@ const calculateSelfEmploymentTax = (taxableIncome) => {
   const medicareRate = 0.029; // 2.9%
   const socialSecurityWageCap = 160200; // 2023 limit
 
-  const socialSecurityTax = Math.min(taxableIncome, socialSecurityWageCap) * socialSecurityRate;
+  const socialSecurityTax =
+    Math.min(taxableIncome, socialSecurityWageCap) * socialSecurityRate;
   const medicareTax = taxableIncome * medicareRate;
 
   return socialSecurityTax + medicareTax;
@@ -161,5 +161,5 @@ const calculateSelfEmploymentTax = (taxableIncome) => {
 module.exports = {
   calculateTaxEstimate,
   saveTaxEstimate,
-  getTaxEstimatesByUserId
+  getTaxEstimatesByUserId,
 };
