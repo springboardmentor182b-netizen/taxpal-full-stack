@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { environment } from '../../../environments/environment';
 
 interface TaxData {
   country: string;
@@ -15,10 +16,20 @@ interface TaxData {
   homeOffice: number;
 }
 
+interface TaxEstimateResponse {
+  taxableIncome: number;
+  estimatedTax: number;
+  effectiveTaxRate: number;
+  breakdown?: {
+    federalIncomeTax: number;
+    selfEmploymentTax: number;
+  };
+}
+
 @Component({
   selector: 'app-tax-estimator',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe],
+  imports: [CommonModule, FormsModule, CurrencyPipe, HttpClientModule],
   templateUrl: './tax-estimator.component.html',
   styleUrls: ['./tax-estimator.component.css']
 })
@@ -36,21 +47,124 @@ export class TaxEstimatorComponent {
   };
 
   estimatedTax: number | null = null;
+  taxableIncome: number | null = null;
+  effectiveRate: number | null = null;
+  loading = false;
+  errorMessage = '';
+  successMessage = '';
+  
+  private apiUrl = environment.apiUrl || '/api';
+  
+  // User data
+  userId = '';
+  userEmail = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    // Get user info from localStorage
+    this.userId = localStorage.getItem('user_id') || '';
+    this.userEmail = localStorage.getItem('user_email') || '';
+  }
 
   calculateTax() {
-    // Later replace this mock with actual API
-    const apiUrl = 'https://api.example.com/calculate-tax';
+    this.loading = true;
+    this.errorMessage = '';
+    this.successMessage = '';
 
-    // For now, do a local calculation
-    const deductions = this.taxData.businessExpenses + this.taxData.retirement + this.taxData.healthInsurance + this.taxData.homeOffice;
-    const taxable = this.taxData.income - deductions;
-    this.estimatedTax = taxable * 0.15;
+    // Prepare request data
+    const requestData = {
+      country: this.taxData.country,
+      state: this.taxData.state,
+      status: this.taxData.status,
+      quarter: this.taxData.quarter,
+      income: this.taxData.income,
+      businessExpenses: this.taxData.businessExpenses,
+      retirement: this.taxData.retirement,
+      healthInsurance: this.taxData.healthInsurance,
+      homeOffice: this.taxData.homeOffice,
+      userId: this.userId,
+      userEmail: this.userEmail
+    };
 
-    // Example API call for future use
-    // this.http.post(apiUrl, this.taxData).subscribe((res: any) => {
-    //   this.estimatedTax = res.estimatedTax;
-    // });
+    console.log('Sending tax calculation request:', requestData);
+
+    // Call the API endpoint
+    this.http.post<TaxEstimateResponse>(`${this.apiUrl}/tax-estimator/calculate`, requestData)
+      .subscribe({
+        next: (response) => {
+          console.log('Tax calculation response:', response);
+          
+          if (response) {
+            this.taxableIncome = response.taxableIncome;
+            this.estimatedTax = response.estimatedTax;
+            this.effectiveRate = response.effectiveTaxRate;
+            this.successMessage = 'Tax calculation successful!';
+            
+            // Automatically save to database after calculation
+            this.autoSaveTaxEstimate(response);
+          }
+          
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error calculating tax:', error);
+          this.errorMessage = error.error?.message || 'Failed to calculate taxes. Please try again.';
+          this.loading = false;
+        }
+      });
+  }
+
+  autoSaveTaxEstimate(calculationResponse: TaxEstimateResponse) {
+    if (!this.userEmail) {
+      console.log('No user email, skipping auto-save');
+      return;
+    }
+
+    const saveData = {
+      userId: this.userId,
+      userEmail: this.userEmail,
+      country: this.taxData.country,
+      state: this.taxData.state,
+      status: this.taxData.status,
+      quarter: this.taxData.quarter,
+      income: this.taxData.income,
+      businessExpenses: this.taxData.businessExpenses,
+      retirement: this.taxData.retirement,
+      healthInsurance: this.taxData.healthInsurance,
+      homeOffice: this.taxData.homeOffice,
+      taxableIncome: calculationResponse.taxableIncome,
+      estimatedTax: calculationResponse.estimatedTax,
+      effectiveRate: calculationResponse.effectiveTaxRate
+    };
+
+    console.log('Auto-saving tax estimate:', saveData);
+
+    this.http.post(`${this.apiUrl}/tax-estimator/save`, saveData)
+      .subscribe({
+        next: (response) => {
+          console.log('Tax estimate auto-saved:', response);
+        },
+        error: (error) => {
+          console.error('Error auto-saving tax estimate:', error);
+        }
+      });
+  }
+
+  resetForm() {
+    this.taxData = {
+      country: 'United States',
+      state: '',
+      status: 'Single',
+      quarter: 'Q2',
+      income: 0,
+      businessExpenses: 0,
+      retirement: 0,
+      healthInsurance: 0,
+      homeOffice: 0
+    };
+    this.estimatedTax = null;
+    this.taxableIncome = null;
+    this.effectiveRate = null;
+    this.errorMessage = '';
+    this.successMessage = '';
   }
 }
