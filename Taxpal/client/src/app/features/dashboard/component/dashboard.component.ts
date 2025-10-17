@@ -181,11 +181,6 @@ onDeleteAllRecent() {
   });
 }
 
-  goToTaxCalendar(ev: Event) {
-    ev.preventDefault();
-    this.router.navigate(['/tax-calendar']);
-  }
-
   openIncome()  { this.showIncome = true;  this.showExpense = false; this.showBudget = false; }
   openExpense() { this.showExpense = true; this.showIncome  = false; this.showBudget = false; }
   closeIncome() { this.showIncome = false; }

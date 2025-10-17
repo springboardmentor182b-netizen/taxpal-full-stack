@@ -12,7 +12,7 @@
       </a>
 
       <!-- Transactions -->
-      <a href="#">
+      <a routerLink="/transactions">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z" fill="currentColor" opacity=".25"/>
           <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor"/>
@@ -21,8 +21,8 @@
         <span>Transactions</span>
       </a>
 
-      <!-- Tax Estimator (same tab) -->
-      <a href="" (click)="goToTaxCalendar($event)">
+      <!-- Tax Estimator (same tab → open Tax Calendar first) -->
+      <a routerLink="/tax-calendar" >
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
           <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
@@ -42,7 +42,7 @@
       </a>
 
       <!-- Reports -->
-      <a href="#">
+      <a routerLink="/reports">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
           <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
@@ -149,92 +149,94 @@
 
   <!-- Recent Transactions -->
   <section class="recent-card">
-  <div class="recent-header">
-    <h3>Recent Transactions</h3>
+    <div class="recent-header">
+      <h3>Recent Transactions</h3>
 
-    <!-- Delete All -->
-    <div class="btn-row">
-      <button class="btn-view-all" (click)="onDeleteAllRecent()">
-        Delete All
-      </button>
+      <!-- Delete All -->
+      <div class="btn-row">
+        <button class="btn-view-all" (click)="onDeleteAllRecent()">
+          Delete All
+        </button>
+      </div>
+    </div>
+
+    <div class="recent-table-wrap">
+      <table class="recent-table">
+        <colgroup>
+          <col style="width:18%">
+          <col style="width:28%">
+          <col style="width:18%">
+          <col style="width:16%">
+          <col style="width:100px">
+          <col style="width:120px"> <!-- actions -->
+        </colgroup>
+
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th class="text-right">Amount</th>
+            <th>Type</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+
+        <tbody *ngIf="recent?.length; else emptyRecent">
+          <tr *ngFor="let tx of recent; trackBy: trackByTx">
+            <td>{{ tx.date | date:'MMM d, y' }}</td>
+            <td>{{ tx.description }}</td>
+            <td>{{ tx.category }}</td>
+            <td class="text-right" [ngClass]="tx.type === 'income' ? 'amt-green' : 'amt-red'">
+              <ng-container *ngIf="tx.type === 'income'">+ ${{ tx.amount | number:'1.2-2' }}</ng-container>
+              <ng-container *ngIf="tx.type === 'expense'">- ${{ tx.amount | number:'1.2-2' }}</ng-container>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="tx.type === 'income' ? 'badge-credit' : 'badge-debit'">
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                  <path *ngIf="tx.type === 'income'"  d="M12 4l6 6h-4v6h-4v-6H6z" fill="currentColor"></path>
+                  <path *ngIf="tx.type === 'expense'" d="M12 20l-6-6h4V8h4v6h4z" fill="currentColor"></path>
+                </svg>
+                {{ tx.type === 'income' ? 'Credited' : 'Debited' }}
+              </span>
+            </td>
+            <td>
+              <button type="button" class="btn-danger"
+                      [disabled]="!tx._id"
+                      (click)="onDeleteRecent(tx)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <ng-template #emptyRecent>
+        <div class="recent-empty">
+          No transactions yet. Add your first income or expense to see it here.
+        </div>
+      </ng-template>
+    </div>
+  </section>
+
+  <!-- Budget Modal -->
+  <div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
+  <div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-budgets-list></app-budgets-list>
     </div>
   </div>
 
-  <div class="recent-table-wrap">
-    <table class="recent-table">
-      <colgroup>
-        <col style="width:18%">
-        <col style="width:28%">
-        <col style="width:18%">
-        <col style="width:16%">
-        <col style="width:100px">
-        <col style="width:120px"> <!-- actions -->
-      </colgroup>
+  <app-income-modal
+    [isOpen]="showIncome"
+    (closeModal)="closeIncome()
+"
+    (save)="onIncomeSave($event)">
+  </app-income-modal>
 
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Description</th>
-          <th>Category</th>
-          <th class="text-right">Amount</th>
-          <th>Type</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-
-      <tbody *ngIf="recent?.length; else emptyRecent">
-        <tr *ngFor="let tx of recent; trackBy: trackByTx">
-          <td>{{ tx.date | date:'MMM d, y' }}</td>
-          <td>{{ tx.description }}</td>
-          <td>{{ tx.category }}</td>
-          <td class="text-right" [ngClass]="tx.type === 'income' ? 'amt-green' : 'amt-red'">
-            <ng-container *ngIf="tx.type === 'income'">+ ${{ tx.amount | number:'1.2-2' }}</ng-container>
-            <ng-container *ngIf="tx.type === 'expense'">- ${{ tx.amount | number:'1.2-2' }}</ng-container>
-          </td>
-          <td>
-            <span class="badge" [ngClass]="tx.type === 'income' ? 'badge-credit' : 'badge-debit'">
-              <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                <path *ngIf="tx.type === 'income'"  d="M12 4l6 6h-4v6h-4v-6H6z" fill="currentColor"></path>
-                <path *ngIf="tx.type === 'expense'" d="M12 20l-6-6h4V8h4v6h4z" fill="currentColor"></path>
-              </svg>
-              {{ tx.type === 'income' ? 'Credited' : 'Debited' }}
-            </span>
-          </td>
-          <td>
-            <button type="button" class="btn-danger"
-                    [disabled]="!tx._id"
-                    (click)="onDeleteRecent(tx)">
-              Delete
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <ng-template #emptyRecent>
-      <div class="recent-empty">
-        No transactions yet. Add your first income or expense to see it here.
-      </div>
-    </ng-template>
-  </div>
-</section>
-
-<!-- Budget Modal -->
-<div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
-<div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <app-budgets-list></app-budgets-list>
-  </div>
+  <app-expense-modal
+    [isOpen]="showExpense"
+    (closeModal)="closeExpense()"
+    (save)="onExpenseSave($event)">
+  </app-expense-modal>
 </div>
-
-<app-income-modal
-  [isOpen]="showIncome"
-  (closeModal)="closeIncome()"
-  (save)="onIncomeSave($event)">
-</app-income-modal>
-
-<app-expense-modal
-  [isOpen]="showExpense"
-  (closeModal)="closeExpense()"
-  (save)="onExpenseSave($event)">
-</app-expense-modal>

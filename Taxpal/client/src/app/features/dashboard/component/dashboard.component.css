@@ -36,6 +36,7 @@
   font-size: 16px;
   border-radius: 8px;           /* nicer hover */
 }
+
 .menu a:hover {
   background: #534CA4;
   color: #FBFBFB;
