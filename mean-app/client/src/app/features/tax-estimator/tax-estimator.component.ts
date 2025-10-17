@@ -20,7 +20,7 @@ interface EstimatedTaxData {
   standalone: true,
   imports: [CommonModule, FormsModule, CurrencyPipe],
   templateUrl: './tax-estimator.component.html',
-  styleUrls: ['./tax-estimator.component.css']
+  styleUrls: ['./tax-estimator.component.scss']
 })
 export class TaxEstimatorComponent {
   taxInputs = signal<TaxInputs>({
@@ -34,12 +34,45 @@ export class TaxEstimatorComponent {
   isCalculating = signal(false);
   errorMessage = signal('');
 
-  quarters = [
-    { name: 'Q1', range: 'Jan – Mar 2025', dueDate: 'April 15, 2025' },
-    { name: 'Q2', range: 'Apr – Jun 2025', dueDate: 'June 15, 2025' },
-    { name: 'Q3', range: 'Jul – Sep 2025', dueDate: 'September 15, 2025' },
-    { name: 'Q4', range: 'Oct – Dec 2025', dueDate: 'January 15, 2026' }
-  ];
+  // ✅ Dynamically generated rolling quarters from today's date
+  quarters = this.generateRollingQuarters();
+
+  /** ✅ Function to generate 4 rolling quarters starting from today */
+  private generateRollingQuarters() {
+    const today = new Date();
+    const quarters = [];
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    for (let i = 0; i < 4; i++) {
+      const startMonth = (today.getMonth() + i * 3) % 12;
+      const startYear = today.getFullYear() + Math.floor((today.getMonth() + i * 3) / 12);
+
+      const endMonth = (startMonth + 2) % 12;
+      const endYear = startYear + Math.floor((startMonth + 2) / 12);
+
+      // Create range like "Oct – Dec 2025" or "Nov 2025 – Jan 2026"
+      const range =
+        startYear === endYear
+          ? ${monthNames[startMonth]} – ${monthNames[endMonth]} ${startYear}
+          : ${monthNames[startMonth]} ${startYear} – ${monthNames[endMonth]} ${endYear};
+
+      // Due date → 15th of the next month after quarter end
+      const dueDate = new Date(endYear, endMonth + 1, 15);
+      const dueDateStr = dueDate.toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      });
+
+      quarters.push({
+        name: Q${i + 1},
+        range,
+        dueDate: dueDateStr
+      });
+    }
+
+    return quarters;
+  }
 
   private async fetchWithRetry(url: string, options: RequestInit, maxRetries = 5): Promise<any> {
     for (let attempt = 0; attempt < maxRetries; attempt++) {
@@ -47,7 +80,7 @@ export class TaxEstimatorComponent {
         const response = await fetch(url, options);
         if (!response.ok) {
           const errorBody = await response.json().catch(() => ({ message: 'Unknown server error' }));
-          throw new Error(errorBody.message || `HTTP ${response.status}`);
+          throw new Error(errorBody.message || HTTP ${response.status});
         }
         return await response.json();
       } catch (error: any) {
@@ -86,7 +119,7 @@ export class TaxEstimatorComponent {
 
       this.estimatedTaxData.set(result);
     } catch (error: any) {
-      this.errorMessage.set(`Calculation failed: ${error.message}`);
+      this.errorMessage.set(Calculation failed: ${error.message});
     } finally {
       this.isCalculating.set(false);
     }
