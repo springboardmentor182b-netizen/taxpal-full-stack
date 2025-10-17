@@ -9,3 +9,14 @@ export interface TaxOutput {
   taxAmount: number;
   effectiveTaxRate: number;
 }
+
+export interface TaxCalendarInput {
+  title: string;
+  dueDate: Date;
+  description?: string;
+}
+
+export interface TaxCalendarOutput extends TaxCalendarInput {
+  _id: string;
+  createdAt: Date;
+}
