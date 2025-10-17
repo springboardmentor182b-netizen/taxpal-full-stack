@@ -98,7 +98,7 @@ export class SignInFormComponent implements OnInit, OnDestroy {
     this.successMsg = '';
 
     try {
-      const res: any = await this.http.post('/api/users/signin', {
+      const res: any = await this.http.post('/api/auth/login', {
         email: this.email,
         password: this.password
       }).toPromise();

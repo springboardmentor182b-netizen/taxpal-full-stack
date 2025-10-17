@@ -4,6 +4,8 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
 import { ProfileSettingsComponent } from './components/profile-settings/profile-settings.component';
 import { TaxEstimatorComponent } from './components/Tax-Estimator/tax-estimator.component';
 import { TaxCalendarComponent } from './components/Tax-Calendar/tax-calendar.component';
+import { FinancialReportComponent } from './features/financial-report/financial-report.component';
+import { AuthGuard } from './core/guards/auth.guard';
 
 // Define the routes
 export const routes: Routes = [
@@ -20,13 +22,13 @@ export const routes: Routes = [
       import('./components/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
   { path: 'user-profile', component: UserProfileComponent },
-  { path: 'transactions', component: UserProfileComponent },
+  { path: 'transactions', loadComponent: () => import('./components/dashboard/dashboard.component').then((m) => m.DashboardComponent) },
   {
     path: 'budget',
     loadComponent: () =>
       import('./components/budget/budget.component').then((m) => m.BudgetComponent),
   },
-  { path: 'reports', component: UserProfileComponent },
+  { path: 'reports', component: FinancialReportComponent, canActivate: [AuthGuard] },
 
   // Tax Estimator route
   {
@@ -47,6 +49,13 @@ export const routes: Routes = [
     path: 'profile-settings',
     component: ProfileSettingsComponent,
     title: 'Profile Settings - TaxPal',
+  },
+
+  // Financial Report route
+  {
+    path: 'financial-report',
+    component: FinancialReportComponent,
+    canActivate: [AuthGuard],
   },
 
   // Redirect to home for any unknown routes

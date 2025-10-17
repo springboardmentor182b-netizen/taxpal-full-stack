@@ -11,7 +11,7 @@ interface Category {
 
 interface CategoryResponse extends Category {
   userId: string;
-  userName?: string;  // Add userName field
+  userName?: string; // Add userName field
   type: 'income' | 'expense';
   color?: string;
 }
@@ -21,16 +21,16 @@ interface CategoryResponse extends Category {
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './categories.component.html',
-  styleUrls: ['./categories.component.css']
+  styleUrls: ['./categories.component.css'],
 })
 export class CategoriesComponent implements OnInit {
   // Categories
   incomeCategories: Category[] = [];
   expenseCategories: Category[] = [];
-  
+
   // API base URL
   private apiUrl = environment.apiUrl || '/api';
-  
+
   // Loading and message states
   loading = false;
   successMsg = '';
@@ -45,9 +45,9 @@ export class CategoriesComponent implements OnInit {
     '#8b5cf6', // violet
     '#ec4899', // pink
     '#14b8a6', // teal
-    '#f97316'  // orange
+    '#f97316', // orange
   ];
-  
+
   // Category suggestions
   incomeCategorySuggestions = [
     'Salary',
@@ -59,7 +59,7 @@ export class CategoriesComponent implements OnInit {
     'Client Payments',
     'Commissions',
     'Royalties',
-    'Side Gig'
+    'Side Gig',
   ];
 
   expenseCategorySuggestions = [
@@ -74,34 +74,34 @@ export class CategoriesComponent implements OnInit {
     'Marketing',
     'Travel',
     'Professional Fees',
-    'Equipment'
+    'Equipment',
   ];
 
   constructor(private http: HttpClient) {}
-  
+
   ngOnInit() {
     this.loadCategories();
   }
-  
+
   loadCategories() {
     // Reset messages
     this.successMsg = '';
     this.errorMsg = '';
-    
+
     // Get user ID and email from localStorage
     const userId = localStorage.getItem('user_id');
     const userEmail = localStorage.getItem('user_email');
-    
+
     if (!userId && !userEmail) {
       this.errorMsg = 'User information not found. Please sign in again.';
       // Load from localStorage as fallback
       this.loadCategoriesFromLocalStorage();
       return;
     }
-    
+
     // Set loading state
     this.loading = true;
-    
+
     // Try first with userId, then with email if userId fails
     if (userId) {
       this.loadCategoriesByUserId(userId);
@@ -126,23 +126,25 @@ export class CategoriesComponent implements OnInit {
           this.loadCategoriesFromLocalStorage();
           this.loading = false;
         }
-      }
+      },
     });
   }
 
   loadCategoriesByEmail(email: string) {
     // Use a workaround to handle the route conflict between /categories/:userId and /categories/email/:email
     // By using a custom prefix for email endpoint
-    this.http.get(`${this.apiUrl}/users/categories-by-email/${encodeURIComponent(email)}`).subscribe({
-      next: (response: any) => {
-        this.processCategoriesResponse(response);
-      },
-      error: (error) => {
-        console.log('Failed to load categories from API, falling back to localStorage', error);
-        this.loadCategoriesFromLocalStorage();
-        this.loading = false;
-      }
-    });
+    this.http
+      .get(`${this.apiUrl}/users/categories-by-email/${encodeURIComponent(email)}`)
+      .subscribe({
+        next: (response: any) => {
+          this.processCategoriesResponse(response);
+        },
+        error: (error) => {
+          console.log('Failed to load categories from API, falling back to localStorage', error);
+          this.loadCategoriesFromLocalStorage();
+          this.loading = false;
+        },
+      });
   }
 
   processCategoriesResponse(response: any) {
@@ -152,16 +154,16 @@ export class CategoriesComponent implements OnInit {
         .filter((cat: CategoryResponse) => cat.type === 'income')
         .map((cat: CategoryResponse) => ({
           name: cat.name,
-          _id: cat._id
+          _id: cat._id,
         }));
-        
+
       this.expenseCategories = response
         .filter((cat: CategoryResponse) => cat.type === 'expense')
         .map((cat: CategoryResponse) => ({
           name: cat.name,
-          _id: cat._id
+          _id: cat._id,
         }));
-        
+
       // Save to localStorage as backup
       localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
       localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
@@ -171,29 +173,43 @@ export class CategoriesComponent implements OnInit {
     }
     this.loading = false;
   }
-  
+
   loadCategoriesFromLocalStorage() {
     const savedIncomeCategories = localStorage.getItem('income_categories');
     const savedExpenseCategories = localStorage.getItem('expense_categories');
-    
+
     // Initialize with empty arrays if nothing found in localStorage
     this.incomeCategories = savedIncomeCategories ? JSON.parse(savedIncomeCategories) : [];
     this.expenseCategories = savedExpenseCategories ? JSON.parse(savedExpenseCategories) : [];
   }
-  
+
   getCategoryColor(index: number, type: 'income' | 'expense'): string {
     // Get a consistent color based on the index
     return this.categoryColors[index % this.categoryColors.length];
   }
-  
+
   addCategory(type: 'income' | 'expense') {
+    const newCategory = { name: '' }; // Start with empty name instead of "New Category"
+
     if (type === 'income') {
-      this.incomeCategories.push({ name: 'New Category' });
+      this.incomeCategories.push(newCategory);
     } else {
-      this.expenseCategories.push({ name: 'New Category' });
+      this.expenseCategories.push(newCategory);
     }
+
+    // Focus on the newly added category input
+    setTimeout(() => {
+      const containers = document.querySelectorAll(`.${type}-categories .category-item`);
+      if (containers.length > 0) {
+        const lastContainer = containers[containers.length - 1];
+        const input = lastContainer.querySelector('input');
+        if (input) {
+          input.focus();
+        }
+      }
+    }, 50);
   }
-  
+
   removeCategory(index: number, type: 'income' | 'expense') {
     if (type === 'income') {
       this.incomeCategories.splice(index, 1);
@@ -201,86 +217,170 @@ export class CategoriesComponent implements OnInit {
       this.expenseCategories.splice(index, 1);
     }
   }
-  
+
   saveCategories() {
     // Reset messages
     this.successMsg = '';
     this.errorMsg = '';
-    
+
+    // Check for empty category names
+    const emptyIncomeCategories = this.incomeCategories.filter((cat) => !cat.name || cat.name.trim() === '');
+    const emptyExpenseCategories = this.expenseCategories.filter((cat) => !cat.name || cat.name.trim() === '');
+
+    // If there are any empty categories, show error and mark those categories
+    if (emptyIncomeCategories.length > 0 || emptyExpenseCategories.length > 0) {
+      this.errorMsg = 'Category name is required. Please provide name for the entered category.';
+
+      // Highlight the empty categories with a CSS class for visual feedback
+      setTimeout(() => {
+        const emptyInputs = document.querySelectorAll(
+          '.category-name input:not([value]), .category-name input[value=""]'
+        );
+        emptyInputs.forEach((input) => {
+          input.classList.add('input-error');
+
+          // Add event listener to remove the error class when the user starts typing
+          input.addEventListener(
+            'input',
+            function(this: HTMLInputElement) {
+              this.classList.remove('input-error');
+            },
+            { once: true }
+          );
+        });
+      }, 100);
+
+      return; // Prevent form submission
+    }
+
+    // Check for duplicate categories before saving
+    const incomeDuplicates = this.findDuplicateCategories(this.incomeCategories);
+    const expenseDuplicates = this.findDuplicateCategories(this.expenseCategories);
+
+    if (incomeDuplicates.length > 0 || expenseDuplicates.length > 0) {
+      let errorMessage = 'Duplicate categories found: ';
+      if (incomeDuplicates.length > 0) {
+        errorMessage += `Income - ${incomeDuplicates.join(', ')}`;
+      }
+      if (expenseDuplicates.length > 0) {
+        errorMessage += `${
+          incomeDuplicates.length > 0 ? '; ' : ''
+        }Expense - ${expenseDuplicates.join(', ')}`;
+      }
+
+      this.errorMsg = errorMessage;
+      this.loading = false;
+      return;
+    }
+
     // Start loading state
     this.loading = true;
-    
-    // Filter out empty category names
-    this.incomeCategories = this.incomeCategories.filter(cat => cat.name.trim() !== '');
-    this.expenseCategories = this.expenseCategories.filter(cat => cat.name.trim() !== '');
-    
+
+    // Filter out "New Category" default names but keep all valid names now that we've checked
+    this.incomeCategories = this.incomeCategories.filter(
+      (cat) => cat.name.trim().toLowerCase() !== 'new category'
+    );
+    this.expenseCategories = this.expenseCategories.filter(
+      (cat) => cat.name.trim().toLowerCase() !== 'new category'
+    );
+
     // Get user ID and name from localStorage
     const userId = localStorage.getItem('user_id');
     const userName = localStorage.getItem('user_name') || 'User';
-    
+
     if (!userId) {
       this.errorMsg = 'User ID not found. Please sign in again.';
       this.loading = false;
       return;
     }
-    
+
     // Save to localStorage as backup
     localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
     localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
-    
+
     // Prepare all categories for the API with current user's ID and name
     const allCategories = [
       ...this.incomeCategories.map((cat, index) => ({
         userId,
-        userName,  // Include the user's name
+        userName,
         name: cat.name,
         type: 'income',
         color: this.getCategoryColor(index, 'income'),
-        _id: cat._id
+        _id: cat._id,
       })),
       ...this.expenseCategories.map((cat, index) => ({
         userId,
-        userName,  // Include the user's name
+        userName,
         name: cat.name,
         type: 'expense',
         color: this.getCategoryColor(index, 'expense'),
-        _id: cat._id
-      }))
+        _id: cat._id,
+      })),
     ];
-    
-    // Save to MongoDB via API - use the correct endpoint path
-    this.http.post(`${this.apiUrl}/users/categories/batch`, { categories: allCategories }).subscribe({
-      next: (response: any) => {
-        this.successMsg = 'Categories saved successfully!';
-        
-        // Update local categories with the ones from the server (with IDs)
-        if (response.categories) {
-          this.incomeCategories = response.categories
-            .filter((cat: CategoryResponse) => cat.type === 'income')
-            .map((cat: CategoryResponse) => ({
-              name: cat.name,
-              _id: cat._id
-            }));
-            
-          this.expenseCategories = response.categories
-            .filter((cat: CategoryResponse) => cat.type === 'expense')
-            .map((cat: CategoryResponse) => ({
-              name: cat.name,
-              _id: cat._id
-            }));
-            
-          // Update localStorage with updated data
-          localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
-          localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
-        }
-        
-        this.loading = false;
-      },
-      error: (error) => {
-        this.errorMsg = error.error?.message || 'Failed to save categories';
-        this.loading = false;
+
+    // Save to MongoDB via API
+    this.http
+      .post(`${this.apiUrl}/users/categories/batch`, { categories: allCategories })
+      .subscribe({
+        next: (response: any) => {
+          this.successMsg = 'Categories saved successfully!';
+
+          // Update local categories with the ones from the server (with IDs)
+          if (response.categories) {
+            this.incomeCategories = response.categories
+              .filter((cat: CategoryResponse) => cat.type === 'income')
+              .map((cat: CategoryResponse) => ({
+                name: cat.name,
+                _id: cat._id,
+              }));
+
+            this.expenseCategories = response.categories
+              .filter((cat: CategoryResponse) => cat.type === 'expense')
+              .map((cat: CategoryResponse) => ({
+                name: cat.name,
+                _id: cat._id,
+              }));
+
+            // Update localStorage with updated data
+            localStorage.setItem('income_categories', JSON.stringify(this.incomeCategories));
+            localStorage.setItem('expense_categories', JSON.stringify(this.expenseCategories));
+          }
+
+          this.loading = false;
+        },
+        error: (error) => {
+          // Improved error handling for duplicate categories
+          if (
+            error.error?.code === 11000 ||
+            error.error?.message?.includes('duplicate') ||
+            error.error?.message?.includes('already exists')
+          ) {
+            this.errorMsg =
+              'Duplicate category names are not allowed. Please use unique names for each category.';
+          } else {
+            this.errorMsg = error.error?.message || 'Failed to save categories';
+          }
+          this.loading = false;
+        },
+      });
+  }
+
+  // Add this helper method to find duplicate categories
+  findDuplicateCategories(categories: Category[]): string[] {
+    const names = categories.map((cat) => cat.name.trim().toLowerCase());
+    const uniqueNames = new Set<string>();
+    const duplicates = new Set<string>();
+
+    for (const name of names) {
+      if (name === '') continue; // Skip empty names
+      if (uniqueNames.has(name)) {
+        duplicates.add(name);
+      } else {
+        uniqueNames.add(name);
       }
-    });
+    }
+
+    return Array.from(duplicates);
   }
 
   /**
@@ -289,9 +389,9 @@ export class CategoriesComponent implements OnInit {
   addSuggestedCategory(type: 'income' | 'expense', name: string) {
     // Check if category already exists
     if (type === 'income') {
-      if (!this.incomeCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+      if (!this.incomeCategories.some((cat) => cat.name.toLowerCase() === name.toLowerCase())) {
         this.incomeCategories.push({ name });
-        
+
         // Animate the newly added item
         setTimeout(() => {
           const elements = document.querySelectorAll('.income-categories .category-item');
@@ -304,7 +404,7 @@ export class CategoriesComponent implements OnInit {
       } else {
         // Highlight the existing category
         const index = this.incomeCategories.findIndex(
-          cat => cat.name.toLowerCase() === name.toLowerCase()
+          (cat) => cat.name.toLowerCase() === name.toLowerCase()
         );
         if (index >= 0) {
           setTimeout(() => {
@@ -318,9 +418,9 @@ export class CategoriesComponent implements OnInit {
         }
       }
     } else {
-      if (!this.expenseCategories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+      if (!this.expenseCategories.some((cat) => cat.name.toLowerCase() === name.toLowerCase())) {
         this.expenseCategories.push({ name });
-        
+
         // Animate the newly added item
         setTimeout(() => {
           const elements = document.querySelectorAll('.expense-categories .category-item');
@@ -333,7 +433,7 @@ export class CategoriesComponent implements OnInit {
       } else {
         // Highlight the existing category
         const index = this.expenseCategories.findIndex(
-          cat => cat.name.toLowerCase() === name.toLowerCase()
+          (cat) => cat.name.toLowerCase() === name.toLowerCase()
         );
         if (index >= 0) {
           setTimeout(() => {

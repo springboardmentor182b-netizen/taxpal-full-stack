@@ -1,9 +1,14 @@
 const express = require('express');
 const cors = require('cors');
-require('dotenv').config();
+const dotenv = require('dotenv');
 const connectDB = require('./db');
 
+// Load environment variables first
+dotenv.config();
+
 const app = express();
+
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +36,7 @@ console.log('  - /api/tax-estimator');
 
 // Root route
 app.get('/', (req, res) => {
-  res.send('TaxPal API is running');
+  res.send('✅ TaxPal API is running...');
 });
 
 // Error handling middleware
@@ -46,7 +51,7 @@ app.use((err, req, res, next) => {
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
   console.log(`✓ API endpoints available:`);
   console.log(`  - POST http://localhost:${PORT}/api/tax-estimator/calculate`);
   console.log(`  - POST http://localhost:${PORT}/api/tax-estimator/save`);

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../user/user.model');
 
 class UserService {
@@ -8,10 +9,11 @@ class UserService {
             throw new Error('Email already registered');
         }
 
+        const passwordHash = await bcrypt.hash(password, 10);
         const newUser = new User({
             name,
             email,
-            passwordHash: password, // map "password" from request to "passwordHash"
+            passwordHash,
             country
         });
 
@@ -25,7 +27,8 @@ class UserService {
             throw new Error('Invalid email or password');
         }
 
-        if (password !== user.passwordHash) { // compare with passwordHash
+        const valid = await bcrypt.compare(password, user.passwordHash);
+        if (!valid) {
             throw new Error('Invalid email or password');
         }
 
@@ -35,7 +38,10 @@ class UserService {
             { expiresIn: '1h' }
         );
 
-        return { token };
+        return {
+            token,
+            user: { id: user._id, name: user.name, email: user.email }
+        };
     }
 }
 
