@@ -11,7 +11,7 @@ export interface Transaction {
   type: 'income' | 'expense';
   category: string;
   amount: number;
-  date: Date;               // <-- Date for the app
+  date: Date;               // App uses Date
   description?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -40,7 +40,6 @@ export interface TransactionFilters {
   category?: string;
   startDate?: string; // ISO yyyy-mm-dd
   endDate?: string;   // ISO yyyy-mm-dd
-  // optional forward-compat sorting if your API supports it
   sortBy?: 'date' | 'createdAt' | 'amount';
   sortDir?: 'asc' | 'desc';
 }
@@ -59,9 +58,9 @@ export interface TransactionResponse {
 
 // ===== DTOs (wire format from/to API)
 type TransactionDTO = Omit<Transaction, 'date' | 'createdAt' | 'updatedAt'> & {
-  date: string;       // ISO
-  createdAt: string;  // ISO
-  updatedAt: string;  // ISO
+  date: string;
+  createdAt: string;
+  updatedAt: string;
 };
 interface TransactionResponseDTO extends Omit<TransactionResponse, 'transactions'> {
   transactions: TransactionDTO[];
@@ -69,7 +68,16 @@ interface TransactionResponseDTO extends Omit<TransactionResponse, 'transactions
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
-  private readonly API = `${environment.API_URL}/transactions`;
+  /**
+   * We expect environment.API_URL to be '/api/v1' in dev (proxied) and
+   * the full origin in prod. Fall back to '/api/v1' if missing.
+   */
+  private readonly BASE =
+    (environment as any)?.API_URL && typeof (environment as any).API_URL === 'string'
+      ? (environment as any).API_URL
+      : '/api/v1';
+
+  private readonly API = `${this.BASE}/transactions`;
 
   constructor(private http: HttpClient) {}
 
@@ -78,6 +86,7 @@ export class TransactionService {
     if (!d) return undefined;
     return typeof d === 'string' ? d : d.toISOString();
   }
+
   private fromDTO(t: TransactionDTO): Transaction {
     return {
       ...t,
@@ -86,6 +95,7 @@ export class TransactionService {
       updatedAt: new Date(t.updatedAt),
     };
   }
+
   private buildParams(filters?: TransactionFilters): HttpParams {
     let params = new HttpParams();
     if (!filters) return params;
@@ -108,40 +118,52 @@ export class TransactionService {
 
   /** Convenience for dashboard “Recent Transactions” */
   getRecentTransactions(limit = 8): Observable<Transaction[]> {
-    // Request first page with limit; also sort by date desc if your API supports it
     const params: TransactionFilters = { page: 1, limit, sortBy: 'date', sortDir: 'desc' };
     return this.getTransactions(params).pipe(
-      map((r) =>
-        [...r.transactions].sort(
-          (a, b) => b.date.getTime() - a.date.getTime()
-        ).slice(0, limit)
-      )
+      map((r) => [...r.transactions].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, limit))
     );
   }
 
   getTransaction(id: string): Observable<Transaction> {
-    return this.http.get<TransactionDTO>(`${this.API}/${id}`).pipe(map(this.fromDTO.bind(this)));
+    return this.http
+      .get<TransactionDTO>(`${this.API}/${encodeURIComponent(id)}`)
+      .pipe(map(this.fromDTO.bind(this)));
   }
 
   // ---------- Commands ----------
-  createTransaction(payload: CreateTransactionRequest):
-    Observable<{ message: string; transaction: Transaction }> {
+  createTransaction(
+    payload: CreateTransactionRequest
+  ): Observable<{ message: string; transaction: Transaction }> {
     const body = { ...payload, date: this.toISO(payload.date) };
-    return this.http.post<{ message: string; transaction: TransactionDTO }>(this.API, body).pipe(
-      map((res) => ({ message: res.message, transaction: this.fromDTO(res.transaction) }))
-    );
+    return this.http
+      .post<{ message: string; transaction: TransactionDTO }>(this.API, body)
+      .pipe(map((res) => ({ message: res.message, transaction: this.fromDTO(res.transaction) })));
   }
 
-  updateTransaction(id: string, payload: UpdateTransactionRequest):
-    Observable<{ message: string; transaction: Transaction }> {
+  updateTransaction(
+    id: string,
+    payload: UpdateTransactionRequest
+  ): Observable<{ message: string; transaction: Transaction }> {
     const body = { ...payload, date: this.toISO(payload.date) };
-    return this.http.put<{ message: string; transaction: TransactionDTO }>(`${this.API}/${id}`, body).pipe(
-      map((res) => ({ message: res.message, transaction: this.fromDTO(res.transaction) }))
-    );
+    return this.http
+      .put<{ message: string; transaction: TransactionDTO }>(`${this.API}/${encodeURIComponent(id)}`, body)
+      .pipe(map((res) => ({ message: res.message, transaction: this.fromDTO(res.transaction) })));
   }
 
+  /** Delete a single transaction by id */
   deleteTransaction(id: string): Observable<{ message: string }> {
-    return this.http.delete<{ message: string }>(`${this.API}/${id}`);
+    return this.http.delete<{ message: string }>(`${this.API}/${encodeURIComponent(id)}`);
+  }
+
+  /** Alias for components using deleteOne(...) */
+  deleteOne(id: string): Observable<{ message: string }> {
+    return this.deleteTransaction(id);
+  }
+
+  /** Delete ALL transactions for the authenticated user */
+  deleteAll(): Observable<{ deletedCount: number }> {
+    // Backend route: DELETE /api/v1/transactions
+    return this.http.delete<{ deletedCount: number }>(this.API);
   }
 
   getTransactionSummary(startDate?: string, endDate?: string): Observable<TransactionSummary> {

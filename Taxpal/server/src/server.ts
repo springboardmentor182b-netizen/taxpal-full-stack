@@ -24,15 +24,17 @@ if (!loaded) console.warn('[env] .env not found; tried:', candidates);
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+
+// (optional) mailer verification if you use it
 import { verifyMailer } from './utils/mailer';
 
+// ✅ Route modules (use v1 paths consistently)
 import authRoutes from './api/auth/auth.routes';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
 import dashboardRoutes from './api/dashboard/dashboard-routes';
 import budgetsRoutes from './api/budget/budget.routes';
-
-// ✅ ADD THIS: Categories router
+import transactionRoutes from './api/transaction/transaction.routes';
 import categoriesRoutes from './api/Categories/category.routes';
 
 // ---------- 3) App setup ----------
@@ -48,7 +50,10 @@ app.disable('x-powered-by');
  * Example: CORS_ORIGIN=http://localhost:4200,http://127.0.0.1:4200
  */
 const corsOrigins =
-  process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || ['http://localhost:4200'];
+  process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || [
+    'http://localhost:4200',
+    'http://127.0.0.1:4200',
+  ];
 
 app.use(cors({ origin: corsOrigins, credentials: true }));
 
@@ -56,29 +61,28 @@ app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// (Optional) quick debug of env AFTER load
-console.log('[debug] SMTP_HOST=', process.env.SMTP_HOST || '(none)');
-console.log('[debug] SMTP_USER=', process.env.SMTP_USER ? '(set)' : '(none)');
-console.log('[debug] GMAIL_USER=', process.env.GMAIL_USER ? '(set)' : '(none)');
-
 // ---------- 6) DB connection ----------
 mongoose
   .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taxpal')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .then(() => console.log('[db] Connected to MongoDB'))
+  .catch(err => console.error('[db] connection error:', err));
 
-// ---------- 7) Routes (use ONLY /api/v1 prefix) ----------
+// ---------- 7) Routes (canonical: /api/v1 prefix) ----------
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/budgets', budgetsRoutes);
-
-// ✅ ADD THIS LINE: mount categories at /api/v1/categories
+app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
-// Health check
-app.get('/api/health', (_req, res) => {
+// ---------- 7b) Legacy compatibility mounts (optional) ----------
+// These let clients calling '/api/*' (no /v1) still work.
+// You can remove once your Angular env points to /api/v1.
+app.use('/api/transactions', transactionRoutes);
+
+// Health check (v1 to be consistent with your Angular environment)
+app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'OK', message: 'TaxPal API is running' });
 });
 
@@ -110,7 +114,7 @@ app.get('/__routes', (_req, res) => {
 if (!(global as any).__taxpal_server_started) {
   const server = app.listen(PORT, () => {
     (global as any).__taxpal_server_started = true;
-    console.log(`TaxPal server running on port ${PORT}`);
+    console.log(`TaxPal server running on http://localhost:${PORT}`);
     try {
       verifyMailer();
     } catch (e) {

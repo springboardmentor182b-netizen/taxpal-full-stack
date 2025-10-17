@@ -1,12 +1,24 @@
 import { Response } from 'express';
-import type { AuthedRequest } from '../auth/requireAuth';   // ← consistent with routes
+import type { AuthedRequest } from '../auth/requireAuth';
 import Expense from './Expense.model';
+import Transaction from '../transaction/Transaction';
 
 function toDate(input: any): Date {
   if (!input) return new Date();
   const d = input instanceof Date ? input : new Date(String(input));
   return isNaN(d.getTime()) ? new Date() : d;
 }
+
+// A lightweight type for .lean() results of Expense
+type ExpenseLean = {
+  _id: any;
+  userId: any;
+  description: string;
+  amount: number;
+  category: string;
+  date: Date;
+  notes?: string;
+};
 
 export async function createExpense(req: AuthedRequest, res: Response) {
   try {
@@ -21,6 +33,16 @@ export async function createExpense(req: AuthedRequest, res: Response) {
       category: String(category).trim(),
       date: toDate(date),
       notes: typeof notes === 'string' ? notes.trim() : notes
+    });
+
+    // Mirror into Transaction for dashboards/recent
+    await Transaction.create({
+      userId,
+      type: 'expense',
+      category: doc.category,
+      amount: doc.amount,
+      date: doc.date,
+      description: doc.description
     });
 
     return res.status(201).json(doc);
@@ -77,6 +99,20 @@ export async function updateExpense(req: AuthedRequest, res: Response) {
     );
 
     if (!updated) return res.status(404).json({ message: 'Not found' });
+
+    // (optional) keep Transaction in sync (heuristic)
+    await Transaction.findOneAndUpdate(
+      {
+        userId,
+        type: 'expense',
+        description: updated.description,
+        date: updated.date,
+        amount: updated.amount
+      },
+      { category: updated.category },
+      { upsert: false }
+    );
+
     return res.json(updated);
   } catch (err: any) {
     if (err?.name === 'ValidationError') {
@@ -93,8 +129,22 @@ export async function deleteExpense(req: AuthedRequest, res: Response) {
     if (!userId) return res.status(401).json({ message: 'Missing user context' });
 
     const { id } = req.params;
-    const deleted = await Expense.findOneAndDelete({ _id: id, userId });
+
+    // IMPORTANT: use .lean<ExpenseLean>() so TS knows the fields exist
+    const deleted = await Expense.findOneAndDelete({ _id: id, userId })
+      .lean<ExpenseLean>()
+      .exec();
+
     if (!deleted) return res.status(404).json({ message: 'Not found' });
+
+    // Remove a matching Transaction (best: store expenseId on Transaction; here we match by fields)
+    await Transaction.deleteOne({
+      userId,
+      type: 'expense',
+      description: deleted.description,
+      amount: deleted.amount,
+      date: deleted.date
+    });
 
     return res.json({ deleted: true, _id: id });
   } catch (err) {
