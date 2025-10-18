@@ -12,7 +12,6 @@ import { DashboardService } from '../../../core/services/dashboard.service';
 import { ExpenseService } from '../../../core/services/expense.service';
 import { IncomeService } from '../../../core/services/income.service';
 import { TransactionService } from '../../../core/services/transaction.service';
- 
 
 type IncomePayloadFromModal = {
   description: string;
@@ -67,7 +66,7 @@ type RecentTx = {
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
   // inside class DashboardComponent (top of class fields)
-user: User | null = null;   
+  user: User | null = null;
 
   showIncome = false;
   showExpense = false;
@@ -110,12 +109,12 @@ user: User | null = null;
     private txApi: TransactionService
   ) {
     // keep sidebar reactive if token/user changes
-  this.auth.currentUser$.subscribe(u => { this.user = u; });
-  // initial value from storage
-  this.user = this.auth.getCurrentUser();
-}
+    this.auth.currentUser$.subscribe(u => { this.user = u; });
+    // initial value from storage
+    this.user = this.auth.getCurrentUser();
+  }
 
-// 🔽🔽🔽  ADD THE GETTERS RIGHT HERE (anywhere inside the class) 🔽🔽🔽
+  // 🔽🔽🔽  GETTERS  🔽🔽🔽
   get firstInitial(): string {
     const s = (this.user?.name || this.user?.email || 'U').trim();
     return s ? s[0].toUpperCase() : 'U';
@@ -127,59 +126,59 @@ user: User | null = null;
     const parts = n.split(/\s+/);
     return (parts[1]?.[0] ?? '').toUpperCase();
   }
-  // 🔼🔼🔼  END OF GETTERS  🔼🔼🔼
+  // 🔼🔼🔼  END GETTERS  🔼🔼🔼
 
   // Keep Angular happy when re-rendering rows
-trackByTx = (_: number, tx: RecentTx) => tx._id || tx.date;
+  trackByTx = (_: number, tx: RecentTx) => tx._id || tx.date;
 
-// ===================== DELETE ONE (Recent row) =====================
-onDeleteRecent(tx: RecentTx) {
-  const id = tx._id;
-  if (!id) { return; } // only delete persisted rows
+  // ===================== DELETE ONE (Recent row) =====================
+  onDeleteRecent(tx: RecentTx) {
+    const id = tx._id;
+    if (!id) { return; } // only delete persisted rows
 
-  // optimistic remove from recent
-  const prevRecent = [...this.recent];
-  this.recent = this.recent.filter(r => r._id !== id);
+    // optimistic remove from recent
+    const prevRecent = [...this.recent];
+    this.recent = this.recent.filter(r => r._id !== id);
 
-  // also try to remove from local income/expense caches (best effort)
-  this.incomes = this.incomes.filter((i: any) => i._id !== id);
-  this.expenses = this.expenses.filter((e: any) => e._id !== id);
+    // also try to remove from local income/expense caches (best effort)
+    this.incomes = this.incomes.filter((i: any) => i._id !== id);
+    this.expenses = this.expenses.filter((e: any) => e._id !== id);
 
-  this.txApi.deleteTransaction(id).subscribe({
-    next: () => {
-      this.dash.invalidate();
-      // refresh cards + charts + recent from server
-      this.refreshDashboard(true, true);
-    },
-    error: (err) => {
-      // rollback UI
-      this.recent = prevRecent;
-      console.error('Failed to delete transaction', err);
-      alert('Failed to delete transaction. Please try again.');
-    }
-  });
-}
+    this.txApi.deleteTransaction(id).subscribe({
+      next: () => {
+        this.dash.invalidate();
+        // refresh cards + charts + recent from server
+        this.refreshDashboard(true, true);
+      },
+      error: (err) => {
+        // rollback UI
+        this.recent = prevRecent;
+        console.error('Failed to delete transaction', err);
+        alert('Failed to delete transaction. Please try again.');
+      }
+    });
+  }
 
-// ===================== DELETE ALL =====================
-onDeleteAllRecent() {
-  if (!this.recent?.length) return;
-  if (!confirm('Delete ALL transactions? This cannot be undone.')) return;
+  // ===================== DELETE ALL =====================
+  onDeleteAllRecent() {
+    if (!this.recent?.length) return;
+    if (!confirm('Delete ALL transactions? This cannot be undone.')) return;
 
-  this.txApi.deleteAll().subscribe({
-    next: () => {
-      // clear local caches
-      this.recent = [];
-      this.expenses = [];
-      this.incomes = [];
-      this.dash.invalidate();
-      this.refreshDashboard(true, true);
-    },
-    error: (err) => {
-      console.error('Failed to delete all transactions', err);
-      alert('Failed to delete all transactions.');
-    }
-  });
-}
+    this.txApi.deleteAll().subscribe({
+      next: () => {
+        // clear local caches
+        this.recent = [];
+        this.expenses = [];
+        this.incomes = [];
+        this.dash.invalidate();
+        this.refreshDashboard(true, true);
+      },
+      error: (err) => {
+        console.error('Failed to delete all transactions', err);
+        alert('Failed to delete all transactions.');
+      }
+    });
+  }
 
   openIncome()  { this.showIncome = true;  this.showExpense = false; this.showBudget = false; }
   openExpense() { this.showExpense = true; this.showIncome  = false; this.showBudget = false; }
@@ -366,9 +365,9 @@ onDeleteAllRecent() {
           const incomeRaw = res?.series?.find((s: any) => s.label === 'Income')?.data || [];
           const expenseRaw = res?.series?.find((s: any) => s.label === 'Expenses')?.data || [];
 
-        const income = this.numberfy(incomeRaw, labels.length);
-        const expense = this.numberfy(expenseRaw, labels.length);
-        this.upsertBar(labels, income, expense);
+          const income = this.numberfy(incomeRaw, labels.length);
+          const expense = this.numberfy(expenseRaw, labels.length);
+          this.upsertBar(labels, income, expense);
         },
         error: (err) => console.error('Failed to load bar series', err),
       });
