@@ -1,11 +1,8 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component } from '@angular/core';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { environment } from '../../../environments/environment';
-import { Subscription } from 'rxjs';
-import { DarkModeService } from '../../core/services/dark-mode.service';
-import { NavbarComponent } from '../navbar/navbar.component';
 
 interface TaxData {
   country: string;
@@ -32,11 +29,11 @@ interface TaxEstimateResponse {
 @Component({
   selector: 'app-tax-estimator',
   standalone: true,
-  imports: [CommonModule, FormsModule, CurrencyPipe, HttpClientModule, NavbarComponent],
+  imports: [CommonModule, FormsModule, CurrencyPipe, HttpClientModule],
   templateUrl: './tax-estimator.component.html',
   styleUrls: ['./tax-estimator.component.css']
 })
-export class TaxEstimatorComponent implements OnInit, OnDestroy {
+export class TaxEstimatorComponent {
   taxData: TaxData = {
     country: 'United States',
     state: '',
@@ -55,29 +52,17 @@ export class TaxEstimatorComponent implements OnInit, OnDestroy {
   loading = false;
   errorMessage = '';
   successMessage = '';
-
+  
   private apiUrl = environment.apiUrl || '/api';
-  private darkModeSubscription: Subscription = new Subscription();
-  isDarkMode: boolean = false;
-
+  
   // User data
   userId = '';
   userEmail = '';
 
-  constructor(private http: HttpClient, private darkModeService: DarkModeService) {
+  constructor(private http: HttpClient) {
     // Get user info from localStorage
     this.userId = localStorage.getItem('user_id') || '';
     this.userEmail = localStorage.getItem('user_email') || '';
-  }
-
-  ngOnInit() {
-    this.darkModeSubscription = this.darkModeService.darkMode$.subscribe(isDark => {
-      this.isDarkMode = isDark;
-    });
-  }
-
-  ngOnDestroy() {
-    this.darkModeSubscription.unsubscribe();
   }
 
   calculateTax() {
@@ -107,17 +92,17 @@ export class TaxEstimatorComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           console.log('Tax calculation response:', response);
-
+          
           if (response) {
             this.taxableIncome = response.taxableIncome;
             this.estimatedTax = response.estimatedTax;
             this.effectiveRate = response.effectiveTaxRate;
             this.successMessage = 'Tax calculation successful!';
-
+            
             // Automatically save to database after calculation
             this.autoSaveTaxEstimate(response);
           }
-
+          
           this.loading = false;
         },
         error: (error) => {

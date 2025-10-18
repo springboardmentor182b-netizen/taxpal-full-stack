@@ -1,5 +1,8 @@
 <nav class="navbar" [ngClass]="{ 'dark': isDarkMode }">
   <div class="navbar-box" [ngClass]="{ 'dark': isDarkMode }">
+    <div class="floating-emoji" *ngFor="let emoji of floatingEmojis" [ngStyle]="emoji.style">
+      {{ emoji.symbol }}
+    </div>
     <div class="navbar-container">
       <div class="logo">
         <a routerLink="/">
@@ -45,28 +48,6 @@
           </svg>
           <span>About</span>
         </a>
-        <a routerLink="/transactions" class="nav-link" *ngIf="isUserLoggedIn()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-            <line x1="7" y1="6" x2="17" y2="6"/>
-          </svg>
-          <span>Transactions</span>
-        </a>
-        <a routerLink="/budget" class="nav-link" *ngIf="isUserLoggedIn()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12,6 12,12 16,14"/>
-          </svg>
-          <span>Budget</span>
-        </a>
-        <a routerLink="/reports" class="nav-link" *ngIf="isUserLoggedIn()">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <line x1="18" y1="20" x2="18" y2="10"/>
-            <line x1="12" y1="20" x2="12" y2="4"/>
-            <line x1="6" y1="20" x2="6" y2="14"/>
-          </svg>
-          <span>Reports</span>
-        </a>
       </div>
       <div class="right-container">
         <button class="theme-toggle-btn" [ngClass]="{ 'dark': isDarkMode }" aria-label="Toggle dark mode" (click)="toggleDarkMode()">
@@ -85,24 +66,6 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
-        <div class="user-actions" *ngIf="isUserLoggedIn()">
-          <button class="notification-btn" [ngClass]="{ 'dark': isDarkMode }">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
-            </svg>
-          </button>
-          <div class="user-profile" (click)="toggleProfileMenu()">
-            <div class="user-avatar">{{ userInitial }}</div>
-            <div class="user-info" *ngIf="showProfileMenu" [ngClass]="{ 'dark': isDarkMode }">
-              <div class="user-details">
-                <p class="user-name">{{ userName }}</p>
-                <p class="user-email">{{ userEmail }}</p>
-              </div>
-              <button class="logout-btn" (click)="logout()">Logout</button>
-            </div>
-          </div>
-        </div>
         <div class="auth-buttons" *ngIf="!isUserLoggedIn()">
           <a class="login-btn btn" (click)="openSignInForm($event)">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="login-icon">
@@ -116,24 +79,17 @@
         </div>
       </div>
     </div>
-    <div
-      *ngFor="let emoji of floatingEmojis"
-      class="floating-emoji"
-      [ngStyle]="emoji.style"
-    >
-      {{ emoji.symbol }}
-    </div>
   </div>
 </nav>
 
-<app-sign-in-form
-  *ngIf="showSignInForm"
+<app-sign-in-form 
+  *ngIf="showSignInForm" 
   (close)="closeAuthForms()"
   (switchToSignUp)="switchToSignUp()"
 ></app-sign-in-form>
 
-<app-sign-up-form
-  *ngIf="showSignUpForm"
+<app-sign-up-form 
+  *ngIf="showSignUpForm" 
   (close)="closeAuthForms()"
   (switchToSignIn)="switchToSignIn()"
 ></app-sign-up-form>

@@ -129,22 +129,8 @@ export class SignUpFormComponent implements OnInit, OnDestroy {
     };
 
     try {
-      const res: any = await this.http.post('http://localhost:5000/api/users/register', payload).toPromise();
-      this.successMsg = 'Account created! Signing you in...';
-
-      // Store user info in localStorage if returned
-      if (res?.user) {
-        localStorage.setItem('user_email', res.user.email);
-        localStorage.setItem('user_name', res.user.name || '');
-        localStorage.setItem('user_id', res.user._id || '');
-
-        // Create a custom event to notify other components about the user login
-        const loginEvent = new CustomEvent('userLoggedIn', {
-          detail: { email: res.user.email, name: res.user.name }
-        });
-        window.dispatchEvent(loginEvent);
-      }
-
+      const res: any = await this.http.post('/api/users/register', payload).toPromise();
+      this.successMsg = 'Account created! Redirecting...';
       setTimeout(() => {
         this.closeForm();
         this.router.navigate(['/user-profile']);
