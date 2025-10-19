@@ -14,7 +14,7 @@ import {
   providedIn: 'root'
 })
 export class FinancialReportsService {
-  private baseURL = '/api/financial-reports';
+  private baseURL = '/api/v1/financial-reports';
 
   constructor(private http: HttpClient) {}
 

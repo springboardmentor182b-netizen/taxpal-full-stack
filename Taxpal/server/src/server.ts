@@ -35,6 +35,9 @@ import budgetsRoutes from './api/budget/budget.routes';
 // ✅ ADD THIS: Categories router
 import categoriesRoutes from './api/Categories/category.routes';
 
+// ADD Financial Reports router
+import financialReportsRoutes from './api/FinancialReport/FinancialReport.routes';
+
 // ---------- 3) App setup ----------
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -76,6 +79,9 @@ app.use('/api/v1/budgets', budgetsRoutes);
 
 // ✅ ADD THIS LINE: mount categories at /api/v1/categories
 app.use('/api/v1/categories', categoriesRoutes);
+
+// Add mount financial reports at /api/v1/financial-reports
+app.use('/api/v1/financial-reports', financialReportsRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
