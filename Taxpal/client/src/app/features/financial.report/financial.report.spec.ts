@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testin
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { of, throwError } from 'rxjs';
 import { FinancialReportsComponent } from './financial.report';
-import { FinancialReportsService } from '../../core/services/financial.report.service';
+import { FinancialReportsService } from '@/app/core/services/financial.report.service';
 
 describe('FinancialReportsComponent', () => {
   let component: FinancialReportsComponent;

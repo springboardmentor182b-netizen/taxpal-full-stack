@@ -1,47 +1,35 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
-import { delay } from 'rxjs/operators';
+import { delay, map, catchError } from 'rxjs/operators';
 import { ReportRequest, FinancialReport } from '@/app/features/financial.report/financial.report';
+import { 
+  CATEGORY_TO_REPORT_TYPE_MAP, 
+  MOCK_REPORTS, 
+  REPORT_TYPE_NAMES, 
+  PERIOD_NAMES 
+} from './financial.report.service.constants';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FinancialReportsService {
-  private mockReports: FinancialReport[] = [
-    {
-      id: '1',
-      name: 'Income Statement - Last Month',
-      reportType: 'INCOME_STATEMENT',
-      period: 'LAST_MONTH',
-      format: 'PDF',
-      fileSize: '2.4 MB',
-      status: 'COMPLETED',
-      generatedDate: new Date('2024-01-15'),
-      downloadUrl: '/api/reports/1/download'
-    },
-    {
-      id: '2',
-      name: 'Balance Sheet - Current Quarter',
-      reportType: 'BALANCE_SHEET',
-      period: 'CURRENT_QUARTER',
-      format: 'EXCEL',
-      fileSize: '1.8 MB',
-      status: 'COMPLETED',
-      generatedDate: new Date('2024-01-10'),
-      downloadUrl: '/api/reports/2/download'
-    } 
-  ];
+  private baseURL = '/api/financial-reports';
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   getRecentReports(): Observable<FinancialReport[]> {
-    // Simulate API call with delay
-    return of([...this.mockReports]).pipe(delay(1000));
+    return this.http.get<any[]>(this.baseURL).pipe(
+      map(backendReports => this.mapBackendToFrontendReports(backendReports)),
+      catchError(error => {
+        console.error('Error fetching reports from backend, using mock data', error);
+        return of(MOCK_REPORTS);
+      })
+    );
   }
 
   generateReport(request: ReportRequest): Observable<FinancialReport> {
-    // Simulate API call with delay and random success/failure
-    const shouldFail = Math.random() < 0.1; // 10% chance of failure
+    const shouldFail = Math.random() < 0.1;
 
     if (shouldFail) {
       return throwError(() => new Error('Report generation failed due to server error'));
@@ -49,85 +37,112 @@ export class FinancialReportsService {
 
     const newReport: FinancialReport = {
       id: Math.random().toString(36).substr(2, 9),
-      name: `${this.getReportTypeName(request.reportType)} - ${this.getPeriodName(request.period)}`,
+      name: `${REPORT_TYPE_NAMES[request.reportType]} - ${PERIOD_NAMES[request.period]}`,
       reportType: request.reportType,
       period: request.period,
       format: request.format,
       fileSize: (Math.random() * 3 + 1).toFixed(1) + ' MB',
       status: 'COMPLETED',
       generatedDate: new Date(),
-      downloadUrl: `/api/reports/${Math.random().toString(36).substr(2, 9)}/download`
+      downloadUrl: `${this.baseURL}/download/${Math.random().toString(36).substr(2, 9)}`
     };
 
-    this.mockReports.unshift(newReport);
-    
-    return of(newReport).pipe(delay(2000));
+    return this.http.post<any>(this.baseURL, this.mapFrontendToBackendReport(newReport)).pipe(
+      map(() => newReport),
+      delay(2000)
+    );
   }
 
   downloadReport(reportId: string): Observable<{ blob: Blob, contentType: string }> {
-    // Simulate file download
-    const report = this.mockReports.find(r => r.id === reportId);
+    const report = MOCK_REPORTS.find(r => r.id === reportId);
+    let downloadUrl = '';
     
-    if (!report) {
-      return throwError(() => new Error('Report not found'));
-    }
-
-    // Create mock file content based on format
-    let content = '';
-    let contentType = '';
-    
-    switch (report.format) {
+    switch (report?.format) {
       case 'PDF':
-        content = '%PDF-1.4 mock pdf content';
-        contentType = 'application/pdf';
+        downloadUrl = `${this.baseURL}/export/pdf`;
         break;
       case 'EXCEL':
-        content = 'mock excel content';
-        contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+        downloadUrl = `${this.baseURL}/export/excel`;
         break;
       case 'CSV':
-        content = 'Date,Amount,Description\n2024-01-01,1000.00,Revenue';
-        contentType = 'text/csv';
+        downloadUrl = `${this.baseURL}/export/csv`;
         break;
+      default:
+        downloadUrl = `${this.baseURL}/export/pdf`;
     }
 
-    const blob = new Blob([content], { type: contentType });
-    
-    return of({ blob, contentType }).pipe(delay(500));
+    return this.http.get(downloadUrl, { responseType: 'blob' }).pipe(
+      map(blob => {
+        let contentType = '';
+        switch (report?.format) {
+          case 'PDF':
+            contentType = 'application/pdf';
+            break;
+          case 'EXCEL':
+            contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+            break;
+          case 'CSV':
+            contentType = 'text/csv';
+            break;
+        }
+        return { blob, contentType };
+      }),
+      catchError(error => {
+        console.error('Error downloading from backend, using mock download', error);
+        return of(this.mockDownload(reportId));
+      })
+    );
   }
 
   deleteReport(reportId: string): Observable<void> {
-    const index = this.mockReports.findIndex(report => report.id === reportId);
+    return this.http.delete<void>(`${this.baseURL}/${reportId}`).pipe(
+      catchError(error => {
+        console.error('Error deleting report from backend', error);
+        return throwError(() => new Error('Failed to delete report'));
+      })
+    );
+  }
+
+  private mapBackendToFrontendReports(backendReports: any[]): FinancialReport[] {
+    return backendReports.map(backendReport => ({
+      id: backendReport._id,
+      name: backendReport.title,
+      reportType: this.determineReportType(backendReport.category),
+      period: 'CUSTOM',
+      format: 'PDF',
+      fileSize: this.calculateFileSize(backendReport),
+      status: 'COMPLETED',
+      generatedDate: new Date(backendReport.date),
+      downloadUrl: `${this.baseURL}/download/${backendReport._id}`
+    }));
+  }
+
+  private mapFrontendToBackendReport(frontendReport: FinancialReport): any {
+    return {
+      title: frontendReport.name,
+      amount: 0,
+      category: frontendReport.reportType,
+      date: frontendReport.generatedDate
+    };
+  }
+
+  private determineReportType(category: string): string {
+    return CATEGORY_TO_REPORT_TYPE_MAP[category] || 'PROFIT_LOSS';
+  }
+
+  private calculateFileSize(report: any): string {
+    const baseSize = JSON.stringify(report).length / 1024 / 1024;
+    return (baseSize * 2.5).toFixed(1) + ' MB';
+  }
+
+  private mockDownload(reportId: string): { blob: Blob, contentType: string } {
+    let content = '';
+    let contentType = '';
     
-    if (index === -1) {
-      return throwError(() => new Error('Report not found'));
-    }
+    content = 'Mock financial report content for ID: ' + reportId;
+    contentType = 'application/pdf';
 
-    this.mockReports.splice(index, 1);
-    return of(undefined).pipe(delay(500));
-  }
-
-  private getReportTypeName(type: string): string {
-    const names: { [key: string]: string } = {
-      'INCOME_STATEMENT': 'Income Statement',
-      'BALANCE_SHEET': 'Balance Sheet',
-      'CASH_FLOW': 'Cash Flow Statement',
-      'PROFIT_LOSS': 'Profit & Loss',
-      'EXPENSE_REPORT': 'Expense Report'
-    };
-    return names[type] || type;
-  }
-
-  private getPeriodName(period: string): string {
-    const names: { [key: string]: string } = {
-      'CURRENT_MONTH': 'Current Month',
-      'LAST_MONTH': 'Last Month',
-      'CURRENT_QUARTER': 'Current Quarter',
-      'LAST_QUARTER': 'Last Quarter',
-      'CURRENT_YEAR': 'Current Year',
-      'LAST_YEAR': 'Last Year',
-      'CUSTOM': 'Custom Range'
-    };
-    return names[period] || period;
+    const blob = new Blob([content], { type: contentType });
+    return { blob, contentType };
   }
 }
