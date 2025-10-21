@@ -37,6 +37,9 @@ import budgetsRoutes from './api/budget/budget.routes';
 import transactionRoutes from './api/transaction/transaction.routes';
 import categoriesRoutes from './api/Categories/category.routes';
 
+// ✅ NEW: Tax Estimator routes
+import taxRoutes from './api/TaxEstimator/TaxEstimator.routes';
+
 // ---------- 3) App setup ----------
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
@@ -45,10 +48,6 @@ const PORT = Number(process.env.PORT || 3000);
 app.disable('x-powered-by');
 
 // ---------- 4) CORS ----------
-/**
- * CORS_ORIGIN can be a single origin or comma-separated list.
- * Example: CORS_ORIGIN=http://localhost:4200,http://127.0.0.1:4200
- */
 const corsOrigins =
   process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || [
     'http://localhost:4200',
@@ -82,6 +81,9 @@ app.use('/api/v1/budgets', budgetsRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
+// ✅ NEW: mount tax estimator + calendar
+app.use('/api/v1/tax', taxRoutes);
+
 // ---------- 7b) Legacy compatibility mounts (optional) ----------
 app.use('/api/transactions', transactionRoutes);
 
@@ -114,7 +116,7 @@ app.get('/__routes', (_req, res) => {
   res.json({ routes });
 });
 
-// ---------- 9) START SERVER (single listen + graceful shutdown) ----------
+// ---------- 9) START SERVER ----------
 if (!(global as any).__taxpal_server_started) {
   const server = app.listen(PORT, () => {
     (global as any).__taxpal_server_started = true;

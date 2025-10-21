@@ -6,14 +6,21 @@
       <p class="page-subtitle">Upcoming estimated payments & reminders</p>
     </header>
 
-    <!-- Card-like content area (same as Budgets form card) -->
     <section class="form-section">
       <div class="form-card">
-        <!-- Card header with actions -->
         <div class="form-card-header" style="display:flex; align-items:center; justify-content:space-between; gap:12px;">
           <h2 class="form-card-title" style="margin:0;">Quarterly Schedule</h2>
 
-          <div style="display:flex; align-items:center; gap:8px; ">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <!-- ✅ New Delete All Reminders -->
+            <button
+              type="button"
+              class="btn btn-danger"
+              [disabled]="bulkBusy || loading"
+              (click)="deleteAllReminders()">
+              {{ bulkBusy ? 'Deleting…' : 'Delete All Reminders' }}
+            </button>
+
             <button type="button" class="btn btn-primary btn-calc-tax" (click)="goToEstimator()">
               Calculate Tax
             </button>
@@ -29,30 +36,49 @@
           </div>
         </div>
 
-        <!-- Your calendar content -->
-        <div class="calendar">
-          <ng-container *ngFor="let section of sections">
-            <div class="calendar__month">{{ section.monthLabel }}</div>
+        <!-- Status -->
+        <div *ngIf="loading" class="status-banner status--loading" style="margin-bottom:8px;">
+          Loading events from server…
+        </div>
+        <div *ngIf="!loading && error" class="status-banner status--err" style="margin-bottom:8px;">
+          {{ error }}
+        </div>
+        <div *ngIf="!loading && bulkMsg" class="status-banner" [ngClass]="{'status--ok': !error, 'status--loading': bulkBusy}" style="margin-bottom:8px;">
+          {{ bulkMsg }}
+        </div>
 
-            <div class="calendar__list">
-              <div class="card" *ngFor="let item of section.items">
-                <div class="card__main">
-                  <div class="card__title">
-                    <span class="card__title-text">{{ item.title }}</span>
-                    <span class="{{ badgeClass(item.type) }}">{{ item.type }}</span>
-                  </div>
+        <!-- Calendar content -->
+        <div class="calendar" *ngIf="!loading && !error">
+          <ng-container *ngIf="sections.length; else empty">
+            <ng-container *ngFor="let section of sections">
+              <div class="calendar__month">{{ section.monthLabel }}</div>
 
-                  <div class="card__date">
-                    {{ item.date | date:'MMM d, y' }}
-                  </div>
+              <div class="calendar__list">
+                <div class="card" *ngFor="let item of section.items">
+                  <div class="card__main">
+                    <div class="card__title">
+                      <span class="card__title-text">{{ item.title }}</span>
+                      <span class="{{ badgeClass(item.type) }}">{{ item.type }}</span>
+                    </div>
 
-                  <div class="card__note" *ngIf="item.note">
-                    {{ item.note }}
+                    <div class="card__date">
+                      {{ item.date | date:'MMM d, y' }}
+                    </div>
+
+                    <div class="card__note" *ngIf="item.note">
+                      {{ item.note }}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </ng-container>
           </ng-container>
+
+          <ng-template #empty>
+            <div class="recent-empty" style="padding:12px 0;">
+              No calendar events yet.
+            </div>
+          </ng-template>
         </div>
       </div>
     </section>
