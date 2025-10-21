@@ -65,7 +65,6 @@ type RecentTx = {
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
-  // inside class DashboardComponent (top of class fields)
   user: User | null = null;
 
   showIncome = false;
@@ -78,6 +77,10 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   recent: RecentTx[] = [];
   pieHasData = false;
+  isDeletingAll = false;
+
+  // Queue of bumps to apply if chart isn't ready yet
+  private pendingBarBumps: Array<{ dateISO: string; delta: number; kind: 'income' | 'expense' }> = [];
 
   budgetModel: BudgetModel = {
     name: '',
@@ -108,25 +111,21 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     public  auth: AuthService,
     private txApi: TransactionService
   ) {
-    // keep sidebar reactive if token/user changes
     this.auth.currentUser$.subscribe(u => { this.user = u; });
-    // initial value from storage
     this.user = this.auth.getCurrentUser();
   }
 
-  // 🔽🔽🔽  GETTERS  🔽🔽🔽
+  // GETTERS
   get firstInitial(): string {
     const s = (this.user?.name || this.user?.email || 'U').trim();
     return s ? s[0].toUpperCase() : 'U';
   }
-
   get secondInitial(): string {
     const n = this.user?.name?.trim();
     if (!n) return '';
     const parts = n.split(/\s+/);
     return (parts[1]?.[0] ?? '').toUpperCase();
   }
-  // 🔼🔼🔼  END GETTERS  🔼🔼🔼
 
   // Keep Angular happy when re-rendering rows
   trackByTx = (_: number, tx: RecentTx) => tx._id || tx.date;
@@ -135,6 +134,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   onDeleteRecent(tx: RecentTx) {
     const id = tx._id;
     if (!id) { return; } // only delete persisted rows
+    if (!confirm('Delete this transaction?')) return;
 
     // optimistic remove from recent
     const prevRecent = [...this.recent];
@@ -161,19 +161,23 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   // ===================== DELETE ALL =====================
   onDeleteAllRecent() {
-    if (!this.recent?.length) return;
+    if (!this.recent.length) return;
     if (!confirm('Delete ALL transactions? This cannot be undone.')) return;
 
+    this.isDeletingAll = true;
     this.txApi.deleteAll().subscribe({
       next: () => {
         // clear local caches
         this.recent = [];
         this.expenses = [];
         this.incomes = [];
+        this.isDeletingAll = false;
+
         this.dash.invalidate();
         this.refreshDashboard(true, true);
       },
       error: (err) => {
+        this.isDeletingAll = false;
         console.error('Failed to delete all transactions', err);
         alert('Failed to delete all transactions.');
       }
@@ -184,7 +188,6 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   openExpense() { this.showExpense = true; this.showIncome  = false; this.showBudget = false; }
   closeIncome() { this.showIncome = false; }
   closeExpense(){ this.showExpense = false; }
-
   openBudget()  { this.showBudget = true;  this.showIncome = false; this.showExpense = false; }
   closeBudget() { this.showBudget = false; }
 
@@ -197,14 +200,13 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   // ===================== INCOME SAVE =====================
   onIncomeSave(evt: IncomePayloadFromModal) {
-    // Guard & permanently narrow the amount to a number for TS
     const amount = Number(evt?.amount ?? 0);
     if (!amount || amount <= 0 || !evt?.date) return;
 
-    // bar (optimistic)
+    // optimistic bump
     this.bumpBarSeries(evt.date, amount, 'income');
 
-    // optimistic recent
+    // optimistic recent row
     const tempId = (globalThis as any).crypto?.randomUUID?.() ?? `tmp_${Date.now()}`;
     this.prependRecent({
       _id: tempId,
@@ -224,7 +226,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
       notes: evt.notes
     }).subscribe({
       next: (doc: any) => {
-        // replace optimistic with server doc
+        // replace optimistic recent with server doc
         this.replaceRecent(tempId, {
           _id: doc?._id,
           type: 'income',
@@ -234,12 +236,13 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
           date: doc?.date ?? evt.date
         });
         this.dash.invalidate();
-        this.loadRecent(); // server now has a Transaction row
+        this.loadRecent(); // server-backed recent
+        // ⬅️ Now refresh charts AFTER save is done (prevents first-time miss)
+        this.refreshDashboard(true, false);
       },
       error: (err) => {
         // rollback optimistic
         this.removeRecent(tempId);
-        // rollback bar using the narrowed number
         this.bumpBarSeries(evt.date, -amount, 'income');
         console.error('Failed to save income', err);
       }
@@ -248,8 +251,8 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.incomes.push({ ...evt, amount });
     this.closeIncome();
 
-    // charts yes, recent no (we reload recent in success handler)
-    this.refreshDashboard(true, false);
+    // DO NOT refresh charts right here; we do it in success handler
+    // this.refreshDashboard(true, false);
   }
 
   // ===================== EXPENSE SAVE =====================
@@ -265,7 +268,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
       notes: evt.notes ?? '',
     };
 
-    // bar (optimistic)
+    // optimistic bump
     this.bumpBarSeries(payload.date, amount, 'expense');
 
     // optimistic local + recent
@@ -285,11 +288,9 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
     this.expensesApi.addExpense(payload).subscribe({
       next: (created) => {
-        // replace optimistic expense in local list
         this.expenses = [created ?? payload, ...this.expenses.filter((e) => e._id !== tempId)];
         this.rebuildPieFromLocal();
 
-        // replace optimistic in recent with actual
         this.replaceRecent(tempId, {
           _id: (created as any)?._id,
           type: 'expense',
@@ -301,11 +302,11 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
         this.closeExpense();
         this.dash.invalidate();
-        this.loadRecent(); // server now has a Transaction row
+        this.loadRecent();
+        // ⬅️ Refresh charts AFTER save is done
         this.refreshDashboard(true, false);
       },
       error: (err) => {
-        // rollback optimistic
         this.expenses = this.expenses.filter((e) => e._id !== tempId);
         this.removeRecent(tempId);
         this.rebuildPieFromLocal();
@@ -462,16 +463,28 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     const incomeFixed   = num(income);
     const expensesFixed = num(expenses);
 
-    const apiHasBars = L > 0 && (incomeFixed.some(v => v > 0) || expensesFixed.some(v => v > 0));
-    const useLabels   = apiHasBars ? labels         : ['Week 1','Week 2','Week 3','Week 4'];
-    const useIncome   = apiHasBars ? incomeFixed    : [1200, 900, 1100, 1400];
-    const useExpenses = apiHasBars ? expensesFixed  : [ 800, 700,  950,  600];
+    // If API returned no bars, scaffold current-month daily buckets
+    let apiHasBars = L > 0 && (incomeFixed.some(v => v > 0) || expensesFixed.some(v => v > 0));
+    let useLabels   = labels;
+    let useIncome   = incomeFixed;
+    let useExpenses = expensesFixed;
+
+    if (!L) {
+      const scaffold = this.buildCurrentMonthScaffold();
+      useLabels   = scaffold.labels;
+      useIncome   = scaffold.income;
+      useExpenses = scaffold.expenses;
+      apiHasBars  = false;
+    }
 
     if (this.barChart) {
       this.barChart.data.labels = useLabels;
       (this.barChart.data.datasets[0].data as number[]) = useIncome;
       (this.barChart.data.datasets[1].data as number[]) = useExpenses;
       this.barChart.update();
+
+      // apply any queued bumps
+      this.applyPendingBarBumps();
       return;
     }
 
@@ -509,6 +522,24 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
         }
       }
     });
+
+    // apply queued bumps after first creation
+    this.applyPendingBarBumps();
+  }
+
+  private buildCurrentMonthScaffold(): { labels: string[]; income: number[]; expenses: number[] } {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+    const labels: string[] = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dd = String(d).padStart(2, '0');
+      const short = new Date(y, m, d).toLocaleString(undefined, { month: 'short' });
+      labels.push(`${dd} ${short}`);
+    }
+    return { labels, income: new Array(daysInMonth).fill(0), expenses: new Array(daysInMonth).fill(0) };
   }
 
   private upsertPie(labels: string[], data: number[]) {
@@ -555,11 +586,23 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   }
 
   private bumpBarSeries(dateISO: string, delta: number, kind: 'income' | 'expense') {
-    if (!this.barChart || !dateISO || !isFinite(delta)) return;
+    if (!dateISO || !isFinite(delta)) return;
+
+    // If chart isn't ready yet, queue the bump
+    if (!this.barChart) {
+      this.pendingBarBumps.push({ dateISO, delta, kind });
+      return;
+    }
 
     const labels = (this.barChart.data.labels || []) as (string | number)[];
-    const idx = this.findBarBucketIndex(dateISO, labels);
-    if (idx < 0) return;
+    let idx = this.findBarBucketIndex(dateISO, labels);
+
+    // If we can't find a bucket (e.g., placeholder labels), push to last bucket as a visual hint;
+    // the next server refresh will correct it.
+    if (idx < 0) {
+      idx = labels.length ? labels.length - 1 : -1;
+      if (idx < 0) return;
+    }
 
     const dsIndex = kind === 'income' ? 0 : 1;
     const ds = this.barChart.data.datasets[dsIndex];
@@ -569,6 +612,15 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     arr[idx] = curr + delta;
 
     this.barChart.update();
+  }
+
+  private applyPendingBarBumps() {
+    if (!this.barChart || !this.pendingBarBumps.length) return;
+    const bumps = [...this.pendingBarBumps];
+    this.pendingBarBumps = [];
+    for (const b of bumps) {
+      this.bumpBarSeries(b.dateISO, b.delta, b.kind);
+    }
   }
 
   private findBarBucketIndex(dateISO: string, labels: (string | number)[]): number {

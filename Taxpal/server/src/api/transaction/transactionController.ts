@@ -2,7 +2,7 @@ import { Response } from 'express';
 import { body } from 'express-validator';
 import Transaction from './Transaction';
 import { AuthedRequest } from '../auth/auth';
-import mongoose from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 
 // ------- Validators -------
 export const validateTransaction = [
@@ -18,12 +18,16 @@ function toNumber(n: any, fallback: number): number {
   const v = Number(n);
   return Number.isFinite(v) ? v : fallback;
 }
+function toObjectId(id: string): Types.ObjectId | null {
+  return mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
+}
 
 // ------- Controllers -------
 export const getTransactions = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
-    const userId = req.user.id;
+    const userId = toObjectId(req.user.id);
+    if (!userId) { res.status(400).json({ error: 'Invalid user id' }); return; }
 
     const rawPage  = (req.query.page  ?? 1) as any;
     const rawLimit = (req.query.limit ?? 10) as any;
@@ -69,15 +73,14 @@ export const getTransactions = async (req: AuthedRequest, res: Response): Promis
 export const getTransactionById = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
-    const userId = req.user.id;
+    const userId = toObjectId(req.user.id);
+    if (!userId) { res.status(400).json({ error: 'Invalid user id' }); return; }
+
     const { id } = req.params;
+    const _id = toObjectId(id);
+    if (!_id) { res.status(400).json({ error: 'Invalid transaction id' }); return; }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({ error: 'Invalid transaction id' });
-      return;
-    }
-
-    const tx = await Transaction.findOne({ _id: id, userId }).lean();
+    const tx = await Transaction.findOne({ _id, userId }).lean();
     if (!tx) { res.status(404).json({ error: 'Transaction not found' }); return; }
     res.json(tx);
   } catch (err) {
@@ -89,7 +92,8 @@ export const getTransactionById = async (req: AuthedRequest, res: Response): Pro
 export const createTransaction = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
-    const userId = req.user.id;
+    const userId = toObjectId(req.user.id);
+    if (!userId) { res.status(400).json({ error: 'Invalid user id' }); return; }
 
     const payload = {
       userId,
@@ -101,7 +105,6 @@ export const createTransaction = async (req: AuthedRequest, res: Response): Prom
     };
 
     const tx = await Transaction.create(payload);
-    // Shape to match Angular service expectations
     res.status(201).json({ message: 'Transaction created', transaction: tx });
   } catch (err) {
     console.error('[transactions.create]', err);
@@ -112,13 +115,12 @@ export const createTransaction = async (req: AuthedRequest, res: Response): Prom
 export const updateTransaction = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
-    const userId = req.user.id;
-    const { id } = req.params;
+    const userId = toObjectId(req.user.id);
+    if (!userId) { res.status(400).json({ error: 'Invalid user id' }); return; }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({ error: 'Invalid transaction id' });
-      return;
-    }
+    const { id } = req.params;
+    const _id = toObjectId(id);
+    if (!_id) { res.status(400).json({ error: 'Invalid transaction id' }); return; }
 
     const patch: any = {};
     if (req.body.type != null)        patch.type = String(req.body.type);
@@ -130,13 +132,12 @@ export const updateTransaction = async (req: AuthedRequest, res: Response): Prom
     }
 
     const tx = await Transaction.findOneAndUpdate(
-      { _id: id, userId },
+      { _id, userId },
       patch,
       { new: true, runValidators: true }
     ).lean();
 
     if (!tx) { res.status(404).json({ error: 'Transaction not found' }); return; }
-    // Shape to match Angular service expectations
     res.json({ message: 'Transaction updated', transaction: tx });
   } catch (err) {
     console.error('[transactions.update]', err);
@@ -147,19 +148,19 @@ export const updateTransaction = async (req: AuthedRequest, res: Response): Prom
 export const deleteTransaction = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
-    const userId = req.user.id;
+    const userId = toObjectId(req.user.id);
+    if (!userId) { res.status(400).json({ error: 'Invalid user id' }); return; }
+
     const { id } = req.params;
+    const _id = toObjectId(id);
+    if (!_id) { res.status(400).json({ error: 'Invalid transaction id' }); return; }
 
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      res.status(400).json({ error: 'Invalid transaction id' });
-      return;
-    }
-
-    const deleted = await Transaction.findOneAndDelete({ _id: id, userId }).lean();
+    const deleted = await Transaction.findOneAndDelete({ _id, userId }).lean();
     if (!deleted) { res.status(404).json({ error: 'Transaction not found' }); return; }
 
-    // 204 is idiomatic for successful deletion (no body)
-    res.status(204).send();
+    console.log(`[transactions.delete] user=${userId.toString()} _id=${_id.toString()} -> deleted`);
+    // Return 200 with a body so frontend can safely "next" without nulls
+    res.status(200).json({ message: 'Transaction deleted' });
   } catch (err) {
     console.error('[transactions.delete]', err);
     res.status(500).json({ error: 'Failed to delete transaction' });
@@ -170,10 +171,13 @@ export const deleteTransaction = async (req: AuthedRequest, res: Response): Prom
 export const deleteAllTransactions = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
-    const userId = req.user.id;
+    const userId = toObjectId(req.user.id);
+    if (!userId) { res.status(400).json({ error: 'Invalid user id' }); return; }
 
     const result = await Transaction.deleteMany({ userId });
-    res.json({ message: 'All transactions deleted', deletedCount: result.deletedCount || 0 });
+    const deletedCount = result.deletedCount || 0;
+    console.log(`[transactions.deleteAll] user=${userId.toString()} -> deletedCount=${deletedCount}`);
+    res.json({ message: 'All transactions deleted', deletedCount });
   } catch (err) {
     console.error('[transactions.deleteAll]', err);
     res.status(500).json({ error: 'Failed to delete all transactions' });

@@ -61,9 +61,15 @@ app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ---------- 6) DB connection ----------
+// ---------- 6) DB connection (accept BOTH MONGODB_URI and MONGO_URI) ----------
+const mongoUri =
+  process.env.MONGODB_URI ||
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/taxpal';
+
+console.log('[db] Connecting to:', mongoUri);
 mongoose
-  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taxpal')
+  .connect(mongoUri)
   .then(() => console.log('[db] Connected to MongoDB'))
   .catch(err => console.error('[db] connection error:', err));
 
@@ -77,11 +83,9 @@ app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
 // ---------- 7b) Legacy compatibility mounts (optional) ----------
-// These let clients calling '/api/*' (no /v1) still work.
-// You can remove once your Angular env points to /api/v1.
 app.use('/api/transactions', transactionRoutes);
 
-// Health check (v1 to be consistent with your Angular environment)
+// Health check
 app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'OK', message: 'TaxPal API is running' });
 });

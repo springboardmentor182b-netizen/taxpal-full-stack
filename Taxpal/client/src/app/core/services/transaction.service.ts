@@ -1,17 +1,16 @@
-// src/app/core/services/transaction.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environments';
 
-// ===== Public models (what components use)
+// ===== Public models
 export interface Transaction {
   _id: string;
   user_id: string;
   type: 'income' | 'expense';
   category: string;
   amount: number;
-  date: Date;               // App uses Date
+  date: Date;
   description?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -38,8 +37,8 @@ export interface TransactionFilters {
   limit?: number;
   type?: 'income' | 'expense';
   category?: string;
-  startDate?: string; // ISO yyyy-mm-dd
-  endDate?: string;   // ISO yyyy-mm-dd
+  startDate?: string;
+  endDate?: string;
   sortBy?: 'date' | 'createdAt' | 'amount';
   sortDir?: 'asc' | 'desc';
 }
@@ -56,7 +55,7 @@ export interface TransactionResponse {
   total: number;
 }
 
-// ===== DTOs (wire format from/to API)
+// ===== DTOs
 type TransactionDTO = Omit<Transaction, 'date' | 'createdAt' | 'updatedAt'> & {
   date: string;
   createdAt: string;
@@ -68,10 +67,6 @@ interface TransactionResponseDTO extends Omit<TransactionResponse, 'transactions
 
 @Injectable({ providedIn: 'root' })
 export class TransactionService {
-  /**
-   * We expect environment.API_URL to be '/api/v1' in dev (proxied) and
-   * the full origin in prod. Fall back to '/api/v1' if missing.
-   */
   private readonly BASE =
     (environment as any)?.API_URL && typeof (environment as any).API_URL === 'string'
       ? (environment as any).API_URL
@@ -81,11 +76,10 @@ export class TransactionService {
 
   constructor(private http: HttpClient) {}
 
-  // ---------- Helpers ----------
   private toISO(d?: Date | string): string | undefined {
     if (!d) return undefined;
     return typeof d === 'string' ? d : d.toISOString();
-  }
+    }
 
   private fromDTO(t: TransactionDTO): Transaction {
     return {
@@ -116,7 +110,6 @@ export class TransactionService {
     );
   }
 
-  /** Convenience for dashboard “Recent Transactions” */
   getRecentTransactions(limit = 8): Observable<Transaction[]> {
     const params: TransactionFilters = { page: 1, limit, sortBy: 'date', sortDir: 'desc' };
     return this.getTransactions(params).pipe(
@@ -152,18 +145,14 @@ export class TransactionService {
 
   /** Delete a single transaction by id */
   deleteTransaction(id: string): Observable<{ message: string }> {
+    // Backend now returns 200 { message: 'Transaction deleted' }
     return this.http.delete<{ message: string }>(`${this.API}/${encodeURIComponent(id)}`);
   }
 
-  /** Alias for components using deleteOne(...) */
-  deleteOne(id: string): Observable<{ message: string }> {
-    return this.deleteTransaction(id);
-  }
-
   /** Delete ALL transactions for the authenticated user */
-  deleteAll(): Observable<{ deletedCount: number }> {
+  deleteAll(): Observable<{ message: string; deletedCount: number }> {
     // Backend route: DELETE /api/v1/transactions
-    return this.http.delete<{ deletedCount: number }>(this.API);
+    return this.http.delete<{ message: string; deletedCount: number }>(this.API);
   }
 
   getTransactionSummary(startDate?: string, endDate?: string): Observable<TransactionSummary> {
