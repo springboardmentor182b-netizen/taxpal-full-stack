@@ -48,6 +48,12 @@ export const routes: Routes = [
     import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
       .then(m => m.TaxEstimatorFormComponent)
 },
+    {
+    path: 'tax-estimator',   // ✅ Added route
+    loadComponent: () =>
+      import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
+        .then(m => m.TaxEstimatorFormComponent)
+  },
   {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
