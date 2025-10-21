@@ -2,11 +2,42 @@ import { Component, signal } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+/** ✅ Constants */
+const TAX_API_URL = '/api/tax/calculate';
+const MAX_RETRY_ATTEMPTS = 5;
+const RETRY_DELAY_BASE_MS = 1000;
+const QUARTERS_COUNT = 4;
+const DUE_DAY = 15;
+
+export const MONTH_NAMES = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+];
+
+export const REGION_OPTIONS = [
+  { code: 'us', label: 'United States (US)' },
+  { code: 'in', label: 'India (IN)' },
+  { code: 'ca', label: 'Canada (CA)' },
+  { code: 'uk', label: 'United Kingdom (UK)' }
+] as const;
+
+export const FILING_STATUSES = [
+  { code: 'single', label: 'Single' },
+  { code: 'married', label: 'Married' }
+] as const;
+
+export const TAX_RESULT_ITEMS = [
+  { key: 'taxableIncome', label: 'Taxable Income' },
+  { key: 'totalTax', label: 'Total Tax' },
+  { key: 'quarterlyPayment', label: 'Quarterly Payment' }
+];
+
+/** ✅ Interfaces */
 interface TaxInputs {
-  region: 'us' | 'in' | 'ca' | 'uk' | '';
+  region: typeof REGION_OPTIONS[number]['code'] | '';
   annualGrossIncome: number | null;
   annualDeductions: number | null;
-  filingStatus: 'single' | 'married';
+  filingStatus: typeof FILING_STATUSES[number]['code'];
 }
 
 interface EstimatedTaxData {
@@ -23,6 +54,7 @@ interface EstimatedTaxData {
   styleUrls: ['./tax-estimator.component.scss']
 })
 export class TaxEstimatorComponent {
+  /** Signals for reactive state */
   taxInputs = signal<TaxInputs>({
     region: 'us',
     annualGrossIncome: null,
@@ -34,30 +66,26 @@ export class TaxEstimatorComponent {
   isCalculating = signal(false);
   errorMessage = signal('');
 
-  // ✅ Dynamically generated rolling quarters from today's date
+  /** Dynamically generated quarters */
   quarters = this.generateRollingQuarters();
 
-  /** ✅ Function to generate 4 rolling quarters starting from today */
+  /** ✅ Generate next rolling quarters */
   private generateRollingQuarters() {
     const today = new Date();
     const quarters = [];
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < QUARTERS_COUNT; i++) {
       const startMonth = (today.getMonth() + i * 3) % 12;
       const startYear = today.getFullYear() + Math.floor((today.getMonth() + i * 3) / 12);
-
       const endMonth = (startMonth + 2) % 12;
       const endYear = startYear + Math.floor((startMonth + 2) / 12);
 
-      // Create range like "Oct – Dec 2025" or "Nov 2025 – Jan 2026"
       const range =
         startYear === endYear
-          ? ${monthNames[startMonth]} – ${monthNames[endMonth]} ${startYear}
-          : ${monthNames[startMonth]} ${startYear} – ${monthNames[endMonth]} ${endYear};
+          ? `${MONTH_NAMES[startMonth]} – ${MONTH_NAMES[endMonth]} ${startYear}`
+          : `${MONTH_NAMES[startMonth]} ${startYear} – ${MONTH_NAMES[endMonth]} ${endYear}`;
 
-      // Due date → 15th of the next month after quarter end
-      const dueDate = new Date(endYear, endMonth + 1, 15);
+      const dueDate = new Date(endYear, endMonth + 1, DUE_DAY);
       const dueDateStr = dueDate.toLocaleDateString('en-US', {
         month: 'short',
         day: 'numeric',
@@ -65,7 +93,7 @@ export class TaxEstimatorComponent {
       });
 
       quarters.push({
-        name: Q${i + 1},
+        name: `Q${i + 1}`,
         range,
         dueDate: dueDateStr
       });
@@ -74,23 +102,26 @@ export class TaxEstimatorComponent {
     return quarters;
   }
 
-  private async fetchWithRetry(url: string, options: RequestInit, maxRetries = 5): Promise<any> {
-    for (let attempt = 0; attempt < maxRetries; attempt++) {
+  /** ✅ Generic fetch with exponential backoff */
+  private async fetchWithRetry(url: string, options: RequestInit): Promise<any> {
+    for (let attempt = 0; attempt < MAX_RETRY_ATTEMPTS; attempt++) {
       try {
         const response = await fetch(url, options);
         if (!response.ok) {
           const errorBody = await response.json().catch(() => ({ message: 'Unknown server error' }));
-          throw new Error(errorBody.message || HTTP ${response.status});
+          throw new Error(errorBody.message || `HTTP ${response.status}`);
         }
         return await response.json();
       } catch (error: any) {
-        if (attempt === maxRetries - 1) throw error;
-        await new Promise(r => setTimeout(r, Math.pow(2, attempt) * 1000));
+        if (attempt === MAX_RETRY_ATTEMPTS - 1) throw error;
+        const delay = Math.pow(2, attempt) * RETRY_DELAY_BASE_MS;
+        await new Promise(r => setTimeout(r, delay));
       }
     }
-    throw new Error('Fetch failed after retries.');
+    throw new Error('Fetch failed after all retries.');
   }
 
+  /** ✅ Calculate tax */
   async calculateTax(): Promise<void> {
     this.estimatedTaxData.set(null);
     this.errorMessage.set('');
@@ -111,7 +142,7 @@ export class TaxEstimatorComponent {
         filingStatus: inputs.filingStatus
       };
 
-      const result: EstimatedTaxData = await this.fetchWithRetry('/api/tax/calculate', {
+      const result: EstimatedTaxData = await this.fetchWithRetry(TAX_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -119,7 +150,7 @@ export class TaxEstimatorComponent {
 
       this.estimatedTaxData.set(result);
     } catch (error: any) {
-      this.errorMessage.set(Calculation failed: ${error.message});
+      this.errorMessage.set(`Calculation failed: ${error.message}`);
     } finally {
       this.isCalculating.set(false);
     }

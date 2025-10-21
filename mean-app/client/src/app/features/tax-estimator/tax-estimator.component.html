@@ -1,18 +1,19 @@
-<!-- Tax Estimator + Calendar Combined UI -->
-<div class="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
+<div class="tax-estimator-container p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
   <div class="max-w-6xl mx-auto">
+    <!-- Header -->
     <header class="text-center mb-10">
       <h1 class="text-3xl sm:text-4xl font-extrabold text-blue-900 mb-2">Quarterly Tax Estimator</h1>
       <p class="text-lg text-gray-600">Calculate your estimated tax and view quarterly payment due dates.</p>
     </header>
 
+    <!-- Main Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Tax Estimator Form (2/3 width) -->
+      <!-- Tax Form -->
       <section class="lg:col-span-2 p-6 bg-white rounded-xl shadow-2xl border border-gray-100">
         <h2 class="text-2xl font-semibold text-blue-800 mb-6 border-b pb-3">Income & Deductions</h2>
 
         <form (ngSubmit)="calculateTax()" #taxForm="ngForm" class="space-y-6">
-          <!-- Region -->
+          <!-- Tax Region -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Tax Region</label>
             <select
@@ -22,14 +23,11 @@
               class="w-full rounded-lg border-gray-300 p-3 focus:border-blue-500 focus:ring-blue-500"
             >
               <option value="" disabled>Select your region</option>
-              <option value="us">United States (US)</option>
-              <option value="in">India (IN)</option>
-              <option value="ca">Canada (CA)</option>
-              <option value="uk">United Kingdom (UK)</option>
+              <option *ngFor="let r of REGION_OPTIONS" [value]="r.code">{{ r.label }}</option>
             </select>
           </div>
 
-          <!-- Income -->
+          <!-- Annual Income -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Annual Gross Income ($)</label>
             <input
@@ -43,7 +41,7 @@
             />
           </div>
 
-          <!-- Deductions -->
+          <!-- Annual Deductions -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Total Annual Deductions ($)</label>
             <input
@@ -60,31 +58,30 @@
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Filing Status</label>
             <div class="flex space-x-6 mt-2">
-              <label class="inline-flex items-center">
-                <input type="radio" [(ngModel)]="taxInputs().filingStatus" name="filingStatus" value="single" />
-                <span class="ml-2 text-gray-700">Single</span>
-              </label>
-              <label class="inline-flex items-center">
-                <input type="radio" [(ngModel)]="taxInputs().filingStatus" name="filingStatus" value="married" />
-                <span class="ml-2 text-gray-700">Married</span>
+              <label *ngFor="let status of FILING_STATUSES" class="inline-flex items-center">
+                <input
+                  type="radio"
+                  [(ngModel)]="taxInputs().filingStatus"
+                  name="filingStatus"
+                  [value]="status.code"
+                />
+                <span class="ml-2 text-gray-700">{{ status.label }}</span>
               </label>
             </div>
           </div>
 
           <!-- Error Message -->
-          @if (errorMessage()) {
-            <p class="p-3 bg-red-100 text-red-700 rounded-lg border border-red-300">
-              {{ errorMessage() }}
-            </p>
-          }
+          <p *ngIf="errorMessage()" class="p-3 bg-red-100 text-red-700 rounded-lg border border-red-300">
+            {{ errorMessage() }}
+          </p>
 
-          <!-- Calculate Button -->
+          <!-- Submit Button -->
           <button
             type="submit"
             [disabled]="!taxForm.valid || isCalculating()"
             class="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-lg disabled:opacity-50"
           >
-            @if (isCalculating()) { Calculating... } @else { Estimate Tax }
+            {{ isCalculating() ? 'Calculating...' : 'Estimate Tax' }}
           </button>
         </form>
       </section>
@@ -93,24 +90,28 @@
       <aside class="lg:col-span-1">
         <div class="p-6 bg-blue-50 rounded-xl shadow-xl border-t-4 border-blue-600">
           <h2 class="text-2xl font-semibold text-blue-800 mb-4">Your Tax Estimate</h2>
-          @if (estimatedTaxData()) {
+
+          <ng-container *ngIf="estimatedTaxData(); else placeholder">
             <div class="space-y-4">
-              <div class="flex justify-between border-b pb-2">
-                <span>Taxable Income:</span>
-                <span class="font-bold text-blue-800">{{ estimatedTaxData()!.taxableIncome | currency }}</span>
-              </div>
-              <div class="flex justify-between border-b pb-2">
-                <span>Total Tax:</span>
-                <span class="font-bold text-red-600">{{ estimatedTaxData()!.totalTax | currency }}</span>
-              </div>
-              <div class="flex justify-between border-b pb-2">
-                <span>Quarterly Payment:</span>
-                <span class="font-bold text-blue-600">{{ estimatedTaxData()!.quarterlyPayment | currency }}</span>
+              <div *ngFor="let item of TAX_RESULT_ITEMS" class="flex justify-between border-b pb-2">
+                <span>{{ item.label }}</span>
+                <span
+                  class="font-bold"
+                  [ngClass]="{
+                    'text-blue-800': item.key === 'taxableIncome',
+                    'text-red-600': item.key === 'totalTax',
+                    'text-blue-600': item.key === 'quarterlyPayment'
+                  }"
+                >
+                  {{ estimatedTaxData()![item.key] | currency }}
+                </span>
               </div>
             </div>
-          } @else {
+          </ng-container>
+
+          <ng-template #placeholder>
             <p class="text-gray-500 text-sm">Fill in the form and click Estimate Tax.</p>
-          }
+          </ng-template>
         </div>
       </aside>
     </div>

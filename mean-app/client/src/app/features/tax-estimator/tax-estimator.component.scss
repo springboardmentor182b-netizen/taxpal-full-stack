@@ -1,16 +1,55 @@
 :host {
   display: block;
+  font-family: 'Inter', sans-serif;
 }
 
+/* Form & Input Focus */
 input:focus,
 select:focus,
 button:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid #3b82f6; // Tailwind blue-500
   outline-offset: 2px;
+  transition: outline 0.2s ease-in-out;
 }
 
-/* Calendar card hover animation */
-.grid div:hover {
-  transform: scale(1.02);
-  transition: all 0.2s ease-in-out;
+/* Section Cards */
+.tax-estimator-container section,
+.tax-estimator-container aside {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1),
+                0 4px 6px -2px rgba(59, 130, 246, 0.05);
+  }
+}
+
+/* Calendar Cards */
+.grid div {
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.1),
+                0 4px 6px -2px rgba(59, 130, 246, 0.05);
+    background-color: #eff6ff; // Tailwind blue-50
+  }
+}
+
+/* Error Message */
+p.bg-red-100 {
+  font-size: 0.9rem;
+}
+
+/* Button Disabled */
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
 }
