@@ -1,10 +1,35 @@
 /* budget.component.css */
 
+/* Import project theme variables */
+:root {
+    --bg-dark: #0f172a;
+    --card-dark: #1e293b;
+    --card-darker: #0b1726;
+    --text-light: #e5eef6;
+    --muted: #9aa8b8;
+    --primary-green: #22c55e;
+    --primary-red: #ef4444;
+    --primary-orange: #f59e0b;
+    --primary-blue: #3b82f6;
+    --glass: rgba(255, 255, 255, 0.02);
+    --border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.light-mode {
+    --bg-dark: #f8fafc;
+    --card-dark: #ffffff;
+    --card-darker: #f3f4f6;
+    --text-light: #0f172a;
+    --muted: #475569;
+    --glass: rgba(0, 0, 0, 0.02);
+    --border-color: #e5e7eb;
+}
+
 /* Budget Page Layout */
 .budget-page {
     min-height: 100vh;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    background: var(--bg-dark);
+    color: var(--text-light);
     font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -36,7 +61,7 @@
 }
 
 .form-card {
-    background: var(--bg-primary);
+    background: var(--card-dark);
     border-radius: 12px;
     border: 2px solid var(--border-color);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
@@ -56,7 +81,7 @@
 .form-card-title {
     font-size: 28px;
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-light);
     margin: 0;
     letter-spacing: -0.02em;
     text-align: center;
@@ -76,7 +101,7 @@
 
 .form-group label {
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--text-light);
     font-size: 14px;
     letter-spacing: -0.01em;
     margin-bottom: 4px;
@@ -88,24 +113,24 @@
     border-radius: 8px;
     font-size: 14px;
     transition: all 0.2s ease;
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+    background: var(--card-darker);
+    color: var(--text-light);
     font-family: inherit;
     font-weight: 500;
 }
 
 .input:focus {
     outline: none;
-    border-color: var(--accent-primary);
+    border-color: var(--primary-blue);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .input:hover {
-    border-color: var(--accent-primary);
+    border-color: var(--primary-blue);
 }
 
 .input::placeholder {
-    color: var(--text-secondary);
+    color: var(--muted);
     font-weight: 400;
 }
 
@@ -136,7 +161,7 @@ select.input {
     left: 12px;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: var(--muted);
     font-weight: 600;
     z-index: 1;
     font-size: 14px;
@@ -148,7 +173,7 @@ select.input {
 
 /* Error Message */
 .error-message {
-    color: #ef4444;
+    color: var(--primary-red);
     font-size: 12px;
     font-weight: 500;
     margin-top: 4px;
@@ -218,24 +243,24 @@ select.input {
 
 .btn-ghost {
     background: transparent;
-    color: var(--text-secondary);
+    color: var(--muted);
     border: 2px solid var(--border-color);
 }
 
 .btn-ghost:hover {
     background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary);
-    border-color: var(--accent-primary);
+    color: var(--text-light);
+    border-color: var(--primary-blue);
 }
 
 /* Form Validation States */
 .form-group .input.ng-invalid.ng-touched {
-    border-color: #ef4444;
+    border-color: var(--primary-red);
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
 }
 
 .form-group .input.ng-valid.ng-touched {
-    border-color: #22c55e;
+    border-color: var(--primary-green);
     box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
 }
 
@@ -245,7 +270,7 @@ select.input {
     grid-template-columns: 1fr 1fr 1fr 2fr;
     row-gap: 12px;
     padding: 16px;
-    background: var(--bg-secondary);
+    background: var(--card-darker);
     border-radius: 8px;
     border: 2px solid var(--border-color);
 }
@@ -256,7 +281,7 @@ select.input {
 
 .budget-head > div {
     font-weight: 700;
-    color: var(--text-primary);
+    color: var(--text-light);
     opacity: 0.9;
     padding-bottom: 12px;
     border-bottom: 2px solid var(--border-color);
@@ -265,7 +290,7 @@ select.input {
 .budget-row:not(.budget-head) > div {
     padding: 12px 0;
     border-bottom: 1px solid var(--border-color);
-    color: var(--text-primary);
+    color: var(--text-light);
 }
 
 .budget-description {
@@ -273,6 +298,57 @@ select.input {
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 200px;
+}
+
+/* Light mode adjustments */
+body.light-mode .budget-page {
+    background: var(--bg-dark);
+}
+
+body.light-mode .form-card {
+    background: var(--card-dark);
+    border: 2px solid var(--border-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+body.light-mode .form-card-header {
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.01), transparent);
+    border-bottom: 2px solid var(--border-color);
+}
+
+body.light-mode .input {
+    background: var(--card-darker);
+    border: 2px solid var(--border-color);
+}
+
+body.light-mode .input:hover {
+    border-color: var(--primary-blue);
+}
+
+body.light-mode .btn-ghost {
+    border: 2px solid var(--border-color);
+}
+
+body.light-mode .btn-ghost:hover {
+    background: var(--card-darker);
+    border-color: var(--primary-blue);
+}
+
+body.light-mode .actions {
+    border-top: 2px solid var(--border-color);
+}
+
+body.light-mode .budget-table-simple {
+    background: var(--card-darker);
+    border: 2px solid var(--border-color);
+}
+
+body.light-mode .budget-head > div {
+    border-bottom: 2px solid var(--border-color);
+}
+
+body.light-mode .budget-row:not(.budget-head) > div {
+    border-bottom: 1px solid var(--border-color);
 }
 
 /* Responsive Design */
@@ -342,64 +418,9 @@ select.input {
     .budget-container {
         flex-direction: column;
     }
-
+    
     .form-section,
     .budget-list-section {
         width: 100%;
     }
-}
-
-/* Dark mode styles */
-.budget-page.dark {
-    background: #1f2937;
-    color: #f9fafb;
-}
-
-.form-card.dark {
-    background: #374151;
-    border-color: #4b5563;
-}
-
-.form-card-title.dark {
-    color: #f9fafb;
-}
-
-.form-group label.dark {
-    color: #f9fafb;
-}
-
-.input.dark {
-    background: #4b5563;
-    color: #f9fafb;
-    border-color: #6b7280;
-}
-
-.input.dark::placeholder {
-    color: #9ca3af;
-}
-
-.btn-ghost.dark {
-    color: #d1d5db;
-    border-color: #4b5563;
-}
-
-.btn-ghost.dark:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #f9fafb;
-    border-color: #3b82f6;
-}
-
-.budget-table-simple.dark {
-    background: #374151;
-    border-color: #4b5563;
-}
-
-.budget-head > div.dark {
-    color: #f9fafb;
-    border-color: #4b5563;
-}
-
-.budget-row:not(.budget-head) > div.dark {
-    color: #f9fafb;
-    border-color: #374151;
 }
