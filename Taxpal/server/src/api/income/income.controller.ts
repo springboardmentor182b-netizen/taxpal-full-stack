@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import Income from './Income.model';
+import Transaction from '../transaction/Transaction';
 import { AuthedRequest } from '../auth/requireAuth';
 
 function toDate(input: any): Date {
@@ -13,13 +14,25 @@ export async function createIncome(req: AuthedRequest, res: Response) {
   const source = String(body.source ?? body.description ?? '').trim();
   if (!source) return res.status(400).json({ message: 'source/description is required' });
 
+  const userId = req.user!.id;
+
   const doc = await Income.create({
-    userId: req.user!.id,
+    userId,
     source,
     category: body.category ? String(body.category).trim() : 'General',
     amount: Number(body.amount),
     date: toDate(body.date),
     notes: body.notes ? String(body.notes).trim() : undefined
+  });
+
+  // Mirror into Transaction for dashboards/recent
+  await Transaction.create({
+    userId,
+    type: 'income',
+    category: doc.category,
+    amount: doc.amount,
+    date: doc.date,
+    description: doc.source
   });
 
   res.status(201).json(doc);
@@ -62,12 +75,38 @@ export async function updateIncome(req: AuthedRequest, res: Response) {
   );
 
   if (!updated) return res.status(404).json({ message: 'Not found' });
+
+  // (optional) keep Transaction in sync (heuristic)
+  await Transaction.findOneAndUpdate(
+    {
+      userId: req.user!.id,
+      type: 'income',
+      description: updated.source,
+      date: updated.date,
+      amount: updated.amount
+    },
+    { category: updated.category },
+    { upsert: false }
+  );
+
   res.json(updated);
 }
 
 export async function deleteIncome(req: AuthedRequest, res: Response) {
   const { id } = req.params;
-  const del = await Income.findOneAndDelete({ _id: id, userId: req.user!.id });
+
+  // Use .lean() so we get a plain object with known fields
+  const del = await Income.findOneAndDelete({ _id: id, userId: req.user!.id }).lean();
   if (!del) return res.status(404).json({ message: 'Not found' });
+
+  // (optional) also remove a matching Transaction (best: store incomeId in Transaction)
+  await Transaction.deleteOne({
+    userId: req.user!.id,
+    type: 'income',
+    description: del.source,
+    amount: del.amount,
+    date: del.date
+  });
+
   res.json({ ok: true });
 }

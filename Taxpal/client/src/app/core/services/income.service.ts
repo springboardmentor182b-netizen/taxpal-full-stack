@@ -1,14 +1,38 @@
+// src/app/core/services/income.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../../environments/environments';
+import { AuthService } from './auth.service';
+
+export interface IncomeDto {
+  description: string;   // alias for server's "source"
+  amount: number;
+  category: string;
+  date: string;          // yyyy-mm-dd
+  notes?: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class IncomeService {
-  private readonly API = `${environment.API_URL}/incomes`;
-  constructor(private http: HttpClient) {}
+  private readonly API = '/api/v1/incomes';
 
-  addIncome(payload: { description: string; amount: number; category: string; date: string; notes?: string }): Observable<any> {
-    return this.http.post<any>(this.API, payload);
+  constructor(
+    private http: HttpClient,
+    private auth: AuthService
+  ) {}
+
+  private buildAuthHeaders(): HttpHeaders {
+    const token = this.auth.getToken();
+    if (!token) throw new Error('Authentication token is missing');
+    return new HttpHeaders({ Authorization: `Bearer ${token}` });
+    // If you use an interceptor, you can remove this and the { headers } objects below.
   }
+
+  create(payload: IncomeDto): Observable<any> {
+    const headers = this.buildAuthHeaders();
+    // server normalizes: `source` from `description` if needed
+    return this.http.post<any>(this.API, payload, { headers });
+  }
+
+  // (optional) add list/update/delete like in ExpenseService if you need them
 }
