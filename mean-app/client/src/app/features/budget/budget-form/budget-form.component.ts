@@ -1,3 +1,4 @@
+
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -58,6 +59,15 @@ export class BudgetFormComponent {
     private router: Router
   ) {
     this.loadCurrentUser();
+  }
+
+  // Compute overall budget health based on all budgets
+  overallBudgetHealth(): 'Good' | 'Fair' | 'Poor' | 'No Budgets' {
+    const budgets = this.budgets();
+    if (!budgets || budgets.length === 0) return 'No Budgets';
+    if (budgets.some((b: Budget) => b.status === 'Poor')) return 'Poor';
+    if (budgets.some((b: Budget) => b.status === 'Fair')) return 'Fair';
+    return 'Good';
   }
 
   // ✅ Load current user and initials
