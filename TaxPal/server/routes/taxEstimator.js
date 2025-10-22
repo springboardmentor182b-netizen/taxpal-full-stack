@@ -5,8 +5,76 @@ const TaxEstimate = require('../models/TaxEstimate');
 console.log('✓ Tax Estimator routes file loaded');
 
 /**
- * POST /api/tax-estimator/calculate
- * Calculate tax estimate based on provided data
+ * @swagger
+ * tags:
+ *   name: Tax Estimator
+ *   description: Tax calculation and estimation endpoints
+ */
+
+/**
+ * @swagger
+ * /api/tax-estimator/calculate:
+ *   post:
+ *     summary: Calculate estimated tax
+ *     tags: [Tax Estimator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - income
+ *             properties:
+ *               income:
+ *                 type: number
+ *                 minimum: 0
+ *                 example: 50000
+ *               businessExpenses:
+ *                 type: number
+ *                 minimum: 0
+ *                 example: 5000
+ *               retirement:
+ *                 type: number
+ *                 minimum: 0
+ *                 example: 3000
+ *               healthInsurance:
+ *                 type: number
+ *                 minimum: 0
+ *                 example: 2000
+ *               homeOffice:
+ *                 type: number
+ *                 minimum: 0
+ *                 example: 1000
+ *               status:
+ *                 type: string
+ *                 enum: [Single, Married, Married Filing Jointly, Married Filing Separately, Head of Household]
+ *                 example: Single
+ *     responses:
+ *       200:
+ *         description: Tax calculation successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 taxableIncome:
+ *                   type: number
+ *                 estimatedTax:
+ *                   type: number
+ *                 effectiveTaxRate:
+ *                   type: number
+ *                 breakdown:
+ *                   type: object
+ *                   properties:
+ *                     federalIncomeTax:
+ *                       type: number
+ *                     selfEmploymentTax:
+ *                       type: number
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
  */
 router.post('/calculate', (req, res) => {
   try {
@@ -88,8 +156,35 @@ router.post('/calculate', (req, res) => {
 });
 
 /**
- * POST /api/tax-estimator/save
- * Save tax estimate to MongoDB
+ * @swagger
+ * /api/tax-estimator/save:
+ *   post:
+ *     summary: Save tax estimate to database
+ *     tags: [Tax Estimator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/TaxEstimate'
+ *     responses:
+ *       201:
+ *         description: Tax estimate saved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   $ref: '#/components/schemas/TaxEstimate'
+ *       400:
+ *         description: Validation error
+ *       500:
+ *         description: Server error
  */
 router.post('/save', async (req, res) => {
   try {
@@ -161,6 +256,35 @@ router.post('/save', async (req, res) => {
     });
   }
 });
+
+/**
+ * @swagger
+ * /api/tax-estimator/user/{email}:
+ *   get:
+ *     summary: Get all tax estimates for a user
+ *     tags: [Tax Estimator]
+ *     parameters:
+ *       - in: path
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: email
+ *         description: User email address
+ *     responses:
+ *       200:
+ *         description: List of tax estimates
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/TaxEstimate'
+ *       400:
+ *         description: Invalid email
+ *       500:
+ *         description: Server error
+ */
 
 console.log('✓ Tax Estimator routes registered:');
 console.log('  - POST /calculate');

@@ -7,6 +7,54 @@ const SimpleBudget = require('../models/SimpleBudget');
 const Category = require('../models/Category');
 const mongoose = require('mongoose');
 
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: User authentication and management
+ */
+
+/**
+ * @swagger
+ * /api/users/signup:
+ *   post:
+ *     summary: Register a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/User'
+ *           example:
+ *             email: user@example.com
+ *             name: John Doe
+ *             password: securepassword123
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     email:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *       400:
+ *         description: User already exists or validation error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Error'
+ */
+
 // POST /api/users/register
 router.post('/register', async (req, res) => {
   try {
@@ -63,6 +111,49 @@ router.post('/register', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/users/signin:
+ *   post:
+ *     summary: Sign in a user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - password
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *                 format: password
+ *           example:
+ *             email: user@example.com
+ *             password: securepassword123
+ *     responses:
+ *       200:
+ *         description: Login successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *       401:
+ *         description: Invalid credentials
+ *       404:
+ *         description: User not found
+ */
+
 // Sign-in route: POST /api/users/signin
 router.post('/signin', async (req, res) => {
   try {
@@ -102,6 +193,30 @@ router.post('/signin', async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+/**
+ * @swagger
+ * /api/users/update-profile:
+ *   post:
+ *     summary: Update user profile
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Profile updated successfully
+ *       404:
+ *         description: User not found
+ */
 
 // GET /api/users/me
 router.get('/me', async (req, res) => {
@@ -549,15 +664,10 @@ router.delete('/categories/:id', async (req, res) => {
     }
     
     res.json({ message: 'Category deleted successfully', category: deletedCategory });
-  } catch (error) {
-    console.error('Error deleting category:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
-  }
-});
-
-module.exports = router;
-
-// Make sure this file is loaded in your Express app:
-// In your main server file (e.g. app.js or server.js):
-// const userRoutes = require('./routes/user');
-// app.use('/api/users', userRoutes);
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  });
+  
+  module.exports = router;
