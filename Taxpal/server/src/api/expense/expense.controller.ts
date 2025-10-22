@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import type { AuthedRequest } from '../auth/requireAuth';
 import Expense from './Expense.model';
-import Transaction from '../transaction/Transaction';
+import Transaction from '../transaction/Transaction.model';
 
 function toDate(input: any): Date {
   if (!input) return new Date();

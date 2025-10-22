@@ -1,122 +1,100 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ExpenseComponent } from './expense.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
+import { ExpenseModalComponent, ExpenseEmit } from './expense';
 
-describe(' ExpenseComponent UI Tests', () => {
-  let component: ExpenseComponent;
-  let fixture: ComponentFixture<ExpenseComponent>;
-  let httpMock: HttpTestingController;
+describe('ExpenseModalComponent (standalone)', () => {
+  let fixture: ComponentFixture<ExpenseModalComponent>;
+  let component: ExpenseModalComponent;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ExpenseComponent],
-      imports: [FormsModule, ReactiveFormsModule, HttpClientTestingModule]
+      // Standalone component: import it, don't declare it
+      imports: [ExpenseModalComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ExpenseComponent);
+    fixture = TestBed.createComponent(ExpenseModalComponent);
     component = fixture.componentInstance;
-    httpMock = TestBed.inject(HttpTestingController);
     fixture.detectChanges();
   });
 
-  afterEach(() => {
-    httpMock.verify();
-  });
-
-  //  Component Creation
-  it('should create the ExpenseComponent', () => {
+  it('should create', () => {
     expect(component).toBeTruthy();
   });
 
-  // Page Load Verification
-  it('should display expense list and Add button on load', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    const addButton = compiled.querySelector('button.add-expense');
-    expect(addButton).toBeTruthy();
+  it('should show the modal when isOpen=true', () => {
+    component.isOpen = true;
+    fixture.detectChanges();
+
+    const overlay = fixture.debugElement.query(By.css('.modal-overlay'));
+    expect(overlay).toBeTruthy();
   });
 
-  //  Form Validation - Empty Fields
-  it('should mark form invalid if fields are empty', () => {
-    component.expenseForm.controls['category'].setValue('');
-    component.expenseForm.controls['amount'].setValue('');
-    component.expenseForm.controls['date'].setValue('');
-    expect(component.expenseForm.invalid).toBeTrue();
+  it('should disable Save while the form is invalid', () => {
+    component.isOpen = true;
+    // leave required fields empty
+    component.formData = { description: '', amount: null, category: '', date: '', notes: '' };
+    fixture.detectChanges();
+
+    const saveBtn: HTMLButtonElement = fixture.debugElement.query(By.css('.btn-save'))
+      .nativeElement;
+    expect(saveBtn.disabled).toBeTrue();
   });
 
-  //  Amount Validation
-  it('should mark form invalid if amount is negative', () => {
-    component.expenseForm.controls['category'].setValue('Food');
-    component.expenseForm.controls['amount'].setValue(-500);
-    component.expenseForm.controls['date'].setValue(new Date());
-    expect(component.expenseForm.invalid).toBeTrue();
-  });
+  it('should emit save with a valid payload and then reset/close', () => {
+    const saveSpy = spyOn(component.save, 'emit');
+    const closeSpy = spyOn(component.closeModal, 'emit');
 
-  //  Add Expense
-  it('should add a new expense when valid data entered', () => {
-    component.expenseForm.setValue({
-      category: 'Travel',
-      amount: 1200,
-      date: new Date()
+    component.isOpen = true;
+    component.formData = {
+      description: 'Grocery shopping',
+      amount: 123.45,
+      category: 'food',
+      date: '2025-10-22',
+      notes: 'Weekly items',
+    };
+    fixture.detectChanges();
+
+    // Call directly; onSave itself validates and emits
+    component.onSave();
+
+    expect(saveSpy).toHaveBeenCalledTimes(1);
+    const payload: ExpenseEmit = saveSpy.calls.mostRecent().args[0] as ExpenseEmit;
+    expect(payload).toEqual({
+      description: 'Grocery shopping',
+      amount: 123.45,
+      category: 'food',
+      date: '2025-10-22',
+      notes: 'Weekly items',
     });
-    expect(component.expenseForm.valid).toBeTrue();
-
-    component.addExpense();
-    expect(component.expenses.length).toBeGreaterThan(0);
-    expect(component.expenses[0].category).toBe('Travel');
+    // onSave calls onClose, which emits closeModal and resets the form
+    expect(closeSpy).toHaveBeenCalledTimes(1);
+    expect(component.formData.description).toBe('');
+    expect(component.formData.amount).toBeNull();
   });
 
-  //  Edit Expense
-  it('should edit an existing expense', () => {
-    component.expenses = [{ id: 1, category: 'Food', amount: 100, date: new Date() }];
-    component.onEdit(1);
-    component.expenseForm.controls['amount'].setValue(300);
-    component.saveEdit();
-    expect(component.expenses[0].amount).toBe(300);
+  it('should emit closeModal when overlay is clicked', () => {
+    const closeSpy = spyOn(component.closeModal, 'emit');
+
+    component.isOpen = true;
+    fixture.detectChanges();
+
+    const overlay = fixture.debugElement.query(By.css('.modal-overlay'));
+    overlay.nativeElement.click(); // triggers (click)="onClose()" on overlay
+    fixture.detectChanges();
+
+    expect(closeSpy).toHaveBeenCalledTimes(1);
   });
 
-  //  Delete Expense
-  it('should delete an expense', () => {
-    component.expenses = [
-      { id: 1, category: 'Food', amount: 100, date: new Date() },
-      { id: 2, category: 'Travel', amount: 200, date: new Date() }
-    ];
-    component.onDelete(1);
-    expect(component.expenses.length).toBe(1);
-    expect(component.expenses[0].category).toBe('Travel');
-  });
+  it('should NOT close when clicking inside modal-content (stopPropagation)', () => {
+    const closeSpy = spyOn(component.closeModal, 'emit');
 
-  //  Calculate Total
-  it('should calculate total expenses correctly', () => {
-    component.expenses = [
-      { id: 1, category: 'Food', amount: 1000, date: new Date() },
-      { id: 2, category: 'Bills', amount: 2000, date: new Date() }
-    ];
-    const total = component.getTotalExpenses();
-    expect(total).toBe(3000);
-  });
+    component.isOpen = true;
+    fixture.detectChanges();
 
-  //  Expense Search Filter
-  it('should filter expenses by category', () => {
-    component.expenses = [
-      { id: 1, category: 'Food', amount: 100, date: new Date() },
-      { id: 2, category: 'Travel', amount: 200, date: new Date() }
-    ];
-    const result = component.searchExpense('Food');
-    expect(result.length).toBe(1);
-    expect(result[0].category).toBe('Food');
-  });
+    const content = fixture.debugElement.query(By.css('.modal-content'));
+    content.nativeElement.click(); // click is stopped by $event.stopPropagation()
+    fixture.detectChanges();
 
-  // Future Date Validation
-  it('should invalidate if future date selected', () => {
-    const future = new Date();
-    future.setDate(future.getDate() + 5);
-    component.expenseForm.controls['category'].setValue('Bills');
-    component.expenseForm.controls['amount'].setValue(500);
-    component.expenseForm.controls['date'].setValue(future);
-
-    const isValid = component.validateDate();
-    expect(isValid).toBeFalse();
+    expect(closeSpy).not.toHaveBeenCalled();
   });
 });

@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { Types } from 'mongoose';
 import { AuthedRequest } from '../auth/auth';
-import Transaction from '../transaction/Transaction';
+import Transaction from '../transaction/Transaction.model';
 import Budget from '../budget/budget.model';
 
 // ---------------- helpers ----------------

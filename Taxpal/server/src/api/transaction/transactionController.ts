@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { body } from 'express-validator';
-import Transaction from './Transaction';
+import Transaction from './Transaction.model';
 import { AuthedRequest } from '../auth/auth';
 import mongoose, { Types } from 'mongoose';
 

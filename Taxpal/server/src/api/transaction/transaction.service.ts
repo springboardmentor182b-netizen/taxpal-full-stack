@@ -1,6 +1,6 @@
 // src/api/dashboard/transaction.service.ts
 import mongoose from 'mongoose';
-import Transaction, { TransactionDoc } from './Transaction';
+import Transaction, { TransactionDoc } from './Transaction.model';
 
 export type ListParams = {
   page?: number;
