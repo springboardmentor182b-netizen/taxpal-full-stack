@@ -24,19 +24,23 @@ if (!loaded) console.warn('[env] .env not found; tried:', candidates);
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+
+// (optional) mailer verification if you use it
 import { verifyMailer } from './utils/mailer';
 
+// ✅ Route modules (use v1 paths consistently)
 import authRoutes from './api/auth/auth.routes';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
 import dashboardRoutes from './api/dashboard/dashboard-routes';
 import budgetsRoutes from './api/budget/budget.routes';
-
-// ✅ ADD THIS: Categories router
+import transactionRoutes from './api/transaction/transaction.routes';
 import categoriesRoutes from './api/Categories/category.routes';
 
 // ADD Financial Reports router
 import financialReportsRoutes from './api/FinancialReport/FinancialReport.routes';
+// ✅ NEW: Tax Estimator routes
+import taxRoutes from './api/TaxEstimator/TaxEstimator.routes';
 
 // ---------- 3) App setup ----------
 const app = express();
@@ -46,12 +50,11 @@ const PORT = Number(process.env.PORT || 3000);
 app.disable('x-powered-by');
 
 // ---------- 4) CORS ----------
-/**
- * CORS_ORIGIN can be a single origin or comma-separated list.
- * Example: CORS_ORIGIN=http://localhost:4200,http://127.0.0.1:4200
- */
 const corsOrigins =
-  process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || ['http://localhost:4200'];
+  process.env.CORS_ORIGIN?.split(',').map(s => s.trim()) || [
+    'http://localhost:4200',
+    'http://127.0.0.1:4200',
+  ];
 
 app.use(cors({ origin: corsOrigins, credentials: true }));
 
@@ -59,32 +62,37 @@ app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// (Optional) quick debug of env AFTER load
-console.log('[debug] SMTP_HOST=', process.env.SMTP_HOST || '(none)');
-console.log('[debug] SMTP_USER=', process.env.SMTP_USER ? '(set)' : '(none)');
-console.log('[debug] GMAIL_USER=', process.env.GMAIL_USER ? '(set)' : '(none)');
+// ---------- 6) DB connection (accept BOTH MONGODB_URI and MONGO_URI) ----------
+const mongoUri =
+  process.env.MONGODB_URI ||
+  process.env.MONGO_URI ||
+  'mongodb://localhost:27017/taxpal';
 
-// ---------- 6) DB connection ----------
+console.log('[db] Connecting to:', mongoUri);
 mongoose
-  .connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taxpal')
-  .then(() => console.log('Connected to MongoDB'))
-  .catch(err => console.error('MongoDB connection error:', err));
+  .connect(mongoUri)
+  .then(() => console.log('[db] Connected to MongoDB'))
+  .catch(err => console.error('[db] connection error:', err));
 
-// ---------- 7) Routes (use ONLY /api/v1 prefix) ----------
+// ---------- 7) Routes (canonical: /api/v1 prefix) ----------
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
 app.use('/api/v1/dashboard', dashboardRoutes);
 app.use('/api/v1/budgets', budgetsRoutes);
-
-// ✅ ADD THIS LINE: mount categories at /api/v1/categories
+app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
 // Add mount financial reports at /api/v1/financial-reports
 app.use('/api/v1/financial-reports', financialReportsRoutes);
+// ✅ NEW: mount tax estimator + calendar
+app.use('/api/v1/tax', taxRoutes);
+
+// ---------- 7b) Legacy compatibility mounts (optional) ----------
+app.use('/api/transactions', transactionRoutes);
 
 // Health check
-app.get('/api/health', (_req, res) => {
+app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'OK', message: 'TaxPal API is running' });
 });
 
@@ -112,11 +120,11 @@ app.get('/__routes', (_req, res) => {
   res.json({ routes });
 });
 
-// ---------- 9) START SERVER (single listen + graceful shutdown) ----------
+// ---------- 9) START SERVER ----------
 if (!(global as any).__taxpal_server_started) {
   const server = app.listen(PORT, () => {
     (global as any).__taxpal_server_started = true;
-    console.log(`TaxPal server running on port ${PORT}`);
+    console.log(`TaxPal server running on http://localhost:${PORT}`);
     try {
       verifyMailer();
     } catch (e) {

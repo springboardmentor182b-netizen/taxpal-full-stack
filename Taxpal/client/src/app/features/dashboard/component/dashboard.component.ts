@@ -7,9 +7,11 @@ import { Router, RouterLink } from '@angular/router';
 import { BudgetsListComponent } from '../../budgets/component/budgets-list.component';
 import { IncomeModalComponent } from '../../auth/components/income/income';
 import { ExpenseModalComponent } from '../../auth/components/expense/expense';
-
-import { DashboardService } from '../../dashboard/service/dashboard.service';
+import { AuthService, User } from '../../../core/services/auth.service';
+import { DashboardService } from '../../../core/services/dashboard.service';
 import { ExpenseService } from '../../../core/services/expense.service';
+import { IncomeService } from '../../../core/services/income.service';
+import { TransactionService } from '../../../core/services/transaction.service';
 
 type IncomePayloadFromModal = {
   description: string;
@@ -38,6 +40,15 @@ type BudgetModel = {
   _id?: string;
 };
 
+type RecentTx = {
+  _id?: string;
+  type: 'income' | 'expense';
+  description: string;
+  category: string;
+  amount: number;
+  date: string | Date;
+};
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -46,7 +57,7 @@ type BudgetModel = {
     HttpClientModule,
     FormsModule,
     IncomeModalComponent,
-    RouterLink,            // needed for routerLink in template
+    RouterLink,
     ExpenseModalComponent,
     BudgetsListComponent
   ],
@@ -54,6 +65,8 @@ type BudgetModel = {
   styleUrls: ['./dashboard.component.css'],
 })
 export class DashboardComponent implements AfterViewInit, OnDestroy {
+  user: User | null = null;
+
   showIncome = false;
   showExpense = false;
   showBudget = false;
@@ -61,6 +74,13 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   incomes: any[] = [];
   expenses: any[] = [];
   budgets: BudgetModel[] = [];
+
+  recent: RecentTx[] = [];
+  pieHasData = false;
+  isDeletingAll = false;
+
+  // Queue of bumps to apply if chart isn't ready yet
+  private pendingBarBumps: Array<{ dateISO: string; delta: number; kind: 'income' | 'expense' }> = [];
 
   budgetModel: BudgetModel = {
     name: '',
@@ -86,26 +106,91 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
   constructor(
     private dash: DashboardService,
     private expensesApi: ExpenseService,
-    private router: Router
-  ) {}
-
-  // ✅ Open Tax Calendar in the SAME SPA tab
-  goToTaxCalendar(ev: Event) {
-    ev.preventDefault();               // stop default anchor navigation
-    this.router.navigate(['/tax-calendar']);
+    private incomesApi: IncomeService,
+    private router: Router,
+    public  auth: AuthService,
+    private txApi: TransactionService
+  ) {
+    this.auth.currentUser$.subscribe(u => { this.user = u; });
+    this.user = this.auth.getCurrentUser();
   }
 
-  // ===== Sidebar / Top buttons =====
+  // GETTERS
+  get firstInitial(): string {
+    const s = (this.user?.name || this.user?.email || 'U').trim();
+    return s ? s[0].toUpperCase() : 'U';
+  }
+  get secondInitial(): string {
+    const n = this.user?.name?.trim();
+    if (!n) return '';
+    const parts = n.split(/\s+/);
+    return (parts[1]?.[0] ?? '').toUpperCase();
+  }
+
+  // Keep Angular happy when re-rendering rows
+  trackByTx = (_: number, tx: RecentTx) => tx._id || tx.date;
+
+  // ===================== DELETE ONE (Recent row) =====================
+  onDeleteRecent(tx: RecentTx) {
+    const id = tx._id;
+    if (!id) { return; } // only delete persisted rows
+    if (!confirm('Delete this transaction?')) return;
+
+    // optimistic remove from recent
+    const prevRecent = [...this.recent];
+    this.recent = this.recent.filter(r => r._id !== id);
+
+    // also try to remove from local income/expense caches (best effort)
+    this.incomes = this.incomes.filter((i: any) => i._id !== id);
+    this.expenses = this.expenses.filter((e: any) => e._id !== id);
+
+    this.txApi.deleteTransaction(id).subscribe({
+      next: () => {
+        this.dash.invalidate();
+        // refresh cards + charts + recent from server
+        this.refreshDashboard(true, true);
+      },
+      error: (err) => {
+        // rollback UI
+        this.recent = prevRecent;
+        console.error('Failed to delete transaction', err);
+        alert('Failed to delete transaction. Please try again.');
+      }
+    });
+  }
+
+  // ===================== DELETE ALL =====================
+  onDeleteAllRecent() {
+    if (!this.recent.length) return;
+    if (!confirm('Delete ALL transactions? This cannot be undone.')) return;
+
+    this.isDeletingAll = true;
+    this.txApi.deleteAll().subscribe({
+      next: () => {
+        // clear local caches
+        this.recent = [];
+        this.expenses = [];
+        this.incomes = [];
+        this.isDeletingAll = false;
+
+        this.dash.invalidate();
+        this.refreshDashboard(true, true);
+      },
+      error: (err) => {
+        this.isDeletingAll = false;
+        console.error('Failed to delete all transactions', err);
+        alert('Failed to delete all transactions.');
+      }
+    });
+  }
+
   openIncome()  { this.showIncome = true;  this.showExpense = false; this.showBudget = false; }
   openExpense() { this.showExpense = true; this.showIncome  = false; this.showBudget = false; }
   closeIncome() { this.showIncome = false; }
   closeExpense(){ this.showExpense = false; }
-
-  // ===== Budgets — inline modal =====
   openBudget()  { this.showBudget = true;  this.showIncome = false; this.showExpense = false; }
   closeBudget() { this.showBudget = false; }
 
-  // Optional local “save” if you keep an old inline budget block
   saveBudget() {
     const payload: BudgetModel = { ...this.budgetModel, amount: Number(this.budgetModel.amount ?? 0) };
     this.budgets = [payload, ...this.budgets];
@@ -115,46 +200,117 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   // ===================== INCOME SAVE =====================
   onIncomeSave(evt: IncomePayloadFromModal) {
-    if (evt?.amount && evt.amount > 0 && evt.date) {
-      this.bumpBarSeries(evt.date, evt.amount, 'income'); // optimistic
-    }
-    this.incomes.push(evt);
+    const amount = Number(evt?.amount ?? 0);
+    if (!amount || amount <= 0 || !evt?.date) return;
+
+    // optimistic bump
+    this.bumpBarSeries(evt.date, amount, 'income');
+
+    // optimistic recent row
+    const tempId = (globalThis as any).crypto?.randomUUID?.() ?? `tmp_${Date.now()}`;
+    this.prependRecent({
+      _id: tempId,
+      type: 'income',
+      description: evt.description?.trim() || 'Income',
+      category: evt.category || 'General',
+      amount,
+      date: evt.date
+    });
+
+    // persist
+    this.incomesApi.create({
+      description: evt.description,
+      amount,
+      category: evt.category,
+      date: evt.date,
+      notes: evt.notes
+    }).subscribe({
+      next: (doc: any) => {
+        // replace optimistic recent with server doc
+        this.replaceRecent(tempId, {
+          _id: doc?._id,
+          type: 'income',
+          description: doc?.source ?? doc?.description ?? evt.description,
+          category: doc?.category ?? evt.category,
+          amount: Number(doc?.amount ?? amount),
+          date: doc?.date ?? evt.date
+        });
+        this.dash.invalidate();
+        this.loadRecent(); // server-backed recent
+        // ⬅️ Now refresh charts AFTER save is done (prevents first-time miss)
+        this.refreshDashboard(true, false);
+      },
+      error: (err) => {
+        // rollback optimistic
+        this.removeRecent(tempId);
+        this.bumpBarSeries(evt.date, -amount, 'income');
+        console.error('Failed to save income', err);
+      }
+    });
+
+    this.incomes.push({ ...evt, amount });
     this.closeIncome();
-    this.dash.invalidate();
-    this.refreshDashboard();
+
+    // DO NOT refresh charts right here; we do it in success handler
+    // this.refreshDashboard(true, false);
   }
 
   // ===================== EXPENSE SAVE =====================
   onExpenseSave(evt: ExpensePayloadFromModal) {
     if (evt.amount == null || evt.amount <= 0) return;
 
+    const amount = Number(evt.amount);
     const payload = {
       description: evt.description?.trim() ?? '',
-      amount: evt.amount as number,
+      amount,
       category: evt.category,
       date: evt.date,
       notes: evt.notes ?? '',
     };
 
-    this.bumpBarSeries(payload.date, payload.amount, 'expense'); // optimistic
+    // optimistic bump
+    this.bumpBarSeries(payload.date, amount, 'expense');
 
+    // optimistic local + recent
     const tempId = (globalThis as any).crypto?.randomUUID?.() ?? `tmp_${Date.now()}`;
     const optimistic = { ...payload, _id: tempId, _optimistic: true };
     this.expenses = [optimistic, ...this.expenses];
     this.rebuildPieFromLocal();
 
+    this.prependRecent({
+      _id: tempId,
+      type: 'expense',
+      description: payload.description || 'Expense',
+      category: payload.category || 'General',
+      amount,
+      date: payload.date
+    });
+
     this.expensesApi.addExpense(payload).subscribe({
       next: (created) => {
         this.expenses = [created ?? payload, ...this.expenses.filter((e) => e._id !== tempId)];
         this.rebuildPieFromLocal();
+
+        this.replaceRecent(tempId, {
+          _id: (created as any)?._id,
+          type: 'expense',
+          description: (created as any)?.description ?? payload.description,
+          category: (created as any)?.category ?? payload.category,
+          amount: Number((created as any)?.amount ?? amount),
+          date: (created as any)?.date ?? payload.date
+        });
+
         this.closeExpense();
         this.dash.invalidate();
-        this.refreshDashboard();
+        this.loadRecent();
+        // ⬅️ Refresh charts AFTER save is done
+        this.refreshDashboard(true, false);
       },
       error: (err) => {
         this.expenses = this.expenses.filter((e) => e._id !== tempId);
+        this.removeRecent(tempId);
         this.rebuildPieFromLocal();
-        this.bumpBarSeries(payload.date, -payload.amount, 'expense'); // rollback
+        this.bumpBarSeries(payload.date, -amount, 'expense');
         console.error('Failed to save expense', err);
       },
     });
@@ -162,7 +318,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
 
   async ngAfterViewInit(): Promise<void> {
     await new Promise<void>((r) => requestAnimationFrame(() => r()));
-    this.refreshDashboard();
+    this.refreshDashboard(); // charts+recent
   }
 
   ngOnDestroy(): void {
@@ -176,8 +332,8 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     this.pieChart = undefined;
   }
 
-  // ===================== DASHBOARD (server data) =====================
-  private refreshDashboard(): void {
+  // ===================== DASHBOARD LOADERS =====================
+  private refreshDashboard(loadCharts: boolean = true, loadRecentFlag: boolean = true): void {
     // cards & pie
     this.dash.getDashboard(undefined, undefined, true).subscribe({
       next: (res: any) => {
@@ -195,6 +351,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
           const labels = apiBreakdown.map((x: any) => x.category);
           const values = apiBreakdown.map((x: any) => Number(x.amount) || 0);
           this.upsertPie(labels, values);
+          this.pieHasData = values.some(v => v > 0);
         } else {
           this.rebuildPieFromLocal();
         }
@@ -202,23 +359,59 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
       error: () => this.rebuildPieFromLocal(),
     });
 
-    // bar
-    this.dash.getIncomeVsExpenses('month', true).subscribe({
-      next: (res: any) => {
-        const labels: string[] = res?.labels || [];
-        const incomeRaw = res?.series?.find((s: any) => s.label === 'Income')?.data || [];
-        const expenseRaw = res?.series?.find((s: any) => s.label === 'Expenses')?.data || [];
+    if (loadCharts) {
+      this.dash.getIncomeVsExpenses('month', true).subscribe({
+        next: (res: any) => {
+          const labels: string[] = res?.labels || [];
+          const incomeRaw = res?.series?.find((s: any) => s.label === 'Income')?.data || [];
+          const expenseRaw = res?.series?.find((s: any) => s.label === 'Expenses')?.data || [];
 
-        const income = this.numberfy(incomeRaw, labels.length);
-        const expense = this.numberfy(expenseRaw, labels.length);
+          const income = this.numberfy(incomeRaw, labels.length);
+          const expense = this.numberfy(expenseRaw, labels.length);
+          this.upsertBar(labels, income, expense);
+        },
+        error: (err) => console.error('Failed to load bar series', err),
+      });
+    }
 
-        if (!labels.length) console.warn('[bar] empty labels from API');
-        console.debug('[bar] labels:', labels, 'income:', income, 'expense:', expense);
+    if (loadRecentFlag) {
+      this.loadRecent();
+    }
+  }
 
-        this.upsertBar(labels, income, expense);
+  private loadRecent(limit: number = 8) {
+    this.dash.getRecentTransactions(limit).subscribe({
+      next: (res) => {
+        const items = (res?.transactions ?? []) as any[];
+        this.recent = items.map((t) => ({
+          _id: t._id,
+          type: t.type,
+          description: t.description ?? (t.type === 'income' ? 'Income' : 'Expense'),
+          category: t.category ?? 'General',
+          amount: Number(t.amount ?? 0),
+          date: t.date
+        }));
       },
-      error: (err) => console.error('Failed to load bar series', err),
+      error: (err) => {
+        console.error('Failed to load recent transactions', err);
+        this.recent = [];
+      }
     });
+  }
+
+  private prependRecent(tx: RecentTx) {
+    this.recent = [tx, ...this.recent].slice(0, 8);
+  }
+  private replaceRecent(tempId: string, real: RecentTx) {
+    const i = this.recent.findIndex(r => r._id === tempId);
+    if (i >= 0) {
+      const copy = [...this.recent];
+      copy[i] = { ...real };
+      this.recent = copy;
+    }
+  }
+  private removeRecent(tempId: string) {
+    this.recent = this.recent.filter(r => r._id !== tempId);
   }
 
   private rebuildPieFromLocal(): void {
@@ -231,6 +424,7 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     const labels = Object.keys(totals);
     const values = labels.map((l) => totals[l]);
     this.upsertPie(labels, values);
+    this.pieHasData = values.some(v => v > 0);
   }
 
   private numberfy(arr: any[], targetLen: number): number[] {
@@ -269,16 +463,28 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     const incomeFixed   = num(income);
     const expensesFixed = num(expenses);
 
-    const apiHasBars = L > 0 && (incomeFixed.some(v => v > 0) || expensesFixed.some(v => v > 0));
-    const useLabels   = apiHasBars ? labels         : ['Week 1','Week 2','Week 3','Week 4'];
-    const useIncome   = apiHasBars ? incomeFixed    : [1200, 900, 1100, 1400];
-    const useExpenses = apiHasBars ? expensesFixed  : [ 800, 700,  950,  600];
+    // If API returned no bars, scaffold current-month daily buckets
+    let apiHasBars = L > 0 && (incomeFixed.some(v => v > 0) || expensesFixed.some(v => v > 0));
+    let useLabels   = labels;
+    let useIncome   = incomeFixed;
+    let useExpenses = expensesFixed;
+
+    if (!L) {
+      const scaffold = this.buildCurrentMonthScaffold();
+      useLabels   = scaffold.labels;
+      useIncome   = scaffold.income;
+      useExpenses = scaffold.expenses;
+      apiHasBars  = false;
+    }
 
     if (this.barChart) {
       this.barChart.data.labels = useLabels;
       (this.barChart.data.datasets[0].data as number[]) = useIncome;
       (this.barChart.data.datasets[1].data as number[]) = useExpenses;
       this.barChart.update();
+
+      // apply any queued bumps
+      this.applyPendingBarBumps();
       return;
     }
 
@@ -316,6 +522,24 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
         }
       }
     });
+
+    // apply queued bumps after first creation
+    this.applyPendingBarBumps();
+  }
+
+  private buildCurrentMonthScaffold(): { labels: string[]; income: number[]; expenses: number[] } {
+    const now = new Date();
+    const y = now.getFullYear();
+    const m = now.getMonth();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+
+    const labels: string[] = [];
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dd = String(d).padStart(2, '0');
+      const short = new Date(y, m, d).toLocaleString(undefined, { month: 'short' });
+      labels.push(`${dd} ${short}`);
+    }
+    return { labels, income: new Array(daysInMonth).fill(0), expenses: new Array(daysInMonth).fill(0) };
   }
 
   private upsertPie(labels: string[], data: number[]) {
@@ -361,13 +585,24 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     });
   }
 
-  // ===================== OPTIMISTIC BAR PATCHER =====================
   private bumpBarSeries(dateISO: string, delta: number, kind: 'income' | 'expense') {
-    if (!this.barChart || !dateISO || !isFinite(delta)) return;
+    if (!dateISO || !isFinite(delta)) return;
+
+    // If chart isn't ready yet, queue the bump
+    if (!this.barChart) {
+      this.pendingBarBumps.push({ dateISO, delta, kind });
+      return;
+    }
 
     const labels = (this.barChart.data.labels || []) as (string | number)[];
-    const idx = this.findBarBucketIndex(dateISO, labels);
-    if (idx < 0) return;
+    let idx = this.findBarBucketIndex(dateISO, labels);
+
+    // If we can't find a bucket (e.g., placeholder labels), push to last bucket as a visual hint;
+    // the next server refresh will correct it.
+    if (idx < 0) {
+      idx = labels.length ? labels.length - 1 : -1;
+      if (idx < 0) return;
+    }
 
     const dsIndex = kind === 'income' ? 0 : 1;
     const ds = this.barChart.data.datasets[dsIndex];
@@ -377,6 +612,15 @@ export class DashboardComponent implements AfterViewInit, OnDestroy {
     arr[idx] = curr + delta;
 
     this.barChart.update();
+  }
+
+  private applyPendingBarBumps() {
+    if (!this.barChart || !this.pendingBarBumps.length) return;
+    const bumps = [...this.pendingBarBumps];
+    this.pendingBarBumps = [];
+    for (const b of bumps) {
+      this.bumpBarSeries(b.dateISO, b.delta, b.kind);
+    }
   }
 
   private findBarBucketIndex(dateISO: string, labels: (string | number)[]): number {

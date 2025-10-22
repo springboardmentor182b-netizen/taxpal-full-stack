@@ -1,13 +1,11 @@
-// src/api/v1/dashboard/dashboardController.ts
 import { Response } from 'express';
 import { Types } from 'mongoose';
 import { AuthedRequest } from '../auth/auth';
-import Transaction from '../dashboard/Transaction';
+import Transaction from '../transaction/Transaction';
 import Budget from '../budget/budget.model';
 
 // ---------------- helpers ----------------
 const round2 = (n: number) => Math.round(n * 100) / 100;
-
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
 const monthRange = (year: number, month1to12: number) => {
@@ -72,13 +70,8 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
       { $sort: { amount: -1 } }
     ]);
 
-    // --- Budgets (with spent/remaining/usedPct) ---
-    // Budget model uses:
-    //   - amount (number): budget cap
-    //   - month (string "YYYY-MM")
-    //   - monthStart (Date) auto-normalized
+    // --- Budgets (spent/remaining/usedPct) ---
     const budgets = await Budget.find({ userId, month: monthStr }).lean();
-
     const spentByCategory = await Transaction.aggregate([
       { $match: { userId, type: 'expense', date: { $gte: start, $lt: end } } },
       { $group: { _id: '$category', spent: { $sum: '$amount' } } }
@@ -95,8 +88,8 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
         userId: (b as any).userId ? String((b as any).userId) : undefined,
         category: b.category,
         amount: round2(cap),
-        month: b.month,               // "YYYY-MM"
-        monthStart: b.monthStart,     // Date
+        month: b.month,
+        monthStart: b.monthStart,
         description: b.description ?? '',
         spent: round2(spent),
         remaining: round2(remaining),
@@ -124,19 +117,13 @@ export const getDashboardData = async (req: AuthedRequest, res: Response): Promi
       budgets: budgetsOut,
       recentTransactions
     });
-    return;
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch dashboard data' });
-    return;
   }
 };
 
 /**
  * GET /api/v1/dashboard/income-vs-expenses
- * Query:
- * - period|range: 'month' | 'quarter' | 'year' (default 'month')
- * - month?: 1-12 (defaults to current month for month/quarter)
- * - year?:  YYYY (defaults to current year)
  */
 export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
@@ -156,8 +143,6 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
 
     if (period === 'month') {
       ({ start, end } = monthRange(qYear, qMonth));
-
-      // Aggregate by DAY within the month
       const rows = await Transaction.aggregate([
         { $match: { userId, date: { $gte: start, $lt: end } } },
         {
@@ -184,7 +169,7 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
 
       while (cur < end) {
         const key = cur.toISOString().slice(0, 10); // YYYY-MM-DD
-        labels.push(cur.toLocaleDateString(undefined, { day: '2-digit', month: 'short' })); // "03 May"
+        labels.push(cur.toLocaleDateString(undefined, { day: '2-digit', month: 'short' }));
         incomeSeries.push(round2(incomeMap.get(key) || 0));
         expenseSeries.push(round2(expenseMap.get(key) || 0));
         cur.setDate(cur.getDate() + 1);
@@ -201,7 +186,6 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
       return;
     }
 
-    // quarter/year -> aggregate by MONTH within the range
     if (period === 'quarter') {
       const q = Math.ceil(qMonth / 3);
       const qr = quarterRange(qYear, q);
@@ -240,7 +224,7 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
       const m = cur.getMonth() + 1;
       const ym = `${y}-${pad2(m)}`;
 
-      labels.push(new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'short', year: 'numeric' })); // "May 2025"
+      labels.push(new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'short', year: 'numeric' }));
       incomeSeries.push(round2(incomeMap.get(ym) || 0));
       expenseSeries.push(round2(expenseMap.get(ym) || 0));
 
@@ -255,18 +239,12 @@ export const getIncomeVsExpenses = async (req: AuthedRequest, res: Response): Pr
       ],
       period
     });
-    return;
   } catch (error) {
     res.status(500).json({ error: 'Failed to fetch income vs expenses data' });
-    return;
   }
 };
 
-// ---------------- NEW: Recent transactions endpoint ----------------
-/**
- * GET /api/v1/dashboard/recent?limit=8&startDate=YYYY-MM-DD&endDate=YYYY-MM-DD
- * Returns the latest N transactions for the authenticated user.
- */
+// ---------------- Recent transactions endpoint ----------------
 export const getRecentTransactions = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
@@ -297,9 +275,7 @@ export const getRecentTransactions = async (req: AuthedRequest, res: Response): 
       amount: Number((d as any).amount),
       date: d.date,
       description:
-        (d as any).description ??
-        (d as any).source ??
-        (d.type === 'income' ? 'Income' : 'Expense'),
+        (d as any).description ?? (d as any).source ?? (d.type === 'income' ? 'Income' : 'Expense'),
       createdAt: (d as any).createdAt,
       updatedAt: (d as any).updatedAt,
     }));

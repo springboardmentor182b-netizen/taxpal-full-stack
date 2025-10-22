@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { TransactionService, Transaction, CreateTransactionRequest } from '../../core/services/transaction.service';
+import { TransactionService, Transaction, CreateTransactionRequest } from '../../../core/services/transaction.service';
 
 @Component({
   selector: 'app-transactions',
@@ -17,9 +17,12 @@ export class TransactionsComponent implements OnInit {
   showAddForm = signal(false);
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
-  
+
+  // for global bulk deletion
+  isDeletingAll = signal(false);
+
   transactionForm: FormGroup;
-  
+
   categories = [
     // Income categories
     { type: 'income', name: 'Salary', value: 'salary' },
@@ -27,7 +30,7 @@ export class TransactionsComponent implements OnInit {
     { type: 'income', name: 'Business', value: 'business' },
     { type: 'income', name: 'Investment', value: 'investment' },
     { type: 'income', name: 'Other Income', value: 'other_income' },
-    
+
     // Expense categories
     { type: 'expense', name: 'Food & Dining', value: 'food_dining' },
     { type: 'expense', name: 'Transportation', value: 'transportation' },
@@ -65,7 +68,7 @@ export class TransactionsComponent implements OnInit {
         this.transactions.set(response.transactions);
         this.isLoading.set(false);
       },
-      error: (error) => {
+      error: () => {
         this.errorMessage.set('Failed to load transactions');
         this.isLoading.set(false);
       }
@@ -97,7 +100,7 @@ export class TransactionsComponent implements OnInit {
           });
         },
         error: (error) => {
-          this.errorMessage.set(error.error?.message || 'Failed to create transaction');
+          this.errorMessage.set(error?.error?.message || 'Failed to create transaction');
           this.isSubmitting.set(false);
         }
       });
@@ -107,16 +110,45 @@ export class TransactionsComponent implements OnInit {
   }
 
   deleteTransaction(id: string): void {
+    if (!id) return;
     if (confirm('Are you sure you want to delete this transaction?')) {
+      // optimistic UI update with revert on failure
+      const prev = this.transactions();
+      this.transactions.set(prev.filter(t => t._id !== id));
+
       this.transactionService.deleteTransaction(id).subscribe({
         next: () => {
-          this.transactions.set(this.transactions().filter(t => t._id !== id));
+          /* no-op: already removed optimistically */
         },
-        error: (error) => {
+        error: () => {
+          // revert UI if backend fails
+          this.transactions.set(prev);
           this.errorMessage.set('Failed to delete transaction');
         }
       });
     }
+  }
+
+  deleteAllTransactions(): void {
+    if (!this.transactions().length) return;
+    if (!confirm('Delete ALL your transactions? This cannot be undone.')) return;
+
+    this.isDeletingAll.set(true);
+    this.transactionService.deleteAll().subscribe({
+      next: (res) => {
+        // If backend says 0 deleted, keep UI as-is and show message
+        if (res.deletedCount > 0) {
+          this.transactions.set([]);
+        } else {
+          this.errorMessage.set('No transactions were deleted.');
+        }
+        this.isDeletingAll.set(false);
+      },
+      error: () => {
+        this.errorMessage.set('Failed to delete all transactions');
+        this.isDeletingAll.set(false);
+      }
+    });
   }
 
   toggleAddForm(): void {
@@ -144,8 +176,9 @@ export class TransactionsComponent implements OnInit {
   }
 
   getTransactionIcon(type: string): string {
-    return type === 'income' ? 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1' : 
-           'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z';
+    return type === 'income'
+      ? 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1'
+      : 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z';
   }
 
   formatCategory(category: string): string {

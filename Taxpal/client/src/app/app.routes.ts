@@ -29,7 +29,7 @@ export const routes: Routes = [
   {
     path: 'transactions',
     loadComponent: () =>
-      import('./features/transactions/transactions.component')
+      import('./features/transactions/component/transactions.component')
         .then(m => m.TransactionsComponent),
     canActivate: [authGuard]
   },

@@ -4,7 +4,6 @@ import { authenticateToken } from '../auth/auth';
 import { handleValidationErrors } from '../../utils/validators/dashboardValidation';
 import { query } from 'express-validator';
 
-
 const router = express.Router();
 
 router.use(authenticateToken);
@@ -25,6 +24,7 @@ router.get(
   '/income-vs-expenses',
   [
     query('period').optional().isIn(['month', 'quarter', 'year']),
+    // keep "range" for backward compat if frontend uses ?range=
     query('range').optional().isIn(['month', 'quarter', 'year']),
     query('month').optional().isInt({ min: 1, max: 12 }).toInt(),
     query('year').optional().isInt({ min: 2000, max: 2100 }).toInt()
@@ -33,7 +33,7 @@ router.get(
   getIncomeVsExpenses
 );
 
-// NEW: GET /api/v1/dashboard/recent?limit=8&startDate=&endDate=
+// GET /api/v1/dashboard/recent?limit=8&startDate=&endDate=
 router.get(
   '/recent',
   [
