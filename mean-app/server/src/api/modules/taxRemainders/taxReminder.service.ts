@@ -21,12 +21,13 @@ export const generateQuarterlyReminders = async (
   totalTax: number,
   startYear: number
 ) => {
+    // Define quarters with due dates. Use month indices (0-based) for Date.
     const quarters = [
-        { quarter: "Q1 (Apr-Jun)", due_date: new Date(startYear, 5, 15) },
-        { quarter: "Q2 (Jul-Sep)", due_date: new Date(startYear, 8, 15) },
-        { quarter: "Q3 (Oct-Dec)", due_date: new Date(startYear, 11, 15) },
-        { quarter: "Q4 (Jan-Mar)", due_date: new Date(startYear + 1, 2, 15) },
-      ];
+      { quarter: "Q1 (Jan-Mar)", due_date: new Date(startYear, 2, 31) },
+      { quarter: "Q2 (Apr-Jun)", due_date: new Date(startYear, 5, 30) },
+      { quarter: "Q3 (Jul-Sep)", due_date: new Date(startYear, 8, 30) },
+      { quarter: "Q4 (Oct-Dec)", due_date: new Date(startYear, 11, 31) },
+    ];
       
 
   const amountPerQuarter = totalTax / 4;
@@ -39,8 +40,14 @@ export const generateQuarterlyReminders = async (
     status: "reminder",
   }));
 
-  // Remove old reminders for this user before creating new ones
-  await TaxReminder.deleteMany({ user_id });
+  // Remove old reminders for this user and the same year before creating new ones
+  // We check reminders whose due_date falls within the startYear..startYear range
+  const startOfYear = new Date(startYear, 0, 1);
+  const endOfYear = new Date(startYear, 11, 31, 23, 59, 59);
+  await TaxReminder.deleteMany({
+    user_id,
+    due_date: { $gte: startOfYear, $lte: endOfYear },
+  });
 
   return await TaxReminder.insertMany(reminders);
 };
