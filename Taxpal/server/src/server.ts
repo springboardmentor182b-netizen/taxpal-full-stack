@@ -84,6 +84,8 @@ app.use('/api/v1/budgets', budgetsRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
+app.use('/api/v1/financial-reports', financialReportsRoutes);
+
 // Health check
 app.get('/api/v1/health', (_req, res) => {
   res.json({ status: 'OK', message: 'TaxPal API is running' });
