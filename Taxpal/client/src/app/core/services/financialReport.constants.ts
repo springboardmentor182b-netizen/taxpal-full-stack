@@ -1,4 +1,4 @@
-import { FinancialReport } from '@/app/features/financial.report/financial.report';
+import { FinancialReport } from '@/app/features/financialReport/financialReport';
 
 export const CATEGORY_TO_REPORT_TYPE_MAP: { [key: string]: string } = {
   'INCOME': 'INCOME_STATEMENT',

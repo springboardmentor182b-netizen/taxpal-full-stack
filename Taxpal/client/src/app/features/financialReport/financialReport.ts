@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FinancialReportsService } from '@/app/core/services/financial.report.service';
+import { FinancialReportsService } from '@/app/core/services/financialReport.service';
 
 export interface ReportRequest {
   reportType: string;

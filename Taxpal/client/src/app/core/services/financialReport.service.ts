@@ -2,13 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, map, catchError } from 'rxjs/operators';
-import { ReportRequest, FinancialReport } from '@/app/features/financial.report/financial.report';
+import { ReportRequest, FinancialReport } from '@/app/features/financialReport/financialReport';
 import { 
   CATEGORY_TO_REPORT_TYPE_MAP, 
   MOCK_REPORTS, 
   REPORT_TYPE_NAMES, 
   PERIOD_NAMES 
-} from './financial.report.service.constants';
+} from './financialReport.constants';
 
 @Injectable({
   providedIn: 'root'
