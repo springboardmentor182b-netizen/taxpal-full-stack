@@ -81,20 +81,8 @@
               </div>
             </div>
 
-            <button class="calculate-btn" type="button" (click)="calculateTax()" [disabled]="isLoading()">
-              <span *ngIf="isLoading()">Calculating...</span>
-              <span *ngIf="!isLoading()">Calculate Estimated Tax</span>
-            </button>
-
-            <!-- Messages -->
-            <div class="error-message" *ngIf="errorMessage()">
-              {{ errorMessage() }}
-            </div>
-            
-            <div class="success-message" *ngIf="successMessage()">
-              {{ successMessage() }}
-            </div>
-          </div><!-- end tax-form-left -->
+            <button class="calculate-btn" (click)="calculateTax()">Calculate Estimated Tax</button>
+          </div>
 
           <div class="tax-summary-right">
             <h3 class="summary-title">Tax Summary</h3>
@@ -106,42 +94,24 @@
               </div>
             </div>
           </div>
-        </div><!-- end tax-form-card -->
-      </div><!-- end tax-calculator-container -->
+        </div>
+      </div>
 
       <!-- Tax Calendar View -->
       <div *ngIf="activeView() === 'calendar' && activePage() === 'tax-estimator'" class="tax-calendar-container calendar-list">
         <h2>Tax Calendar</h2>
-        
-        <!-- Loading indicator -->
-        <div class="loading-indicator" *ngIf="isLoading()">
-          <p>Loading tax reminders...</p>
-          <div class="spinner"></div>
-        </div>
-        
-        <!-- Empty state -->
-        <div class="empty-state" *ngIf="!isLoading() && taxCalendar().length === 0">
-          <p>No tax reminders found.</p>
-          <p class="empty-state-action">Calculate your estimated tax to generate reminders for upcoming payments.</p>
-        </div>
-        
-        <!-- Calendar content -->
-        <div class="calendar-content" *ngIf="!isLoading() && taxCalendar().length > 0">
-          <div class="month-section" *ngFor="let month of taxCalendar(); trackBy: trackByMonth">
-            <h3 class="month-title">{{ month.month }}</h3>
-            <div class="reminders-list">
-              <div class="reminder-card"
-                   *ngFor="let reminder of month.reminders; trackBy: trackByReminderId"
-                   [class.payment]="reminder.type === 'payment'"
-                   [class.reminder]="reminder.type === 'reminder'">
-                <div class="reminder-date">{{ reminder.date }}</div>
-                <div class="reminder-details">
-                  <div class="reminder-title">{{ reminder.title }}</div>
-                  <div class="reminder-description">{{ reminder.description }}</div>
-                </div>
-                <span class="reminder-type-tag" [class]="reminder.type">{{ reminder.type }}</span>
-              </div>
+        <div *ngFor="let month of taxCalendar; trackBy: trackByMonth">
+          <h3 class="month-title">{{ month.month }} 2025</h3>
+          <div class="reminder-card"
+               *ngFor="let reminder of month.reminders; trackBy: trackByReminderId"
+               [class.payment]="reminder.type === 'payment'"
+               [class.reminder]="reminder.type === 'reminder'">
+            <div class="reminder-date">{{ reminder.date }}</div>
+            <div class="reminder-details">
+              <div class="reminder-title">{{ reminder.title }}</div>
+              <div class="reminder-description">{{ reminder.description }}</div>
             </div>
+            <span class="reminder-type-tag">{{ reminder.type }}</span>
           </div>
         </div>
       </div>

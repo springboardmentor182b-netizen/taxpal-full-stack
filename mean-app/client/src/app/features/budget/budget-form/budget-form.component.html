@@ -69,16 +69,7 @@
 
       <div class="budget-tables">
         <span class="left-item" style="color:red;">● Hi, {{ currentUser.fullName }}! Here's your Budget page.</span>
-        <span class="right-item">
-          Budget Health:
-          <span [ngClass]="{
-            'status-good': overallBudgetHealth() === 'Good',
-            'status-fair': overallBudgetHealth() === 'Fair',
-            'status-poor': overallBudgetHealth() === 'Poor'
-          }">
-            {{ overallBudgetHealth() }}
-          </span>
-        </span>
+        <span class="right-item">Budget Health</span>
       </div>
 
       <div class="budget-table">

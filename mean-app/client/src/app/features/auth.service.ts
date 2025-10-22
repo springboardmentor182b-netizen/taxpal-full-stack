@@ -246,13 +246,6 @@ export class AuthService {
   }
 
   /**
-   * Backwards-compatible alias for components expecting isLoggedIn()
-   */
-  isLoggedIn(): boolean {
-    return this.isAuthenticated();
-  }
-
-  /**
    * Get stored authentication token
    */
   getToken(): string | null {

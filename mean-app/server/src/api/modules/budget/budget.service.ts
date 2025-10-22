@@ -2,21 +2,26 @@ import { Budget, IBudget } from './budget.model';
 import { Types } from 'mongoose'; 
 
 const calculateStatus = (amount: number, spent: number): 'Good' | 'Fair' | 'Poor' => {
+   
+    // 💡 MODIFIED LOGIC: Status is now based ONLY on the total budget amount, as requested.
+    // The previous logic based on percentage spent has been removed.
+
     if (amount <= 0) {
         return 'Poor';
     }
     
-    // Calculate percentage spent
-    const percentageSpent = (spent / amount) * 100;
-    
-    // Status based on percentage spent
-    if (percentageSpent >= 90) {
-        return 'Poor';  // Over 90% spent
-    } else if (percentageSpent >= 70) {
-        return 'Fair';  // Between 70-90% spent
-    } else {
-        return 'Good';  // Less than 70% spent
+    // Budget less than $100 -> Poor
+    if (amount < 100) {
+        return 'Poor';
     }
+    
+    // Budget between $100 and $500 (inclusive) -> Fair
+    if (amount <= 500) {
+        return 'Fair';
+    }
+    
+    // Budget above $500 -> Good
+    return 'Good';
 };
 
 
@@ -30,122 +35,56 @@ type IBudgetResponse = IBudget & {
 };
 
 export class BudgetService {
+    
+  
     public async getBudgetsByUser(userId: string): Promise<IBudgetResponse[]> {
-        const budgets = await Budget.find({ userId: userId }).lean().exec();
+     
+        const budgets = await Budget.find({ userId: userId }).lean().exec(); 
+        
+        
         return budgets.map(budget => {
-            const spent = budget.spent || 0;
-            const remaining = budget.amount - spent;
-            const status = calculateStatus(budget.amount, spent);
+            // Note: with .lean(), 'budget' is already a clean JS object (IBudget with _id, etc.)
+            
+            const remaining = budget.amount - budget.spent;
+            const status = calculateStatus(budget.amount, budget.spent);
             
             return {
-                ...budget,
-                remaining,
-                status
+                ...budget, // Includes _id, createdAt, etc. from .lean()
+                remaining: remaining,
+                status: status
             } as IBudgetResponse;
         });
     }
 
-    public async getBudgetById(budgetId: string): Promise<IBudgetResponse | null> {
-        const budget = await Budget.findById(budgetId).lean().exec();
-        if (!budget) return null;
-        
-        const spent = budget.spent || 0;
-        const remaining = budget.amount - spent;
-        const status = calculateStatus(budget.amount, spent);
-        
-        return {
-            ...budget,
-            remaining,
-            status
-        } as IBudgetResponse;
-    }
-
+    // POST (Create) Operations
     public async createBudget(data: {
-        spent?: number;
-        category: string;
-        amount: number;
-        month: string;
-        description?: string;
-        userId: string;
-    }): Promise<IBudgetResponse> {
-        // Ensure spent is a number >= 0
-        const spent = Math.max(0, data.spent || 0);
-        
+        spent: number; category: string, amount: number, month: string, description?: string, userId: string 
+}): Promise<IBudgetResponse> {
         const newBudget = new Budget({
             ...data,
-            spent: spent,
+            spent: data.spent ?? 0,
         });
         
+        // Save the document
         const savedDoc = await newBudget.save();
+
+        // Get the plain object representation to return
         const savedBudget = savedDoc.toObject();
+
+        // Calculate final response fields
+        const remaining = savedBudget.amount;
+        const status = calculateStatus(savedBudget.amount, 0); // Status is calculated based on 0 spent
         
         return {
-            ...savedBudget,
-            remaining: savedBudget.amount - spent,
-            status: calculateStatus(savedBudget.amount, spent)
+            ...savedBudget, // Includes _id, createdAt, etc.
+            remaining: remaining,
+            status: status
         } as IBudgetResponse;
     }
 
-    public async updateBudgetSpent(budgetId: string, newSpent: number): Promise<IBudgetResponse | null> {
-        const updatedBudget = await Budget.findByIdAndUpdate(
-            budgetId,
-            { spent: newSpent },
-            { new: true, lean: true }
-        );
-
-        if (!updatedBudget) return null;
-        
-        const remaining = updatedBudget.amount - newSpent;
-        const status = calculateStatus(updatedBudget.amount, newSpent);
-        
-        return {
-            ...updatedBudget,
-            remaining,
-            status
-        } as IBudgetResponse;
-    }
-
-    public async incrementBudgetSpent(budgetId: string, amount: number): Promise<IBudgetResponse | null> {
-        const updatedBudget = await Budget.findByIdAndUpdate(
-            budgetId,
-            { $inc: { spent: amount } },
-            { new: true, lean: true }
-        );
-
-        if (!updatedBudget) return null;
-        
-        const spent = updatedBudget.spent || 0;
-        const remaining = updatedBudget.amount - spent;
-        const status = calculateStatus(updatedBudget.amount, spent);
-        
-        return {
-            ...updatedBudget,
-            remaining,
-            status
-        } as IBudgetResponse;
-    }
-
-    public async updateBudget(budgetId: string, data: Partial<IBudget>): Promise<IBudgetResponse | null> {
-        const updatedBudget = await Budget.findByIdAndUpdate(
-            budgetId,
-            data,
-            { new: true, lean: true }
-        );
-
-        if (!updatedBudget) return null;
-        
-        const spent = updatedBudget.spent || 0;
-        const remaining = updatedBudget.amount - spent;
-        const status = calculateStatus(updatedBudget.amount, spent);
-        
-        return {
-            ...updatedBudget,
-            remaining,
-            status
-        } as IBudgetResponse;
-    }
-
+    // DELETE Operations
     public async deleteBudget(budgetId: string): Promise<IBudget | null> {
+        // This method is fine, it returns the deleted document or null.
         return Budget.findByIdAndDelete(budgetId).exec();
     }
 }
