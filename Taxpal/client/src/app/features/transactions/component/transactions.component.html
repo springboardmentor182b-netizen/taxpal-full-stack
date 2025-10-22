@@ -1,0 +1,122 @@
+<div class="transactions-container">
+  <!-- Navigation Header -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <h1 class="brand-title">TaxPal</h1>
+      <span class="brand-subtitle">Transaction Management</span>
+    </div>
+    <div class="navbar-actions">
+      <a routerLink="/dashboard" class="btn btn-outline">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+        </svg>
+        Back to Dashboard
+      </a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Page Header -->
+    <section class="page-header">
+      <div class="page-title-section">
+        <h1 class="page-title">Transactions</h1>
+        <p class="page-subtitle">Manage your income and expenses</p>
+      </div>
+      <div class="page-actions" style="display:flex; gap:8px;">
+        <button
+          class="btn btn-danger"
+          [disabled]="isDeletingAll() || isLoading() || !transactions().length"
+          (click)="deleteAllTransactions()"
+          title="Delete ALL transactions"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+          </svg>
+          <span *ngIf="!isDeletingAll()">Delete All</span>
+          <span *ngIf="isDeletingAll()">Deleting…</span>
+        </button>
+
+        <button 
+          class="btn btn-primary"
+          (click)="toggleAddForm()"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+          </svg>
+          Add Transaction
+        </button>
+      </div>
+    </section>
+
+    <!-- Add Transaction Form -->
+    <!-- (unchanged)... keep your existing form here -->
+    <!-- ... -->
+    <!-- Error banner (already present inside the form) -->
+
+    <!-- Transactions List -->
+    <section class="transactions-section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Transactions</h2>
+        <div class="section-actions">
+          <span class="transaction-count">{{ transactions().length }} transactions</span>
+        </div>
+      </div>
+
+      <div class="transactions-list">
+        <div *ngIf="isLoading()" class="loading-state">
+          <svg class="animate-spin h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p>Loading transactions...</p>
+        </div>
+
+        <div *ngIf="!isLoading() && transactions().length === 0" class="empty-state">
+          <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          <h3 class="empty-title">No transactions yet</h3>
+          <p class="empty-description">Start by adding your first transaction to track your finances.</p>
+          <button class="btn btn-primary" (click)="toggleAddForm()">Add Transaction</button>
+        </div>
+
+        <div *ngIf="!isLoading() && transactions().length > 0" class="transactions-grid">
+          <div 
+            *ngFor="let transaction of transactions()" 
+            class="transaction-card"
+          >
+            <div class="transaction-header">
+              <div class="transaction-type" [class]="getTransactionTypeClass(transaction.type)">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getTransactionIcon(transaction.type)"></path>
+                </svg>
+                <span>{{ transaction.type === 'income' ? 'Income' : 'Expense' }}</span>
+              </div>
+              <div class="transaction-actions">
+                <button 
+                  class="action-button delete-button"
+                  (click)="deleteTransaction(transaction._id)"
+                  title="Delete transaction"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="transaction-content">
+              <h4 class="transaction-category">{{ formatCategory(transaction.category) }}</h4>
+              <p class="transaction-amount" [class]="transaction.type === 'income' ? 'text-green-600' : 'text-red-600'">
+                {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
+              </p>
+              <p *ngIf="transaction.description" class="transaction-description">{{ transaction.description }}</p>
+              <p class="transaction-date">{{ transaction.date | date:'MMM d, y' }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>

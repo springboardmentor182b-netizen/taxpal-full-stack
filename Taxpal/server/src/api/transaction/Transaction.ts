@@ -23,7 +23,6 @@ const TransactionSchema = new Schema<TransactionDoc>(
   { timestamps: true }
 );
 
-// Helpful indexes for your dashboard queries
 TransactionSchema.index({ userId: 1, date: -1 });
 TransactionSchema.index({ userId: 1, type: 1, date: -1 });
 

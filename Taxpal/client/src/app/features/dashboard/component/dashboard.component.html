@@ -6,27 +6,49 @@
       <!-- Dashboard -->
       <a routerLink="/dashboard">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" fill="currentColor"/>
+          <path
+            d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z"
+            fill="currentColor"
+          />
         </svg>
         <span>Dashboard</span>
       </a>
 
       <!-- Transactions -->
-      <a href="transactions">
+      <a routerLink="/transactions">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z" fill="currentColor" opacity=".25"/>
-          <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor"/>
+          <path
+            d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z"
+            fill="currentColor"
+            opacity=".25"
+          />
+          <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor" />
           <path d="M15 11h7v2h-7z" fill="currentColor" opacity=".1" />
         </svg>
         <span>Transactions</span>
       </a>
 
-      <!-- ✅ Tax Estimator opens Tax Calendar in SAME TAB -->
-      <a href="" (click)="goToTaxCalendar($event)">
+      <!-- Tax Estimator -->
+      <a routerLink="/tax-calendar">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
-          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-          <path d="M8 12h8M8 16h8M8 8h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path
+            d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+            fill="currentColor"
+            opacity=".12"
+          />
+          <path
+            d="M14 3v5h5"
+            stroke="currentColor"
+            stroke-width="1.6"
+            fill="none"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M8 12h8M8 16h8M8 8h4"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
         </svg>
         <span>Tax Estimator</span>
       </a>
@@ -34,47 +56,72 @@
       <!-- Budgets -->
       <a href="#" (click)="openBudget(); $event.preventDefault()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M12 3a9 9 0 1 0 9 9h-9V3Z" fill="currentColor" opacity=".2"/>
-          <path d="M12 3v9h9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" fill="none"/>
+          <path d="M12 3a9 9 0 1 0 9 9h-9V3Z" fill="currentColor" opacity=".2" />
+          <path
+            d="M12 3v9h9"
+            stroke="currentColor"
+            stroke-width="1.8"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" fill="none" />
         </svg>
         <span>Budgets</span>
       </a>
 
       <!-- Reports -->
-      <a href="reports">
+      <a routerLink="/reports">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
-          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
-          <path d="M8 14h8M8 18h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+          <path
+            d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
+            fill="currentColor"
+            opacity=".12"
+          />
+          <path
+            d="M14 3v5h5"
+            stroke="currentColor"
+            stroke-width="1.6"
+            fill="none"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M8 14h8M8 18h6"
+            stroke="currentColor"
+            stroke-width="1.6"
+            stroke-linecap="round"
+          />
         </svg>
         <span>Reports</span>
       </a>
     </div>
   </div>
 
- <!-- ✅ Profile pinned to bottom-left -->
+  <!-- Profile -->
   <div class="profile">
     <div class="profile-top">
-      <div class="avatar">AM</div>
+      <div class="avatar">{{ firstInitial }}{{ secondInitial }}</div>
       <div class="who">
-        <div class="name">Alex Morgan</div>
-        <div class="email">alex@company.com</div>
+        <div class="name">{{ user?.name || 'User' }}</div>
+        <div class="email">{{ user?.email || '—' }}</div>
       </div>
     </div>
 
     <div class="profile-actions">
-      <!-- ✅ Use RouterLink to open Settings → Categories -->
       <a [routerLink]="['/settings/categories']" class="action">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.44 7.44 0 0 0-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62.24-1.2.57-1.73 1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02.67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53.42 1.11.76 1.73 1l.36 2.54a.5.5 0 0 0 .5.43h3.84a.5.5 0 0 0 .5-.43l.36-2.54c.62-.24 1.2-.57 1.73-1l2.39.96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
+          <path
+            d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.44 7.44 0 0 0-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62-.24-1.2-.57-1.73-1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02.67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53 .42 1.11 .76 1.73 1l.36 2.54a.5.5 0 0 0 .5 .43h3.84a.5.5 0 0 0 .5-.43l.36-2.54c.62-.24 1.2-.57 1.73-1l2.39 .96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"
+          />
         </svg>
         <span>Settings</span>
       </a>
 
-      <a href="#" class="action">
+      <a href="#" class="action" (click)="auth.logout(); $event.preventDefault()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+          <path
+            d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"
+          />
         </svg>
         <span>Log Out</span>
       </a>
@@ -83,7 +130,6 @@
 </div>
 
 <div class="main">
-  <!-- ===== Default Dashboard View (always visible now) ===== -->
   <!-- Top bar -->
   <div class="top-bar">
     <h1><strong>Dashboard</strong></h1>
@@ -103,65 +149,77 @@
     <button (click)="closeExpense()">Close</button>
   </div>
 
-  <!-- ===== Cards ===== -->
+  <!-- Cards -->
   <div class="cards">
     <div class="card">
       <h3>Monthly Income</h3>
-      <p>$420.00</p>
-      <p>^ 15% from last month</p>
+      <p>${{ cards.income.amount | number : '1.0-2' }}</p>
+      <p>^ {{ cards.income.changePct | number : '1.0-2' }}% from last month</p>
     </div>
     <div class="card">
       <h3>Monthly Expenses</h3>
-      <p>$0.00</p>
-      <p>0% from last month</p>
+      <p>${{ cards.expenses.amount | number : '1.0-2' }}</p>
+      <p>{{ cards.expenses.changePct | number : '1.0-2' }}% from last month</p>
     </div>
     <div class="card">
       <h3>Estimated Tax Dues</h3>
-      <p>$1200</p>
-      <p>torn upcoming layer</p>
+      <p>${{ cards.estimatedTaxDues | number : '1.0-2' }}</p>
+      <p>placeholder</p>
     </div>
     <div class="card">
       <h3>Savings Rate</h3>
-      <p>100%</p>
-      <p>13 2 % your goal</p>
+      <p>{{ cards.savingsRatePct | number : '1.0-2' }}%</p>
+      <p>toward your goal</p>
     </div>
   </div>
 
-  <!-- ===== Charts ===== -->
+  <!-- Charts -->
   <div class="charts">
     <div class="chart-container">
       <h3>Income vs Expenses</h3>
-      <div style="width:100%; max-width:720px; height:360px;">
+      <div style="width: 100%; max-width: 720px; height: 360px">
         <canvas #barCanvas></canvas>
       </div>
     </div>
 
     <div class="chart-container chart-has-note">
       <h3>Expense Breakdown</h3>
-      <div style="width:100%; max-width:520px; height:360px;">
+      <div style="width: 100%; max-width: 520px; height: 360px">
         <canvas id="pieChart"></canvas>
       </div>
-      <div class="chart-note" *ngIf="!expenses?.length">
+      <div class="chart-note" *ngIf="!expenses.length && !pieHasData">
         No expenses yet — add one to see the breakdown.
       </div>
     </div>
   </div>
 
-  <!-- ===== Recent Transactions ===== -->
+  <!-- Recent Transactions -->
   <section class="recent-card">
     <div class="recent-header">
       <h3>Recent Transactions</h3>
-      <button class="btn-view-all">View All</button>
+
+      <!-- Delete All -->
+      <div class="btn-row">
+        <button
+          class="btn-view-all"
+          [disabled]="!recent.length || isDeletingAll"
+          (click)="onDeleteAllRecent()"
+        >
+          {{ isDeletingAll ? 'Deleting…' : 'Delete All' }}
+        </button>
+      </div>
     </div>
 
     <div class="recent-table-wrap">
       <table class="recent-table">
         <colgroup>
-          <col style="width:18%">
-          <col style="width:36%">
-          <col style="width:22%">
-          <col style="width:22%">
-          <col style="width:120px">
+          <col style="width: 18%" />
+          <col style="width: 28%" />
+          <col style="width: 18%" />
+          <col style="width: 16%" />
+          <col style="width: 100px" />
+          <col style="width: 120px" />
+          <!-- actions -->
         </colgroup>
 
         <thead>
@@ -169,54 +227,83 @@
             <th>Date</th>
             <th>Description</th>
             <th>Category</th>
-            <th>Amount</th>
+            <th class="text-right">Amount</th>
             <th>Type</th>
+            <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>May 5, 2025</td>
-            <td>Design Project</td>
-            <td>Consulting</td>
-            <td class="amt-green">+ $320.00</td>
-            <td>Income</td>
-          </tr>
-          <tr>
-            <td>May 3, 2025</td>
-            <td>Groceries</td>
-            <td>Food</td>
-            <td class="amt-red">- $54.20</td>
-            <td>Expense</td>
-          </tr>
-          <tr>
-            <td>May 2, 2025</td>
-            <td>Uber to client</td>
-            <td>Transport</td>
-            <td class="amt-red">- $12.80</td>
-            <td>Expense</td>
+
+        <tbody *ngIf="recent.length; else emptyRecent">
+          <tr *ngFor="let tx of recent; trackBy: trackByTx">
+            <td>{{ tx.date | date : 'MMM d, y' }}</td>
+            <td>{{ tx.description }}</td>
+            <td>{{ tx.category }}</td>
+            <td class="text-right" [ngClass]="tx.type === 'income' ? 'amt-green' : 'amt-red'">
+              <ng-container *ngIf="tx.type === 'income'">
+                + ${{ tx.amount | number : '1.2-2' }}
+              </ng-container>
+              <ng-container *ngIf="tx.type === 'expense'">
+                - ${{ tx.amount | number : '1.2-2' }}
+              </ng-container>
+            </td>
+            <td>
+              <span class="badge" [ngClass]="tx.type === 'income' ? 'badge-credit' : 'badge-debit'">
+                <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    *ngIf="tx.type === 'income'"
+                    d="M12 4l6 6h-4v6h-4v-6H6z"
+                    fill="currentColor"
+                  ></path>
+                  <path
+                    *ngIf="tx.type === 'expense'"
+                    d="M12 20l-6-6h4V8h4v6h4z"
+                    fill="currentColor"
+                  ></path>
+                </svg>
+                {{ tx.type === 'income' ? 'Credited' : 'Debited' }}
+              </span>
+            </td>
+            <td>
+              <button
+                type="button"
+                class="btn-danger"
+                [disabled]="!tx._id"
+                (click)="onDeleteRecent(tx)"
+              >
+                Delete
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
+
+      <ng-template #emptyRecent>
+        <div class="recent-empty">
+          No transactions yet. Add your first income or expense to see it here.
+        </div>
+      </ng-template>
     </div>
   </section>
-</div>
 
-<!-- ===== Budget Modal (same tab) — now shows the LIST component ===== -->
-<div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
-<div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-    <app-budgets-list></app-budgets-list>
+  <!-- Budget Modal -->
+  <div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
+  <div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-budgets-list></app-budgets-list>
+    </div>
   </div>
+
+  <app-income-modal
+    [isOpen]="showIncome"
+    (closeModal)="closeIncome()"
+    (save)="onIncomeSave($event)"
+  >
+  </app-income-modal>
+
+  <app-expense-modal
+    [isOpen]="showExpense"
+    (closeModal)="closeExpense()"
+    (save)="onExpenseSave($event)"
+  >
+  </app-expense-modal>
 </div>
-
-<app-income-modal
-  [isOpen]="showIncome"
-  (closeModal)="closeIncome()"
-  (save)="onIncomeSave($event)">
-</app-income-modal>
-
-<app-expense-modal
-  [isOpen]="showExpense"
-  (closeModal)="closeExpense()"
-  (save)="onExpenseSave($event)">
-</app-expense-modal>

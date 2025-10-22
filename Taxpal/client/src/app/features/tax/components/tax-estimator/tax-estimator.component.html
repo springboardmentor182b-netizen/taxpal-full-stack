@@ -6,6 +6,16 @@
       <p class="page-subtitle">Calculate your estimated tax obligations</p>
     </div>
 
+    <!-- Status banner -->
+    <div *ngIf="status !== 'idle'" class="status-banner" [ngClass]="{
+      'status--loading': status === 'calculating',
+      'status--ok': status === 'success',
+      'status--err': status === 'error'
+    }" style="margin: 8px 0 8px;">
+      {{ statusMsg }}
+      <span *ngIf="calendarMsg" style="margin-left:8px;">• {{ calendarMsg }}</span>
+    </div>
+
     <!-- Cards -->
     <section class="form-section">
       <div class="grid grid-2" style="width: 100%; max-width: 1120px">
@@ -14,7 +24,7 @@
           <div class="form-card-header">
             <h2 class="form-card-title">Quarterly Tax Calculator</h2>
 
-            <!-- ✅ Close (X) button -->
+            <!-- Close (X) -->
             <button
               type="button"
               class="icon-btn"
@@ -148,7 +158,9 @@
             </div>
 
             <div class="actions">
-              <button class="btn btn-primary" type="submit">Calculate Estimated Tax</button>
+              <button class="btn btn-primary" type="submit" [disabled]="status==='calculating'">
+                {{ status==='calculating' ? 'Calculating…' : 'Calculate Estimated Tax' }}
+              </button>
             </div>
           </form>
         </div>
@@ -159,13 +171,8 @@
             <h2 class="form-card-title">Tax Summary</h2>
           </div>
 
-          <div *ngIf="!summary.estimatedTax">
-            <p style="color:#323236; margin: 8px 0 0;">
-              Enter your income and deduction details to calculate your estimated quarterly tax.
-            </p>
-          </div>
-
-          <div *ngIf="summary.estimatedTax" class="grid grid-1">
+          <!-- Always show the summary (even if values are 0) -->
+          <div class="grid grid-1">
             <div class="form-group">
               <label>Gross Income</label>
               <div>{{ asCurrency(summary.gross) }}</div>
@@ -186,6 +193,15 @@
             <div class="form-group">
               <label><strong>Estimated Tax</strong></label>
               <div><strong>{{ asCurrency(summary.estimatedTax) }}</strong></div>
+            </div>
+
+            <!-- Small helper when nothing computed yet -->
+            <div *ngIf="status==='idle'" style="color:#666; font-size: 13px; margin-top: 4px;">
+              Enter details on the left and click “Calculate” to update these numbers.
+            </div>
+
+            <div *ngIf="calendarMsg" class="status-banner status--ok" style="margin-top:8px;">
+              {{ calendarMsg }}
             </div>
           </div>
         </div>
