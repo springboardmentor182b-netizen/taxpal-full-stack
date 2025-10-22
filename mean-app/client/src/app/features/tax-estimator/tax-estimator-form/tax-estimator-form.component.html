@@ -1,0 +1,267 @@
+<div class="layout">
+  <aside class="sidebar">
+   <div class="sidebar-top">
+  <div class="brand-row">
+    <div class="brand">TaxPal</div>
+    <button class="collapse-btn"
+      title="Collapse sidebar"
+      (click)="toggleCollapse()"
+      [style.transform]="collapsed ? 'rotate(180deg)' : 'rotate(0deg)'"
+      style="transition: transform 0.3s;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+        <path d="M9 6L15 12L9 18"
+              stroke="white"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round" />
+      </svg>
+    </button>
+  </div>
+</div>
+
+
+    <nav class="nav">
+  <a class="nav-item" routerLink="/dashboard" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">
+        <span class="label">Dashboard</span>
+      </a>
+      <a class="nav-item" routerLink="/transactions" routerLinkActive="active-link">
+        <span class="label">Transactions</span>
+      </a>
+      <a class="nav-item" routerLink="/budgets" routerLinkActive="active-link">
+        <span class="label">Budgets</span>
+      </a>
+      <a class="nav-item" routerLink="/tax-estimator" routerLinkActive="active-link">
+        <span class="label">Tax Estimator</span>
+      </a>
+      <a class="nav-item" routerLink="/reports" routerLinkActive="active-link">
+        <span class="label">Reports</span>
+      </a>
+    </nav>
+   <div class="sidebar-bottom">
+<!-- Settings Button -->
+<button class="action-settings">
+  <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+    <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="white" stroke-width="2" />
+    <path d="M19.4 15A1.65 1.65 0 0 0 20 13.5V10.5A1.65 1.65 0 0 0 19.4 9L17.6 7.2A1.65 1.65 0 0 0 16 6.6H8A1.65 1.65 0 0 0 6.4 7.2L4.6 9A1.65 1.65 0 0 0 4 10.5V13.5A1.65 1.65 0 0 0 4.6 15L6.4 16.8A1.65 1.65 0 0 0 8 17.4H16A1.65 1.65 0 0 0 17.6 16.8L19.4 15Z" stroke="white" stroke-width="2" />
+  </svg>
+  <span class="label">Settings</span>
+</button>
+
+      <div class="profile">
+        <div class="avatar">{{ userInitials() }}</div>
+        <div class="meta">
+          <div class="name">{{ currentUser?.fullName }}</div>
+          <div class="email">{{ currentUser?.email }}</div>
+        </div>
+      </div>
+      <button class="logout" (click)="logout()">Logout</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="main-header">
+      <h1 class="main-title">{{ mainHeader() }}</h1>
+      <p class="main-subtitle">{{ mainSubheader() }}</p>
+    </header>
+
+    <div class="content-wrapper">
+      <div class="tax-nav" *ngIf="activePage() === 'tax-estimator'">
+        <button class="tax-nav-btn" [class.active]="activeView() === 'calculator'" (click)="setActiveView('calculator')">Calculator</button>
+        <button class="tax-nav-btn" [class.active]="activeView() === 'calendar'" (click)="setActiveView('calendar')">Calendar</button>
+      </div>
+
+      <div *ngIf="activeView() === 'calculator' && activePage() === 'tax-estimator'" class="tax-calculator-container">
+        
+        <div class="tax-form-card">
+          
+      <!-- Tax Estimator Navigation Tabs -->
+      <div class="tax-nav" *ngIf="activePage() === 'tax-estimator'">
+        <button class="tax-nav-btn" [class.active]="activeView() === 'calculator'" (click)="setActiveView('calculator')">
+          Calculator
+        </button>
+        <button class="tax-nav-btn" [class.active]="activeView() === 'calendar'" (click)="setActiveView('calendar')">
+          Calendar
+        </button>
+      </div>
+
+      <!-- Tax Calculator View -->
+      <div *ngIf="activeView() === 'calculator' && activePage() === 'tax-estimator'" class="tax-calculator-container">
+        <div class="tax-form-card">
+          <div class="tax-form-left">
+            <h2 class="heading">Quarterly Tax Calculator</h2>
+            <p class="form-subtitle">Calculate your estimated tax obligations</p>
+            
+            <div class="form-group-row">
+                <div class="form-field">
+                    <label>Country/Region</label>
+                    <select [ngModel]="taxForm().country" (ngModelChange)="updateFormField('country', $event)">
+                        <option>United States</option>
+                        <option>India</option>
+                        <option>China</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>State/Province</label>
+                    <select [ngModel]="taxForm().state" (ngModelChange)="updateFormField('state', $event)">
+                        <option *ngFor="let state of states" [ngValue]="state">{{ state }}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group-row">
+                <div class="form-field">
+                    <label>Filing Status</label>
+                    <select [ngModel]="taxForm().filingStatus" (ngModelChange)="updateFormField('filingStatus', $event)">
+                        <option *ngFor="let status of filingStatuses" [ngValue]="status">{{ status }}</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>Quarter</label>
+                    <select [ngModel]="taxForm().quarter" (ngModelChange)="updateFormField('quarter', $event)">
+                        <option *ngFor="let q of quarters" [ngValue]="q">{{ q }}</option>
+                    </select>
+                </div>
+            </div>
+            <h3 class="form-section-title">Income</h3>
+            <div class="form-field full-width">
+                <label>Gross Income for Quarter</label>
+                <input type="number" [ngModel]="taxForm().grossIncome" (ngModelChange)="updateFormField('grossIncome', $event)">
+            </div>
+            
+            <h3 class="form-section-title">Deductions</h3>
+            <div class="form-group-grid">
+                <div class="form-field"><label>Business Expenses</label><input type="number" [ngModel]="taxForm().deductions" (ngModelChange)="updateFormField('deductions', $event)"></div>
+                <div class="form-field"><label>Retirement Contributions</label><input type="number" [ngModel]="taxForm().retirementContributions" (ngModelChange)="updateFormField('retirementContributions', $event)"></div>
+                <div class="form-field"><label>Health Insurance Premiums</label><input type="number" [ngModel]="taxForm().healthInsurancePremiums" (ngModelChange)="updateFormField('healthInsurancePremiums', $event)"></div>
+                <div class="form-field"><label>Home Office Deduction</label><input type="number" [ngModel]="taxForm().homeOfficeDeduction" (ngModelChange)="updateFormField('homeOfficeDeduction', $event)"></div>
+            </div>
+            
+            <button class="calculate-btn" (click)="calculateTax()">Calculate Estimated Tax</button>
+          </div>
+          
+          <div class="tax-summary-right">
+            <h3 class="summary-title">Tax Summary</h3>
+            <div class="summary-box">
+                <i class="summary-icon">🧾</i>
+                <p>{{ taxSummaryMessage() }}</p>
+                <div class="tax-result" *ngIf="taxForm().calculatedTax > 0">
+                    <div class="result-amount">{{ taxForm().calculatedTax | currency:'USD' }}</div>
+                </div>
+            </div>
+          </div>
+          </div>
+      </div>
+
+     <div *ngIf="activeView() === 'calendar' && activePage() === 'tax-estimator'" class="tax-calendar-container calendar-list">
+    <h2>Tax Calendar</h2>
+    
+    <div *ngFor="let month of taxCalendar; trackBy: trackByMonth"> 
+      <h3 class="month-title">{{ month.month }} 2025</h3>
+      
+      <div class="reminder-card" *ngFor="let reminder of month.reminders; trackBy: trackByReminderId" [class.payment]="reminder.type === 'payment'" [class.reminder]="reminder.type === 'reminder'">
+        <div class="reminder-date">{{ reminder.date }}</div>
+        <div class="reminder-details">
+            <div class="reminder-title">{{ reminder.title }}</div>
+            <div class="reminder-description">{{ reminder.description }}</div>
+        </div>
+        <span class="reminder-type-tag">{{ reminder.type }}</span>
+      </div>
+    </div>
+</div>
+    </div>
+  </main>
+</div>
+              <div class="form-field">
+                <label>Country/Region</label>
+                <select [ngModel]="taxForm().country" (ngModelChange)="updateFormField('country', $event)">
+                  <option>United States</option>
+                  <option>India</option>
+                  <option>China</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>State/Province</label>
+                <select [ngModel]="taxForm().state" (ngModelChange)="updateFormField('state', $event)">
+                  <option *ngFor="let state of states" [ngValue]="state">{{ state }}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group-row">
+              <div class="form-field">
+                <label>Filing Status</label>
+                <select [ngModel]="taxForm().filingStatus" (ngModelChange)="updateFormField('filingStatus', $event)">
+                  <option *ngFor="let status of filingStatuses" [ngValue]="status">{{ status }}</option>
+                </select>
+              </div>
+              <div class="form-field">
+                <label>Quarter</label>
+                <select [ngModel]="taxForm().quarter" (ngModelChange)="updateFormField('quarter', $event)">
+                  <option *ngFor="let q of quarters" [ngValue]="q">{{ q }}</option>
+                </select>
+              </div>
+            </div>
+
+            <h3 class="form-section-title">Income</h3>
+            <div class="form-field full-width">
+              <label>Gross Income for Quarter</label>
+              <input type="number" [ngModel]="taxForm().grossIncome" (ngModelChange)="updateFormField('grossIncome', $event)">
+            </div>
+
+            <h3 class="form-section-title">Deductions</h3>
+            <div class="form-group-grid">
+              <div class="form-field">
+                <label>Business Expenses</label>
+                <input type="number" [ngModel]="taxForm().deductions" (ngModelChange)="updateFormField('deductions', $event)">
+              </div>
+              <div class="form-field">
+                <label>Retirement Contributions</label>
+                <input type="number" [ngModel]="taxForm().retirementContributions" (ngModelChange)="updateFormField('retirementContributions', $event)">
+              </div>
+              <div class="form-field">
+                <label>Health Insurance Premiums</label>
+                <input type="number" [ngModel]="taxForm().healthInsurancePremiums" (ngModelChange)="updateFormField('healthInsurancePremiums', $event)">
+              </div>
+              <div class="form-field">
+                <label>Home Office Deduction</label>
+                <input type="number" [ngModel]="taxForm().homeOfficeDeduction" (ngModelChange)="updateFormField('homeOfficeDeduction', $event)">
+              </div>
+            </div>
+
+            <button class="calculate-btn" (click)="calculateTax()">Calculate Estimated Tax</button>
+          </div>
+
+          <div class="tax-summary-right">
+            <h3 class="summary-title">Tax Summary</h3>
+            <div class="summary-box">
+              <i class="summary-icon">🧾</i>
+              <p>{{ taxSummaryMessage() }}</p>
+              <div class="tax-result" *ngIf="taxForm().calculatedTax > 0">
+                <div class="result-amount">{{ taxForm().calculatedTax | currency:'USD' }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tax Calendar View -->
+      <div *ngIf="activeView() === 'calendar' && activePage() === 'tax-estimator'" class="tax-calendar-container calendar-list">
+        <h2>Tax Calendar</h2>
+        <div *ngFor="let month of taxCalendar; trackBy: trackByMonth">
+          <h3 class="month-title">{{ month.month }} 2025</h3>
+          <div class="reminder-card"
+               *ngFor="let reminder of month.reminders; trackBy: trackByReminderId"
+               [class.payment]="reminder.type === 'payment'"
+               [class.reminder]="reminder.type === 'reminder'">
+            <div class="reminder-date">{{ reminder.date }}</div>
+            <div class="reminder-details">
+              <div class="reminder-title">{{ reminder.title }}</div>
+              <div class="reminder-description">{{ reminder.description }}</div>
+            </div>
+            <span class="reminder-type-tag">{{ reminder.type }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
