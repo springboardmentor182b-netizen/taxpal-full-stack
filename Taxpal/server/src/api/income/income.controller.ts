@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import Income from './Income.model';
-import Transaction from '../transaction/Transaction';
+import Transaction from '../transaction/Transaction.model';
 import { AuthedRequest } from '../auth/requireAuth';
 
 function toDate(input: any): Date {
