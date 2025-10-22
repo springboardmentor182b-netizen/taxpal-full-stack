@@ -4,7 +4,7 @@ import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2
 import { ChartConfiguration } from 'chart.js';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { DashboardService } from '../../../services/dashboard.service';
 import { IncomeForm } from '../../income/income-form/income-form.component';
@@ -12,11 +12,18 @@ import { ExpensesForm } from '../../expenses/expenses-form/expenses-form.compone
 import { DashboardForm } from '../../dashboard-form/dashboard-form/dashboard-form.component';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../features/auth.service';
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-   
-  imports: [CommonModule, BaseChartDirective, FormsModule, MatDialogModule, MatIconModule, RouterModule,],
+  imports: [
+    CommonModule,
+    BaseChartDirective,
+    FormsModule,
+    MatDialogModule,
+    MatIconModule,
+    RouterModule
+  ],
   providers: [provideCharts(withDefaultRegisterables())],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -32,7 +39,7 @@ export class Dashboard implements OnInit {
   savingsRate = 0;
 
   transactions: any[] = [];
-  showAllTransactions = false; // for View All toggle
+  showAllTransactions = false;
 
   barChartData: ChartConfiguration<'bar'>['data'] = {
     labels: ['Income', 'Expenses'],
@@ -65,7 +72,7 @@ export class Dashboard implements OnInit {
     private dialog: MatDialog,
     private router: Router,
     private dashboardService: DashboardService,
-    private authService: AuthService  
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -75,8 +82,10 @@ export class Dashboard implements OnInit {
       return;
     }
 
-    this.currentUser = JSON.parse(userData) as { id: string, fullName: string, email: string };
-    this.setUserInitials(this.currentUser.fullName);
+    this.currentUser = JSON.parse(userData);
+    if (this.currentUser) {
+      this.setUserInitials(this.currentUser.fullName);
+    }
     this.loadDashboardData();
   }
 
@@ -88,7 +97,7 @@ export class Dashboard implements OnInit {
   }
 
   private loadDashboardData() {
-    if (!this.currentUser?.id) return console.error('No user ID!');
+    if (!this.currentUser?.id) return;
 
     this.dashboardService.getDashboard(this.currentUser.id).subscribe({
       next: res => {
@@ -98,8 +107,6 @@ export class Dashboard implements OnInit {
         this.savingsRate = res.savingsRate ?? 0;
 
         this.transactions = Array.isArray(res.transactions) ? res.transactions : [];
-
-        // normalize transactions
         this.transactions = this.transactions.map(tx => ({
           ...tx,
           category: tx.category?.trim() || 'Other',
@@ -113,11 +120,12 @@ export class Dashboard implements OnInit {
     });
   }
 
+  // Sidebar controls
   toggleSidebar() { this.sidebarActive = !this.sidebarActive; }
   closeSidebarOverlay() { this.sidebarActive = false; }
   toggleCollapse() { this.collapsed = !this.collapsed; }
 
-  // Recent transactions getter
+  // Recent transactions
   get recentTransactions() {
     const sorted = [...this.transactions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
     return this.showAllTransactions ? sorted : sorted.slice(0, 5);
@@ -127,105 +135,27 @@ export class Dashboard implements OnInit {
     this.showAllTransactions = !this.showAllTransactions;
   }
 
+  // Forms
   openIncomeForm() {
     const dialogRef = this.dialog.open(IncomeForm, { width: '400px' });
     dialogRef.afterClosed().subscribe(res => {
       if (!res || !this.currentUser?.id) return;
-  
       const newIncome = { ...res, type: 'Income', amount: res.amount, date: res.date || new Date() };
       this.transactions.push(newIncome);
-      this.updateCharts(); // <-- totals updated immediately
-  
-      // Send transactions to backend (optional, async)
-      this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe({
-        next: updatedRes => console.log('Income saved'),
-        error: err => console.error('Failed to save income:', err)
-      });
+      this.updateCharts();
+      this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe();
     });
   }
-  
+
   openExpenseForm() {
     const dialogRef = this.dialog.open(ExpensesForm, { width: '400px' });
     dialogRef.afterClosed().subscribe(res => {
       if (!res || !this.currentUser?.id) return;
-  
       const newExpense = { ...res, type: 'Expense', amount: res.amount, date: res.date || new Date() };
       this.transactions.push(newExpense);
-      this.updateCharts(); // <-- totals updated immediately
-  
-      this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe({
-        next: updatedRes => console.log('Expense saved'),
-        error: err => console.error('Failed to save expense:', err)
-      });
+      this.updateCharts();
+      this.dashboardService.upsertDashboard(this.currentUser.id, { transactions: this.transactions }).subscribe();
     });
-  }
-  
-
-  updateCharts() {
-    const now = new Date();
-  
-    // Filter transactions for the selected period
-    const filteredTransactions = this.transactions.filter(tx => {
-      const d = new Date(tx.date);
-      if (this.selectedPeriod === 'month')
-        return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-      if (this.selectedPeriod === 'quarter')
-        return Math.floor(d.getMonth() / 3) === Math.floor(now.getMonth() / 3) && d.getFullYear() === now.getFullYear();
-      return d.getFullYear() === now.getFullYear();
-    });
-  
-    // Compute totals from filtered transactions
-    this.monthlyIncome = filteredTransactions
-      .filter(tx => tx.type === 'Income')
-      .reduce((sum, t) => sum + (t.amount || 0), 0);
-  
-    this.monthlyExpenses = filteredTransactions
-      .filter(tx => tx.type === 'Expense')
-      .reduce((sum, t) => sum + (t.amount || 0), 0);
-  
-    // Update bar chart
-    this.barChartData = {
-      ...this.barChartData,
-      datasets: [{ ...this.barChartData.datasets[0], data: [this.monthlyIncome, this.monthlyExpenses] }]
-    };
-  
-    // Update pie chart (expense categories)
-    const expenseTransactions = filteredTransactions.filter(tx => tx.type === 'Expense');
-    const categoryMap: Record<string, number> = {};
-    expenseTransactions.forEach(tx => {
-      const cat = tx.category?.trim() || 'Other';
-      categoryMap[cat] = (categoryMap[cat] || 0) + (tx.amount || 0);
-    });
-  
-    let categories = Object.keys(categoryMap);
-    let categoryData = Object.values(categoryMap);
-    const totalExpense = categoryData.reduce((a, b) => a + b, 0);
-  
-    if (categories.length === 0) {
-      categories = ['No Expenses'];
-      categoryData = [100];
-    } else {
-      categoryData = categoryData.map(val => (val / totalExpense) * 100); // convert to %
-    }
-  
-    const defaultColors = ['#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0', '#00bcd4', '#ffc107'];
-    const bgColors = categories.map((_, i) => defaultColors[i % defaultColors.length]);
-  
-    this.pieChartData = {
-      labels: categories,
-      datasets: [{ ...this.pieChartData.datasets[0], data: categoryData, backgroundColor: bgColors }]
-    };
-  
-    // Update savings rate
-    this.savingsRate = this.monthlyIncome
-      ? ((this.monthlyIncome - this.monthlyExpenses) / this.monthlyIncome) * 100
-      : 0;
-  }
-  
-
-  onPeriodChange(period: 'month' | 'quarter' | 'year') {
-    this.selectedPeriod = period;
-    this.updateCharts();
   }
 
   openDashboardForm() {
@@ -251,22 +181,20 @@ export class Dashboard implements OnInit {
         transactions: updatedData.transactions?.length ? updatedData.transactions : this.transactions
       };
 
-      this.dashboardService.upsertDashboard(this.currentUser.id, payload).subscribe({
-        next: res => {
-          this.monthlyIncome = res.monthlyIncome ?? this.monthlyIncome;
-          this.monthlyExpenses = res.monthlyExpenses ?? this.monthlyExpenses;
-          this.estimatedTax = res.estimatedTaxDue ?? this.estimatedTax;
-          this.savingsRate = res.savingsRate ?? this.savingsRate;
-          this.transactions = res.transactions?.length ? res.transactions : this.transactions;
-          this.updateCharts();
-        },
-        error: err => console.error('Update failed:', err)
+      this.dashboardService.upsertDashboard(this.currentUser.id, payload).subscribe(res => {
+        this.monthlyIncome = res.monthlyIncome ?? this.monthlyIncome;
+        this.monthlyExpenses = res.monthlyExpenses ?? this.monthlyExpenses;
+        this.estimatedTax = res.estimatedTaxDue ?? this.estimatedTax;
+        this.savingsRate = res.savingsRate ?? this.savingsRate;
+        this.transactions = res.transactions?.length ? res.transactions : this.transactions;
+        this.updateCharts();
       });
     });
   }
 
-  trackByIndex(index: number): number {
-    return index;
+  // Navigation
+  goToDashboard(): void {
+    this.router.navigate(['/features/dashboard']);
   }
 
   logout() {
@@ -280,9 +208,62 @@ export class Dashboard implements OnInit {
       }
     });
   }
-  goToDashboard() {
-    this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
-      this.router.navigate(['/dashboard']);
+
+  // Chart logic
+  updateCharts() {
+    const now = new Date();
+    const filteredTransactions = this.transactions.filter(tx => {
+      const d = new Date(tx.date);
+      if (this.selectedPeriod === 'month') return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+      if (this.selectedPeriod === 'quarter') return Math.floor(d.getMonth() / 3) === Math.floor(now.getMonth() / 3) && d.getFullYear() === now.getFullYear();
+      return d.getFullYear() === now.getFullYear();
     });
+
+    this.monthlyIncome = filteredTransactions.filter(tx => tx.type === 'Income').reduce((sum, t) => sum + (t.amount || 0), 0);
+    this.monthlyExpenses = filteredTransactions.filter(tx => tx.type === 'Expense').reduce((sum, t) => sum + (t.amount || 0), 0);
+
+    this.barChartData = {
+      ...this.barChartData,
+      datasets: [{ ...this.barChartData.datasets[0], data: [this.monthlyIncome, this.monthlyExpenses] }]
+    };
+
+    const expenseTransactions = filteredTransactions.filter(tx => tx.type === 'Expense');
+    const categoryMap: Record<string, number> = {};
+    expenseTransactions.forEach(tx => {
+      const cat = tx.category?.trim() || 'Other';
+      categoryMap[cat] = (categoryMap[cat] || 0) + (tx.amount || 0);
+    });
+
+    let categories = Object.keys(categoryMap);
+    let categoryData = Object.values(categoryMap);
+    const totalExpense = categoryData.reduce((a, b) => a + b, 0);
+
+    if (categories.length === 0) {
+      categories = ['No Expenses'];
+      categoryData = [100];
+    } else {
+      categoryData = categoryData.map(val => (val / totalExpense) * 100);
+    }
+
+    const defaultColors = ['#2196f3', '#ff9800', '#4caf50', '#e91e63', '#9c27b0', '#00bcd4', '#ffc107'];
+    const bgColors = categories.map((_, i) => defaultColors[i % defaultColors.length]);
+
+    this.pieChartData = {
+      labels: categories,
+      datasets: [{ ...this.pieChartData.datasets[0], data: categoryData, backgroundColor: bgColors }]
+    };
+
+    this.savingsRate = this.monthlyIncome
+      ? ((this.monthlyIncome - this.monthlyExpenses) / this.monthlyIncome) * 100
+      : 0;
+  }
+
+  onPeriodChange(period: 'month' | 'quarter' | 'year') {
+    this.selectedPeriod = period;
+    this.updateCharts();
+  }
+
+  trackByIndex(index: number): number {
+    return index;
   }
 }

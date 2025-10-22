@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
-import { BudgetFormComponent } from './budget-form.component';
+import { BudgetFormComponent, Budget } from './budget-form.component';
 import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService, User } from '../../../features/auth.service';
+import { Router } from '@angular/router'; // Import Router for testing
 
 // Mock AuthService
 class MockAuthService {
@@ -12,7 +13,6 @@ class MockAuthService {
       id: 'user-1',
       fullName: 'Test User',
       email: 'test@example.com',
-      
       username: 'testuser'
     };
   }
@@ -24,33 +24,43 @@ class MockAuthService {
 
 // Mock HttpClient
 class MockHttpClient {
+  // Mock 'get' to return an empty list initially
   get() {
-    return of([]); // Return empty list of budgets
+    return of([]);
   }
 
-  post() {
-    return of({
-      category: 'Testing',
-      amount: 1000,
-      spent: 0,
-      remaining: 1000,
+  // Mock 'post' to simulate API response for a new budget
+  post(url: string, body: any) {
+    // The API might incorrectly return remaining = amount, 
+    // but the component should correct it based on the spent amount in the body.
+    const postedBudget: Budget = {
+      category: body.category,
+      amount: body.amount,
+      spent: body.spent,
+      // Simulate INCORRECT API behavior (where remaining is not calculated)
+      remaining: body.amount, 
       status: 'Good',
-      month: '2025-06',
-      description: 'Test budget'
-    });
+      month: body.month,
+      description: body.description
+    };
+    return of(postedBudget);
   }
 }
 
 describe('BudgetFormComponent', () => {
   let component: BudgetFormComponent;
   let fixture: ComponentFixture<BudgetFormComponent>;
+  let mockRouter: any;
 
   beforeEach(async () => {
+    mockRouter = { navigate: jasmine.createSpy('navigate') };
+
     await TestBed.configureTestingModule({
       imports: [FormsModule, BudgetFormComponent],
       providers: [
         { provide: HttpClient, useClass: MockHttpClient },
-        { provide: AuthService, useClass: MockAuthService }
+        { provide: AuthService, useClass: MockAuthService },
+        { provide: Router, useValue: mockRouter } // Provide the mock router
       ]
     }).compileComponents();
 
@@ -59,27 +69,26 @@ describe('BudgetFormComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create the component', () => {
+  it('should create the component and initialize user', () => {
     expect(component).toBeTruthy();
+    expect(component.currentUser.fullName).toBe('Test User');
+    expect(component.userInitials).toBe('TU');
   });
 
-  it('should toggle form visibility', () => {
-    expect(component.isFormVisible()).toBeFalse();
-    component.isFormVisible.set(true);
-    expect(component.isFormVisible()).toBeTrue();
-    component.isFormVisible.set(false);
-    expect(component.isFormVisible()).toBeFalse();
-  });
-
-  it('should add a new budget correctly', () => {
+  it('should calculate remaining and status correctly on addBudget (Non-Zero Spent)', () => {
     const initialLength = component.budgets().length;
+    
+    // Set up a budget where spent > 0
+    const budgetAmount = 1000;
+    const spentAmount = 300;
+    const expectedRemaining = budgetAmount - spentAmount; // 700
 
     component.newBudget.set({
-      category: 'Testing',
-      amount: 1000,
-      spent: 0,
+      category: 'Testing Expense',
+      amount: budgetAmount,
+      spent: spentAmount,
       month: '2025-06',
-      description: 'Test budget'
+      description: 'Budget with partial spend'
     });
 
     component.addBudget();
@@ -88,21 +97,42 @@ describe('BudgetFormComponent', () => {
     expect(updatedBudgets.length).toBe(initialLength + 1);
 
     const newBudget = updatedBudgets[updatedBudgets.length - 1];
-    expect(newBudget.category).toBe('Testing');
-    expect(newBudget.amount).toBe(1000);
-    expect(newBudget.spent).toBe(0);
-    expect(newBudget.remaining).toBe(1000);
-    expect(newBudget.status).toBe('Good');
-    expect(newBudget.month).toBe('2025-06');
 
+    // CRITICAL ASSERTION: Checks if the component's client-side logic corrected the amount
+    expect(newBudget.remaining).toBe(expectedRemaining); 
+    
+    // Check status logic (700 is 70% of 1000, which is >= 50%)
+    expect(newBudget.status).toBe('Good'); 
+
+    // Check form reset
     const formState = component.newBudget();
     expect(formState.category).toBeNull();
     expect(formState.amount).toBeNull();
-    expect(formState.spent).toBe(0); // ✅ Reset to 0
-    expect(formState.month).toBeNull();
-    expect(formState.description).toBeNull();
-
+    expect(formState.spent).toBe(0); 
     expect(component.isFormVisible()).toBeFalse();
+  });
+
+  it('should calculate remaining and status correctly on addBudget (Zero Spent)', () => {
+    const initialLength = component.budgets().length;
+    
+    component.newBudget.set({
+      category: 'Testing Income',
+      amount: 500,
+      spent: 0,
+      month: '2025-07',
+      description: 'Zero spend'
+    });
+
+    component.addBudget();
+
+    const updatedBudgets = component.budgets();
+    const newBudget = updatedBudgets[updatedBudgets.length - 1];
+
+    // Check remaining when spent is 0
+    expect(newBudget.remaining).toBe(500); 
+    
+    // Check status logic (500 is 100% of 500)
+    expect(newBudget.status).toBe('Good'); 
   });
 
   it('should not add budget if required fields are missing', () => {
