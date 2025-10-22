@@ -30,17 +30,23 @@ export const routes: Routes = [
     path: 'dashboard-form', 
     loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
   },
+  {
+  path: 'reports',
+  loadComponent: () =>
+    import('./features/reports/reports-form/reports.component').then(
+      m => m.ReportsComponent
+    )
+},
   { 
     path: 'budgets', 
     loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
   },
-  
-{
-  path: 'tax-estimator',
-  loadComponent: () =>
-    import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
-      .then(m => m.TaxEstimatorFormComponent)
-},
+    {
+    path: 'tax-estimator',   // ✅ Added route
+    loadComponent: () =>
+      import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
+        .then(m => m.TaxEstimatorFormComponent)
+  },
   {
     path: 'settings',
     loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
@@ -78,5 +84,7 @@ export const routes: Routes = [
  
   
   // Wildcard route - redirect to login for any unknown routes
-  { path: '**', redirectTo: '/login' }
+  { path: '**', redirectTo: '/login' },
+  
+
 ];

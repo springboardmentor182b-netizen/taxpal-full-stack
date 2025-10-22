@@ -1,5 +1,3 @@
-
-
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
@@ -28,6 +26,7 @@ app.use(
 );
 app.use(bodyParser.json());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 setupSwagger(app);
 
 
@@ -40,7 +39,7 @@ app.use("/api/v1/reports", reportRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
-
+app.use("/api/v1/reports", reportRoutes);
 
 app.use("/api/v1/reportexports", reportExportRoutes );  
 // Root route
