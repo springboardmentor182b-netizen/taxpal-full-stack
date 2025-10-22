@@ -14,7 +14,6 @@ import reportExportRoutes from "./api/modules/reportexport/reportexport.routes";
 
 import budgetRoutes from "./api/modules/budget/budget.routes";
 import reportRoutes from "./api/modules/reports/report.routes";
-import reportExportRoutes from "./api/modules/export_download/reportexport.routes";
 
 
 
@@ -45,7 +44,6 @@ app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 app.use("/api/v1/reports", reportRoutes);
 
-app.use("/api/v1/reportexports", reportExportRoutes );  
 // Root route
 app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");
