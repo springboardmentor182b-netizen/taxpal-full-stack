@@ -6,16 +6,6 @@
       <p class="page-subtitle">Calculate your estimated tax obligations</p>
     </div>
 
-    <!-- Status banner -->
-    <div *ngIf="status !== 'idle'" class="status-banner" [ngClass]="{
-      'status--loading': status === 'calculating',
-      'status--ok': status === 'success',
-      'status--err': status === 'error'
-    }" style="margin: 8px 0 8px;">
-      {{ statusMsg }}
-      <span *ngIf="calendarMsg" style="margin-left:8px;">• {{ calendarMsg }}</span>
-    </div>
-
     <!-- Cards -->
     <section class="form-section">
       <div class="grid grid-2" style="width: 100%; max-width: 1120px">
@@ -195,17 +185,20 @@
               <div><strong>{{ asCurrency(summary.estimatedTax) }}</strong></div>
             </div>
 
-            <!-- Small helper when nothing computed yet -->
             <div *ngIf="status==='idle'" style="color:#666; font-size: 13px; margin-top: 4px;">
               Enter details on the left and click “Calculate” to update these numbers.
-            </div>
-
-            <div *ngIf="calendarMsg" class="status-banner status--ok" style="margin-top:8px;">
-              {{ calendarMsg }}
             </div>
           </div>
         </div>
       </div>
     </section>
+  </div>
+
+  <!-- Inline snackbar outlet -->
+  <div class="snack-container" aria-live="polite" aria-atomic="true">
+    <div *ngFor="let s of snacks" class="snack" [ngClass]="s.kind">
+      <span class="snack-text">{{ s.text }}</span>
+      <button class="snack-close" (click)="dismissSnack(s.id)" aria-label="Dismiss">×</button>
+    </div>
   </div>
 </div>

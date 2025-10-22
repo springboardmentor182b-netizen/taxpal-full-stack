@@ -58,7 +58,8 @@
                   <div class="card__main">
                     <div class="card__title">
                       <span class="card__title-text">{{ item.title }}</span>
-                      <span class="{{ badgeClass(item.type) }}">{{ item.type }}</span>
+                      <!-- switch to ngClass for correctness -->
+                      <span [ngClass]="badgeClass(item.type)">{{ item.type }}</span>
                     </div>
 
                     <div class="card__date">
@@ -67,6 +68,17 @@
 
                     <div class="card__note" *ngIf="item.note">
                       {{ item.note }}
+                    </div>
+
+                    <!-- ✅ Actions: only for payments -->
+                    <div class="card__actions" *ngIf="item.type === 'payment'">
+                      <button
+                        type="button"
+                        class="btn btn-success"
+                        [disabled]="isCompleting(item._id)"
+                        (click)="markComplete(item)">
+                        {{ isCompleting(item._id) ? 'Completing…' : 'Mark Complete' }}
+                      </button>
                     </div>
                   </div>
                 </div>
