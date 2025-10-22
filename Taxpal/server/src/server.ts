@@ -37,11 +37,18 @@ import budgetsRoutes from './api/budget/budget.routes';
 import transactionRoutes from './api/transaction/transaction.routes';
 import categoriesRoutes from './api/Categories/category.routes';
 
+<<<<<<< HEAD
 // ✅ NEW: Tax Estimator routes
 import taxRoutes from './api/TaxEstimator/TaxEstimator.routes';
 
 // ADD Financial Reports router
 import financialReportsRoutes from './api/FinancialReport/FinancialReport.routes';
+=======
+// ADD Financial Reports router
+import financialReportsRoutes from './api/FinancialReport/FinancialReport.routes';
+// ✅ NEW: Tax Estimator routes
+import taxRoutes from './api/TaxEstimator/TaxEstimator.routes';
+>>>>>>> 53abeff7876848aba7cad65cd8b160d6b118f1d6
 
 // ---------- 3) App setup ----------
 const app = express();
@@ -84,7 +91,17 @@ app.use('/api/v1/budgets', budgetsRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
+<<<<<<< HEAD
 app.use('/api/v1/financial-reports', financialReportsRoutes);
+=======
+// Add mount financial reports at /api/v1/financial-reports
+app.use('/api/v1/financial-reports', financialReportsRoutes);
+// ✅ NEW: mount tax estimator + calendar
+app.use('/api/v1/tax', taxRoutes);
+
+// ---------- 7b) Legacy compatibility mounts (optional) ----------
+app.use('/api/transactions', transactionRoutes);
+>>>>>>> 53abeff7876848aba7cad65cd8b160d6b118f1d6
 
 // Health check
 app.get('/api/v1/health', (_req, res) => {
