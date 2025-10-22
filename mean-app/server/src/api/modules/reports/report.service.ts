@@ -1,11 +1,17 @@
-// server/src/api/modules/reports/report.service.ts (FIXED VERSION)
+// server/src/api/modules/reports/report.service.ts
+//new
 
 import Report, { IReportDocument } from "./report.model";
 import { ReportType, ReportPeriod, ReportFormat, ReportStatus } from "./report.types";
+import PDFDocument from "pdfkit";
 
+import fs from "fs";
+import path from "path";
+
+console.log('Report schema paths:', Object.keys(Report.schema.paths));
 
 class ReportService {
-  
+
   private calculateDateRange(period: ReportPeriod, customPeriod?: { startDate: Date; endDate: Date }) {
     const now = new Date();
     let startDate: Date;
@@ -61,7 +67,6 @@ class ReportService {
     return { startDate, endDate };
   }
 
-  
   private async generateReportData(
     userId: string,
     reportType: ReportType,
@@ -75,10 +80,10 @@ class ReportService {
       charts: []
     };
 
+
     try {
       switch (reportType) {
         case ReportType.INCOME_STATEMENT:
-         
           reportData.summary = {
             totalIncome: 0,
             totalExpense: 0,
@@ -88,7 +93,6 @@ class ReportService {
           break;
 
         case ReportType.EXPENSE_REPORT:
-         
           reportData.summary = {
             totalExpense: 0,
             message: "No expense data found for this period"
@@ -96,7 +100,6 @@ class ReportService {
           break;
 
         case ReportType.TAX_SUMMARY:
-        
           reportData.summary = {
             totalIncome: 0,
             totalExpense: 0,
@@ -107,7 +110,6 @@ class ReportService {
           break;
 
         case ReportType.BUDGET_ANALYSIS:
-        
           reportData.summary = {
             totalBudget: 0,
             totalSpent: 0,
@@ -117,7 +119,6 @@ class ReportService {
           break;
 
         case ReportType.CASH_FLOW:
-        
           reportData.summary = {
             openingBalance: 0,
             totalIncome: 0,
@@ -136,7 +137,6 @@ class ReportService {
     }
   }
 
- 
   private async processReportGeneration(
     reportId: string,
     userId: string,
@@ -149,15 +149,35 @@ class ReportService {
 
       const reportData = await this.generateReportData(userId, reportType, startDate, endDate);
 
-      const fileName = `${reportType.replace(/\s+/g, '_')}_${Date.now()}.pdf`;
-      const fileUrl = `/reports/${fileName}`;
+      const fileName = `${reportType.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
+      const filePath = path.join(__dirname, "../../../public/reports", fileName);
+
+      // Ensure folder exists
+      fs.mkdirSync(path.dirname(filePath), { recursive: true });
+
+      // Generate PDF
+      const doc = new PDFDocument();
+      doc.pipe(fs.createWriteStream(filePath));
+
+      doc.fontSize(20).text(`${reportType} Report`, { align: "center" });
+      doc.moveDown();
+      doc.fontSize(12).text(`Period: ${startDate.toDateString()} - ${endDate.toDateString()}`);
+      doc.moveDown();
+      doc.text("Summary:");
+      doc.moveDown();
+
+      for (const key in reportData.summary) {
+        doc.text(`${key}: ${reportData.summary[key]}`);
+      }
+
+      doc.end();
 
       await Report.findByIdAndUpdate(reportId, {
         status: ReportStatus.COMPLETED,
         reportData,
         generatedAt: new Date(),
         fileName,
-        fileUrl
+        fileUrl: `/reports/${fileName}`
       });
     } catch (error: any) {
       console.error("Report generation error:", error);

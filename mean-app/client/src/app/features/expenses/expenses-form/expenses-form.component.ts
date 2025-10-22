@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { ExpenseService } from '../../../services/expense.service';
+
 @Component({
   selector: 'app-expense-form',
   standalone: true,
@@ -21,13 +22,14 @@ import { ExpenseService } from '../../../services/expense.service';
   ],templateUrl: './expenses-form.component.html',
   styleUrls: ['./expenses-form.component.scss']
 })
+
 export class ExpensesForm {
   expensesForm: FormGroup;
   categories = ['Salary', 'Freelance', 'Business', 'Investments', 'Other'];
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<ExpensesForm>,// ✅ inject DialogRef
+    private dialogRef: MatDialogRef<ExpensesForm>, // ✅ inject DialogRef
     private expenseService:ExpenseService
   ) {
     this.expensesForm = this.fb.group({
@@ -39,17 +41,17 @@ export class ExpensesForm {
     });
   }
   closeForm() {
-    this.dialogRef.close();   // ✅ actually closes dialog
+    this.dialogRef.close();  // ✅ actually closes dialog
   }
 
   cancelForm() {
     this.expensesForm.reset();
-    this.closeForm();         // ✅ close after cancel
+    this.closeForm();        // ✅ close after cancel
   }
   submitForm() {
     if (this.expensesForm.valid) {
       this.expenseService.addExpense(this.expensesForm.value).subscribe({
-        next: (res: any) => { // Change type to any
+        next: (res: any) => {  // Change type to any
           console.log('✅ Expense saved:', res);
           this.dialogRef.close(res.expense);
         },
