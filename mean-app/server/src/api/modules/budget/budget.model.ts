@@ -13,20 +13,11 @@ export interface IBudget {
 
 const BudgetSchema = new Schema<IBudget>({
   category: { type: String, required: true },
-  amount: { type: Number, required: true, min: 0 },
+  amount: { type: Number, required: true },
   month: { type: String, required: true },
   description: { type: String },
-  spent: { type: Number, default: 0, min: 0 },
+  spent: { type: Number, default: 0 },
   userId: { type: String, required: true }
-}, { 
-  timestamps: true,
-  toJSON: { 
-    virtuals: true,
-    transform: function(doc, ret) {
-      ret.remaining = ret.amount - (ret.spent || 0);
-      return ret;
-    }
-  }
-});
+}, { timestamps: true });
 
 export const Budget = model<IBudget>('Budget', BudgetSchema);

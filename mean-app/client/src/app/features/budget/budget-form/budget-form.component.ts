@@ -1,4 +1,3 @@
-
 import { Component, signal, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,11 +9,10 @@ export interface Budget {
   category: string;
   amount: number;
   spent: number;
+  remaining: number;
+  status: 'Good' | 'Fair' | 'Poor';
   month: string;
   description?: string;
-  // Server-calculated fields
-  readonly remaining: number;
-  readonly status: 'Good' | 'Fair' | 'Poor';
 }
 
 @Component({
@@ -59,15 +57,6 @@ export class BudgetFormComponent {
     private router: Router
   ) {
     this.loadCurrentUser();
-  }
-
-  // Compute overall budget health based on all budgets
-  overallBudgetHealth(): 'Good' | 'Fair' | 'Poor' | 'No Budgets' {
-    const budgets = this.budgets();
-    if (!budgets || budgets.length === 0) return 'No Budgets';
-    if (budgets.some((b: Budget) => b.status === 'Poor')) return 'Poor';
-    if (budgets.some((b: Budget) => b.status === 'Fair')) return 'Fair';
-    return 'Good';
   }
 
   // ✅ Load current user and initials
@@ -123,14 +112,20 @@ export class BudgetFormComponent {
       return;
     }
 
-    // Convert spent to number if provided, otherwise use 0
-    const spent = budgetData.spent !== null ? Number(budgetData.spent) : 0;
+    const remaining = (budgetData.amount ?? 0) - (budgetData.spent ?? 0);
 
-    // Let the server calculate remaining and status
-    const payload: Omit<Budget, 'remaining' | 'status'> = {
+    const status = remaining >= (budgetData.amount ?? 0) * 0.5
+      ? 'Good'
+      : remaining >= (budgetData.amount ?? 0) * 0.25
+      ? 'Fair'
+      : 'Poor';
+
+    const payload: Budget = {
       category: budgetData.category,
-      amount: Number(budgetData.amount) ?? 0,
-      spent: spent,
+      amount: budgetData.amount ?? 0,
+      spent: budgetData.spent ?? 0,
+      remaining,
+      status,
       month: budgetData.month,
       description: budgetData.description ?? ''
     };

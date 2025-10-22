@@ -1,6 +1,5 @@
 import TaxEstimate, { ITaxEstimate } from "./taxEstimator.model";
 import * as reminderService from "../taxRemainders/taxReminder.service";
-
 // Tax calculation logic
 export const calculateEstimatedTax = (data: Partial<ITaxEstimate>): number => {
   const {
@@ -45,24 +44,13 @@ export const createEstimate = async (
   const newEstimate = new TaxEstimate({ ...data, estimated_tax, due_date });
   const savedEstimate = await newEstimate.save();
 
-  // ✅ Only generate reminders if we have a positive estimated tax amount
-  // This prevents creating default reminders when the form was empty or
-  // produced zero tax.
-  if (data.user_id && estimated_tax > 0) {
-    // Determine the year to use for generating reminders. Prefer the due_date's year
-    // so reminders align with the quarter the user selected. If due_date isn't
-    // available, fall back to the current year.
-    const reminderStartYear = due_date ? due_date.getFullYear() : new Date().getFullYear();
-
-    // The estimate returned is the tax for the reported quarter. The reminder
-    // generator expects a total annual tax amount (it splits by 4). Multiply by
-    // 4 so each generated quarter uses the correct per-quarter amount.
-    const annualTax = estimated_tax * 4;
-
+  // ✅ Automatically generate reminders for the entire year
+  if (data.user_id) {
+    const year = new Date().getFullYear();
     await reminderService.generateQuarterlyReminders(
       data.user_id.toString(),
-      annualTax,
-      reminderStartYear
+      estimated_tax , // assuming this quarter represents 1/4th of total
+      year
     );
   }
 

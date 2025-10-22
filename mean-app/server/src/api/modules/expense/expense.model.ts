@@ -7,7 +7,6 @@ export interface IExpense extends Document {
   category: string;
   date: Date;
   notes?: string;
-  budgetId?: mongoose.Types.ObjectId;
 }
 
 const expenseSchema = new mongoose.Schema<IExpense>(
@@ -18,7 +17,6 @@ const expenseSchema = new mongoose.Schema<IExpense>(
     category:    { type: String, required: true },
     date:        { type: Date, required: true },
     notes:       { type: String },
-    budgetId:    { type: mongoose.Schema.Types.ObjectId, ref: 'Budget' },
   },
   { timestamps: true }
 );
