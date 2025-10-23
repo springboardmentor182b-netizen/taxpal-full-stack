@@ -1,0 +1,109 @@
+:root{
+  --primary:#656ED3;
+  --bg:#FBFBFB;
+  --accent:#AFB3FF;
+  --primary-dark:#534CA4;
+  --text:#000000;
+  --ink:#25295A;
+  --ink-2:#1A1A1A;
+  --primary-soft:#838CF1;
+  --panel:#EBEFFF;
+  --panel-2:#FBFBFB;
+}
+
+.page{
+  padding:24px;
+  background:var(--bg);
+  color:var(--ink);
+  min-height:100%;
+}
+
+.page-title{
+  font-size:28px;
+  font-weight:700;
+  color:#534CA4;
+  margin:0 0 4px;
+}
+
+.page-subtitle{
+  margin:0 0 20px;
+  color:var(--ink);
+  opacity:.8;
+}
+
+.card{
+  background:var(--panel-2);
+  border:1px solid var(--panel);
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(37,41,90,.06);
+}
+
+.card-title{
+  font-size:18px;
+  font-weight:600;
+  margin:0 0 16px;
+  color:#534CA4;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap:12px;
+  align-items:end;
+}
+
+.form-field{ display:flex; flex-direction:column; gap:6px; }
+.form-field label{ font-weight:600; color:var(--ink); }
+
+select{
+  height:40px;
+  border:1px solid var(--primary);
+  border-radius:10px;
+  padding:0 12px;
+  background:#fff;
+  color:var(--ink-2);
+  outline:none;
+}
+
+.form-actions{
+  display:flex; gap:10px; align-items:center;
+}
+
+.btn{
+  height:40px; padding:0 14px; border-radius:10px; border:none;
+  font-weight:600; cursor:pointer;
+}
+.btn-primary{ background:#656ED3; color:#fff; }
+.btn-primary:disabled{ opacity:.6; cursor:not-allowed; }
+.btn-secondary{ background:var(--panel); color:var(--ink); }
+
+.error{ color:#c0392b; margin-top:12px; }
+
+.table-wrapper{ overflow:auto; border:1px solid var(--panel); border-radius:10px; }
+table{ width:100%; border-collapse:collapse; }
+th, td{ padding:12px 14px; border-bottom:1px solid var(--panel); text-align:left; }
+thead th{ background:var(--panel); color:var(--ink-2); font-weight:700; }
+.actions-col{ width:160px; }
+.row-actions{ display:flex; gap:10px; }
+.link{
+  background:transparent; border:none; color:var(--primary-dark);
+  font-weight:600; cursor:pointer;
+}
+.link.danger{ color:#b22; }
+
+.empty{
+  padding:28px; color:var(--ink); opacity:.7;
+  text-align:center;
+}
+
+.spinner{
+  width:14px;height:14px;border:2px solid rgba(37,41,90,.25);
+  border-top-color:#656ED3;border-radius:50%;display:inline-block;
+  animation:spin .7s linear infinite; vertical-align:-2px;
+}
+@keyframes spin{ to{ transform:rotate(360deg); } }
+
+
+button[aria-label="Close"]:hover svg { stroke: #656ED3; }

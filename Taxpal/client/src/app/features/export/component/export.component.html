@@ -1,0 +1,49 @@
+<div class="page">
+  <!-- Top-right Close/X -->
+  <button
+    type="button"
+    aria-label="Close"
+    (click)="onClose()"
+    title="Close"
+    style="
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      line-height: 0;
+    "
+  >
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+         style="stroke:#534CA4; transition: stroke .15s ease">
+      <path d="M6 6l12 12M18 6L6 18" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <h1 class="page-title">Report Preview</h1>
+
+  <section class="card">
+    <div class="toolbar">
+      <button class="btn" (click)="print()" [disabled]="!previewable || loading">Print</button>
+      <button class="btn btn-primary" (click)="download()" [disabled]="loading">Download</button>
+    </div>
+
+    <div class="preview" *ngIf="!loading && previewable && previewUrl">
+      <iframe [src]="previewUrl" title="report preview"></iframe>
+    </div>
+
+    <div class="preview placeholder" *ngIf="!loading && !previewable">
+      <div class="empty-icon">📄</div>
+      <div class="empty-text">
+        Select a report to preview<br/>
+        <small>Generated reports will appear here for review before downloading</small><br/>
+        <small>(CSV/XLSX don’t support inline preview – use Download)</small>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="loading">Building preview…</div>
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  </section>
+</div>

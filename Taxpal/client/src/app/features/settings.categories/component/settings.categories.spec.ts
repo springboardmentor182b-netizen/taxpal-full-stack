@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { SettingsCategoriesComponent } from './settings.categories';
+import { SettingsCategoriesComponent } from '../component/settings.categories';
 import { CategoryService } from '@/app/core/services/category.service';
 
 describe('SettingsCategoriesComponent', () => {
