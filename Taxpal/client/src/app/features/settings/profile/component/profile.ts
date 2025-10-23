@@ -8,8 +8,8 @@ import { Profile, ProfileService } from '@/app/core/services/profile.service';
   selector: 'app-settings-profile',
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, RouterLinkActive],
-  templateUrl: './settings.profile.html',
-  styleUrls: ['./settings.profile.css'],
+  templateUrl: './profile.html',
+  styleUrls: ['./profile.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class SettingsProfileComponent implements OnInit {

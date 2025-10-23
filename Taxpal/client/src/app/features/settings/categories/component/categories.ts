@@ -9,8 +9,8 @@ import { CategoryService, Category } from '@/app/core/services/category.service'
   selector: 'app-settings-categories',
   standalone: true,
   imports: [CommonModule, FormsModule, HttpClientModule, RouterLink, RouterLinkActive],
-  templateUrl: './settings.categories.html',
-  styleUrls: ['./settings.categories.css'],
+  templateUrl: './categories.html',
+  styleUrls: ['./categories.css'],
   encapsulation: ViewEncapsulation.None
 })
 export class SettingsCategoriesComponent implements OnInit {
