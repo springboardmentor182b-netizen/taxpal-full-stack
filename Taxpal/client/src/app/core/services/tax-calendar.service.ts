@@ -68,7 +68,6 @@ export class TaxCalendarService {
         }));
         return mapped;
       }),
-      // keep the observable type as TaxCalendarItem[] even on error
       catchError(() => of([] as TaxCalendarItem[]))
     );
   }
@@ -103,13 +102,17 @@ export class TaxCalendarService {
 
   /** ✅ Delete ALL reminder events (bulk) */
   deleteAllReminders(): Observable<number> {
-    // Backend route: DELETE /api/v1/tax/calendar?type=reminder
     return this.http
       .delete<DeleteManyResp>(`${this.base}/calendar`, { params: { type: 'reminder' } })
       .pipe(
         map((r) => (r?.success ? (r.deletedCount ?? 0) : 0)),
         catchError(() => of(0))
       );
+  }
+
+  /** ✅ Mark a payment complete (just delete it server-side) */
+  completePayment(id: string): Observable<boolean> {
+    return this.deleteItem(id);
   }
 
   /** Group items by month label, preserving chronological order */
