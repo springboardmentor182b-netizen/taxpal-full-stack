@@ -48,7 +48,7 @@ export const routes: Routes = [
   {
     path: 'settings/profile',
     loadComponent: () =>
-      import('./features/settings.profile/component/settings.profile')
+      import('./features/settings/profile/component/profile')
         .then(m => m.SettingsProfileComponent),
     canActivate: [authGuard]
   },
@@ -57,7 +57,7 @@ export const routes: Routes = [
   {
     path: 'settings/categories',
     loadComponent: () =>
-      import('./features/settings.categories/component/settings.categories')
+      import('./features/settings/categories/component/categories')
         .then(m => m.SettingsCategoriesComponent),
     canActivate: [authGuard]
   },
