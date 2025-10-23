@@ -5,7 +5,6 @@ import { FinancialReportService } from './financial-report.service';
 import { HttpClient } from '@angular/common/http';
 import { DarkModeService } from '../../core/services/dark-mode.service';
 import { Subscription } from 'rxjs';
-import { NavbarComponent } from '../../components/navbar/navbar.component';
 
 interface MonthlyReport {
   name: string;
@@ -40,7 +39,7 @@ type Report = MonthlyReport | QuarterlyReport;
   templateUrl: './financial-report.component.html',
   styleUrls: ['./financial-report.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, NavbarComponent]
+  imports: [CommonModule, FormsModule]
 })
 export class FinancialReportComponent implements OnInit, OnDestroy {
   selectedYear = new Date().getFullYear();

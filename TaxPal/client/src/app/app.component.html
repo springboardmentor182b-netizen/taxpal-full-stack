@@ -1,0 +1,10 @@
+<div [ngClass]="{'dark-theme': isDarkMode}" class="app-container">
+  <div class="nav-container">
+    <app-navbar></app-navbar>
+  </div>
+  <div class="content-container" [ngClass]="{'dark': isDarkMode}">
+    <div class="router-outlet-container">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
