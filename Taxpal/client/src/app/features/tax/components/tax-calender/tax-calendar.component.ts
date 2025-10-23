@@ -25,6 +25,9 @@ export class TaxCalendarComponent implements OnInit {
   bulkMsg = '';
   bulkBusy = false;
 
+  // track per-item "completing" state
+  private completingIds = new Set<string>();
+
   ngOnInit(): void {
     this.fetch();
   }
@@ -52,6 +55,10 @@ export class TaxCalendarComponent implements OnInit {
 
   badgeClass(t: TaxType) {
     return t === 'reminder' ? 'badge badge--reminder' : 'badge badge--payment';
+  }
+
+  isCompleting(id?: string) {
+    return !!id && this.completingIds.has(id);
   }
 
   onClose() {
@@ -83,6 +90,32 @@ export class TaxCalendarComponent implements OnInit {
         console.error('[tax-calendar] bulk delete failed', err);
         this.bulkMsg = 'Failed to delete reminders.';
         this.bulkBusy = false;
+      }
+    });
+  }
+
+  // ✅ NEW: Mark a payment as complete (delete it on server + remove from UI)
+  markComplete(item: TaxCalendarItem) {
+    if (!item?._id) return;
+    if (this.isCompleting(item._id)) return;
+    if (!confirm('Mark this payment as completed? It will be removed.')) return;
+
+    this.completingIds.add(item._id);
+    this.calendarSvc.completePayment(item._id).subscribe({
+      next: (ok) => {
+        this.completingIds.delete(item._id!);
+        if (ok) {
+          this.items = this.items.filter(i => i._id !== item._id);
+        } else {
+          this.error = 'Failed to mark payment as complete.';
+          setTimeout(() => (this.error = ''), 3000);
+        }
+      },
+      error: (err) => {
+        console.error('[tax-calendar] complete payment failed', err);
+        this.completingIds.delete(item._id!);
+        this.error = 'Failed to mark payment as complete.';
+        setTimeout(() => (this.error = ''), 3000);
       }
     });
   }

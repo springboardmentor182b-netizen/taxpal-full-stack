@@ -1,0 +1,114 @@
+<div class="page">
+  <!-- Top-right Close/X -->
+  <button
+    type="button"
+    aria-label="Close"
+    (click)="onClose()"
+    title="Close"
+    style="
+      position: fixed;
+      top: 16px;
+      right: 24px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      line-height: 0;
+    "
+  >
+    <!-- X Icon (uses palette #534CA4 / #656ED3 on hover via inline) -->
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
+         style="stroke:#534CA4; transition: stroke .15s ease">
+      <path d="M6 6l12 12M18 6L6 18" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <h1 class="page-title">Financial Reports</h1>
+  <p class="page-subtitle">Generate and download your financial reports</p>
+
+  <!-- Generate Report Card -->
+  <section class="card">
+    <h2 class="card-title">Generate Report</h2>
+
+    <div class="grid">
+      <div class="form-field">
+        <label>Report Type</label>
+        <select [(ngModel)]="reportType">
+          <option value="income-statement">Income Statement</option>
+          <option value="balance-sheet">Balance Sheet</option>
+          <option value="cash-flow">Cash Flow</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>Period</label>
+        <select [(ngModel)]="period">
+          <option value="current-month">Current Month</option>
+          <option value="last-month">Last Month</option>
+          <option value="this-quarter">This Quarter</option>
+          <option value="this-year">This Year</option>
+        </select>
+      </div>
+
+      <div class="form-field">
+        <label>Format</label>
+        <select [(ngModel)]="format">
+          <option value="pdf">PDF</option>
+          <option value="csv">CSV</option>
+          <option value="xlsx">XLSX</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-secondary" type="button" (click)="resetForm()">Reset</button>
+        <button class="btn btn-primary" type="button" (click)="generateReport()">
+          <span *ngIf="!generating">Generate Report</span>
+          <span *ngIf="generating" class="btn-spin">
+            <span class="spinner"></span>&nbsp;Generating…
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+  </section>
+
+  <!-- Recent Reports -->
+  <section class="card">
+    <h2 class="card-title">Recent Reports</h2>
+
+    <div class="table-wrapper" *ngIf="recent?.length; else emptyState">
+      <table>
+        <thead>
+          <tr>
+            <th>Report Name</th>
+            <th>Generated</th>
+            <th>Period</th>
+            <th>Format</th>
+            <th class="actions-col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of recent">
+            <td>{{ r.name || (r.reportType | titlecase) }}</td>
+            <td>{{ r.createdAt | date:'medium' }}</td>
+            <td>{{ r.periodLabel }}</td>
+            <td>{{ r.format.toUpperCase() }}</td>
+            <td class="row-actions">
+              <button class="link" (click)="openInExport(r)">Preview</button>
+              <button class="link danger" (click)="deleteReport(r)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyState>
+      <div class="empty" *ngIf="!loadingList; else loadingTpl">No results.</div>
+    </ng-template>
+
+    <ng-template #loadingTpl>
+      <div class="empty"><span class="spinner"></span>&nbsp;Loading…</div>
+    </ng-template>
+  </section>
+</div>

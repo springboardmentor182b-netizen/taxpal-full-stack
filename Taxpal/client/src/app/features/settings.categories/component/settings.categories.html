@@ -5,18 +5,14 @@
   </div>
 
   <div class="menu-section">
-    <div class="menu-item">
+    <a class="menu-item" routerLink="/settings/profile" routerLinkActive="active">
       <i></i> Profile
-    </div>
-    <div class="menu-item active">
+    </a>
+    <a class="menu-item active" routerLink="/settings/categories" routerLinkActive="active">
       <i></i> Categories
-    </div>
-    <div class="menu-item">
-      <i></i> Notifications
-    </div>
-    <div class="menu-item">
-      <i></i> Security
-    </div>
+    </a>
+    <div class="menu-item"><i></i> Notifications</div>
+    <div class="menu-item"><i></i> Security</div>
   </div>
 </div>
 
@@ -24,7 +20,16 @@
 <div class="main-content">
   <div class="header">
     <h2>Category Management</h2>
+
     <div class="user-actions">
+      <!-- ✕ Close button (routes back to dashboard) -->
+      <a
+        class="btn btn-settings"
+        routerLink="/dashboard"
+        aria-label="Close and go to dashboard"
+        title="Close"
+      >✕</a>
+
       <button class="btn btn-settings" (click)="loadCategories()" [disabled]="isLoading">
         {{ isLoading ? 'Refreshing...' : 'Refresh' }}
       </button>
@@ -94,6 +99,7 @@
           placeholder="Enter category name"
         />
       </div>
+
       <div class="form-group">
         <label for="category-type">Category Type</label>
         <select id="category-type" [(ngModel)]="categoryType" [disabled]="isLoading">
@@ -101,6 +107,7 @@
           <option value="income">Income</option>
         </select>
       </div>
+
       <button class="btn-add" (click)="handleAddCategory()" [disabled]="isLoading || !categoryName.trim()">
         {{ isLoading ? 'Processing...' : (isEditing ? 'Update Category' : 'Add Category') }}
       </button>

@@ -28,7 +28,7 @@ import mongoose from 'mongoose';
 // (optional) mailer verification if you use it
 import { verifyMailer } from './utils/mailer';
 
-// ✅ Route modules (use v1 paths consistently)
+// ✅ Route modules (use v1 paths consistently where you want)
 import authRoutes from './api/auth/auth.routes';
 import incomeRoutes from './api/income/income.routes';
 import expenseRoutes from './api/expense/expense.routes';
@@ -37,16 +37,14 @@ import budgetsRoutes from './api/budget/budget.routes';
 import transactionRoutes from './api/transaction/transaction.routes';
 import categoriesRoutes from './api/Categories/category.routes';
 
-// ✅ NEW: Tax Estimator routes
+// ✅ Tax Estimator + Calendar
 import taxRoutes from './api/TaxEstimator/TaxEstimator.routes';
 
-// ADD Financial Reports router
+// ✅ Financial Reports (CRUD)
 import financialReportsRoutes from './api/FinancialReport/FinancialReport.routes';
 
-// ADD Financial Reports router
-import financialReportsRoutes from './api/FinancialReport/FinancialReport.routes';
-// ✅ NEW: Tax Estimator routes
-import taxRoutes from './api/TaxEstimator/TaxEstimator.routes';
+// ✅ Export / Download (files)
+import exportRoutes from './api/ExportDownload/ExportDownload.routes';
 
 // ---------- 3) App setup ----------
 const app = express();
@@ -68,7 +66,7 @@ app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ---------- 6) DB connection (accept BOTH MONGODB_URI and MONGO_URI) ----------
+// ---------- 6) DB connection ----------
 const mongoUri =
   process.env.MONGODB_URI ||
   process.env.MONGO_URI ||
@@ -80,7 +78,7 @@ mongoose
   .then(() => console.log('[db] Connected to MongoDB'))
   .catch(err => console.error('[db] connection error:', err));
 
-// ---------- 7) Routes (canonical: /api/v1 prefix) ----------
+// ---------- 7) Routes ----------
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/incomes', incomeRoutes);
 app.use('/api/v1/expenses', expenseRoutes);
@@ -89,15 +87,17 @@ app.use('/api/v1/budgets', budgetsRoutes);
 app.use('/api/v1/transactions', transactionRoutes);
 app.use('/api/v1/categories', categoriesRoutes);
 
-
-// Add mount financial reports at /api/v1/financial-reports
-app.use('/api/v1/financial-reports', financialReportsRoutes);
-// ✅ NEW: mount tax estimator + calendar
+// ✅ Tax Estimator + Calendar
 app.use('/api/v1/tax', taxRoutes);
+
+// ✅ Financial Reports (CRUD only)
+app.use('/api/v1/financial-reports', financialReportsRoutes);
+
+// ✅ Export/Download module (CSV/XLSX/PDF)
+app.use('/api/export', exportRoutes);
 
 // ---------- 7b) Legacy compatibility mounts (optional) ----------
 app.use('/api/transactions', transactionRoutes);
->>>>>>> 53abeff7876848aba7cad65cd8b160d6b118f1d6
 
 // Health check
 app.get('/api/v1/health', (_req, res) => {
@@ -136,7 +136,7 @@ if (!(global as any).__taxpal_server_started) {
     try {
       verifyMailer();
     } catch (e) {
-      console.warn('[mailer] verify skipped/failed:', (e as Error)?.message);
+      console.warn('[mailer] verify skipped/failed]:', (e as Error)?.message);
     }
   });
 

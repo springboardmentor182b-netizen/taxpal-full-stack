@@ -1,16 +1,11 @@
-import express from "express";
-import { FinancialReportController } from "./FinancialReport.controller";
+import { Router } from 'express';
+import * as ctrl from './FinancialReport.controller';
 
-const router = express.Router();
-const controller = new FinancialReportController();
+const router = Router();
 
-router.post("/", controller.createReport.bind(controller));
-router.get("/", controller.getAllReports.bind(controller));
-router.get("/export/csv", controller.exportCSV.bind(controller));
-router.get("/export/excel", controller.exportExcel.bind(controller));
-router.get("/export/pdf", controller.exportPDF.bind(controller)); 
-router.delete("/:id", controller.deleteReport.bind(controller)); 
-router.get("/download/:id", controller.downloadReport.bind(controller)); 
-
+router.get('/', ctrl.list);
+router.get('/:id', ctrl.byId);
+router.post('/generate', ctrl.generate);
+router.delete('/:id', ctrl.remove);
 
 export default router;

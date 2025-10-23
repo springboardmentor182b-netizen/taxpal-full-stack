@@ -41,12 +41,23 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
-  // ✅ Settings → Categories
+// ✅ Settings → default to Categories (unchanged)
   { path: 'settings', redirectTo: 'settings/categories', pathMatch: 'full' },
+
+  // ✅ NEW: Settings → Profile
+  {
+    path: 'settings/profile',
+    loadComponent: () =>
+      import('./features/settings.profile/component/settings.profile')
+        .then(m => m.SettingsProfileComponent),
+    canActivate: [authGuard]
+  },
+
+  // ✅ Settings → Categories (existing)
   {
     path: 'settings/categories',
     loadComponent: () =>
-      import('./features/settings.categories/settings.categories')
+      import('./features/settings.categories/component/settings.categories')
         .then(m => m.SettingsCategoriesComponent),
     canActivate: [authGuard]
   },
@@ -69,11 +80,22 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
 
+
+  // ✅ Financial Reports (standalone component)
   {
-    path: 'reports',
+    path: 'financial-reports',
     loadComponent: () =>
-      import('./features/reports/reports.component')
-        .then(m => m.ReportsComponent),
+      import('./features/financialReport/component/financialReport')
+        .then(m => m.FinancialReportsComponent),
+    canActivate: [authGuard]
+  },
+
+  // ✅ Export / Download page (uses your ExportComponent)
+  {
+    path: 'export',
+    loadComponent: () =>
+      import('./features/export/component/export.component')
+        .then(m => m.ExportComponent),
     canActivate: [authGuard]
   },
 

@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { CategoryService, Category } from '@/app/core/services/category.service';
 
 @Component({
   selector: 'app-settings-categories',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
+  imports: [CommonModule, FormsModule, HttpClientModule, RouterLink, RouterLinkActive],
   templateUrl: './settings.categories.html',
   styleUrls: ['./settings.categories.css'],
   encapsulation: ViewEncapsulation.None

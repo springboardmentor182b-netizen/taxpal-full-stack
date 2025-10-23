@@ -1,16 +1,9 @@
-import express from "express";
-import { ExportDownloadController } from "./ExportDownload.controller";
+import { Router } from 'express';
+import * as ctrl from './ExportDownload.controller';
 
-const router = express.Router();
-const controller = new ExportDownloadController();
+const router = Router();
 
-// Fetch all data
-router.get("/", controller.getAllRecords.bind(controller));
-
-// Export as CSV
-router.get("/export/csv", controller.exportCSV.bind(controller));
-
-// Export as Excel
-router.get("/export/excel", controller.exportExcel.bind(controller));
+router.post('/preview', ctrl.preview);
+router.post('/download', ctrl.download);
 
 export default router;
