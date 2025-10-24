@@ -165,32 +165,26 @@ export class UserProfileComponent implements OnInit {
   }
 
   private calculateExpenseBreakdown() {
-    let customCategories: Categories = {
-      'rent': { label: 'Rent/Mortgage', total: 0 },
-      'business': { label: 'Business', total: 0 },
-      'utilities': { label: 'Utilities', total: 0 },
-      'food': { label: 'Food', total: 0 }
-    };
+    // Initialize empty custom categories object
+    let customCategories: Categories = {};
 
-    // Group expenses by category or title
+    // Calculate total for each expense
     this.expenseList.forEach(expense => {
-      const category = expense.category?.toLowerCase();
-      if (category && Object.prototype.hasOwnProperty.call(customCategories, category)) {
-        customCategories[category].total += expense.amount || 0;
-      } else {
-        // Create a new category using the expense title
-        const titleKey = expense.title.toLowerCase().replace(/\s+/g, '_');
-        if (!customCategories[titleKey]) {
-          customCategories[titleKey] = {
-            label: expense.title,
-            total: 0
-          };
-        }
-        customCategories[titleKey].total += expense.amount || 0;
+      // Get category name, use expense title if category is empty or undefined
+      const categoryKey = expense.category?.toLowerCase() || '';
+      const categoryLabel = expense.category || expense.title;
+
+      // Add category if it doesn't exist
+      if (!customCategories[categoryKey]) {
+        customCategories[categoryKey] = {
+          label: categoryLabel,
+          total: 0
+        };
       }
+      customCategories[categoryKey].total += expense.amount || 0;
     });
 
-    // Filter out categories with zero expenses
+    // Filter out categories with zero expenses and sort by amount
     const nonZeroCategories = Object.values(customCategories)
       .filter(cat => cat.total > 0)
       .sort((a, b) => b.total - a.total);
