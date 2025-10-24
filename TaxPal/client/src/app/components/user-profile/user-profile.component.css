@@ -286,9 +286,7 @@
 
 /* Balance and Transactions Row */
 .balance-transactions-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  display: block;
   margin-bottom: 2rem;
 }
 
@@ -388,6 +386,7 @@
 
 /* Dashboard Section */
 .dashboard-section {
+  width: 100%;
   background-color: white;
   border-radius: 0.75rem;
   padding: 1.5rem;
@@ -481,9 +480,7 @@
 
 /* Dashboard Grid - Two Column Layout */
 .dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
+  display: block;
   margin-bottom: 2rem;
 }
 
@@ -584,7 +581,9 @@
   flex-direction: column;
   align-items: center;
   gap: 1.5rem;
-  padding: 1rem 0;
+  padding: 1rem;
+  height: 400px;
+  width: 100%;
 }
 
 .pie-chart-container {
@@ -726,6 +725,20 @@
   position: relative;
   border-bottom: 1px solid var(--border-color, #e5e7eb);
   margin-bottom: 1rem;
+  width: 100%;
+}
+
+/* Updated styles for expense pie chart container */
+.expense-pie-container {
+  padding: 1rem;
+  height: 400px;
+  width: 100%;
+}
+
+.chart-container {
+  position: relative;
+  height: 100%;
+  width: 100%;
 }
 
 .chart-legend {

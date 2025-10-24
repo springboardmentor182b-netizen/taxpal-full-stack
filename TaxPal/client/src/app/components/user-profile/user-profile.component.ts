@@ -4,6 +4,16 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterModule } from '@angular/router';
+import { Chart } from 'chart.js/auto';
+
+interface CategoryData {
+  label: string;
+  total: number;
+}
+
+interface Categories {
+  [key: string]: CategoryData;
+}
 
 @Component({
   selector: 'app-user-profile',
@@ -73,6 +83,8 @@ export class UserProfileComponent implements OnInit {
   totalBalance: number = 0;
   balanceChange: number = 0;
   
+  private expenseChart: Chart | null = null;
+  
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
@@ -96,6 +108,97 @@ export class UserProfileComponent implements OnInit {
     const today = this.getCurrentDate();
     this.incomeForm.date = today;
     this.expenseForm.date = today;
+
+    this.initializeExpenseChart();
+  }
+  
+  private initializeExpenseChart() {
+    const ctx = document.getElementById('expenseChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    // Destroy existing chart if any
+    if (this.expenseChart) {
+      this.expenseChart.destroy();
+    }
+
+    // Calculate expense breakdown data
+    const expenseData = this.calculateExpenseBreakdown();
+    const hasData = expenseData.data.some(value => value > 0);
+
+    // If no data, show empty donut
+    const chartData = {
+      labels: hasData ? expenseData.labels : ['No expenses'],
+      datasets: [{
+        data: hasData ? expenseData.data : [1],
+        backgroundColor: hasData ? [
+          '#3b82f6', // blue
+          '#10b981', // green
+          '#f59e0b', // yellow
+          '#ef4444', // red
+          '#8b5cf6'  // purple
+        ] : ['#e5e7eb'], // light gray for empty state
+        borderWidth: 1
+      }]
+    };
+
+    this.expenseChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: chartData,
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            display: hasData, // Only show legend if there's data
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: { size: 12 }
+            }
+          }
+        },
+        cutout: '65%',
+        radius: '90%'
+      }
+    });
+  }
+
+  private calculateExpenseBreakdown() {
+    let customCategories: Categories = {
+      'rent': { label: 'Rent/Mortgage', total: 0 },
+      'business': { label: 'Business', total: 0 },
+      'utilities': { label: 'Utilities', total: 0 },
+      'food': { label: 'Food', total: 0 }
+    };
+
+    // Group expenses by category or title
+    this.expenseList.forEach(expense => {
+      const category = expense.category?.toLowerCase();
+      if (category && Object.prototype.hasOwnProperty.call(customCategories, category)) {
+        customCategories[category].total += expense.amount || 0;
+      } else {
+        // Create a new category using the expense title
+        const titleKey = expense.title.toLowerCase().replace(/\s+/g, '_');
+        if (!customCategories[titleKey]) {
+          customCategories[titleKey] = {
+            label: expense.title,
+            total: 0
+          };
+        }
+        customCategories[titleKey].total += expense.amount || 0;
+      }
+    });
+
+    // Filter out categories with zero expenses
+    const nonZeroCategories = Object.values(customCategories)
+      .filter(cat => cat.total > 0)
+      .sort((a, b) => b.total - a.total);
+
+    return {
+      labels: nonZeroCategories.map(cat => cat.label),
+      data: nonZeroCategories.map(cat => cat.total)
+    };
   }
   
   toggleDarkMode() {
@@ -112,6 +215,7 @@ export class UserProfileComponent implements OnInit {
     
     // Save preference to localStorage
     localStorage.setItem('darkMode', this.isDarkMode.toString());
+    this.initializeExpenseChart(); // Reinitialize chart with new theme
   }
   
   showAddIncomeModal() {
@@ -277,6 +381,7 @@ export class UserProfileComponent implements OnInit {
         this.calculateMonthlyTotals();
         this.updateRecentTransactions();
         this.prepareChartData();
+        this.initializeExpenseChart(); // Re-initialize chart with new data
       },
       error: () => {
         this.expenseList = [];
