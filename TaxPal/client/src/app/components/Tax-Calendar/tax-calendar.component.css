@@ -579,30 +579,173 @@
     text-align: center;
   }
 }
-/* In tax-calendar.component.css */
-.estimate-tax-btn {
-  padding: 0.75rem 1.25rem;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 0.5rem;
-  font-weight: 500;
-  font-size: 0.95rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.2s ease;
+
+/* Responsive adjustments for medium screens */
+@media (max-width: 1024px) {
+  .tax-calendar-container {
+    padding: 1rem;
+  }
+
+  .calendar-section,
+  .events-section,
+  .upcoming-events {
+    max-width: 100%;
+    padding: 1rem;
+  }
+
+  .calendar-header-wrapper {
+    flex-direction: column;
+    gap: 0.8rem;
+    text-align: center;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5px;
+  }
+
+  .weekday {
+    font-size: 0.75rem;
+  }
+
+  .calendar-day {
+    min-height: 45px;
+    padding: 0.3rem;
+  }
+
+  .event-card {
+    padding: 0.8rem;
+  }
+
+  .upcoming-event {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+  }
+
+  .event-date {
+    min-width: 40px;
+    padding: 0.4rem;
+  }
+
+  .event-info h4 {
+    font-size: 0.9rem;
+  }
+
+  .event-info p {
+    font-size: 0.8rem;
+  }
 }
 
-.estimate-tax-btn:hover {
-  background-color: #2563eb;
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+  .tax-calendar-container {
+    padding: 0.8rem;
+  }
+
+  .calendar-header-wrapper {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.5px;
+  }
+
+  .weekday {
+    font-size: 0.7rem;
+  }
+
+  .calendar-day {
+    min-height: 40px;
+    padding: 0.2rem;
+  }
+
+  .event-card {
+    padding: 0.6rem;
+  }
+
+  .upcoming-event {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.4rem;
+  }
+
+  .event-date {
+    min-width: 35px;
+    padding: 0.3rem;
+  }
+
+  .event-info h4 {
+    font-size: 0.85rem;
+  }
+
+  .event-info p {
+    font-size: 0.75rem;
+  }
 }
 
-.tax-calendar-container.dark .estimate-tax-btn {
-  background-color: #4f46e5;
+/* Responsive adjustments for extra-small screens */
+@media (max-width: 480px) {
+  .tax-calendar-container {
+    padding: 0.5rem;
+  }
+
+  .calendar-section,
+  .events-section,
+  .upcoming-events {
+    padding: 0.8rem;
+  }
+
+  .calendar-header-wrapper {
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .calendar-grid {
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.3px;
+  }
+
+  .weekday {
+    font-size: 0.65rem;
+  }
+
+  .calendar-day {
+    min-height: 35px;
+    padding: 0.2rem;
+  }
+
+  .event-card {
+    padding: 0.5rem;
+  }
+
+  .upcoming-event {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.3rem;
+  }
+
+  .event-date {
+    min-width: 30px;
+    padding: 0.3rem;
+  }
+
+  .event-info h4 {
+    font-size: 0.8rem;
+  }
+
+  .event-info p {
+    font-size: 0.7rem;
+  }
 }
 
-.tax-calendar-container.dark .estimate-tax-btn:hover {
-  background-color: #4338ca;
+/* Ensure accessibility focus styles */
+.nav-btn:focus,
+.estimate-tax-btn:focus,
+.event-card:focus,
+.upcoming-event:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
 }

@@ -114,10 +114,10 @@
                                 <div>Description</div>
                             </div>
                             <div class="budget-row" *ngFor="let b of budgets">
-                                <div>${{ b.amount | number:'1.2-2' }}</div>
-                                <div>{{ b.category }}</div>
-                                <div>{{ b.date | date:'MMM dd, yyyy' }}</div>
-                                <div class="budget-description">{{ b.description }}</div>
+                                <div data-label="Amount">${{ b.amount | number:'1.2-2' }}</div>
+                                <div data-label="Category">{{ b.category }}</div>
+                                <div data-label="Date">{{ b.date | date:'MMM dd, yyyy' }}</div>
+                                <div data-label="Description" class="budget-description">{{ b.description }}</div>
                             </div>
                         </div>
                     </div>

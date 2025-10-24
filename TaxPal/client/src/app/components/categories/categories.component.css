@@ -1,3 +1,189 @@
+/* Fluid section/title sizing */
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: clamp(0.95rem, 1.2vw + 0.4rem, 1.05rem);
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 1rem 0;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Make categories container responsive: auto-fit columns */
+.categories-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  align-items: start;
+}
+
+/* Ensure categories card spans full width when needed */
+.categories-card {
+  grid-column: 1 / -1;
+  width: 100%;
+}
+
+/* Category item becomes a flexible card that can wrap */
+.category-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem;
+  border-radius: 0.375rem;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* make name and actions flow nicely */
+.category-name {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex: 1 1 auto;
+  min-width: 0; /* allow children to shrink */
+}
+
+.category-name input {
+  border: none;
+  background: transparent;
+  padding: 0.25rem 0;
+  color: #111827;
+  font-size: 0.875rem;
+  width: 100%;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+  min-width: 0;
+}
+
+/* ensure description wraps instead of overflowing */
+.budget-description,
+.category-description {
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+  word-break: break-word;
+}
+
+/* actions area should shrink and wrap on small screens */
+.category-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  align-items: center;
+}
+
+/* Make add button full-width on small screens */
+.add-category-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  background: transparent;
+  border: 1px dashed #d1d5db;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.5rem;
+  box-sizing: border-box;
+}
+
+/* Chip container becomes scrollable if many chips */
+.suggestion-chips {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Accessibility: visible focus styles for keyboard users */
+.btn-icon:focus,
+.add-category-btn:focus,
+.category-name input:focus,
+.suggestion-chip:focus {
+  outline: 3px solid rgba(59,130,246,0.16);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Mobile: single column layout and stacked item content */
+@media (max-width: 768px) {
+  .categories-container {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .category-item {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 0.75rem;
+  }
+
+  .category-name {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .category-actions {
+    justify-content: flex-end;
+    width: 100%;
+    gap: 8px;
+  }
+
+  .suggestion-chips {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+}
+
+/* Extra-small screens: optimize spacing and font sizes */
+@media (max-width: 480px) {
+  .section-title {
+    font-size: clamp(0.9rem, 3.5vw, 1rem);
+  }
+
+  .btn-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .add-category-btn {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.85rem;
+  }
+
+  .category-item > .category-name > input {
+    font-size: 0.9rem;
+  }
+}
+
+/* Large screens: provide multi-column layout and spacing */
+@media (min-width: 1400px) {
+  .categories-container {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .categories-card {
+    grid-column: span 3;
+  }
+
+  .category-item {
+    padding: 0.75rem;
+  }
+}
+
 /* Categories Card Styles */
 .categories-card {
   grid-column: 1 / -1; /* Span all available columns */

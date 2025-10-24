@@ -400,103 +400,136 @@
     justify-content: center;
     gap: 2rem;
   }
-  
+
   .navbar-container {
     justify-content: space-between;
   }
-  
+
   .right-container {
     position: static;
     right: auto;
   }
-  
+
   .auth-buttons {
     padding-right: 1rem;
   }
-  
+
   .logo {
     margin-left: 1rem;
   }
 }
 
+/* Adjust navbar layout for small screens */
 @media (max-width: 768px) {
   .navbar-container {
     padding: 0 1rem;
   }
-  
+
   .navbar-box {
     padding: 1rem 1.5rem;
   }
-  
+
   .nav-links {
     gap: 1.5rem;
   }
-  
+
   .right-container {
     gap: 1rem;
   }
-  
+
   .auth-buttons {
     padding-right: 1rem;
   }
-  
+
   .btn {
     padding: 0.45rem 0.9rem;
     font-size: 0.9rem;
   }
-  
+
   .login-btn {
     padding: 0.45rem 0.9rem;
   }
-  
+
   .login-btn span {
     display: inline; /* Show text on medium screens */
   }
 }
 
+/* Hide navigation links and adjust layout for very small screens */
 @media (max-width: 640px) {
   .nav-links {
     display: none;
   }
-  
+
   .logo a {
     font-size: 1.4rem;
   }
-  
+
   .navbar-box {
     padding: 0.75rem 0;
   }
-  
+
   .theme-toggle-btn {
     width: 32px;
     height: 32px;
     padding: 0.4rem;
   }
-  
+
   .register-btn {
     font-size: 0.85rem;
     padding: 0.4rem 0.8rem;
   }
-  
+
   .right-container {
     gap: 0.75rem;
   }
-  
+
   .auth-buttons {
     padding-right: 0.5rem;
   }
-  
+
   .login-btn span {
     display: none; /* Hide text on smaller screens */
   }
-  
+
   .login-btn {
     padding: 0.45rem;
   }
-  
+
   .login-icon {
     margin-right: 0;
   }
+}
+
+/* Adjust user profile indicator for small screens */
+@media (max-width: 640px) {
+  .user-profile-indicator {
+    margin-right: 0.5rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .user-name {
+    display: none;
+  }
+}
+
+/* Ensure navbar remains accessible and touch-friendly */
+.nav-link:focus,
+.btn:focus,
+.theme-toggle-btn:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
+}
+
+/* Add hover effects for better interactivity */
+.nav-link:hover,
+.btn:hover {
+  transform: translateY(-1px);
 }
 
 .floating-emoji {
@@ -577,12 +610,12 @@
     margin-right: 0.5rem;
     padding: 0.4rem 0.6rem;
   }
-  
+
   .user-avatar {
     width: 28px;
     height: 28px;
   }
-  
+
   .user-name {
     display: none;
   }
