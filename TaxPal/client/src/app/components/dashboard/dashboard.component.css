@@ -3,60 +3,95 @@
   background-color: #f9fafb;
   padding: 3rem 1.5rem;
   transition: background-color 0.3s ease;
+  box-sizing: border-box;
 }
 
+/* Make main content a responsive grid */
 .dashboard-content {
   max-width: 1200px;
   margin: 0 auto;
+  box-sizing: border-box;
 }
 
+/* new: responsive layout wrapper */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+/* stats/cards row: auto-fit columns */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+/* welcome section with fluid typography */
 .welcome-section {
-  margin-bottom: 3rem;
+  margin-bottom: 2rem;
   text-align: center;
 }
 
+/* fluid typography */
 h1 {
-  font-size: 2rem;
+  font-size: clamp(1.5rem, 2.8vw + 0.5rem, 2.25rem);
   font-weight: 700;
   color: #111827;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  line-height: 1.1;
 }
 
 .subtitle {
-  font-size: 1.1rem;
+  font-size: clamp(0.95rem, 1.2vw + 0.5rem, 1.1rem);
   color: #6b7280;
-  max-width: 600px;
+  max-width: 720px;
   margin: 0 auto;
 }
 
+/* flexible placeholder adjusts to available width */
 .dashboard-placeholder {
   background-color: white;
   border-radius: 0.75rem;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 4rem 2rem;
+  padding: 2.25rem;
   text-align: center;
-  max-width: 800px;
-  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* placeholder icon scaling */
 .placeholder-icon {
   display: flex;
   justify-content: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.25rem;
   color: #3b82f6;
 }
 
+/* headings inside cards */
 h2 {
-  font-size: 1.5rem;
+  font-size: clamp(1.125rem, 1.2vw + 0.6rem, 1.5rem);
   font-weight: 600;
   color: #1f2937;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .dashboard-placeholder p {
   color: #6b7280;
-  max-width: 500px;
+  max-width: 600px;
   margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* small utility for actions row */
+.actions-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
 /* Dark mode styles */
@@ -89,20 +124,104 @@ h2 {
   color: #9ca3af;
 }
 
+/* Responsive adjustments */
+
+/* Very small screens: stack, increase readability */
+@media (max-width: 420px) {
+  .dashboard-container {
+    padding: 1.5rem 0.75rem;
+  }
+  h1 {
+    font-size: clamp(1.25rem, 5.5vw, 1.75rem);
+    text-align: center;
+  }
+  .subtitle {
+    padding: 0 0.5rem;
+    text-align: center;
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-placeholder {
+    padding: 1.25rem;
+  }
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+/* Small / Mobile landscape and small tablets */
 @media (max-width: 640px) {
   .dashboard-container {
     padding: 2rem 1rem;
   }
-  h1 {
-    font-size: 1.75rem;
-  }
-  .subtitle {
-    font-size: 1rem;
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
   .dashboard-placeholder {
-    padding: 3rem 1.5rem;
+    padding: 1.5rem;
   }
-  h2 {
-    font-size: 1.25rem;
+}
+
+/* Medium screens: two-column layout for dashboard content */
+@media (min-width: 641px) and (max-width: 992px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
   }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .dashboard-placeholder {
+    padding: 2rem;
+  }
+}
+
+/* Large screens: two-column main layout */
+@media (min-width: 993px) and (max-width: 1399px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .dashboard-placeholder {
+    padding: 2.25rem;
+  }
+}
+
+/* Very large screens: wider spacing and three-column stats */
+@media (min-width: 1400px) {
+  .dashboard-container {
+    padding: 3.5rem 2.5rem;
+  }
+  .dashboard-grid {
+    grid-template-columns: 2.2fr 1fr;
+    gap: 2.5rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+  .dashboard-placeholder {
+    padding: 2.5rem;
+  }
+}
+
+/* Accessibility: focus states for interactive elements */
+button:focus,
+a:focus {
+  outline: 3px solid rgba(59,130,246,0.18);
+  outline-offset: 2px;
+}
+
+/* ensure images/icons inside placeholders scale */
+.dashboard-placeholder img,
+.dashboard-placeholder svg {
+  max-width: 100%;
+  height: auto;
 }

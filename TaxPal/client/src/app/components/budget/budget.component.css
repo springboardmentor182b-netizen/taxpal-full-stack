@@ -79,7 +79,7 @@ body.light-mode {
 }
 
 .form-card-title {
-    font-size: 28px;
+    font-size: clamp(1.25rem, 2.2vw + 0.25rem, 1.75rem);
     font-weight: 700;
     color: var(--text-light);
     margin: 0;
@@ -111,7 +111,7 @@ body.light-mode {
     padding: 12px 16px;
     border: 2px solid var(--border-color);
     border-radius: 8px;
-    font-size: 14px;
+    font-size: clamp(0.9rem, 1vw + 0.25rem, 1rem);
     transition: all 0.2s ease;
     background: var(--card-darker);
     color: var(--text-light);
@@ -194,7 +194,7 @@ select.input {
     padding: 12px 24px;
     border-radius: 8px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: clamp(0.9rem, 1vw + 0.25rem, 1rem);
     cursor: pointer;
     transition: all 0.2s ease;
     text-decoration: none;
@@ -352,75 +352,138 @@ body.light-mode .budget-row:not(.budget-head) > div {
 }
 
 /* Responsive Design */
+@media (max-width: 1024px) {
+  .budget-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-section,
+  .budget-list-section {
+    width: 100%;
+  }
+
+  .budget-table-simple {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 12px;
+  }
+}
+
 @media (max-width: 768px) {
-    .budget-main {
-        padding: 12px;
-    }
+  .budget-main {
+    padding: 12px;
+  }
 
-    .budget-container {
-        max-width: 100%;
-    }
+  .budget-container {
+    flex-direction: column;
+    gap: 12px;
+  }
 
-    .form-card-header,
-    .budget-form {
-        padding: 16px;
-    }
+  .form-section,
+  .budget-list-section {
+    width: 100%;
+  }
 
-    .actions {
-        flex-direction: column;
-    }
+  .form-card-header,
+  .budget-form {
+    padding: 16px;
+  }
 
-    .btn {
-        width: 100%;
-    }
+  .actions {
+    flex-direction: column;
+    gap: 10px;
+  }
 
-    .form-card-title {
-        font-size: 22px;
-    }
+  .btn {
+    width: 100%;
+  }
 
-    .budget-table-simple {
-        grid-template-columns: 1fr 1fr;
-    }
-    
-    .budget-row.budget-head:nth-child(3),
-    .budget-row.budget-head:nth-child(4),
-    .budget-row:not(.budget-head) :nth-child(3),
-    .budget-row:not(.budget-head) :nth-child(4) {
-        display: none;
-    }
+  /* Collapse grid to stacked card items */
+  .budget-table-simple {
+    display: block;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+  }
+
+  .budget-row.budget-head {
+    display: none;
+  }
+
+  .budget-row {
+    display: block;
+    background: var(--card-darker);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    margin-bottom: 12px;
+    padding: 12px;
+    box-sizing: border-box;
+  }
+
+  .budget-row > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 6px 0;
+    align-items: center;
+    border-bottom: none;
+    color: var(--text-light);
+    word-break: break-word;
+  }
+
+  .budget-description {
+    white-space: normal;
+    max-width: 65%;
+    overflow: visible;
+    text-overflow: clip;
+  }
 }
 
-@media (max-width: 480px) {
-    .budget-main {
-        padding: 8px;
-    }
+@media (max-width: 420px) {
+  .form-card-title {
+    font-size: clamp(1.05rem, 4.5vw, 1.25rem);
+  }
 
-    .form-card-header,
-    .budget-form {
-        padding: 12px;
-    }
+  .input,
+  .btn {
+    font-size: 0.95rem;
+    padding: 10px 12px;
+  }
 
-    .form-card-title {
-        font-size: 20px;
-    }
+  .budget-row > div {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-    .form-group {
-        margin-bottom: 16px;
-    }
-
-    .actions {
-        margin-top: 16px;
-        padding-top: 16px;
-    }
+  .budget-description {
+    max-width: 100%;
+  }
 }
 
-@media (max-width: 992px) {
-    .budget-container {
-        flex-direction: column;
-    }
-    
-    .form-section,
-    .budget-list-section {
-        width: 100%;
-    }
+@media (min-width: 1400px) {
+  .budget-container {
+    max-width: 1400px;
+    gap: 24px;
+  }
+
+  .form-section {
+    width: 46%;
+  }
+
+  .budget-table-simple {
+    grid-template-columns: 1fr 1fr 1fr 2fr;
+    padding: 18px;
+  }
+
+  .form-card {
+    padding-bottom: 4px;
+  }
+}
+
+/* Maintain accessibility focus styles */
+.input:focus,
+.btn:focus {
+  outline: 3px solid rgba(59,130,246,0.14);
+  outline-offset: 2px;
 }

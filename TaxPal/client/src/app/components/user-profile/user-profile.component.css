@@ -1339,121 +1339,122 @@
   .metrics-row {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .balance-transactions-row,
-  .dashboard-grid,
-  .charts-grid {
+  .dashboard-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .balance-progress {
     flex-direction: row;
     justify-content: center;
   }
-  
+
   .circular-progress {
     width: 100px;
     height: 100px;
   }
-  
+
   .pie-chart-container {
     width: 200px;
     height: 200px;
   }
-  
+
   .bar {
     width: 20px;
   }
 }
 
+/* Responsive adjustments for small screens */
 @media (max-width: 768px) {
   .top-actions .action-buttons {
     flex-direction: row;
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .top-actions .action-btn {
     width: auto;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .action-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .bar {
     width: 18px;
   }
-  
+
   .bar-value {
     font-size: 0.65rem;
   }
 }
 
+/* Responsive adjustments for extra-small screens */
 @media (max-width: 640px) {
   .top-actions .action-buttons {
     flex-direction: column;
   }
-  
+
   .top-actions .action-btn {
     width: 100%;
   }
-  
+
   .metrics-row {
     grid-template-columns: 1fr;
   }
-  
+
   .balance-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .balance-progress {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
   }
-  
+
   .circular-progress {
     width: 80px;
     height: 80px;
   }
-  
+
   .pie-chart-container {
     width: 180px;
     height: 180px;
   }
-  
+
   .budget-legend {
     padding: 0 1rem;
   }
-  
+
   .bar-chart {
     height: 200px;
   }
-  
+
   .bar-container {
     height: 150px;
   }
-  
+
   .bar {
     width: 12px;
   }
-  
+
   .bar-value {
     display: none;
   }
-  
+
   .bar:hover .bar-value {
     display: block;
   }
-  
+
   .chart-legend {
     margin-bottom: 1rem;
   }

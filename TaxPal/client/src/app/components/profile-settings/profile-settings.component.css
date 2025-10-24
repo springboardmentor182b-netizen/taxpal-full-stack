@@ -946,7 +946,7 @@ input:disabled + .toggle-slider {
   .settings-cards {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .settings-card:nth-child(n+3) {
     grid-column: span 2;
   }
@@ -956,21 +956,21 @@ input:disabled + .toggle-slider {
   .settings-header h1 {
     font-size: 1.875rem;
   }
-  
+
   .settings-header .subtitle {
     font-size: 1rem;
   }
-  
+
   .card-header h2 {
     font-size: 1.125rem;
   }
-  
+
   .preference-item {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .preference-control {
     align-self: flex-start;
   }
@@ -980,9 +980,119 @@ input:disabled + .toggle-slider {
   .categories-card {
     grid-column: span 1;
   }
-  
+
   /* Update settings cards layout to accommodate full-width categories */
   .settings-cards {
     grid-template-columns: 1fr;
   }
+}
+
+@media (max-width: 1024px) {
+  .settings-content {
+    padding: 2rem 1rem;
+  }
+
+  .settings-cards {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .settings-card {
+    width: 100%;
+  }
+}
+
+/* Adjust layout for medium screens */
+@media (max-width: 768px) {
+  .settings-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .settings-header .subtitle {
+    font-size: 1rem;
+  }
+
+  .settings-cards {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .settings-card {
+    padding: 1rem;
+  }
+
+  .profile-avatar {
+    width: 36px;
+    height: 36px;
+    font-size: 0.9rem;
+  }
+
+  .profile-menu-dropdown {
+    width: 240px;
+  }
+}
+
+/* Adjust layout for small screens */
+@media (max-width: 640px) {
+  .settings-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .settings-header .subtitle {
+    font-size: 0.9rem;
+  }
+
+  .profile-avatar {
+    width: 32px;
+    height: 32px;
+    font-size: 0.85rem;
+  }
+
+  .profile-menu-dropdown {
+    width: 200px;
+  }
+
+  .preference-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .preference-control {
+    align-self: flex-start;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .btn-primary {
+    font-size: 0.9rem;
+  }
+}
+
+/* Adjust layout for extra-large screens */
+@media (min-width: 1400px) {
+  .settings-content {
+    max-width: 1400px;
+    padding: 3rem 2rem;
+  }
+
+  .settings-cards {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+  }
+
+  .settings-card {
+    padding: 1.5rem;
+  }
+}
+
+/* Ensure accessibility focus styles */
+.btn:focus,
+.profile-avatar:focus,
+.profile-menu-item:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
 }
