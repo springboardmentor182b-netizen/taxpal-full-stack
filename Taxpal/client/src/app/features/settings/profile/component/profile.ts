@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewEncapsulation, inject } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { Profile, ProfileService } from '@/app/core/services/profile.service';
@@ -20,6 +20,7 @@ export class SettingsProfileComponent implements OnInit {
   error   = '';
 
   viewOnly = true; // start in view mode
+  mobileNavOpen = false; // drawer state
 
   model: Profile = {
     id: '',
@@ -36,6 +37,19 @@ export class SettingsProfileComponent implements OnInit {
     this.fetch();
   }
 
+  /* ===== Drawer controls ===== */
+  toggleDrawer() { this.mobileNavOpen = !this.mobileNavOpen; }
+  closeDrawer()  { this.mobileNavOpen = false; }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeyDown(e: KeyboardEvent) {
+    if (e.key === 'Escape' && this.mobileNavOpen) {
+      e.preventDefault();
+      this.closeDrawer();
+    }
+  }
+
+  /* ===== Data ===== */
   fetch() {
     this.loading = true;
     this.error = '';

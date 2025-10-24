@@ -1,32 +1,50 @@
-<div class="sidebar">
+<!-- Sidebar (drawer on mobile/tablet) -->
+<div class="sidebar" [class.open]="mobileNavOpen">
   <div class="logo">
     <h1>Settings</h1>
     <p>Manage your account settings and preferences</p>
   </div>
 
-  <div class="menu-section">
+  <div class="menu-section" (click)="closeDrawer()">
     <a class="menu-item active" routerLink="/settings/profile" routerLinkActive="active">
       <i></i> Profile
     </a>
     <a class="menu-item" routerLink="/settings/categories" routerLinkActive="active">
       <i></i> Categories
     </a>
-    <div class="menu-item"><i></i> Notifications</div>
-    <div class="menu-item"><i></i> Security</div>
+    <a class="menu-item"><i></i> Notifications</a>
+    <a class="menu-item"><i></i> Security</a>
   </div>
 </div>
 
+<!-- Backdrop for drawer -->
+<div class="drawer-backdrop" [class.show]="mobileNavOpen" (click)="closeDrawer()"></div>
+
 <div class="main-content">
   <div class="header">
-    <h2>Profile</h2>
+    <div class="header-left">
+      <!-- Hamburger (only shows on ≤1024px) -->
+      <button
+        type="button"
+        class="btn-menu"
+        aria-label="Open menu"
+        [attr.aria-expanded]="mobileNavOpen"
+        (click)="toggleDrawer()"
+      >☰</button>
+
+      <h2>Profile</h2>
+    </div>
 
     <!-- ✕ Close button (top-right) -->
-    <a
-      class="btn-icon close-btn"
-      routerLink="/dashboard"
-      aria-label="Close and go to dashboard"
-      title="Close"
-    >✕</a>
+    <div class="user-actions">
+      <a
+        class="btn-icon close-btn"
+        routerLink="/dashboard"
+        aria-label="Close and go to dashboard"
+        title="Close"
+        (click)="closeDrawer()"
+      >✕</a>
+    </div>
   </div>
 
   <div *ngIf="error" class="error-message">{{ error }}</div>

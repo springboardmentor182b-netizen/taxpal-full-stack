@@ -105,5 +105,116 @@ thead th{ background:var(--panel); color:var(--ink-2); font-weight:700; }
 }
 @keyframes spin{ to{ transform:rotate(360deg); } }
 
-
 button[aria-label="Close"]:hover svg { stroke: #656ED3; }
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & small devices (≤ 480px) */
+@media (max-width:480px){
+  .page{ padding:14px; }
+  .page-title{ font-size:22px; margin-bottom:6px; }
+  .page-subtitle{ margin-bottom:14px; }
+
+  .card{ padding:12px; border-radius:12px; }
+
+  /* stack form grid */
+  .grid{
+    grid-template-columns: 1fr;
+    gap:10px;
+  }
+  .form-actions{
+    width:100%;
+    justify-content:stretch;
+    gap:8px;
+  }
+  .form-actions .btn{
+    width:100%;
+  }
+  select{ width:100%; }
+
+  /* compact table */
+  th, td{ padding:10px 12px; font-size:14px; }
+  .actions-col{ width:110px; }
+  .row-actions{ flex-wrap:wrap; gap:8px; }
+  .table-wrapper{ border-radius:8px; }
+
+  .empty{ padding:20px; }
+
+  /* make long content fit better */
+  .link{ font-size:14px; }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width:360px){
+  .page{ padding:12px; }
+  .page-title{ font-size:20px; }
+  .card{ padding:10px; }
+  th, td{ padding:8px 10px; }
+  .actions-col{ width:96px; }
+}
+
+/* Small tablets (481px–767px) */
+@media (min-width:481px) and (max-width:767px){
+  .page{ padding:18px; }
+  .page-title{ font-size:24px; }
+  .card{ padding:14px; }
+
+  /* two columns + actions below */
+  .grid{
+    grid-template-columns: 1fr 1fr;
+    gap:12px;
+  }
+  .form-actions{
+    grid-column: 1 / -1;          /* span both columns */
+    justify-content:flex-end;
+  }
+  select{ min-width:180px; }
+  th, td{ padding:12px; font-size:15px; }
+  .actions-col{ width:130px; }
+}
+
+/* Tablets (768px–1024px) */
+@media (min-width:768px) and (max-width:1024px){
+  .page{ padding:22px; }
+  .page-title{ font-size:26px; }
+
+  /* three data cols + actions */
+  .grid{
+    grid-template-columns: 1fr 1fr 1fr;
+    gap:12px;
+  }
+  .form-actions{
+    grid-column: 1 / -1;
+    justify-content:flex-end;
+  }
+
+  .actions-col{ width:150px; }
+}
+
+/* Small desktops (1025px–1279px) */
+@media (min-width:1025px) and (max-width:1279px){
+  .grid{
+    grid-template-columns: 1fr 1fr 1fr auto; /* default */
+  }
+}
+
+/* Large desktops (≥ 1280px) */
+@media (min-width:1280px){
+  .page{ padding:28px; }
+  .page-title{ font-size:28px; }
+  .grid{ gap:14px; }
+  .table-wrapper{ border-radius:12px; }
+}
+
+/* Short landscape viewports (e.g., phones with keyboard open) */
+@media (max-height:600px) and (orientation:landscape){
+  .grid{ grid-template-columns: 1fr 1fr; }
+  .form-actions{ grid-column: 1 / -1; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{ transition:none !important; }
+}

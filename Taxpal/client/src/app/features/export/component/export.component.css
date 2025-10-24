@@ -42,5 +42,80 @@
 .loading{ padding:14px; opacity:.8; }
 .error{ color:#c0392b; margin-top:10px; }
 
-
 button[aria-label="Close"]:hover svg { stroke: #656ED3; }
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & small devices (≤ 480px) */
+@media (max-width:480px){
+  .page{ padding:14px; }
+  .page-title{ font-size:18px; margin-bottom:10px; }
+
+  .toolbar{
+    justify-content:flex-start;
+    flex-wrap:wrap;
+    gap:8px;
+  }
+  .btn{
+    height:36px;
+    padding:0 12px;
+  }
+  .card{ padding:10px; border-radius:12px; }
+
+  .preview{ height:55vh; border-radius:10px; }
+  .placeholder{ height:220px; gap:10px; }
+  .empty-icon{ font-size:28px; }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width:360px){
+  .page{ padding:12px; }
+  .page-title{ font-size:17px; }
+  .toolbar{ gap:6px; }
+  .btn{ width:100%; }
+  .preview{ height:50vh; }
+  .placeholder{ height:200px; }
+}
+
+/* Small tablets (481px–767px) */
+@media (min-width:481px) and (max-width:767px){
+  .page{ padding:18px; }
+  .page-title{ font-size:20px; }
+  .toolbar{
+    flex-wrap:wrap;
+    justify-content:space-between;
+  }
+  .preview{ height:60vh; }
+}
+
+/* Tablets (768px–1024px) */
+@media (min-width:768px) and (max-width:1024px){
+  .page{ padding:22px; }
+  .page-title{ font-size:22px; }
+  .preview{ height:64vh; }
+}
+
+/* Small desktops (1025px–1279px) */
+@media (min-width:1025px) and (max-width:1279px){
+  .preview{ height:66vh; } /* default, keep layout stable */
+}
+
+/* Large desktops (≥ 1280px) */
+@media (min-width:1280px){
+  .page{ padding:28px; }
+  .preview{ height:70vh; }
+  .placeholder{ height:320px; }
+}
+
+/* Short landscape viewports (e.g., phones with keyboard open) */
+@media (max-height:600px) and (orientation:landscape){
+  .preview{ height:52vh; }
+  .placeholder{ height:180px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{ transition:none !important; animation:none !important; }
+}

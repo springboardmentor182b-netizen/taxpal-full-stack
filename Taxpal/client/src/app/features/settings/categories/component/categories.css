@@ -15,20 +15,27 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overflow-x:hidden}
 
-/* Sidebar */
+/* Sidebar (pinned on desktop, drawer on ≤1024px) */
 .sidebar{
-  width:250px;background-color:var(--ink-700);color:#fff;padding:20px 0;height:100vh;position:fixed;left:0;top:0;overflow-y:auto;z-index:10
+  width:250px;background-color:var(--ink-700);color:#fff;padding:20px 0;height:100vh;position:fixed;left:0;top:0;overflow-y:auto;z-index:1100;
+  transition:transform .25s ease;
 }
 .logo{padding:0 20px 20px;border-bottom:1px solid var(--primary-light);margin-bottom:20px}
 .logo h1{font-size:24px;font-weight:600;color:#fff}
 .logo p{font-size:14px;color:var(--primary-light);margin-top:5px}
 .menu-section{margin-bottom:30px}
-.menu-item{padding:12px 20px;cursor:pointer;transition:background-color .2s,color .2s;display:flex;align-items:center;color:#fff}
+.menu-item{padding:12px 20px;cursor:pointer;transition:background-color .2s,color .2s;display:flex;align-items:center;color:#fff;text-decoration:none}
 .menu-item:hover{background-color:var(--primary-dark)}
 .menu-item.active{background-color:var(--primary);border-left:4px solid var(--primary-light)}
 .menu-item i{margin-right:10px;width:20px;text-align:center}
 
-/* Main content fills the remaining width */
+/* Drawer backdrop (mobile/tablet only, shown when sidebar is open) */
+.drawer-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1090;opacity:0;pointer-events:none;transition:opacity .2s ease;
+}
+.drawer-backdrop.show{opacity:1;pointer-events:auto}
+
+/* Main content fills the remaining width on desktop */
 .main-content{
   margin-left:250px;width:calc(100vw - 250px);max-width:calc(100vw - 250px);
   padding:30px;background-color:var(--surface);box-sizing:border-box;min-height:100vh
@@ -37,14 +44,32 @@ body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overf
 /* Header */
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border);width:100%}
 .header h2{color:var(--ink-700);font-weight:600;font-size:28px}
+.header-left{display:flex;align-items:center;gap:12px}
 .user-actions{display:flex;align-items:center;gap:15px}
 
 /* Buttons */
-.btn{padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:500;transition:all .2s;border:none;font-size:14px}
+.btn{padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:500;transition:all .2s;border:none;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
 .btn-settings{background-color:var(--surface);color:var(--primary);border:1px solid var(--primary)}
 .btn-settings:hover{background-color:var(--accent);color:#fff;border-color:var(--accent)}
 .btn-logout{background-color:var(--primary);color:#fff}
 .btn-logout:hover{background-color:var(--primary-dark)}
+
+/* Mobile hamburger (visibility controlled in media queries) */
+.btn-menu{
+  height:38px;width:38px;border-radius:8px;border:1px solid var(--border);
+  background:#fff;color:var(--ink-900);cursor:pointer;font-size:20px;line-height:1;
+  align-items:center;justify-content:center;
+}
+.btn-menu:hover{background:var(--surface-2)}
+
+/* Icon-style button (used by ✕ close) */
+.btn-icon{
+  padding:0; width:38px; height:38px; border-radius:10px;
+  font-size:20px; line-height:1; text-align:center;
+}
+
+/* Hide hamburger by default on desktop */
+.btn.btn-menu{ display:none; }
 
 /* Category management container */
 .category-management{
@@ -94,10 +119,73 @@ body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overf
 button:disabled{opacity:.6;cursor:not-allowed}
 input:disabled,select:disabled{opacity:.6;background-color:var(--surface-2);color:var(--ink-900)}
 
-/* Responsive */
-@media (max-width:768px){
-  .sidebar{width:100%;height:auto;position:relative}
-  .main-content{margin-left:0;width:100vw;max-width:100vw;padding:20px}
-  .category-item{flex-direction:column;align-items:flex-start;gap:10px}
-  .category-actions{align-self:flex-end}
+button[aria-label="Close"]:hover svg { stroke: var(--primary); }
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & tablets (≤1024px): use drawer + show hamburger */
+@media (max-width:1024px){
+  .btn.btn-menu{ display:inline-flex; }
+
+  .sidebar{
+    width:min(86vw, 320px);
+    transform:translateX(-100%);
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
+  }
+  .sidebar.open{ transform:translateX(0); }
+
+  .main-content{ margin-left:0;width:100vw;max-width:100vw;padding:20px; }
+
+  .header{ padding-bottom:14px;margin-bottom:20px; }
+  .header h2{ font-size:24px; }
+
+  .category-item{ flex-direction:column; align-items:flex-start; gap:10px; }
+  .category-actions{ align-self:flex-end; }
+
+  /* smaller ✕ button and extra spacing on header in tablet */
+  .btn-settings.btn-icon{ width:34px; height:34px; font-size:18px; }
+  .user-actions{ gap:18px; }
+}
+
+/* Small phones (≤480px) */
+@media (max-width:480px){
+  .header h2{ font-size:22px; }
+
+  .btn-settings{ padding:8px 12px; }
+
+  /* Make ✕ smaller on phones */
+  .btn-settings.btn-icon{ width:28px; height:28px; font-size:16px; border-radius:8px; }
+
+  /* Extra spacing between header buttons */
+  .user-actions{ gap:20px; }
+
+  .category-management{ padding:20px; }
+  .category-item{ padding:12px 14px; }
+
+  /* Stack action buttons in form with spacing */
+  .add-category-form .btn-add,
+  .add-category-form .btn-cancel{
+    display:block; width:100%; margin-left:0;
+  }
+  .add-category-form .btn-cancel{
+    margin-top:12px;    /* space between Update and Cancel */
+  }
+}
+
+/* ≥1280px: larger spacing */
+@media (min-width:1280px){
+  .main-content{ padding:34px; }
+}
+
+/* Short landscape viewports */
+@media (max-height:600px) and (orientation:landscape){
+  .header{ margin-bottom:16px; }
+  .category-management{ padding:22px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{ transition:none !important; animation:none !important; }
 }
