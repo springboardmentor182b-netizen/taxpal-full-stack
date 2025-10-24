@@ -10,6 +10,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { IncomeService } from '../../../services/income.services';
+
 @Component({
   selector: 'app-income-form',
   standalone: true,
@@ -29,11 +30,12 @@ import { IncomeService } from '../../../services/income.services';
 export class IncomeForm {
   incomeForm: FormGroup;
   categories = ['Salary', 'Freelance', 'Business', 'Investments', 'Other'];
+  errorMessage: string = '';  // ✅ For displaying inside the form
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<IncomeForm>,   // ✅ inject DialogRef
-    private incomeService:IncomeService,
+    private dialogRef: MatDialogRef<IncomeForm>,
+    private incomeService: IncomeService,
     private snackBar: MatSnackBar
   ) {
     this.incomeForm = this.fb.group({
@@ -44,41 +46,50 @@ export class IncomeForm {
       notes: [''],
     });
   }
+
   closeForm() {
-    this.dialogRef.close();   // ✅ actually closes dialog
+    this.dialogRef.close();
   }
+
   cancelForm() {
     this.incomeForm.reset();
-    this.closeForm();         // ✅ close after cancel
+    this.closeForm();
   }
+
   submitForm() {
-    if (this.incomeForm.valid) {
-      this.incomeService.addIncome(this.incomeForm.value).subscribe({
-        next: (res: any) => {
-          console.log('✅ Income saved:', res);
-  
-          this.snackBar.open('✔ Income saved successfully!', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-            panelClass: ['success-snackbar']   // ✅ applies green background
-          });
-  
-          this.dialogRef.close(res.income);
-        },
-        error: (err) => {
-          console.error('❌ Error saving income:', err);
-  
-          this.snackBar.open('✖ Failed to save income!', 'Close', {
-            duration: 3000,
-            horizontalPosition: 'right',
-            verticalPosition: 'top',
-            panelClass: ['error-snackbar']    // ✅ applies red background
-          });
-        }
-      });
+    this.errorMessage = '';
+
+    if (this.incomeForm.invalid) {
+      const amountValue = this.incomeForm.get('amount')?.value;
+
+      if (amountValue === 0) {
+        this.errorMessage = 'Enter a valid amount';
+      } else {
+        this.errorMessage = 'Please fill in all required fields correctly';
+      }
+      return;  // ✅ Stop submission and show error inside form
     }
+
+    // ✅ Submit valid form
+    this.incomeService.addIncome(this.incomeForm.value).subscribe({
+      next: (res: any) => {
+        this.snackBar.open('✔ Income saved successfully!', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['success-snackbar']
+        });
+        this.dialogRef.close(res.income);
+      },
+      error: (err) => {
+        console.error('❌ Error saving income:', err);
+        this.snackBar.open('✖ Failed to save income!', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
   }
-  
-  
 }

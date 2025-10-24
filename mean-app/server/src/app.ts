@@ -15,6 +15,8 @@ import reportExportRoutes from "./api/modules/reportexport/reportexport.routes";
 import budgetRoutes from "./api/modules/budget/budget.routes";
 import reportRoutes from "./api/modules/reports/report.routes";
 
+
+
 const app = express();
 app.use(
   cors({
@@ -36,12 +38,12 @@ app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
 app.use("/api/v1/tax-reminders", taxRemindersRoutes);
 app.use("/api/v1/budgets", budgetRoutes);
 app.use("/api/v1/reports", reportRoutes); 
+app.use("/api/v1/reportexports", reportExportRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 app.use("/api/v1/reports", reportRoutes);
 
-app.use("/api/v1/reportexports", reportExportRoutes );  
 // Root route
 app.get("/", (req, res) => {
   res.send("Hello from Express 🚀");
