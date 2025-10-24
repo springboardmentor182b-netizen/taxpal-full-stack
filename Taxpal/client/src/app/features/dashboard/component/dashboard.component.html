@@ -1,27 +1,32 @@
-<div class="sidebar">
+<!-- Mobile drawer overlay -->
+<div
+  class="drawer-overlay"
+  *ngIf="mobileNavOpen"
+  (click)="closeMobileNav()"
+  [class.open]="mobileNavOpen">
+</div>
+
+<!-- Sidebar (acts as off-canvas on small screens) -->
+<div class="sidebar" [class.open]="mobileNavOpen" role="navigation" aria-label="Primary">
+  <!-- Mobile close button -->
+  <button type="button" class="close-mobile" aria-label="Close menu" (click)="closeMobileNav()">✕</button>
+
   <div>
     <h1><strong>TaxPal</strong></h1>
 
     <div class="menu">
       <!-- Dashboard -->
-      <a routerLink="/dashboard">
+      <a routerLink="/dashboard" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z"
-            fill="currentColor"
-          />
+          <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" fill="currentColor"/>
         </svg>
         <span>Dashboard</span>
       </a>
 
       <!-- Transactions -->
-      <a routerLink="/transactions">
+      <a routerLink="/transactions" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z"
-            fill="currentColor"
-            opacity=".25"
-          />
+          <path d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z" fill="currentColor" opacity=".25"/>
           <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor" />
           <path d="M15 11h7v2h-7z" fill="currentColor" opacity=".1" />
         </svg>
@@ -29,69 +34,31 @@
       </a>
 
       <!-- Tax Estimator -->
-      <a routerLink="/tax-calendar">
+      <a routerLink="/tax-calendar" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
-            fill="currentColor"
-            opacity=".12"
-          />
-          <path
-            d="M14 3v5h5"
-            stroke="currentColor"
-            stroke-width="1.6"
-            fill="none"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M8 12h8M8 16h8M8 8h4"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-          />
+          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 12h8M8 16h8M8 8h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
         <span>Tax Estimator</span>
       </a>
 
       <!-- Budgets -->
-      <a href="#" (click)="openBudget(); $event.preventDefault()">
+      <a href="#" (click)="openBudget(); closeMobileNavIfSmall(); $event.preventDefault()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 3a9 9 0 1 0 9 9h-9V3Z" fill="currentColor" opacity=".2" />
-          <path
-            d="M12 3v9h9"
-            stroke="currentColor"
-            stroke-width="1.8"
-            fill="none"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          />
-          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" fill="none" />
+          <path d="M12 3v9h9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" fill="none"/>
         </svg>
         <span>Budgets</span>
       </a>
 
       <!-- Reports -->
-      <!-- CHANGED: route to financial-reports -->
-      <a routerLink="/financial-reports">
+      <a routerLink="/financial-reports" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"
-            fill="currentColor"
-            opacity=".12"
-          />
-          <path
-            d="M14 3v5h5"
-            stroke="currentColor"
-            stroke-width="1.6"
-            fill="none"
-            stroke-linejoin="round"
-          />
-          <path
-            d="M8 14h8M8 18h6"
-            stroke="currentColor"
-            stroke-width="1.6"
-            stroke-linecap="round"
-          />
+          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 14h8M8 18h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
         </svg>
         <span>Reports</span>
       </a>
@@ -109,20 +76,16 @@
     </div>
 
     <div class="profile-actions">
-      <a [routerLink]="['/settings/categories']" class="action">
+      <a [routerLink]="['/settings/categories']" class="action" (click)="closeMobileNavIfSmall()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.44 7.44 0 0 0-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62-.24-1.2-.57-1.73-1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02 .67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53 .42 1.11 .76 1.73 1l.36 2.54a.5.5 0 0 0 .5 .43h3.84a.5.5 0 0 0 .5-.43l.36-2.54c.62-.24 1.2-.57 1.73-1l2.39 .96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"
-          />
+          <path d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.44 7.44 0 0 0-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62-.24-1.2-.57-1.73-1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02 .67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53 .42 1.11 .76 1.73 1l.36 2.54a.5.5 0 0 0 .5 .43h3.84a.5.5 0 0 0 .5-.43l.36-2.54c.62-.24 1.2-.57 1.73-1l2.39 .96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
         </svg>
         <span>Settings</span>
       </a>
 
-      <a href="#" class="action" (click)="auth.logout(); $event.preventDefault()">
+      <a href="#" class="action" (click)="auth.logout(); closeMobileNavIfSmall(); $event.preventDefault()">
         <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path
-            d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"
-          />
+          <path d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
         </svg>
         <span>Log Out</span>
       </a>
@@ -130,9 +93,15 @@
   </div>
 </div>
 
+<!-- Main -->
 <div class="main">
   <!-- Top bar -->
   <div class="top-bar">
+    <!-- Hamburger (mobile/tablet only) -->
+    <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">
+      <span></span><span></span><span></span>
+    </button>
+
     <h1><strong>Dashboard</strong></h1>
     <div>
       <button (click)="openIncome()">+ Add Income</button>
@@ -198,14 +167,11 @@
   <section class="recent-card">
     <div class="recent-header">
       <h3>Recent Transactions</h3>
-
-      <!-- Delete All -->
       <div class="btn-row">
         <button
           class="btn-view-all"
           [disabled]="!recent.length || isDeletingAll"
-          (click)="onDeleteAllRecent()"
-        >
+          (click)="onDeleteAllRecent()">
           {{ isDeletingAll ? 'Deleting…' : 'Delete All' }}
         </button>
       </div>
@@ -220,7 +186,6 @@
           <col style="width: 16%" />
           <col style="width: 100px" />
           <col style="width: 120px" />
-          <!-- actions -->
         </colgroup>
 
         <thead>
@@ -240,37 +205,20 @@
             <td>{{ tx.description }}</td>
             <td>{{ tx.category }}</td>
             <td class="text-right" [ngClass]="tx.type === 'income' ? 'amt-green' : 'amt-red'">
-              <ng-container *ngIf="tx.type === 'income'">
-                + ${{ tx.amount | number : '1.2-2' }}
-              </ng-container>
-              <ng-container *ngIf="tx.type === 'expense'">
-                - ${{ tx.amount | number : '1.2-2' }}
-              </ng-container>
+              <ng-container *ngIf="tx.type === 'income'">+ ${{ tx.amount | number : '1.2-2' }}</ng-container>
+              <ng-container *ngIf="tx.type === 'expense'">- ${{ tx.amount | number : '1.2-2' }}</ng-container>
             </td>
             <td>
               <span class="badge" [ngClass]="tx.type === 'income' ? 'badge-credit' : 'badge-debit'">
                 <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true">
-                  <path
-                    *ngIf="tx.type === 'income'"
-                    d="M12 4l6 6h-4v6h-4v-6H6z"
-                    fill="currentColor"
-                  ></path>
-                  <path
-                    *ngIf="tx.type === 'expense'"
-                    d="M12 20l-6-6h4V8h4v6h4z"
-                    fill="currentColor"
-                  ></path>
+                  <path *ngIf="tx.type === 'income'"  d="M12 4l6 6h-4v6h-4v-6H6z"  fill="currentColor"></path>
+                  <path *ngIf="tx.type === 'expense'" d="M12 20l-6-6h4V8h4v6h4z" fill="currentColor"></path>
                 </svg>
                 {{ tx.type === 'income' ? 'Credited' : 'Debited' }}
               </span>
             </td>
             <td>
-              <button
-                type="button"
-                class="btn-danger"
-                [disabled]="!tx._id"
-                (click)="onDeleteRecent(tx)"
-              >
+              <button type="button" class="btn-danger" [disabled]="!tx._id" (click)="onDeleteRecent(tx)">
                 Delete
               </button>
             </td>
@@ -297,14 +245,12 @@
   <app-income-modal
     [isOpen]="showIncome"
     (closeModal)="closeIncome()"
-    (save)="onIncomeSave($event)"
-  >
+    (save)="onIncomeSave($event)">
   </app-income-modal>
 
   <app-expense-modal
     [isOpen]="showExpense"
     (closeModal)="closeExpense()"
-    (save)="onExpenseSave($event)"
-  >
+    (save)="onExpenseSave($event)">
   </app-expense-modal>
 </div>

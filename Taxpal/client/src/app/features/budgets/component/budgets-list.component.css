@@ -150,6 +150,7 @@
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,.35);
+  z-index: 1000;                        /* ensure behind shell/content */
 }
 .modal-shell {
   position: fixed;
@@ -157,16 +158,164 @@
   display: grid;
   place-items: center;
   padding: 20px;
+  z-index: 1001;                        /* above backdrop */
 }
 .modal-content {
-  width: min(860px, 92vw);        /* align with form max width */
+  position: relative;                   /* <<< anchor for .modal-close */
+  width: min(860px, 92vw);              /* align with form max width */
   background: #ffffff;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0,0,0,.25);
-  padding: 16px;                  /* inner spacing to match list shell */
+  padding: 16px;                        /* inner spacing to match list shell */
 }
 
 /* === Snackbars (reuse) ============================================ */
 .snack-success { background: #155724; color: #fff; }
 .snack-error   { background: #721c24; color: #fff; }
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & small devices (≤ 480px) */
+@media (max-width: 480px) {
+  .list-shell { padding: 12px; }
+
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    text-align: left;
+  }
+  .list-header h2 { font-size: 22px; }
+
+  .actions, .filters {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filters input[type="month"],
+  .filters select {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .table-wrap { border-radius: 12px; }
+  .table th, .table td {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .table .w-actions { width: 96px; }
+
+  .btn { width: 100%; min-width: 0; }
+  .btn-sm { width: auto; } /* keep small buttons inline where needed */
+
+  .modal-shell { padding: 12px; }
+  .modal-content {
+    width: 96vw;
+    padding: 14px;
+    border-radius: 12px;
+  }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width: 360px) {
+  .list-header h2 { font-size: 20px; }
+  .table th, .table td { padding: 8px 10px; }
+  .table .w-actions { width: 88px; }
+}
+
+/* Small tablets (481px–767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .list-shell { padding: 14px; }
+
+  .list-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actions, .filters { flex-wrap: wrap; }
+  .filters input[type="month"],
+  .filters select { min-width: 180px; }
+
+  .table th, .table td { padding: 12px; font-size: 15px; }
+  .table .w-actions { width: 110px; }
+
+  .modal-shell { padding: 16px; }
+  .modal-content { width: 94vw; padding: 16px; }
+}
+
+/* Tablets (768px–1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .list-shell { padding: 16px 20px; max-width: 100%; }
+  .list-header h2 { font-size: 26px; }
+
+  .table th, .table td { padding: 12px 14px; }
+  .table .w-actions { width: 130px; }
+
+  .modal-content { width: min(820px, 92vw); padding: 20px; }
+}
+
+/* Small desktops (1025px–1279px) */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .list-shell { max-width: 1040px; }
+  .table .w-actions { width: 140px; }
+}
+
+/* Large desktops (≥ 1280px) */
+@media (min-width: 1280px) {
+  .list-shell { max-width: 1180px; }
+  .table th, .table td { padding: 14px 16px; }
+  .table .w-actions { width: 160px; }
+}
+
+/* Short landscape viewports (e.g., phones with keyboard open) */
+@media (max-height: 600px) and (orientation: landscape) {
+  .modal-shell { padding: 12px; }
+  .modal-content {
+    width: 96vw;
+    max-height: calc(100vh - 24px);
+  }
+}
+
+/* Close button for the modal */
+.modal-close{
+  position:absolute;
+  top:16px;
+  right:16px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  background:transparent;
+  color:#6B7280;        /* slate-500 */
+  border-radius:8px;
+  cursor:pointer;
+  line-height:1;
+  font-size:20px;       /* size of × if using text */
+  transition:background-color .2s ease,color .2s ease,transform .2s ease;
+  z-index: 10;          /* above modal contents */
+}
+.modal-close:hover{ background:#F3F4F6; color:#374151; }
+.modal-close:focus-visible{
+  outline:2px solid transparent;
+  box-shadow:0 0 0 3px rgba(139,127,247,0.20);
+}
+
+/* ---------- Responsive sizing for the close button ---------- */
+@media (max-width:480px){
+  .modal-close{ top:8px; right:8px; width:24px; height:24px; border-radius:6px; font-size:16px; }
+}
+@media (max-width:360px){
+  .modal-close{ top:6px; right:6px; width:22px; height:22px; font-size:14px; }
+}
+@media (min-width:481px) and (max-width:767px){
+  .modal-close{ top:12px; right:12px; width:28px; height:28px; font-size:18px; }
+}
+@media (max-height:600px) and (orientation:landscape){
+  .modal-close{ top:8px; right:8px; }
+}

@@ -7,7 +7,6 @@
   flex-direction: column;
 }
 
-
 /* Page header */
 .main-content { flex: 1; }
 .page-header {
@@ -166,3 +165,97 @@
 
 .snack-success { background: #155724; color: #fff; }
 .snack-error   { background: #721c24; color: #fff; }
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & small devices (≤ 480px) */
+@media (max-width: 480px) {
+  .page-header { padding: 0 14px; margin-top: 12px; }
+  .page-title { font-size: 22px; }
+  .page-subtitle { font-size: 14px; }
+
+  .form-section { padding: 16px; }
+  .form-card {
+    padding: 16px;
+    border-radius: 12px;
+    max-height: calc(100vh - 32px);
+  }
+
+  .form-card-header { padding-bottom: 16px; }
+  .form-card-title { font-size: 22px; }
+
+  /* keep close icon tidy on small screens */
+  .icon-btn {
+    width: 24px; height: 24px; font-size: 16px; border-radius: 6px;
+  }
+
+  .grid { gap: 16px; }
+  .grid-2 { grid-template-columns: 1fr; }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .btn { width: 100%; min-width: 0; }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width: 360px) {
+  .page-title { font-size: 20px; }
+  .form-card { padding: 14px; }
+  .icon-btn { width: 22px; height: 22px; font-size: 14px; }
+}
+
+/* Small tablets (481px–767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .page-header { padding: 0 18px; }
+  .page-title { font-size: 24px; }
+
+  .form-section { padding: 18px; }
+  .form-card { padding: 20px; }
+  .form-card-title { font-size: 24px; }
+
+  .grid { gap: 20px; }
+  .grid-2 { grid-template-columns: 1fr; }
+
+  .actions { justify-content: flex-end; gap: 12px; }
+  .icon-btn { width: 28px; height: 28px; font-size: 18px; }
+}
+
+/* Tablets (768px–1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .page-header { padding: 0 24px; }
+  .page-title { font-size: 26px; }
+
+  .form-section { padding: 22px; }
+  .form-card { padding: 24px; }
+
+  .grid { gap: 22px; }
+  .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .icon-btn { width: 28px; height: 28px; font-size: 18px; }
+}
+
+/* Small desktops (1025px–1279px) */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .page-header { padding: 0 24px; }
+  .form-card { padding: 28px; }
+}
+
+/* Large desktops (≥ 1280px) */
+@media (min-width: 1280px) {
+  .page-header { padding: 0 28px; }
+  .form-card { padding: 32px; }
+}
+
+/* Short landscape viewports (e.g., phones with keyboard open) */
+@media (max-height: 600px) and (orientation: landscape) {
+  .form-section { padding: 12px; }
+  .form-card {
+    max-height: calc(100vh - 24px);
+    padding: 16px;
+  }
+}

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, HostListener, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -26,9 +26,24 @@ export class SettingsCategoriesComponent implements OnInit {
   error = '';
   private isOffline = false;
 
+  /** Mobile/tablet drawer state */
+  mobileNavOpen = false;
+
   constructor(private categoryService: CategoryService) {}
 
   ngOnInit() { this.loadCategories(); }
+
+  // ===== Drawer controls =====
+  toggleDrawer(): void { this.mobileNavOpen = !this.mobileNavOpen; }
+  closeDrawer(): void { this.mobileNavOpen = false; }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(e: KeyboardEvent): void {
+    if (e.key === 'Escape' && this.mobileNavOpen) {
+      e.preventDefault();
+      this.closeDrawer();
+    }
+  }
 
   // ===== Load =====
   loadCategories(): void {
@@ -126,7 +141,7 @@ export class SettingsCategoriesComponent implements OnInit {
     if (!cat) return;
 
     this.isEditing = true;
-    this.currentEditId = id;
+       this.currentEditId = id;
     this.categoryName = cat.name;
     this.categoryType = cat.type;
 

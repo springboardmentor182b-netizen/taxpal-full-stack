@@ -6,7 +6,7 @@
   background: #FBFBFB;
 }
 
-/* Sidebar */
+/* ---------------- Sidebar (desktop default) ---------------- */
 .sidebar {
   width: 250px;
   background: #FBFBFB;
@@ -17,6 +17,7 @@
   flex-direction: column;
   justify-content: space-between;
   flex-shrink: 0;
+  position: relative;            /* for the mobile close button positioning */
 }
 .sidebar h1 {
   text-align: center;
@@ -27,27 +28,17 @@
 
 /* menu links with icons */
 .menu a {
-  display: flex;                /* changed to flex to align icon + text */
+  display: flex;
   align-items: center;
-  gap: 10px;                    /* space between icon and label */
+  gap: 10px;
   color: #25295A;
   padding: 10px 15px;
   text-decoration: none;
   font-size: 16px;
-  border-radius: 8px;           /* nicer hover */
+  border-radius: 8px;
 }
-
-.menu a:hover {
-  background: #534CA4;
-  color: #FBFBFB;
-}
-.menu a .nav-ic {
-  width: 18px;
-  height: 18px;
-  flex: 0 0 18px;
-  display: inline-block;
-  color: currentColor;
-}
+.menu a:hover { background: #534CA4; color: #FBFBFB; }
+.menu a .nav-ic { width: 18px; height: 18px; flex: 0 0 18px; color: currentColor; }
 
 /* ✅ Profile pinned to bottom-left */
 .profile {
@@ -65,12 +56,9 @@
   align-items: center;
 }
 .avatar {
-  width: 44px; height: 44px;
-  border-radius: 50%;
+  width: 44px; height: 44px; border-radius: 50%;
   display: grid; place-items: center;
-  font-weight: 700;
-  color: #fff;
-  background: #5c62d6;
+  font-weight: 700; color: #fff; background: #5c62d6;
   letter-spacing: 0.5px;
 }
 .who .name { font-weight: 700; color: #2d335f; line-height: 1.2; }
@@ -93,7 +81,7 @@
 .profile-actions .action:hover { background: #ECEEFF; color: #2d335f; }
 .profile-actions .action svg { width: 18px; height: 18px; fill: currentColor; }
 
-/* Main content */
+/* ---------------- Main content ---------------- */
 .main {
   flex: 1;
   padding: 15px;
@@ -102,12 +90,15 @@
   gap: 10px;
   overflow: auto;
   background: #EBEFFF;
+  /* FIX: remove the extra margin; the sidebar already takes 250px via flex */
+  margin-left: 0;
 }
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
+  gap: 8px;
 }
 .top-bar h1 { font-size: 34px; color: #2d3e50; }
 .top-bar button {
@@ -115,6 +106,20 @@
   background: #534CA4; color: #fff; border: none; border-radius: 6px;
   cursor: pointer; min-height: 36px;
 }
+
+/* ---------- Hamburger (mobile/tablet only) ---------- */
+.hamburger {
+  display: none;                /* shown in media queries */
+  width: 40px; height: 40px;
+  border: 1px solid #e6e8ff;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.hamburger span { display: block; width: 18px; height: 2px; background: #25295A; }
 
 /* Cards */
 .cards {
@@ -133,7 +138,7 @@
 .card h3 { margin: 0 0 8px; font-size: 18px; color: #666; }
 .card p { font-size: 16px; font-weight: bold; }
 
-/* Charts section */
+/* Charts */
 .charts {
   display: grid;
   grid-template-columns: 2fr 1fr;
@@ -148,14 +153,10 @@
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   display: flex;
   flex-direction: column;
+  min-height: 320px;
 }
 .chart-container h3 { font-size: 18px; margin-bottom: 8px; flex-shrink: 0; }
-.chart-container canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-.chart-container { min-height: 320px; }
+.chart-container canvas { width: 100% !important; height: 100% !important; display: block; }
 
 /* helper note stays inside the pie card */
 .chart-note {
@@ -163,20 +164,7 @@
   font-size: 12px; opacity: 0.7; pointer-events: none;
 }
 
-/* (legacy transactions block styles can stay if used elsewhere) */
-.transactions { background: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); font-size: 13px; }
-.transactions table { width: 100%; border-collapse: collapse; }
-.transactions td { padding: 8px; text-align: left; border-bottom: 1px solid #eee; font-size: 16px; }
-.transactions th { background: #f4f6fa; font-size: 13px; padding: 8px; text-align: left; border-bottom: 1px solid #eee; }
-.transactions button { padding: 5px 8px; background: #534CA4; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 15px; margin-left: 72%; width: 30%; }
-
-/* amount colors */
-.amt-green { color: #1a7f37; font-weight: 600; }
-.amt-red   { color: #b42318; font-weight: 600; }
-
-/* ===================== */
-/* 🧾 Recent Transactions */
-/* ===================== */
+/* Recent Transactions */
 .recent-card {
   background: #fff;
   border-radius: 8px;
@@ -187,12 +175,8 @@
   flex-direction: column;
   gap: 10px;
 }
-.recent-header {
-  display: flex; align-items: center; justify-content: space-between; gap: 12px;
-}
-.recent-header h3 {
-  margin: 0; font-size: 18px; color: #2d3e50; font-weight: 600;
-}
+.recent-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.recent-header h3 { margin: 0; font-size: 18px; color: #2d3e50; font-weight: 600; }
 .btn-view-all,.btn-danger {
   padding: 6px 12px; font-size: 13px;
   border: 1px solid #d7d9ff; background: #f4f6ff; color: #4a4fd4;
@@ -203,7 +187,6 @@
 .btn-view-all,.btn-danger:active { transform: translateY(1px); }
 
 .recent-table-wrap { width: 100%; overflow: auto; }
-
 .recent-table {
   width: 100%;
   border-collapse: collapse;
@@ -211,11 +194,7 @@
   min-width: 720px;
   table-layout: auto;
 }
-.recent-table thead, .recent-table tbody,
-.recent-table tr, .recent-table th, .recent-table td { box-sizing: border-box; }
-
-.recent-table th,
-.recent-table td {
+.recent-table th, .recent-table td {
   padding: 10px 12px;
   border-bottom: 1px solid #f0f2f7;
   color: #334155;
@@ -225,11 +204,7 @@
   vertical-align: middle;
   text-align: left;
 }
-.recent-table thead th {
-  background: #f7f8ff;
-  font-weight: 600;
-  color: #475569;
-}
+.recent-table thead th { background: #f7f8ff; font-weight: 600; color: #475569; }
 
 /* center Amount column */
 .recent-table th:nth-child(4),
@@ -241,33 +216,71 @@
   font-feature-settings: "tnum" 1, "lnum" 1;
 }
 .recent-table th:nth-child(5),
-.recent-table td:nth-child(5) {
-  text-align: left !important;
-  min-width: 110px;
+.recent-table td:nth-child(5) { text-align: left !important; min-width: 110px; }
+
+.text-right { text-align: right; width: 60%; }
+.amt-green { color: #16a34a; font-weight: 600; }
+.amt-red   { color: #dc2626; font-weight: 600; }
+
+/* ====== Mobile Drawer (off-canvas) ====== */
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.35);
+  backdrop-filter: blur(1px);
+  z-index: 998;
+  display: none;                 /* toggled in media query when open */
+}
+.close-mobile {
+  display: none;
+  position: absolute;
+  right: 10px; top: 10px;
+  width: 30px; height: 30px;
+  border-radius: 8px;
+  border: 1px solid #e6e8ff;
+  background: #fff;
+  color: #25295A;
+  cursor: pointer;
+  font-size: 18px;
 }
 
-/* Responsive */
+/* ================== RESPONSIVE ================== */
+
+/* Tablets and down: turn sidebar into a drawer */
 @media (max-width: 1024px) {
+  .hamburger { display: inline-flex; }
+  .top-bar h1 { font-size: 28px; }
+
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 100vh;
+    width: 280px;
+    transform: translateX(-100%);
+    transition: transform .25s ease;
+    z-index: 999;
+    box-shadow: 0 20px 50px rgba(0,0,0,.25);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .drawer-overlay.open { display: block; }
+
+  .close-mobile { display: inline-flex; align-items: center; justify-content: center; }
+  .menu a { font-size: 15px; padding: 10px 14px; }
+  .profile { margin: 12px; }
   .cards { grid-template-columns: repeat(2, 1fr); }
   .charts { grid-template-columns: 1fr; }
-  .top-bar h1 { font-size: 24px; }
 }
+
+/* Phones (≤768px) */
 @media (max-width: 768px) {
-  :host { flex-direction: column; }
-  .sidebar {
-    width: 100%; height: auto; flex-direction: row;
-    justify-content: space-between; align-items: center; padding: 10px;
-  }
-  .menu { display: flex; gap: 10px; }
-  .menu a { font-size: 12px; padding: 6px 8px; }
+  .top-bar h1 { font-size: 24px; }
   .cards { grid-template-columns: 1fr 1fr; }
-  .profile { margin: 10px; }
 }
+
+/* Small phones (≤480px) */
 @media (max-width: 480px) {
-  .cards { grid-template-columns: 1fr; }
-  .charts { grid-template-columns: 1fr; }
-  .menu { flex-direction: column; align-items: center; }
   .top-bar h1 { font-size: 20px; }
+  .cards { grid-template-columns: 1fr; }
+  .menu a { font-size: 14px; }
 }
 
 /* Modal */
@@ -306,33 +319,9 @@
 .form-actions button { padding: 8px 14px; border: none; border-radius: 6px; cursor: pointer; background: #534CA4; color: #fff; }
 .form-actions .secondary { background: #e7e7ef; color: #333; }
 
-.text-right { text-align: right; width: 60%; }
+/* Badges */
+.badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 8px; border-radius: 999px; font-weight: 600; }
+.badge-credit { background: #e6f7f0; color: #0f766e; }
+.badge-debit  { background: #fdecec; color: #b91c1c; }
 
-.amt-green { color: #16a34a; font-weight: 600; }
-.amt-red   { color: #dc2626; font-weight: 600; }
-
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  font-weight: 600;
-}
-
-.badge-credit {
-  background: #e6f7f0;
-  color: #0f766e;
-}
-
-.badge-debit {
-  background: #fdecec;
-  color: #b91c1c;
-}
-
-.recent-empty {
-  padding: 14px;
-  color: #667085;
-  font-size: 14px;
-}
+.recent-empty { padding: 14px; color: #667085; font-size: 14px; }

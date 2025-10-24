@@ -2,49 +2,66 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
 body{background-color:#FBFBFB;color:#1A1A1A;min-height:100vh;overflow-x:hidden}
 
-/* ===== Sidebar (identical sizing so content doesn't jump) ===== */
+/* ===== Sidebar (pinned on desktop, drawer on ≤1024px) ===== */
 .sidebar{
   width:250px;background-color:#25295A;color:#fff;padding:20px 0;height:100vh;
-  position:fixed;left:0;top:0;overflow-y:auto;z-index:10
+  position:fixed;left:0;top:0;overflow-y:auto;z-index:1100;
+  transition:transform .25s ease;
 }
 .logo{padding:0 20px 20px;border-bottom:1px solid #656ED3;margin-bottom:20px}
 .logo h1{font-size:24px;font-weight:600;color:#fff}
 .logo p{font-size:14px;color:#AFB3FF;margin-top:5px}
 .menu-section{margin-bottom:30px}
 .menu-item{padding:12px 20px;cursor:pointer;transition:background-color .2s,color .2s;display:flex;align-items:center;color:#fff;text-decoration:none}
-.menu-item:hover{background-color:#534CA4;}
-.menu-item.active{background-color:#656ED3;border-left:4px solid #AFB3FF;}
+.menu-item:hover{background-color:#534CA4}
+.menu-item.active{background-color:#656ED3;border-left:4px solid #AFB3FF}
 .menu-item i{margin-right:10px;width:20px;text-align:center}
 
-/* ===== Main content (same width rules as categories) ===== */
+/* Drawer backdrop (mobile/tablet) */
+.drawer-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1090;
+  opacity:0;pointer-events:none;transition:opacity .2s ease;
+}
+.drawer-backdrop.show{opacity:1;pointer-events:auto}
+
+/* ===== Main content (pinned layout on desktop) ===== */
 .main-content{
   margin-left:250px;width:calc(100vw - 250px);max-width:calc(100vw - 250px);
   padding:30px;background-color:#FBFBFB;box-sizing:border-box;min-height:100vh
 }
 
-/* ===== Header (same spacing/typography) ===== */
+/* ===== Header ===== */
 .header{
   display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;
   padding-bottom:20px;border-bottom:1px solid #EBEFFF;width:100%
 }
 .header h2{color:#25295A;font-weight:600;font-size:28px}
+.header-left{display:flex;align-items:center;gap:12px}
+.user-actions{display:flex;align-items:center;gap:15px}
+
+/* Hamburger (hidden on desktop; shown via media query) */
+.btn-menu{
+  height:38px;width:38px;border-radius:8px;border:1px solid #EBEFFF;
+  background:#fff;color:#1A1A1A;cursor:pointer;font-size:20px;line-height:1;
+  display:none;align-items:center;justify-content:center;
+}
+.btn-menu:hover{background:#EBEFFF}
 
 /* ✕ Close icon button in header */
 .btn-icon{
   display:inline-flex;align-items:center;justify-content:center;
-  width:36px;height:36px;border-radius:8px;border:1px solid var(--border);
-  background:var(--surface);color:var(--ink-700);text-decoration:none;line-height:1;font-weight:700
+  width:36px;height:36px;border-radius:8px;border:1px solid #EBEFFF;
+  background:#FBFBFB;color:#25295A;text-decoration:none;line-height:1;font-weight:700;
 }
-.btn-icon:hover{background:var(--surface-2);color:var(--primary);border-color:var(--primary-light)}
+.btn-icon:hover{background:#EBEFFF;color:#656ED3;border-color:#AFB3FF}
 .close-btn{font-size:18px}
-
 
 /* ===== Buttons (unified look) ===== */
 .btn{
   padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:500;transition:all .2s;border:1px solid #EBEFFF;font-size:14px;background:#656ED3;color:#1A1A1A
 }
 .btn-primary{background-color:#656ED3;color:#fff;border-color:#656ED3}
-.btn-primary:hover{background-color:#534CA4;}
+.btn-primary:hover{background-color:#534CA4}
 .btn-secondary{background-color:#FBFBFB;color:#656ED3;border-color:#656ED3}
 .btn-secondary:hover{background-color:#838CF1;color:#fff;border-color:#838CF1}
 button:disabled{opacity:.6;cursor:not-allowed}
@@ -57,11 +74,11 @@ button:disabled{opacity:.6;cursor:not-allowed}
 .avatar-row{display:flex;align-items:center;gap:16px;margin-bottom:18px}
 .avatar{
   width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:#EBEFFF;color:#534CA4;;font-weight:700;font-size:20px
+  background:#EBEFFF;color:#534CA4;font-weight:700;font-size:20px
 }
 .avatar-actions .btn{margin-right:8px}
 
-/* Two-column form like categories sections */
+/* Two-column form */
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .field label{display:block;margin-bottom:8px;font-weight:500;color:#1A1A1A}
 .field input,.field select,.field textarea{
@@ -73,13 +90,66 @@ button:disabled{opacity:.6;cursor:not-allowed}
 
 .actions{margin-top:18px;display:flex;gap:10px}
 
-/* States (aligned with categories) */
+/* States */
 .loading-state{text-align:center;padding:20px;color:#656ED3;font-style:italic}
 .error-message{background-color:#fed7d7;color:#c53030;padding:12px;border-radius:6px;margin-bottom:20px;border-left:4px solid #fc8181}
 
-/* Responsive (match categories) */
-@media (max-width:768px){
-  .sidebar{width:100%;height:auto;position:relative}
-  .main-content{margin-left:0;width:100vw;max-width:100vw;padding:20px}
-  .grid{grid-template-columns:1fr}
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & tablets (≤1024px): sidebar becomes drawer */
+@media (max-width:1024px){
+  .btn-menu{ display:inline-flex; }
+
+  .sidebar{
+    width:min(86vw, 320px);
+    transform:translateX(-100%);   /* hidden by default */
+    box-shadow:0 12px 40px rgba(0,0,0,.25);
+  }
+  .sidebar.open{ transform:translateX(0); }
+
+  .main-content{ margin-left:0;width:100vw;max-width:100vw;padding:22px; }
+
+  .header{ padding-bottom:14px;margin-bottom:20px; }
+  .header h2{ font-size:24px; }
+
+  /* slightly smaller ✕ on tablets */
+  .btn-icon{ width:32px;height:32px;font-size:16px }
+}
+
+/* Small phones (≤480px) */
+@media (max-width:480px){
+  .header h2{ font-size:22px; }
+  .profile-card{ padding:20px; }
+
+  /* Stack form to single column */
+  .grid{ grid-template-columns:1fr; gap:12px; }
+
+  /* Make header buttons breathe */
+  .user-actions{ gap:18px; }
+
+  /* Smaller ✕ on phones */
+  .btn-icon{ width:28px;height:28px;font-size:15px;border-radius:8px }
+
+  /* Stack action buttons and full-width on phones */
+  .actions{ flex-direction:column; gap:12px }
+  .actions .btn{ width:100% }
+}
+
+/* Very small phones (≤360px) */
+@media (max-width:360px){
+  .header h2{ font-size:20px; }
+  .btn-menu{ width:34px;height:34px }
+  .btn-icon{ width:26px;height:26px;font-size:14px }
+}
+
+/* Short landscape viewports */
+@media (max-height:600px) and (orientation:landscape){
+  .main-content{ padding:18px }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{ transition:none !important; animation:none !important; }
 }
