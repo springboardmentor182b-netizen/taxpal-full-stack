@@ -670,4 +670,72 @@ router.delete('/categories/:id', async (req, res) => {
     }
   });
   
-  module.exports = router;
+  // Delete single income record
+router.delete('/delete-income/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userEmail } = req.query;
+
+    if (!id || !userEmail) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const result = await Income.findOneAndDelete({ _id: id, userEmail });
+    
+    if (!result) {
+      return res.status(404).json({ error: 'Income record not found' });
+    }
+
+    res.json({ message: 'Income deleted successfully' });
+  } catch (error) {
+    console.error('Delete income error:', error);
+    res.status(500).json({ error: 'Failed to delete income' });
+  }
+});
+
+// Delete all income records for a user
+router.delete('/delete-all-income', async (req, res) => {
+  try {
+    const { userEmail } = req.query;
+    await Income.deleteMany({ userEmail });
+    res.json({ message: 'All income records deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete income records' });
+  }
+});
+
+// Delete single expense record
+router.delete('/delete-expense/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { userEmail } = req.query;
+
+    if (!id || !userEmail) {
+      return res.status(400).json({ error: 'Missing required parameters' });
+    }
+
+    const expense = await Expense.findOneAndDelete({ _id: id, userEmail });
+    
+    if (!expense) {
+      return res.status(404).json({ error: 'Expense record not found' });
+    }
+
+    res.json({ message: 'Expense deleted successfully' });
+  } catch (error) {
+    console.error('Delete expense error:', error);
+    res.status(500).json({ error: 'Failed to delete expense' });
+  }
+});
+
+// Delete all expense records for a user
+router.delete('/delete-all-expenses', async (req, res) => {
+  try {
+    const { userEmail } = req.query;
+    await Expense.deleteMany({ userEmail });
+    res.json({ message: 'All expense records deleted' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete expense records' });
+  }
+});
+
+module.exports = router;

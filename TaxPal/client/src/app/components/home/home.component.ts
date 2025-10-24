@@ -34,6 +34,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
   
   ngOnInit() {
+    // Clear any existing auth data on home page load
+    if (window.location.pathname === '/') {
+      localStorage.removeItem('user_email');
+      localStorage.removeItem('user_name');
+      localStorage.removeItem('user_id');
+      this.isLoggedIn = false;
+    }
+    
     // Listen for dark mode changes
     window.addEventListener('darkModeChanged', (event: any) => {
       this.isDarkMode = event.detail?.isDarkMode || false;

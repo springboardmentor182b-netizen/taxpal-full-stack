@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { AuthGuard } from './guards/auth.guard';
 import { HomeComponent } from './components/home/home.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
 import { ProfileSettingsComponent } from './components/profile-settings/profile-settings.component';
@@ -20,12 +21,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
-  { path: 'user-profile', component: UserProfileComponent },
+  { path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard] },
   { path: 'transactions', component: UserProfileComponent },
   {
     path: 'budget',
     loadComponent: () =>
       import('./components/budget/budget.component').then((m) => m.BudgetComponent),
+    canActivate: [AuthGuard],
   },
   { path: 'reports', loadComponent: () => import('./components/export-download/export-download.component').then(m => m.ExportDownloadComponent) },
 
@@ -53,6 +55,7 @@ export const routes: Routes = [
     path: 'profile-settings',
     component: ProfileSettingsComponent,
     title: 'Profile Settings - TaxPal',
+    canActivate: [AuthGuard],
   },
 
   // Redirect to home for any unknown routes

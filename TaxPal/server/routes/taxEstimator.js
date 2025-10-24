@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const TaxEstimate = require('../models/TaxEstimate');
+const { calculateTax } = require('../src/apis/TaxEstimator/taxestimate.controller');
 
 console.log('✓ Tax Estimator routes file loaded');
 
@@ -76,82 +76,27 @@ console.log('✓ Tax Estimator routes file loaded');
  *       500:
  *         description: Server error
  */
-router.post('/calculate', (req, res) => {
+router.post('/calculate', async (req, res) => {
   try {
-    console.log('=== TAX CALCULATION REQUEST ===');
-    console.log('Request body:', req.body);
-    
-    const { 
-      income, 
-      businessExpenses = 0, 
-      retirement = 0, 
-      healthInsurance = 0, 
-      homeOffice = 0, 
-      status = 'Single' 
-    } = req.body;
+    const { userEmail, annualIncome, taxDeductibleExpenses } = req.body;
 
     // Validate required fields
-    if (income === undefined || income === null) {
-      return res.status(400).json({ message: 'Income is required' });
+    if (!userEmail || typeof annualIncome !== 'number' || typeof taxDeductibleExpenses !== 'number') {
+      return res.status(400).json({ 
+        error: 'Missing or invalid required fields',
+        details: {
+          userEmail: !userEmail ? 'Required' : null,
+          annualIncome: typeof annualIncome !== 'number' ? 'Must be a number' : null,
+          taxDeductibleExpenses: typeof taxDeductibleExpenses !== 'number' ? 'Must be a number' : null
+        }
+      });
     }
 
-    // Convert string values to numbers
-    const numIncome = parseFloat(income);
-    const numBusinessExpenses = parseFloat(businessExpenses || 0);
-    const numRetirement = parseFloat(retirement || 0);
-    const numHealthInsurance = parseFloat(healthInsurance || 0);
-    const numHomeOffice = parseFloat(homeOffice || 0);
-
-    // Calculate total deductions
-    const totalDeductions = 
-      numBusinessExpenses + 
-      numRetirement + 
-      numHealthInsurance + 
-      numHomeOffice;
-    
-    // Calculate taxable income
-    const taxableIncome = Math.max(0, numIncome - totalDeductions);
-    
-    // Simple tax calculation based on filing status
-    let taxRate = 0.15; // Default rate
-    
-    if (status === 'Single') {
-      if (taxableIncome * 4 <= 11000) taxRate = 0.10;
-      else if (taxableIncome * 4 <= 44725) taxRate = 0.12;
-      else if (taxableIncome * 4 <= 95375) taxRate = 0.22;
-      else taxRate = 0.24;
-    } else if (status === 'Married') {
-      if (taxableIncome * 4 <= 22000) taxRate = 0.10;
-      else if (taxableIncome * 4 <= 89450) taxRate = 0.12;
-      else if (taxableIncome * 4 <= 190750) taxRate = 0.22;
-      else taxRate = 0.24;
-    }
-    
-    // Calculate tax
-    const estimatedTax = taxableIncome * taxRate;
-    const effectiveTaxRate = numIncome > 0 ? (estimatedTax / numIncome) * 100 : 0;
-
-    // Create tax breakdown
-    const breakdown = {
-      federalIncomeTax: estimatedTax * 0.7,
-      selfEmploymentTax: estimatedTax * 0.3
-    };
-
-    console.log('✓ Tax calculation successful:', {
-      taxableIncome,
-      estimatedTax,
-      effectiveTaxRate
-    });
-
-    res.json({
-      taxableIncome,
-      estimatedTax,
-      effectiveTaxRate,
-      breakdown
-    });
+    const result = await calculateTax(userEmail, annualIncome, taxDeductibleExpenses);
+    res.json(result);
   } catch (error) {
-    console.error('✗ Error calculating tax:', error);
-    res.status(500).json({ message: 'Server error while calculating tax' });
+    console.error('Tax calculation error:', error);
+    res.status(500).json({ error: error.message || 'Error calculating tax' });
   }
 });
 

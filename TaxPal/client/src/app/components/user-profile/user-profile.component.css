@@ -237,17 +237,26 @@
   gap: 0.25rem;
 }
 
+/* Updated trend icon styles */
 .trend-icon {
   width: 16px;
   height: 16px;
+  transition: transform 0.2s ease;
 }
 
-.trend-icon.up {
-  color: #10b981;
+/* Income trend icon specific styles */
+.metric-card:first-child .trend-icon {
+  color: #10b981 !important; /* Green color for income */
 }
 
-.trend-icon.down {
-  color: #ef4444;
+/* Expense trend icon specific styles */
+.metric-card:nth-child(2) .trend-icon {
+  color: #ef4444 !important; /* Red color for expense */
+}
+
+/* Hover effect for trend icons */
+.metric-trend:hover .trend-icon {
+  transform: scale(1.1);
 }
 
 .metric-change {
@@ -1736,7 +1745,65 @@
   white-space: nowrap;
 }
 
-/* Remove the previous hover effect on bars */
-.bar:hover::after {
-  display: none;
+/* Table header with delete all button */
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+/* Delete all button */
+.delete-all-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.375rem;
+  background-color: #fee2e2;
+  color: #dc2626;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-all-btn:hover {
+  background-color: #fecaca;
+}
+
+.dark .delete-all-btn {
+  background-color: #7f1d1d;
+  color: #fca5a5;
+}
+
+.dark .delete-all-btn:hover {
+  background-color: #991b1b;
+}
+
+/* Individual delete button */
+.action-column {
+  width: 50px;
+  text-align: center;
+}
+
+.delete-btn {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  background: none;
+  border: none;
+  color: #dc2626;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background-color: #fee2e2;
+}
+
+.dark .delete-btn {
+  color: #ef4444;
+}
+
+.dark .delete-btn:hover {
+  background-color: #7f1d1d;
 }

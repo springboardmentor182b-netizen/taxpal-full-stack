@@ -56,14 +56,18 @@
         <div class="metric-header">
           <h3>Monthly Income</h3>
           <div class="metric-trend">
-            <svg class="trend-icon up" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-              <polyline points="17 6 23 6 23 12"></polyline>
+            <!-- Modified SVG for income - always shows upward trend in green -->
+            <svg class="trend-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #10b981;">
+              <path d="M23 6l-9.5 9.5-5-5L1 18" />
+              <path d="M17 6h6v6" />
             </svg>
-            <span class="metric-change positive">+15.2%</span>
+            <!-- Changed to always use positive class for income changes -->
+            <span class="metric-change positive">
+              {{ monthlyIncomeChange >= 0 ? '+' : '' }}{{ monthlyIncomeChange | number:'1.1-1' }}%
+            </span>
           </div>
         </div>
-        <div class="metric-value">$8,430</div>
+        <div class="metric-value">${{ currentMonthIncome | number:'1.0-0' }}</div>
         <div class="metric-subtitle">from last month</div>
       </div>
 
@@ -71,45 +75,66 @@
         <div class="metric-header">
           <h3>Monthly Expenses</h3>
           <div class="metric-trend">
-            <svg class="trend-icon down" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="1 18 10.5 8.5 15.5 13.5 23 6"></polyline>
-              <polyline points="17 18 23 18 23 12"></polyline>
+            <!-- Modified SVG for expenses - always shows downward trend in red -->
+            <svg class="trend-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #ef4444;">
+              <path d="M23 18l-9.5-9.5-5 5L1 6" />
+              <path d="M17 18h6v-6" />
             </svg>
-            <span class="metric-change negative">-8.1%</span>
+            <span class="metric-change" [class.positive]="monthlyExpenseChange < 0" [class.negative]="monthlyExpenseChange >= 0">
+              {{ monthlyExpenseChange >= 0 ? '+' : '' }}{{ monthlyExpenseChange | number:'1.1-1' }}%
+            </span>
           </div>
         </div>
-        <div class="metric-value">$3,245</div>
+        <div class="metric-value">${{ currentMonthExpense | number:'1.0-0' }}</div>
         <div class="metric-subtitle">from last month</div>
       </div>
 
+      <!-- Replace Estimated Tax Due with Total Balance -->
       <div class="metric-card">
         <div class="metric-header">
-          <h3>Estimated Tax Due</h3>
+          <h3>Total Balance</h3>
           <div class="metric-trend">
-            <svg class="trend-icon up" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-              <polyline points="17 6 23 6 23 12"></polyline>
+            <svg class="trend-icon" [ngClass]="{'up': balanceChange >= 0, 'down': balanceChange < 0}" 
+                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path [attr.d]="balanceChange >= 0 ? 
+                'M23 6l-9.5 9.5-5-5L1 18' : 
+                'M23 18l-9.5-9.5-5 5L1 6'" />
+              <path [attr.d]="balanceChange >= 0 ? 
+                'M17 6h6v6' : 
+                'M17 18h6v-6'" />
             </svg>
-            <span class="metric-change positive">+5.3%</span>
+            <span class="metric-change" [class.positive]="balanceChange >= 0" [class.negative]="balanceChange < 0">
+              {{ balanceChange >= 0 ? '+' : '' }}{{ balanceChange | number:'1.1-1' }}%
+            </span>
           </div>
         </div>
-        <div class="metric-value">$1,264</div>
-        <div class="metric-subtitle">from last month</div>
+        <div class="metric-value">${{ totalBalance | number:'1.0-0' }}</div>
+        <div class="metric-subtitle">total balance</div>
       </div>
 
+      <!-- Savings Rate Card -->
       <div class="metric-card">
         <div class="metric-header">
           <h3>Savings Rate</h3>
           <div class="metric-trend">
-            <svg class="trend-icon up" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
-              <polyline points="17 6 23 6 23 12"></polyline>
+            <svg class="trend-icon" [ngClass]="{'up': savingsRateChange >= 0, 'down': savingsRateChange < 0}" 
+                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path [attr.d]="savingsRateChange >= 0 ? 
+                'M23 6l-9.5 9.5-5-5L1 18' : 
+                'M23 18l-9.5-9.5-5 5L1 6'" />
+              <path [attr.d]="savingsRateChange >= 0 ? 
+                'M17 6h6v6' : 
+                'M17 18h6v-6'" />
             </svg>
-            <span class="metric-change positive">+2.1%</span>
+            <span class="metric-change" [class.positive]="savingsRateChange >= 0" [class.negative]="savingsRateChange < 0">
+              {{ savingsRateChange >= 0 ? '+' : '' }}{{ savingsRateChange | number:'1.1-1' }}%
+            </span>
           </div>
         </div>
-        <div class="metric-value">23.8%</div>
-        <div class="metric-subtitle">from last month</div>
+        <div class="metric-value">{{ savingsRate | number:'1.1-1' }}%</div>
+        <div class="metric-subtitle">of monthly income</div>
       </div>
     </div>
     
@@ -119,48 +144,34 @@
         <button class="action-btn income-btn" (click)="showAddIncomeModal()">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
-            <line x1="12" y1="8" x2="12" y2="16"/>
-            <line x1="8" y1="12" x2="16" y2="12"/>
+            <line x="12" y="8" x2="12" y2="16"/>
+            <line x="8" y="12" x2="16" y2="12"/>
           </svg>
           Add Income
         </button>
         <button class="action-btn expense-btn" (click)="showAddExpenseModal()">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"/>
-            <line x1="8" y1="12" x2="16" y2="12"/>
+            <line x="8" y="12" x2="16" y2="12"/>
           </svg>
           Add Expense
-        </button>
-        <button class="action-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Add Transaction
-        </button>
-        <button class="action-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          Schedule Payment
-        </button>
-        <button class="action-btn">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          Export Report
         </button>
       </div>
     </div>
 
     <!-- Income Table -->
     <div class="income-table-section">
-      <h3 class="income-table-title">Your Income Records</h3>
+      <div class="table-header">
+        <h3 class="income-table-title">Your Income Records</h3>
+        <button class="delete-all-btn" *ngIf="incomeList.length > 0" (click)="deleteAllIncome()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"></path>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete All
+        </button>
+      </div>
       <table class="income-table" *ngIf="incomeList.length > 0">
         <thead>
           <tr>
@@ -169,6 +180,7 @@
             <th>Category</th>
             <th>Date</th>
             <th>Notes</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -178,17 +190,33 @@
             <td>{{ income.category || '-' }}</td>
             <td>{{ income.date | date:'mediumDate' }}</td>
             <td>{{ income.notes || '-' }}</td>
+            <td class="action-column">
+              <button class="delete-btn" (click)="deleteIncome(income._id)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
-      <div *ngIf="incomeList.length === 0" class="no-income-msg">
-        No income records yet.
-      </div>
     </div>
 
     <!-- Expense Table -->
     <div class="income-table-section">
-      <h3 class="income-table-title" style="color:#ef4444">Your Expense Records</h3>
+      <div class="table-header">
+        <h3 class="income-table-title" style="color:#ef4444">Your Expense Records</h3>
+        <button class="delete-all-btn" *ngIf="expenseList.length > 0" (click)="deleteAllExpenses()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h18"></path>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+          Delete All
+        </button>
+      </div>
       <table class="income-table" *ngIf="expenseList.length > 0">
         <thead>
           <tr>
@@ -198,6 +226,7 @@
             <th>Date</th>
             <th>Tax Deductible</th>
             <th>Notes</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -208,12 +237,18 @@
             <td>{{ expense.date | date:'mediumDate' }}</td>
             <td>{{ expense.taxDeductible || '-' }}</td>
             <td>{{ expense.notes || '-' }}</td>
+            <td class="action-column">
+              <button class="delete-btn" (click)="deleteExpense(expense._id)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
-      <div *ngIf="expenseList.length === 0" class="no-income-msg">
-        No expense records yet.
-      </div>
     </div>
 
     <!-- Total Balance and Recent Transactions Row -->

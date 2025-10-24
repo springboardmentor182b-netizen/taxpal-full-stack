@@ -25,21 +25,13 @@ console.log('📚 Swagger documentation available at: http://localhost:5000/api-
 
 // Import routes
 const userRoutes = require('./routes/user');
-const taxEstimatorRoutes = require('./routes/taxEstimator');
+app.use('/api/users', userRoutes);
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
-
-// Register routes
-app.use('/api/users', userRoutes);
-app.use('/api/tax-estimator', taxEstimatorRoutes);
-
-console.log('✓ Routes registered:');
-console.log('  - /api/users');
-console.log('  - /api/tax-estimator');
 
 // Root route
 app.get('/', (req, res) => {

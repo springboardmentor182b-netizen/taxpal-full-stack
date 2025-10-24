@@ -5,6 +5,7 @@
 
 // Import service
 const taxEstimateService = require('./taxestimate.service');
+const TaxEstimate = require('./taxestimate.model');
 
 /**
  * Calculate estimated taxes
@@ -13,7 +14,40 @@ const calculateTax = async (req, res) => {
   try {
     const taxData = req.body;
     const result = await taxEstimateService.calculateTaxEstimate(taxData);
-    return res.status(200).json(result);
+
+    // Simple tax calculation logic
+    const { annualIncome, taxDeductibleExpenses, userEmail } = taxData;
+    const taxableIncome = Math.max(0, annualIncome - taxDeductibleExpenses);
+    let estimatedTax = 0;
+    
+    // Progressive tax brackets (example rates)
+    if (taxableIncome <= 50000) {
+      estimatedTax = taxableIncome * 0.15;
+    } else if (taxableIncome <= 100000) {
+      estimatedTax = 7500 + (taxableIncome - 50000) * 0.25;
+    } else {
+      estimatedTax = 20000 + (taxableIncome - 100000) * 0.35;
+    }
+
+    // Get previous tax estimate for comparison
+    const previousEstimate = await TaxEstimate.findOne({ userEmail }).sort({ createdAt: -1 });
+    const previousTax = previousEstimate ? previousEstimate.estimatedTax : 0;
+
+    // Save new estimate
+    await TaxEstimate.create({
+      userEmail,
+      annualIncome,
+      taxDeductibleExpenses,
+      taxableIncome,
+      estimatedTax,
+      createdAt: new Date()
+    });
+
+    return res.status(200).json({
+      estimatedTax: Math.round(estimatedTax),
+      previousTax: Math.round(previousTax),
+      taxableIncome: Math.round(taxableIncome)
+    });
   } catch (error) {
     console.error('Error in tax calculation:', error);
     return res.status(500).json({ 

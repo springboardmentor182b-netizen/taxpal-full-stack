@@ -57,6 +57,22 @@ export class UserProfileComponent implements OnInit {
 
   showProfileMenu: boolean = false; // Add this property
 
+  // Add new properties for monthly totals
+  currentMonthIncome: number = 0;
+  currentMonthExpense: number = 0;
+  monthlyIncomeChange: number = 0;
+  monthlyExpenseChange: number = 0;
+  savingsRate: number = 0;
+  savingsRateChange: number = 0;
+
+  // Remove estimated tax properties
+  // estimatedTaxDue: number = 0;
+  // estimatedTaxChange: number = 0;
+
+  // Add new balance properties
+  totalBalance: number = 0;
+  balanceChange: number = 0;
+  
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
@@ -232,13 +248,14 @@ export class UserProfileComponent implements OnInit {
               date: item.date ? new Date(item.date) : null
             }))
           : [];
+        this.calculateMonthlyTotals();
         this.updateRecentTransactions();
-        this.prepareChartData(); // Add this line
+        this.prepareChartData();
       },
       error: () => {
         this.incomeList = [];
         this.updateRecentTransactions();
-        this.prepareChartData(); // Add this line
+        this.prepareChartData();
       }
     });
   }
@@ -257,13 +274,14 @@ export class UserProfileComponent implements OnInit {
               date: item.date ? new Date(item.date) : null
             }))
           : [];
+        this.calculateMonthlyTotals();
         this.updateRecentTransactions();
-        this.prepareChartData(); // Add this line
+        this.prepareChartData();
       },
       error: () => {
         this.expenseList = [];
         this.updateRecentTransactions();
-        this.prepareChartData(); // Add this line
+        this.prepareChartData();
       }
     });
   }
@@ -479,5 +497,151 @@ export class UserProfileComponent implements OnInit {
       date: this.getCurrentDate(),
       notes: ''
     };
+  }
+
+  // Add new method to calculate monthly totals
+  calculateMonthlyTotals() {
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+
+    // Calculate current month income
+    this.currentMonthIncome = this.incomeList
+      .filter(income => {
+        const incomeDate = new Date(income.date);
+        return incomeDate.getMonth() === currentMonth && 
+               incomeDate.getFullYear() === currentYear;
+      })
+      .reduce((sum, income) => sum + (income.amount || 0), 0);
+
+    // Calculate last month income
+    const lastMonthIncome = this.incomeList
+      .filter(income => {
+        const incomeDate = new Date(income.date);
+        return incomeDate.getMonth() === lastMonth && 
+               incomeDate.getFullYear() === lastMonthYear;
+      })
+      .reduce((sum, income) => sum + (income.amount || 0), 0);
+
+    // Calculate current month expenses
+    this.currentMonthExpense = this.expenseList
+      .filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate.getMonth() === currentMonth && 
+               expenseDate.getFullYear() === currentYear;
+      })
+      .reduce((sum, expense) => sum + (expense.amount || 0), 0);
+
+    // Calculate last month expenses
+    const lastMonthExpense = this.expenseList
+      .filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate.getMonth() === lastMonth && 
+               expenseDate.getFullYear() === lastMonthYear;
+      })
+      .reduce((sum, expense) => sum + (expense.amount || 0), 0);
+
+    // Calculate percentage changes
+    this.monthlyIncomeChange = lastMonthIncome === 0 ? 100 :
+      ((this.currentMonthIncome - lastMonthIncome) / lastMonthIncome) * 100;
+
+    this.monthlyExpenseChange = lastMonthExpense === 0 ? 100 :
+      ((this.currentMonthExpense - lastMonthExpense) / lastMonthExpense) * 100;
+
+    // Calculate savings rate
+    const totalIncome = this.currentMonthIncome;
+    const totalExpenses = this.currentMonthExpense;
+    const savings = totalIncome - totalExpenses;
+    this.savingsRate = totalIncome > 0 ? (savings / totalIncome) * 100 : 0;
+
+    // Calculate savings rate change
+    const lastMonthSavings = lastMonthIncome - lastMonthExpense;
+    const lastMonthSavingsRate = lastMonthIncome > 0 ? (lastMonthSavings / lastMonthIncome) * 100 : 0;
+    this.savingsRateChange = lastMonthSavingsRate > 0 ? 
+      ((this.savingsRate - lastMonthSavingsRate) / lastMonthSavingsRate) * 100 : 0;
+
+    // Calculate total balance and balance change
+    this.totalBalance = this.currentMonthIncome - this.currentMonthExpense;
+    const previousBalance = lastMonthIncome - lastMonthExpense;
+    this.balanceChange = previousBalance !== 0 ? 
+      ((this.totalBalance - previousBalance) / Math.abs(previousBalance)) * 100 : 0;
+  }
+
+  deleteIncome(id: string) {
+    if (!confirm('Are you sure you want to delete this income record?')) {
+      return;
+    }
+
+    this.http.delete(`/api/users/delete-income/${id}?userEmail=${encodeURIComponent(this.userEmail)}`)
+      .subscribe({
+        next: () => {
+          // Update local array immediately
+          this.incomeList = this.incomeList.filter(income => income._id !== id);
+          this.calculateMonthlyTotals();
+          this.updateRecentTransactions();
+          this.prepareChartData();
+        },
+        error: (error) => {
+          console.error('Error deleting income:', error);
+          // Show user-friendly error message
+          alert('Failed to delete income record. Please try again.');
+        }
+      });
+  }
+
+  deleteExpense(id: string) {
+    if (!confirm('Are you sure you want to delete this expense record?')) {
+      return;
+    }
+
+    this.http.delete(`/api/users/delete-expense/${id}?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
+      next: () => {
+        this.expenseList = this.expenseList.filter(expense => expense._id !== id);
+        this.calculateMonthlyTotals();
+        this.updateRecentTransactions();
+        this.prepareChartData();
+      },
+      error: (error) => {
+        console.error('Error deleting expense:', error);
+      }
+    });
+  }
+
+  deleteAllIncome() {
+    if (!confirm('Are you sure you want to delete ALL income records? This cannot be undone.')) {
+      return;
+    }
+
+    this.http.delete(`/api/users/delete-all-income?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
+      next: () => {
+        this.incomeList = [];
+        this.calculateMonthlyTotals();
+        this.updateRecentTransactions();
+        this.prepareChartData();
+      },
+      error: (error) => {
+        console.error('Error deleting all income:', error);
+      }
+    });
+  }
+
+  deleteAllExpenses() {
+    if (!confirm('Are you sure you want to delete ALL expense records? This cannot be undone.')) {
+      return;
+    }
+
+    this.http.delete(`/api/users/delete-all-expenses?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
+      next: () => {
+        this.expenseList = [];
+        this.calculateMonthlyTotals();
+        this.updateRecentTransactions();
+        this.prepareChartData();
+      },
+      error: (error) => {
+        console.error('Error deleting all expenses:', error);
+      }
+    });
   }
 }
