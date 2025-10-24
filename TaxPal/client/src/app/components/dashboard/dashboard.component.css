@@ -1,102 +1,114 @@
+/* Base layout */
 .dashboard-container {
   min-height: calc(100vh - 80px);
   background-color: #f9fafb;
-  padding: 3rem 1.5rem;
+  padding: 1rem;
   transition: background-color 0.3s ease;
   box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
 }
 
-/* Make main content a responsive grid */
 .dashboard-content {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
-  box-sizing: border-box;
-}
-
-/* new: responsive layout wrapper */
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-  align-items: start;
-}
-
-/* stats/cards row: auto-fit columns */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
   width: 100%;
 }
 
-/* welcome section with fluid typography */
-.welcome-section {
-  margin-bottom: 2rem;
-  text-align: center;
+/* Grid layouts */
+.dashboard-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+  width: 100%;
 }
 
-/* fluid typography */
-h1 {
-  font-size: clamp(1.5rem, 2.8vw + 0.5rem, 2.25rem);
-  font-weight: 700;
-  color: #111827;
-  margin-bottom: 0.75rem;
-  line-height: 1.1;
+.stats-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  margin-bottom: 1.5rem;
 }
 
-.subtitle {
-  font-size: clamp(0.95rem, 1.2vw + 0.5rem, 1.1rem);
-  color: #6b7280;
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-/* flexible placeholder adjusts to available width */
+/* Card styles */
 .dashboard-placeholder {
   background-color: white;
   border-radius: 0.75rem;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-  padding: 2.25rem;
-  text-align: center;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-/* placeholder icon scaling */
-.placeholder-icon {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 1.25rem;
+  height: 100%;
   display: flex;
-  justify-content: center;
-  margin-bottom: 1.25rem;
-  color: #3b82f6;
+  flex-direction: column;
 }
 
-/* headings inside cards */
-h2 {
-  font-size: clamp(1.125rem, 1.2vw + 0.6rem, 1.5rem);
-  font-weight: 600;
-  color: #1f2937;
+/* Typography */
+h1 {
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.2;
   margin-bottom: 0.75rem;
+  color: #111827;
 }
 
-.dashboard-placeholder p {
+.subtitle {
+  font-size: clamp(0.875rem, 1.5vw, 1rem);
   color: #6b7280;
-  max-width: 600px;
-  margin: 0 auto;
-  line-height: 1.5;
+  margin-bottom: 2rem;
 }
 
-/* small utility for actions row */
-.actions-row {
-  display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 1rem;
+/* Responsive breakpoints */
+@media (min-width: 640px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+  
+  .dashboard-placeholder {
+    padding: 1.5rem;
+  }
 }
 
-/* Dark mode styles */
-.dashboard-container.dark {
+@media (min-width: 768px) {
+  .dashboard-container {
+    padding: 2rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: 2fr 1fr;
+    gap: 2rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  
+  .dashboard-placeholder {
+    padding: 2rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  .dashboard-container {
+    padding: 2.5rem;
+  }
+  
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Dark mode */
+.dark .dashboard-container {
   background-color: #111827;
+}
+
+.dark .dashboard-placeholder {
+  background-color: #1f2937;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 .dark h1 {
@@ -107,121 +119,37 @@ h2 {
   color: #9ca3af;
 }
 
-.dark .dashboard-placeholder {
-  background-color: #1f2937;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+/* Utility classes */
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.dark .placeholder-icon {
-  color: #60a5fa;
+.w-full {
+  width: 100%;
 }
 
-.dark h2 {
-  color: #e5e7eb;
+.overflow-hidden {
+  overflow: hidden;
 }
 
-.dark .dashboard-placeholder p {
-  color: #9ca3af;
+/* Touch device optimization */
+@media (hover: none) {
+  .dashboard-placeholder {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
-/* Responsive adjustments */
-
-/* Very small screens: stack, increase readability */
-@media (max-width: 420px) {
+/* Print styles */
+@media print {
   .dashboard-container {
-    padding: 1.5rem 0.75rem;
+    padding: 0;
+    background: white;
   }
-  h1 {
-    font-size: clamp(1.25rem, 5.5vw, 1.75rem);
-    text-align: center;
-  }
-  .subtitle {
-    padding: 0 0.5rem;
-    text-align: center;
-  }
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
+  
   .dashboard-placeholder {
-    padding: 1.25rem;
+    box-shadow: none;
+    border: 1px solid #e5e7eb;
   }
-  .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 0.75rem;
-  }
-}
-
-/* Small / Mobile landscape and small tablets */
-@media (max-width: 640px) {
-  .dashboard-container {
-    padding: 2rem 1rem;
-  }
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-  .dashboard-placeholder {
-    padding: 1.5rem;
-  }
-}
-
-/* Medium screens: two-column layout for dashboard content */
-@media (min-width: 641px) and (max-width: 992px) {
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .dashboard-placeholder {
-    padding: 2rem;
-  }
-}
-
-/* Large screens: two-column main layout */
-@media (min-width: 993px) and (max-width: 1399px) {
-  .dashboard-grid {
-    grid-template-columns: 2fr 1fr;
-    gap: 2rem;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(3, 1fr);
-  }
-  .dashboard-placeholder {
-    padding: 2.25rem;
-  }
-}
-
-/* Very large screens: wider spacing and three-column stats */
-@media (min-width: 1400px) {
-  .dashboard-container {
-    padding: 3.5rem 2.5rem;
-  }
-  .dashboard-grid {
-    grid-template-columns: 2.2fr 1fr;
-    gap: 2.5rem;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  .stats-grid {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1.5rem;
-  }
-  .dashboard-placeholder {
-    padding: 2.5rem;
-  }
-}
-
-/* Accessibility: focus states for interactive elements */
-button:focus,
-a:focus {
-  outline: 3px solid rgba(59,130,246,0.18);
-  outline-offset: 2px;
-}
-
-/* ensure images/icons inside placeholders scale */
-.dashboard-placeholder img,
-.dashboard-placeholder svg {
-  max-width: 100%;
-  height: auto;
 }
