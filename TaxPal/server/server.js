@@ -1,11 +1,12 @@
 // Import routes AFTER requiring dotenv
-const userRoutes = require('./routes/user');
-const taxEstimatorRoutes = require('./routes/taxEstimator');
+const userRoutes = require("./routes/user");
+const taxEstimatorRoutes = require("./routes/taxEstimator");
+const transactionsRouter = require("./routes/transactions");
 
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-require('dotenv').config();
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+require("dotenv").config();
 
 // Initialize Express
 const app = express();
@@ -16,9 +17,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/taxpal')
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose
+  .connect(process.env.MONGO_URI || "mongodb://localhost:27017/taxpal")
+  .then(() => console.log("MongoDB connected"))
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
@@ -26,25 +28,31 @@ app.use((req, res, next) => {
   next();
 });
 
-// Register routes
-app.use('/api/users', userRoutes);
-app.use('/api/tax-estimator', taxEstimatorRoutes);
+// Mount transactions API
+app.use("/api/transactions", transactionsRouter);
 
-console.log('✓ Server routes registered:');
-console.log('  - /api/users');
-console.log('  - /api/tax-estimator');
+// Register routes
+app.use("/api/users", userRoutes);
+app.use("/api/tax-estimator", taxEstimatorRoutes);
+
+console.log("✓ Server routes registered:");
+console.log("  - /api/users");
+console.log("  - /api/tax-estimator");
 
 // Root route
-app.get('/', (req, res) => {
-  res.send('TaxPal API is running');
+app.get("/", (req, res) => {
+  res.send("TaxPal API is running");
 });
 
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+    error: "Internal Server Error",
+    message:
+      process.env.NODE_ENV === "development"
+        ? err.message
+        : "Something went wrong",
   });
 });
 
@@ -52,5 +60,7 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-  console.log(`Test tax estimator at http://localhost:${PORT}/api/tax-estimator/calculate`);
+  console.log(
+    `Test tax estimator at http://localhost:${PORT}/api/tax-estimator/calculate`
+  );
 });

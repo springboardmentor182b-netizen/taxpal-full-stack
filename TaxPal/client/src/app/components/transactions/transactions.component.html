@@ -1,0 +1,126 @@
+<div class="transactions-page">
+  <div
+    class="header-row"
+    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem"
+  >
+    <h1>Transactions</h1>
+    <div>
+      <button
+        (click)="openAdd('income')"
+        style="
+          background: #06c167;
+          color: white;
+          border-radius: 8px;
+          padding: 10px 16px;
+          margin-right: 8px;
+        "
+      >
+        ➕ Add Income
+      </button>
+      <button
+        (click)="openAdd('expense')"
+        style="background: #e02424; color: white; border-radius: 8px; padding: 10px 16px"
+      >
+        ➖ Add Expense
+      </button>
+    </div>
+  </div>
+
+  <!-- form -->
+  <div
+    *ngIf="formVisible"
+    class="form-panel"
+    style="margin-bottom: 1rem; padding: 12px; border-radius: 8px; border: 1px solid #e6eef6"
+  >
+    <div style="display: flex; gap: 8px; flex-wrap: wrap">
+      <input [(ngModel)]="form.title" placeholder="Title" style="flex: 2; padding: 8px" />
+      <input
+        type="number"
+        [(ngModel)]="form.amount"
+        placeholder="Amount"
+        style="width: 140px; padding: 8px"
+      />
+      <select [(ngModel)]="form.type" style="width: 140px; padding: 8px">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <input
+        [(ngModel)]="form.category"
+        placeholder="Category"
+        style="width: 200px; padding: 8px"
+      />
+      <input type="date" [(ngModel)]="form.date" style="padding: 8px" />
+    </div>
+    <div style="margin-top: 8px; display: flex; gap: 8px; align-items: center">
+      <input [(ngModel)]="form.notes" placeholder="Notes" style="flex: 1; padding: 8px" />
+      <button
+        (click)="save()"
+        style="background: #1f6feb; color: white; padding: 8px 12px; border-radius: 6px"
+      >
+        Save
+      </button>
+      <button (click)="cancel()" style="padding: 8px 12px; border-radius: 6px">Cancel</button>
+    </div>
+  </div>
+
+  <!-- list -->
+  <div *ngIf="loading">Loading...</div>
+  <div *ngIf="!loading && transactions.length === 0">No transactions</div>
+
+  <div *ngFor="let t of transactions" style="margin-bottom: 12px">
+    <div
+      style="
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid #eef6fb;
+      "
+    >
+      <div style="display: flex; gap: 12px; align-items: center">
+        <div
+          [ngStyle]="{
+            background: t.type === 'income' ? '#e9faf0' : '#fff1f0',
+            color: t.type === 'income' ? '#06c167' : '#e02424',
+            width: '48px',
+            height: '48px',
+            'border-radius': '24px',
+            display: 'flex',
+            'align-items': 'center',
+            'justify-content': 'center'
+          }"
+        >
+          <span *ngIf="t.type === 'income'">↑</span>
+          <span *ngIf="t.type === 'expense'">↓</span>
+        </div>
+        <div>
+          <div style="font-weight: 600">{{ t.title }}</div>
+          <div style="color: #6b7280; font-size: 13px">
+            {{ t.category }} • {{ t.date | date : 'mediumDate' }}
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; align-items: center">
+        <div [ngStyle]="{ color: t.type === 'income' ? '#0b8f4a' : '#c21b1b', 'font-weight': 700 }">
+          {{ t.type === 'income' ? '+' : '-' }}{{ t.amount | currency }}
+        </div>
+        <button
+          (click)="startEdit(t)"
+          title="Edit"
+          style="background: none; border: 0; cursor: pointer"
+        >
+          ✎
+        </button>
+        <button
+          (click)="remove(t._id)"
+          title="Delete"
+          style="background: none; border: 0; cursor: pointer"
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
