@@ -5,35 +5,43 @@ import { ProfileSettingsComponent } from './components/profile-settings/profile-
 import { TaxEstimatorComponent } from './components/Tax-Estimator/tax-estimator.component';
 import { TaxCalendarComponent } from './components/Tax-Calendar/tax-calendar.component';
 import { ExportDownloadComponent } from './components/export-download/export-download.component';
+import { TransactionsComponent } from './components/transactions/transactions.component';
 
 // Define the routes
 export const routes: Routes = [
   // Root route goes to home
-  { path: '', component: HomeComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
 
   // Home page route
   { path: 'home', component: HomeComponent },
 
-  // User dashboard routes
+  // Dashboard route
   {
     path: 'dashboard',
     loadComponent: () =>
       import('./components/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
+
+  // Transactions route
+  { path: 'transactions', component: TransactionsComponent },
+
+  // User profile routes
   { path: 'user-profile', component: UserProfileComponent },
-  { path: 'transactions', component: UserProfileComponent },
+  {
+    path: 'profile-settings',
+    component: ProfileSettingsComponent,
+    title: 'Profile Settings - TaxPal',
+  },
+
+  // Tax-related routes
+  { path: 'tax-estimator', component: TaxEstimatorComponent, title: 'Tax Estimator - TaxPal' },
+  { path: 'tax-calendar', component: TaxCalendarComponent, title: 'Tax Calendar - TaxPal' },
+
+  // Budget and reports routes
   {
     path: 'budget',
     loadComponent: () =>
       import('./components/budget/budget.component').then((m) => m.BudgetComponent),
-  },
-  { path: 'reports', loadComponent: () => import('./components/export-download/export-download.component').then(m => m.ExportDownloadComponent) },
-
-  // Tax Estimator route
-  {
-    path: 'tax-estimator',
-    component: TaxEstimatorComponent,
-    title: 'Tax Estimator - TaxPal',
   },
   {
     path: 'reports',
@@ -41,20 +49,6 @@ export const routes: Routes = [
     title: 'Export Reports - TaxPal',
   },
 
-  // Tax Calendar route
-  {
-    path: 'tax-calendar',
-    component: TaxCalendarComponent,
-    title: 'Tax Calendar - TaxPal',
-  },
-
-  // Profile settings route
-  {
-    path: 'profile-settings',
-    component: ProfileSettingsComponent,
-    title: 'Profile Settings - TaxPal',
-  },
-
-  // Redirect to home for any unknown routes
-  { path: '**', redirectTo: '' },
+  // Catch-all route: redirect to home
+  { path: '**', redirectTo: '/home' },
 ];

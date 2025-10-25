@@ -1,9 +1,18 @@
 <div class="transactions-container">
   <div class="header">
     <h2>All Transactions</h2>
+    <div class="action-buttons">
+      <button class="add-income-btn" (click)="openAddTransactionModal('income')">
+        <span class="btn-icon">+</span> Add Income
+      </button>
+      <button class="add-expense-btn" (click)="openAddTransactionModal('expense')">
+        <span class="btn-icon">-</span> Add Expense
+      </button>
+    </div>
   </div>
 
   <div *ngIf="loading" class="loading">
+    <div class="spinner"></div>
     <p>Loading transactions...</p>
   </div>
 
@@ -13,7 +22,26 @@
 
   <div *ngIf="!loading && !error" class="transactions-content">
     <div *ngIf="transactions.length === 0" class="no-transactions">
-      <p>No transactions found. Start by adding your first transaction!</p>
+      <div class="empty-state">
+        <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+          ></path>
+        </svg>
+        <h3>No Transactions Found</h3>
+        <p>Add your first transaction to get started tracking your finances!</p>
+        <div class="empty-actions">
+          <button class="add-income-btn" (click)="openAddTransactionModal('income')">
+            Add Income
+          </button>
+          <button class="add-expense-btn" (click)="openAddTransactionModal('expense')">
+            Add Expense
+          </button>
+        </div>
+      </div>
     </div>
 
     <div *ngIf="transactions.length > 0" class="table-container">
@@ -29,14 +57,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr
-            *ngFor="let transaction of transactions"
-            [class.income]="transaction.type === 'income'"
-            [class.expense]="transaction.type === 'expense'"
-          >
+          <tr *ngFor="let transaction of transactions">
             <td>{{ formatDate(transaction.date) }}</td>
             <td>{{ transaction.description }}</td>
-            <td>{{ transaction.category }}</td>
+            <td>
+              <span class="category-tag">{{ transaction.category }}</span>
+            </td>
             <td>
               <span
                 class="type-badge"
@@ -54,13 +80,93 @@
               {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
             </td>
             <td>
-              <button class="delete-btn" (click)="deleteTransaction(transaction._id)">
-                Delete
-              </button>
+              <div class="action-btns">
+                <button
+                  class="edit-btn"
+                  (click)="openEditTransactionModal(transaction)"
+                  title="Edit"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                    ></path>
+                  </svg>
+                </button>
+                <button
+                  class="delete-btn"
+                  (click)="deleteTransaction(transaction._id)"
+                  title="Delete"
+                >
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                    ></path>
+                  </svg>
+                </button>
+              </div>
             </td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <!-- Reuse Dashboard Modal by emitting events to parent or using a shared service -->
+  <div class="modal" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>
+          {{ isEditMode ? 'Edit' : 'Add' }} {{ modalType === 'income' ? 'Income' : 'Expense' }}
+        </h3>
+        <button class="close-btn" (click)="closeModal()">×</button>
+      </div>
+      <form (ngSubmit)="saveTransaction()">
+        <div class="form-group">
+          <label>Description</label>
+          <input
+            type="text"
+            [(ngModel)]="transactionForm.description"
+            name="description"
+            required
+            placeholder="Enter description"
+          />
+        </div>
+        <div class="form-group">
+          <label>Amount ($)</label>
+          <input
+            type="number"
+            [(ngModel)]="transactionForm.amount"
+            name="amount"
+            required
+            placeholder="0.00"
+            step="0.01"
+            min="0"
+          />
+        </div>
+        <div class="form-group">
+          <label>Category</label>
+          <select [(ngModel)]="transactionForm.category" name="category" required>
+            <option value="">Select category</option>
+            <option *ngFor="let cat of getCategories()" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="transactionForm.date" name="date" required />
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" (click)="closeModal()">Cancel</button>
+          <button type="submit" class="save-btn" [disabled]="!isFormValid()">
+            {{ isEditMode ? 'Update' : 'Add' }} Transaction
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
