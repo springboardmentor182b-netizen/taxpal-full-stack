@@ -66,25 +66,9 @@ export class TaxEstimatorComponent {
   }
 
   calculateTax() {
-    if (this.loading) return; // Prevent multiple submissions
+    this.loading = true;
     this.errorMessage = '';
     this.successMessage = '';
-
-    // Validate required fields
-    if (
-      !this.taxData.country ||
-      !this.taxData.state ||
-      !this.taxData.status ||
-      !this.taxData.quarter ||
-      typeof this.taxData.income !== 'number' ||
-      isNaN(this.taxData.income) ||
-      this.taxData.income <= 0
-    ) {
-      this.errorMessage = 'Please fill all required fields and enter a valid income amount.';
-      return;
-    }
-
-    this.loading = true;
 
     // Prepare request data
     const requestData = {
@@ -101,35 +85,32 @@ export class TaxEstimatorComponent {
       userEmail: this.userEmail
     };
 
-    try {
-      this.http.post<TaxEstimateResponse>(`${this.apiUrl}/tax-estimator/calculate`, requestData)
-        .subscribe({
-          next: (response) => {
-            console.log('Tax calculation response:', response);
+    console.log('Sending tax calculation request:', requestData);
+
+    // Call the API endpoint
+    this.http.post<TaxEstimateResponse>(`${this.apiUrl}/tax-estimator/calculate`, requestData)
+      .subscribe({
+        next: (response) => {
+          console.log('Tax calculation response:', response);
+          
+          if (response) {
+            this.taxableIncome = response.taxableIncome;
+            this.estimatedTax = response.estimatedTax;
+            this.effectiveRate = response.effectiveTaxRate;
+            this.successMessage = 'Tax calculation successful!';
             
-            if (response) {
-              this.taxableIncome = response.taxableIncome;
-              this.estimatedTax = response.estimatedTax;
-              this.effectiveRate = response.effectiveTaxRate;
-              this.successMessage = 'Tax calculation successful!';
-              // Only auto-save if calculation succeeded and estimatedTax is a number
-              if (typeof response.estimatedTax === 'number' && !isNaN(response.estimatedTax)) {
-                this.autoSaveTaxEstimate(response);
-              }
-            }
-            
-            this.loading = false;
-          },
-          error: (error) => {
-            console.error('Error calculating tax:', error);
-            this.errorMessage = error.error?.message || 'Failed to calculate taxes. Please try again.';
-            this.loading = false;
+            // Automatically save to database after calculation
+            this.autoSaveTaxEstimate(response);
           }
-        });
-    } catch (err) {
-      this.errorMessage = 'Unexpected error occurred. Please reload and try again.';
-      this.loading = false;
-    }
+          
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error calculating tax:', error);
+          this.errorMessage = error.error?.message || 'Failed to calculate taxes. Please try again.';
+          this.loading = false;
+        }
+      });
   }
 
   autoSaveTaxEstimate(calculationResponse: TaxEstimateResponse) {

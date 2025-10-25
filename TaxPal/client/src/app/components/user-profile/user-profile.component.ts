@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router, ActivatedRoute } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
+import { RouterLink, RouterModule } from '@angular/router';
 import { Chart } from 'chart.js/auto';
 
 interface CategoryData {
@@ -18,11 +18,11 @@ interface Categories {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, HttpClientModule],
+  imports: [CommonModule, HttpClientModule, FormsModule, RouterLink, RouterModule],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
 })
-export class UserProfileComponent implements OnInit {
+export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   isDarkMode: boolean = false;
   currentRoute: string = 'user-profile';
   pageTitle: string = 'Dashboard';
@@ -84,6 +84,7 @@ export class UserProfileComponent implements OnInit {
   balanceChange: number = 0;
   
   private expenseChart: Chart | null = null;
+  private chartInitialized: boolean = false;
   
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
@@ -108,60 +109,95 @@ export class UserProfileComponent implements OnInit {
     const today = this.getCurrentDate();
     this.incomeForm.date = today;
     this.expenseForm.date = today;
+  }
 
-    this.initializeExpenseChart();
+  ngAfterViewInit() {
+    // Initialize chart after view is ready
+    setTimeout(() => {
+      this.initializeExpenseChart();
+    }, 100);
+  }
+
+  ngOnDestroy() {
+    // Clean up chart when component is destroyed
+    this.destroyChart();
+  }
+
+  private destroyChart() {
+    if (this.expenseChart) {
+      try {
+        this.expenseChart.destroy();
+        this.expenseChart = null;
+        this.chartInitialized = false;
+      } catch (error) {
+        console.error('Error destroying chart:', error);
+      }
+    }
   }
   
   private initializeExpenseChart() {
-    const ctx = document.getElementById('expenseChart') as HTMLCanvasElement;
-    if (!ctx) return;
-
-    // Destroy existing chart if any
-    if (this.expenseChart) {
-      this.expenseChart.destroy();
+    // Prevent multiple initializations
+    if (this.chartInitialized) {
+      return;
     }
 
-    // Calculate expense breakdown data
-    const expenseData = this.calculateExpenseBreakdown();
-    const hasData = expenseData.data.some(value => value > 0);
+    const ctx = document.getElementById('expenseChart') as HTMLCanvasElement;
+    if (!ctx) {
+      console.warn('Chart canvas not found');
+      return;
+    }
 
-    // If no data, show empty donut
-    const chartData = {
-      labels: hasData ? expenseData.labels : ['No expenses'],
-      datasets: [{
-        data: hasData ? expenseData.data : [1],
-        backgroundColor: hasData ? [
-          '#3b82f6', // blue
-          '#10b981', // green
-          '#f59e0b', // yellow
-          '#ef4444', // red
-          '#8b5cf6'  // purple
-        ] : ['#e5e7eb'], // light gray for empty state
-        borderWidth: 1
-      }]
-    };
+    try {
+      // Destroy existing chart if any
+      this.destroyChart();
 
-    this.expenseChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: chartData,
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom',
-            display: hasData, // Only show legend if there's data
-            labels: {
-              padding: 20,
-              usePointStyle: true,
-              font: { size: 12 }
+      // Calculate expense breakdown data
+      const expenseData = this.calculateExpenseBreakdown();
+      const hasData = expenseData.data.some(value => value > 0);
+
+      // If no data, show empty donut
+      const chartData = {
+        labels: hasData ? expenseData.labels : ['No expenses'],
+        datasets: [{
+          data: hasData ? expenseData.data : [1],
+          backgroundColor: hasData ? [
+            '#3b82f6', // blue
+            '#10b981', // green
+            '#f59e0b', // yellow
+            '#ef4444', // red
+            '#8b5cf6'  // purple
+          ] : ['#e5e7eb'], // light gray for empty state
+          borderWidth: 1
+        }]
+      };
+
+      this.expenseChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: chartData,
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              display: hasData, // Only show legend if there's data
+              labels: {
+                padding: 20,
+                usePointStyle: true,
+                font: { size: 12 }
+              }
             }
-          }
-        },
-        cutout: '65%',
-        radius: '90%'
-      }
-    });
+          },
+          cutout: '65%',
+          radius: '90%'
+        }
+      });
+
+      this.chartInitialized = true;
+    } catch (error) {
+      console.error('Error initializing chart:', error);
+      this.chartInitialized = false;
+    }
   }
 
   private calculateExpenseBreakdown() {
@@ -194,6 +230,35 @@ export class UserProfileComponent implements OnInit {
       data: nonZeroCategories.map(cat => cat.total)
     };
   }
+
+  private updateChart() {
+    if (!this.chartInitialized || !this.expenseChart) {
+      this.initializeExpenseChart();
+      return;
+    }
+
+    try {
+      const expenseData = this.calculateExpenseBreakdown();
+      const hasData = expenseData.data.some(value => value > 0);
+
+      this.expenseChart.data.labels = hasData ? expenseData.labels : ['No expenses'];
+      this.expenseChart.data.datasets[0].data = hasData ? expenseData.data : [1];
+      this.expenseChart.data.datasets[0].backgroundColor = hasData ? [
+        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
+      ] : ['#e5e7eb'];
+      
+      if (this.expenseChart.options.plugins?.legend) {
+        this.expenseChart.options.plugins.legend.display = hasData;
+      }
+
+      this.expenseChart.update();
+    } catch (error) {
+      console.error('Error updating chart:', error);
+      // Try to reinitialize if update fails
+      this.chartInitialized = false;
+      this.initializeExpenseChart();
+    }
+  }
   
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
@@ -209,7 +274,7 @@ export class UserProfileComponent implements OnInit {
     
     // Save preference to localStorage
     localStorage.setItem('darkMode', this.isDarkMode.toString());
-    this.initializeExpenseChart(); // Reinitialize chart with new theme
+    this.updateChart(); // Update chart with new theme
   }
   
   showAddIncomeModal() {
@@ -375,7 +440,7 @@ export class UserProfileComponent implements OnInit {
         this.calculateMonthlyTotals();
         this.updateRecentTransactions();
         this.prepareChartData();
-        this.initializeExpenseChart(); // Re-initialize chart with new data
+        this.updateChart(); // Update chart with new data
       },
       error: () => {
         this.expenseList = [];
@@ -566,6 +631,9 @@ export class UserProfileComponent implements OnInit {
   }
   
   logout() {
+    // Clean up chart before logout
+    this.destroyChart();
+    
     // Clear user data from localStorage
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_name');
@@ -701,6 +769,7 @@ export class UserProfileComponent implements OnInit {
         this.calculateMonthlyTotals();
         this.updateRecentTransactions();
         this.prepareChartData();
+        this.updateChart(); // Update chart after deleting expense
       },
       error: (error) => {
         console.error('Error deleting expense:', error);
@@ -737,6 +806,7 @@ export class UserProfileComponent implements OnInit {
         this.calculateMonthlyTotals();
         this.updateRecentTransactions();
         this.prepareChartData();
+        this.updateChart(); // Update chart after deleting all expenses
       },
       error: (error) => {
         console.error('Error deleting all expenses:', error);
