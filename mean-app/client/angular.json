@@ -5,33 +5,46 @@
   "projects": {
     "dum": {
       "projectType": "application",
-      "root": "",
-      "sourceRoot": "src",
-      "prefix": "app",
       "schematics": {
         "@schematics/angular:component": {
           "style": "css"
         }
       },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular/build:browser",
+          "builder": "@angular/build:application",
           "options": {
-            "outputPath": "dist/dum",
-            "index": "src/index.html",
-            "main": "src/main.ts",
-            "polyfills": ["zone.js"],
+            "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              { "glob": "**/*", "input": "public", "output": "/" }
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
             ],
-            "styles": ["src/styles.css"]
+            "styles": [
+              "src/styles.css"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
-                { "type": "initial", "maximumWarning": "500kB", "maximumError": "1MB" },
-                { "type": "anyComponentStyle", "maximumWarning": "4kB", "maximumError": "8kB" }
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kB",
+                  "maximumError": "1MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "4kB",
+                  "maximumError": "8kB"
+                }
               ],
               "outputHashing": "all"
             },
@@ -46,29 +59,45 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": { "buildTarget": "dum:build:production" },
-            "development": { "buildTarget": "dum:build:development" }
+            "production": {
+              "buildTarget": "dum:build:production"
+            },
+            "development": {
+              "buildTarget": "dum:build:development"
+            }
           },
           "defaultConfiguration": "development"
         },
         "extract-i18n": {
-          "builder": "@angular/build:extract-i18n",
-          "options": { "browserTarget": "dum:build" }
+          "builder": "@angular/build:extract-i18n"
         },
         "test": {
           "builder": "@angular/build:karma",
           "options": {
-            "polyfills": ["zone.js", "zone.js/testing"],
-            "tsConfig": "tsconfig.spec.json",
-            "include": ["**/*.spec.ts"],
-            "assets": [
-              { "glob": "**/*", "input": "public", "output": "/" }
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
             ],
-            "styles": ["src/styles.css"]
+            "tsConfig": "tsconfig.spec.json",
+            "include": [
+              "**/*.spec.ts"
+            ],
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
           }
         }
+        
       }
     }
   },
-  "cli": { "analytics": false }
+  "cli": {
+    "analytics": false
+  }
 }
