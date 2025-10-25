@@ -46,8 +46,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "configurations": {
-            "production": { "browserTarget": "dum:build:production" },
-            "development": { "browserTarget": "dum:build:development" }
+            "production": { "buildTarget": "dum:build:production" },
+            "development": { "buildTarget": "dum:build:development" }
           },
           "defaultConfiguration": "development"
         },
