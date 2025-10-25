@@ -1,5 +1,3 @@
-
-
 <div class="export-container">
   <h2 class="title">Export & Download Reports</h2>
   <p class="subtitle">Generate and download financial reports in your preferred format</p>
@@ -27,5 +25,86 @@
 
   <div *ngIf="downloadUrl" class="success-msg">
     ✅ Report ready! Download started automatically.
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal" *ngIf="showPreview">
+    <div class="preview-overlay" (click)="closePreview()"></div>
+    <div class="preview-content">
+      <div class="preview-header">
+        <h2>Report Preview</h2>
+        <span class="report-type-badge">{{ selectedReport }}</span>
+        <button class="close-button" (click)="closePreview()">×</button>
+      </div>
+      
+      <div class="preview-body" *ngIf="previewData">
+        <div class="preview-summary">
+          <h3>{{ previewData.year }} Financial Summary</h3>
+          <div class="summary-grid">
+            <div class="summary-item">
+              <span class="label">Total Income:</span>
+              <span class="value income">${{ previewData.yearSummary.totalIncome | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Total Expenses:</span>
+              <span class="value expense">${{ previewData.yearSummary.totalExpenses | number:'1.2-2' }}</span>
+            </div>
+            <div class="summary-item">
+              <span class="label">Net Savings:</span>
+              <span class="value" [class.income]="previewData.yearSummary.netSavings >= 0" [class.expense]="previewData.yearSummary.netSavings < 0">
+                ${{ previewData.yearSummary.netSavings | number:'1.2-2' }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="preview-tabs">
+          <button class="tab-button active" id="table-tab">Table View</button>
+          <button class="tab-button" id="csv-tab" *ngIf="selectedFormat.toLowerCase() === 'csv'">CSV Preview</button>
+        </div>
+        
+        <div class="preview-table">
+          <table>
+            <thead>
+              <tr>
+                <th>Period</th>
+                <th>Income</th>
+                <th>Expenses</th>
+                <th>Net Income</th>
+                <th>Transactions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let report of previewData.reports">
+                <td>{{ report.name }}</td>
+                <td class="income">${{ report.income | number:'1.2-2' }}</td>
+                <td class="expense">${{ report.expenses | number:'1.2-2' }}</td>
+                <td [class.income]="report.netIncome >= 0" [class.expense]="report.netIncome < 0">
+                  ${{ report.netIncome | number:'1.2-2' }}
+                </td>
+                <td>{{ report.transactions }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div class="csv-preview" *ngIf="selectedFormat.toLowerCase() === 'csv'" style="display: none;">
+          <pre>{{ previewData.csvPreview }}</pre>
+        </div>
+      </div>
+      
+      <div class="preview-footer">
+        <button class="btn secondary" (click)="closePreview()">Cancel</button>
+        <button class="btn primary" (click)="downloadFromPreview()" [disabled]="loading">
+          <span *ngIf="loading">Downloading...</span>
+          <span *ngIf="!loading">Download {{ selectedFormat.toUpperCase() }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-overlay" *ngIf="previewLoading">
+    <div class="loading-spinner"></div>
+    <p>Generating preview...</p>
   </div>
 </div>

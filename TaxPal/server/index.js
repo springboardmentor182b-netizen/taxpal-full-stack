@@ -62,6 +62,7 @@ app.listen(PORT, () => {
   console.log(`  - POST http://localhost:${PORT}/api/users/signin`);
   console.log(`  - POST http://localhost:${PORT}/api/users/signup`);
   console.log(`  - GET  http://localhost:${PORT}/api/reports/data/:userEmail/:year`);
+  console.log(`  - POST http://localhost:${PORT}/api/reports/preview-report`);
   console.log(`  - POST http://localhost:${PORT}/api/reports/generate-report`);
   console.log(`  - GET  http://localhost:${PORT}/api/reports/test`);
   console.log(`  - GET  http://localhost:${PORT}/api-docs\n`);
