@@ -30,9 +30,13 @@ app.use('/api/users', userRoutes);
 const reportsRouter = require('./routes/reports');
 app.use('/api/reports', reportsRouter);
 
+const taxEstimatorRouter = require('./routes/taxEstimator');
+app.use('/api/tax-estimator', taxEstimatorRouter);
+
 console.log('✓ API routes registered:');
 console.log('  - /api/users/*');
 console.log('  - /api/reports/*');
+console.log('  - /api/tax-estimate/*');
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
