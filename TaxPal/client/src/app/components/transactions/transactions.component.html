@@ -1,0 +1,66 @@
+<div class="transactions-container">
+  <div class="header">
+    <h2>All Transactions</h2>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading transactions...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error" class="transactions-content">
+    <div *ngIf="transactions.length === 0" class="no-transactions">
+      <p>No transactions found. Start by adding your first transaction!</p>
+    </div>
+
+    <div *ngIf="transactions.length > 0" class="table-container">
+      <table class="transactions-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Type</th>
+            <th>Amount</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let transaction of transactions"
+            [class.income]="transaction.type === 'income'"
+            [class.expense]="transaction.type === 'expense'"
+          >
+            <td>{{ formatDate(transaction.date) }}</td>
+            <td>{{ transaction.description }}</td>
+            <td>{{ transaction.category }}</td>
+            <td>
+              <span
+                class="type-badge"
+                [class.income-badge]="transaction.type === 'income'"
+                [class.expense-badge]="transaction.type === 'expense'"
+              >
+                {{ transaction.type }}
+              </span>
+            </td>
+            <td
+              class="amount"
+              [class.income-amount]="transaction.type === 'income'"
+              [class.expense-amount]="transaction.type === 'expense'"
+            >
+              {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
+            </td>
+            <td>
+              <button class="delete-btn" (click)="deleteTransaction(transaction._id)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

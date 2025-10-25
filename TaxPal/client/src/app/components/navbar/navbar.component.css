@@ -19,7 +19,7 @@
   width: 100%;
   border-bottom: 1px solid #e5e7eb;
   position: relative;
-  overflow: hidden;  /* Contain the floating emojis */
+  overflow: hidden; /* Contain the floating emojis */
 }
 
 .navbar-container {
@@ -82,7 +82,7 @@
   text-decoration: none;
   font-weight: 500;
   padding: 0.75rem 0;
-  font-size: 0.95rem;  /* Reduced from 1.05rem */
+  font-size: 0.95rem; /* Reduced from 1.05rem */
   transition: color 0.3s ease;
   display: flex;
   align-items: center;
@@ -92,8 +92,8 @@
 .nav-icon {
   stroke: #4b5563;
   transition: stroke 0.3s ease;
-  width: 16px;  /* Reduced from 18px */
-  height: 16px;  /* Reduced from 18px */
+  width: 16px; /* Reduced from 18px */
+  height: 16px; /* Reduced from 18px */
 }
 
 .nav-link:hover .nav-icon {
