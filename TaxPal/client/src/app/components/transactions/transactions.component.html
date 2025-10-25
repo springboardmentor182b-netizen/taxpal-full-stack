@@ -1,27 +1,142 @@
 <div class="transactions-container">
-  <div class="header">
-    <h2>All Transactions</h2>
-    <div class="action-buttons">
-      <button class="add-income-btn" (click)="openAddTransactionModal('income')">
-        <span class="btn-icon">+</span> Add Income
-      </button>
-      <button class="add-expense-btn" (click)="openAddTransactionModal('expense')">
-        <span class="btn-icon">-</span> Add Expense
-      </button>
+  <!-- Header with Search and Filters -->
+  <div class="header-section">
+    <div class="page-header">
+      <h1>Transactions</h1>
+      <p class="subtitle">Track and manage all your financial transactions</p>
+    </div>
+
+    <div class="header-controls">
+      <!-- Search Bar -->
+      <div class="search-wrapper">
+        <svg
+          class="search-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="11" cy="11" r="8"></circle>
+          <path d="m21 21-4.35-4.35"></path>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          placeholder="Search transactions..."
+          [(ngModel)]="searchQuery"
+          (input)="filterTransactions()"
+        />
+      </div>
+
+      <!-- Filter Buttons -->
+      <div class="filter-buttons">
+        <button class="filter-btn" [class.active]="filterType === 'all'" (click)="setFilter('all')">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M3 6h18M7 12h10M10 18h4"></path>
+          </svg>
+          All
+        </button>
+        <button
+          class="filter-btn filter-income"
+          [class.active]="filterType === 'income'"
+          (click)="setFilter('income')"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M5 12l7-7 7 7"></path>
+          </svg>
+          Income
+        </button>
+        <button
+          class="filter-btn filter-expense"
+          [class.active]="filterType === 'expense'"
+          (click)="setFilter('expense')"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M12 5v14M19 12l-7 7-7-7"></path>
+          </svg>
+          Expenses
+        </button>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button class="add-income-btn" (click)="openAddTransactionModal('income')">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="16"></line>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Add Income
+        </button>
+        <button class="add-expense-btn" (click)="openAddTransactionModal('expense')">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="8" y1="12" x2="16" y2="12"></line>
+          </svg>
+          Add Expense
+        </button>
+      </div>
     </div>
   </div>
 
+  <!-- Loading State -->
   <div *ngIf="loading" class="loading">
     <div class="spinner"></div>
     <p>Loading transactions...</p>
   </div>
 
+  <!-- Error State -->
   <div *ngIf="error" class="error">
     <p>{{ error }}</p>
   </div>
 
+  <!-- Transactions Content -->
   <div *ngIf="!loading && !error" class="transactions-content">
-    <div *ngIf="transactions.length === 0" class="no-transactions">
+    <!-- Empty State -->
+    <div *ngIf="filteredTransactions.length === 0" class="no-transactions">
       <div class="empty-state">
         <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
@@ -32,8 +147,14 @@
           ></path>
         </svg>
         <h3>No Transactions Found</h3>
-        <p>Add your first transaction to get started tracking your finances!</p>
-        <div class="empty-actions">
+        <p>
+          {{
+            searchQuery
+              ? 'Try adjusting your search or filters'
+              : 'Add your first transaction to get started!'
+          }}
+        </p>
+        <div class="empty-actions" *ngIf="!searchQuery">
           <button class="add-income-btn" (click)="openAddTransactionModal('income')">
             Add Income
           </button>
@@ -44,80 +165,145 @@
       </div>
     </div>
 
-    <div *ngIf="transactions.length > 0" class="table-container">
-      <table class="transactions-table">
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Type</th>
-            <th>Amount</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let transaction of transactions">
-            <td>{{ formatDate(transaction.date) }}</td>
-            <td>{{ transaction.description }}</td>
-            <td>
-              <span class="category-tag">{{ transaction.category }}</span>
-            </td>
-            <td>
-              <span
-                class="type-badge"
-                [class.income-badge]="transaction.type === 'income'"
-                [class.expense-badge]="transaction.type === 'expense'"
-              >
-                {{ transaction.type }}
-              </span>
-            </td>
-            <td
-              class="amount"
-              [class.income-amount]="transaction.type === 'income'"
-              [class.expense-amount]="transaction.type === 'expense'"
+    <!-- Grouped Transactions List -->
+    <div *ngIf="filteredTransactions.length > 0" class="transactions-list">
+      <div *ngFor="let group of groupedTransactions" class="date-group">
+        <div class="date-header">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span class="date-label">{{ group.date }}</span>
+          <span class="transaction-count"
+            >{{ group.transactions.length }} transaction{{
+              group.transactions.length > 1 ? 's' : ''
+            }}</span
+          >
+        </div>
+
+        <div class="transactions-group">
+          <div *ngFor="let transaction of group.transactions" class="transaction-card">
+            <div
+              class="transaction-icon"
+              [class.income-icon]="transaction.type === 'income'"
+              [class.expense-icon]="transaction.type === 'expense'"
             >
-              {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
-            </td>
-            <td>
-              <div class="action-btns">
+              <svg
+                *ngIf="transaction.type === 'income'"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M12 5v14M5 12l7-7 7 7"></path>
+              </svg>
+              <svg
+                *ngIf="transaction.type === 'expense'"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M12 5v14M19 12l-7 7-7-7"></path>
+              </svg>
+            </div>
+
+            <div class="transaction-details">
+              <h4 class="transaction-title">{{ transaction.description }}</h4>
+              <div class="transaction-meta">
+                <span class="category-badge">{{ transaction.category }}</span>
+                <span class="separator">•</span>
+                <span class="notes" *ngIf="transaction.notes">{{ transaction.notes }}</span>
+              </div>
+            </div>
+
+            <div class="transaction-right">
+              <div
+                class="transaction-amount"
+                [class.income-amount]="transaction.type === 'income'"
+                [class.expense-amount]="transaction.type === 'expense'"
+              >
+                {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
+              </div>
+              <div class="transaction-actions">
                 <button
-                  class="edit-btn"
+                  class="action-btn edit-btn"
                   (click)="openEditTransactionModal(transaction)"
                   title="Edit"
                 >
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-                    ></path>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
                   </svg>
                 </button>
                 <button
-                  class="delete-btn"
+                  class="action-btn delete-btn"
                   (click)="deleteTransaction(transaction._id)"
                   title="Delete"
                 >
-                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polyline points="3 6 5 6 21 6"></polyline>
                     <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
                     ></path>
                   </svg>
                 </button>
+                <button class="action-btn more-btn">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                  </svg>
+                </button>
               </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Reuse Dashboard Modal by emitting events to parent or using a shared service -->
+  <!-- Modal -->
   <div class="modal" *ngIf="showModal" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
@@ -159,6 +345,23 @@
         <div class="form-group">
           <label>Date</label>
           <input type="date" [(ngModel)]="transactionForm.date" name="date" required />
+        </div>
+        <div class="form-group" *ngIf="modalType === 'expense'">
+          <label>Tax Deductible</label>
+          <select [(ngModel)]="transactionForm.taxDeductible" name="taxDeductible">
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+            <option value="partial">Partially</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Notes</label>
+          <input
+            type="text"
+            [(ngModel)]="transactionForm.notes"
+            name="notes"
+            placeholder="Optional notes"
+          />
         </div>
         <div class="modal-actions">
           <button type="button" class="cancel-btn" (click)="closeModal()">Cancel</button>
