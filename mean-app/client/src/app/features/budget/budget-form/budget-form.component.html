@@ -106,9 +106,7 @@
                   'status-fair': budget.status === 'Fair',
                   'status-poor': budget.status === 'Poor'
                 }">{{ budget.status }}</td>
-                <div>
               <td class="viewBox" (click)="viewBudgetDetails(budget, $event)">View</td>
-              </div>
             </tr>
           </tbody>
         </table>
@@ -188,4 +186,3 @@
   </div>
 
   <div class="overlay" *ngIf="sidebarActive" (click)="closeSidebarOverlay()"></div>
-</div>
