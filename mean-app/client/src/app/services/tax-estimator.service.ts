@@ -78,4 +78,9 @@ export class TaxEstimatorService {
   getTaxReminders(): Observable<TaxReminder[]> {
     return this.http.get<TaxReminder[]>(this.reminderUrl);
   }
+
+  // Update a reminder status (e.g. mark as paid)
+  updateReminderStatus(id: string, status: 'reminder' | 'payment_done'): Observable<TaxReminder> {
+    return this.http.patch<TaxReminder>(`${this.reminderUrl}/${id}`, { status });
+  }
 }

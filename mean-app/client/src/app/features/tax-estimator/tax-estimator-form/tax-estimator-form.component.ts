@@ -88,6 +88,89 @@ export class TaxEstimatorFormComponent implements OnInit {
   ) {
     this.loadCurrentUser();
   }
+
+  // Mark a reminder as paid (payment_done)
+  markReminderDone(reminderId: string) {
+    if (!reminderId) {
+      console.error('No reminder ID provided');
+      return;
+    }
+
+    // Clear any previous messages
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
+
+    // If it's already marked payment in the UI, do nothing
+    const flat = this.taxCalendar().flatMap(m => m.reminders);
+    const existing = flat.find(r => r.id === reminderId);
+    
+    if (!existing) {
+      console.error('Reminder not found:', reminderId);
+      this.errorMessage.set('Reminder not found. Please refresh and try again.');
+      return;
+    }
+
+    if (existing.type === 'payment') {
+      console.log('Reminder already marked as paid:', reminderId);
+      return;
+    }
+
+    // Optimistic UI update: set the reminder locally to 'payment' type so UI responds instantly
+    const previousCalendar = this.taxCalendar();
+    const optimistic = previousCalendar.map(month => ({
+      ...month,
+      reminders: month.reminders.map(r => 
+        r.id === reminderId 
+          ? { ...r, type: 'payment' } as Reminder 
+          : r
+      )
+    }));
+
+    this.taxCalendar.set(optimistic);
+    this.isLoading.set(true);
+
+    this.taxEstimatorService.updateReminderStatus(reminderId, 'payment_done')
+      .pipe(
+        catchError(err => {
+          console.error('Failed to mark reminder done:', err);
+          // Revert optimistic change
+          this.taxCalendar.set(previousCalendar);
+          
+          // Set appropriate error message based on error type
+          if (err.status === 404) {
+            this.errorMessage.set('Reminder not found. The page may be outdated, please refresh.');
+          } else if (err.status === 401) {
+            this.errorMessage.set('Session expired. Please login again.');
+            this.router.navigate(['/login']);
+          } else {
+            this.errorMessage.set('Failed to mark reminder as paid. Please try again.');
+          }
+          return of(null);
+        }),
+        finalize(() => {
+          this.isLoading.set(false);
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          if (res) {
+            // Update was successful
+            this.successMessage.set('Reminder marked as paid successfully!');
+            
+            // Refresh calendar to get latest state from server
+            this.loadTaxReminders();
+
+            // Clear success message after delay
+            setTimeout(() => this.successMessage.set(null), 2500);
+          }
+        },
+        error: (err) => {
+          // This catches any errors not caught in the catchError operator
+          console.error('Unexpected error:', err);
+          this.errorMessage.set('An unexpected error occurred. Please try again.');
+        }
+      });
+  }
   
   ngOnInit(): void {
     this.loadTaxReminders();

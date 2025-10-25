@@ -140,7 +140,19 @@
                   <div class="reminder-title">{{ reminder.title }}</div>
                   <div class="reminder-description">{{ reminder.description }}</div>
                 </div>
-                <span class="reminder-type-tag" [class]="reminder.type">{{ reminder.type }}</span>
+                <div class="reminder-status">
+                  <span class="reminder-type-tag" [class]="reminder.type">{{ reminder.type }}</span>
+                  <button
+                    class="btn-mark-done"
+                    [ngClass]="{ 'done': reminder.type === 'payment' }"
+                    (click)="markReminderDone(reminder.id)"
+                    [attr.aria-pressed]="reminder.type === 'payment'"
+                    [disabled]="isLoading()"
+                    title="{{ reminder.type === 'payment' ? 'Already paid' : 'Mark as paid' }}"
+                  >
+                    {{ reminder.type === 'payment' ? 'Paid' : (isLoading() ? 'Saving...' : 'Mark as Paid') }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>

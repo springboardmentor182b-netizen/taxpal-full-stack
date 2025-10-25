@@ -511,13 +511,21 @@
     color: #6b7280;
 }
 
+.reminder-status {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
 .reminder-type-tag {
     padding: 4px 10px;
     border-radius: 9999px;
     font-size: 12px;
     font-weight: 700;
     text-transform: capitalize;
-    flex-shrink: 0;
+    white-space: nowrap;
 }
 
 .reminder-card.payment .reminder-type-tag {
@@ -528,6 +536,56 @@
 .reminder-card.reminder .reminder-type-tag {
     background: #bfdbfe;
     color: #1e40af;
+}
+
+/* Mark as done button styled as a tag */
+.btn-mark-done {
+    appearance: none;
+    -webkit-appearance: none;
+    border: none;
+    padding: 4px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #e5e7eb;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 80px;
+}
+
+.btn-mark-done:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    background: #f3f4f6;
+}
+
+.btn-mark-done.done {
+    background: #34d399;
+    color: #065f46;
+    cursor: default;
+}
+.btn-mark-done:hover {
+    background: rgba(59,130,246,0.08);
+}
+.btn-mark-done.done {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+.btn-mark-done.done::after {
+    content: '\2713';
+    color: white;
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Visual for paid reminders */
+.reminder-card.payment .reminder-title {
+    text-decoration: line-through;
+    color: #6b7280;
+}
+.reminder-card.payment .reminder-description {
+    opacity: 0.7;
 }
 
 /* Responsive adjustment */
