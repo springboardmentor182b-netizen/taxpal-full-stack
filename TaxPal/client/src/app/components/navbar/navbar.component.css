@@ -388,11 +388,21 @@
     margin: 0 auto;
     gap: 1.5rem;
   }
-  
+
   .navbar-container {
     padding: 0 1.5rem;
+    justify-content: space-between;
   }
-  
+
+  .right-container {
+    position: static;
+    right: auto;
+  }
+
+  .auth-buttons {
+    padding-right: 1rem;
+  }
+
   .logo {
     margin-right: 1rem;
   }
@@ -403,11 +413,11 @@
   .navbar-container {
     padding: 0 1rem;
   }
-  
+
   .navbar-box {
     padding: 1rem 0;
   }
-  
+
   .nav-links {
     gap: 1rem;
   }
@@ -421,19 +431,27 @@
     width: 14px;
     height: 14px;
   }
-  
+
   .right-container {
     gap: 1rem;
   }
-  
+
   .auth-buttons {
     gap: 0.75rem;
     padding-left: 1rem;
   }
-  
+
   .btn {
     padding: 0.45rem 0.9rem;
     font-size: 0.9rem;
+  }
+
+  .login-btn {
+    padding: 0.45rem 0.9rem;
+  }
+
+  .login-btn span {
+    display: inline; /* Show text on medium screens */
   }
 }
 
@@ -460,7 +478,7 @@
     margin-left: 0 !important;
     display: block !important;
   }
-  
+
   .logo a {
     font-size: 1.4rem !important;
     display: flex !important;
@@ -471,7 +489,7 @@
     height: 20px !important;
     margin-right: 0.5rem !important;
   }
-  
+
   .navbar-box {
     padding: 0.85rem 0 !important;
   }
@@ -542,6 +560,20 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
+
+  .user-profile-indicator {
+    margin-right: 0.5rem;
+    padding: 0.4rem 0.6rem;
+  }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .user-name {
+    display: none;
+  }
 }
 
 /* Extra small screens */
@@ -559,11 +591,11 @@
     height: 18px !important;
     margin-right: 0.4rem !important;
   }
-  
+
   .right-container {
     gap: 0.5rem !important;
   }
-  
+
   .auth-buttons {
     gap: 0.4rem !important;
   }
@@ -578,17 +610,37 @@
     height: 32px !important;
     padding: 0.4rem !important;
   }
-  
+
   .login-btn {
     min-width: 36px !important;
     min-height: 36px !important;
     padding: 0.45rem !important;
   }
-  
+
   .login-icon {
     width: 16px !important;
     height: 16px !important;
   }
+
+  .user-avatar {
+    width: 28px;
+    height: 28px;
+    font-size: 0.8rem;
+  }
+}
+
+/* Ensure navbar remains accessible and touch-friendly */
+.nav-link:focus,
+.btn:focus,
+.theme-toggle-btn:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
+}
+
+/* Add hover effects for better interactivity */
+.nav-link:hover,
+.btn:hover {
+  transform: translateY(-1px);
 }
 
 /* Floating emoji animations */
@@ -672,23 +724,15 @@
     padding: 0.4rem 0.6rem;
     gap: 0.5rem;
   }
-  
+
   .user-avatar {
     width: 32px;
     height: 32px;
     font-size: 0.85rem;
   }
-  
+
   .user-name {
     display: none;
-  }
-}
-
-@media (max-width: 480px) {
-  .user-avatar {
-    width: 28px;
-    height: 28px;
-    font-size: 0.8rem;
   }
 }
 
@@ -737,14 +781,14 @@
   transform: translateY(-10px);
   opacity: 0;
   transition: transform 0.3s ease, opacity 0.3s ease;
-  pointer-events: none; /* Add this */
+  pointer-events: none;
 }
 
 .mobile-dropdown.active {
   display: block;
   transform: translateY(0);
   opacity: 1;
-  pointer-events: auto; /* Add this */
+  pointer-events: auto;
 }
 
 .dark .mobile-dropdown {
@@ -769,9 +813,9 @@
   text-decoration: none;
   transition: background-color 0.2s ease;
   font-weight: 500;
-  cursor: pointer; /* Add this */
-  -webkit-tap-highlight-color: transparent; /* Add this */
-  touch-action: manipulation; /* Add this */
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
 .mobile-nav-link:hover {
@@ -856,13 +900,13 @@
   z-index: 998;
   opacity: 0;
   transition: opacity 0.3s ease;
-  pointer-events: none; /* Add this */
+  pointer-events: none;
 }
 
 .mobile-menu-backdrop.active {
   display: block;
   opacity: 1;
-  pointer-events: auto; /* Add this */
+  pointer-events: auto;
 }
 
 /* Mobile Only and Desktop Only classes */
