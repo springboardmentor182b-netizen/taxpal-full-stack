@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, ActivatedRoute } from '@angular/router';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, RouterModule } from '@angular/router';
+import { RouterLink } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Chart } from 'chart.js/auto';
 
 interface CategoryData {
@@ -18,7 +18,7 @@ interface Categories {
 @Component({
   selector: 'app-user-profile',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, FormsModule, RouterLink, RouterModule],
+  imports: [CommonModule, FormsModule, RouterLink, HttpClientModule],
   templateUrl: './user-profile.component.html',
   styleUrls: ['./user-profile.component.css']
 })

@@ -21,7 +21,7 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./components/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
-  { path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard] },
+  { path: 'user-profile', component: UserProfileComponent },
   { path: 'transactions', component: UserProfileComponent },
   {
     path: 'budget',
