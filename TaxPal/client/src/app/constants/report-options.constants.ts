@@ -1,19 +1,18 @@
-export const REPORT_TYPES: string[] = [
+export const REPORT_TYPES = [
   'Income Statement',
-  'Balance Sheet',
-  'Cash Flow Statement',
-  'Tax Summary',
-  'Expense Report'
+  'Expense Report', 
+  'Financial Summary'
 ];
 
-export const REPORT_FORMATS: string[] = ['PDF', 'CSV'];
+export const REPORT_FORMATS = [
+  'PDF',
+  'CSV', 
+  'Excel'
+];
 
-export const REPORT_PERIODS: string[] = [
+export const REPORT_PERIODS = [
   'Current Month',
   'Last Month',
-  'Current Quarter',
-  'Last Quarter',
   'Current Year',
-  'Last Year',
-  'Custom Range'
+  'Last Year'
 ];

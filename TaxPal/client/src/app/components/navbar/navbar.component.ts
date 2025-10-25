@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { SignInFormComponent } from '../signin/sign-in-form.component';
@@ -19,7 +19,10 @@ export class NavbarComponent implements OnInit {
   showProfileMenu = false;
   isMobileMenuOpen = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private cdr: ChangeDetectorRef  // Add this
+  ) {}
 
   ngOnInit() {
     // Check if dark mode is enabled in localStorage
@@ -50,24 +53,14 @@ export class NavbarComponent implements OnInit {
   toggleMobileMenu(event?: Event) {
     if (event) {
       event.stopPropagation();
-      event.preventDefault();
     }
     this.isMobileMenuOpen = !this.isMobileMenuOpen;
-    
-    // Prevent body scrolling when menu is open
-    if (this.isMobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
+    this.cdr.detectChanges(); // Add this line
   }
 
-  closeMobileMenu(event?: Event) {
-    if (event) {
-      event.stopPropagation();
-    }
+  closeMobileMenu() {
     this.isMobileMenuOpen = false;
-    document.body.style.overflow = '';
+    this.cdr.detectChanges(); // Add this line
   }
 
   // Add this method to navigate to routes from mobile menu

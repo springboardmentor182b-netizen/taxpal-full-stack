@@ -27,6 +27,13 @@ console.log('📚 Swagger documentation available at: http://localhost:5000/api-
 const userRoutes = require('./routes/user');
 app.use('/api/users', userRoutes);
 
+const reportsRouter = require('./routes/reports');
+app.use('/api/reports', reportsRouter);
+
+console.log('✓ API routes registered:');
+console.log('  - /api/users/*');
+console.log('  - /api/reports/*');
+
 // Debug middleware to log all requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
@@ -50,9 +57,12 @@ app.use((err, req, res, next) => {
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`✓ API endpoints available:`);
-  console.log(`  - POST http://localhost:${PORT}/api/tax-estimator/calculate`);
-  console.log(`  - POST http://localhost:${PORT}/api/tax-estimator/save`);
-  console.log(`  - GET  http://localhost:${PORT}/api-docs (if Swagger is configured)`);
+  console.log(`\n🚀 Server running on port ${PORT}`);
+  console.log(`\n✓ API endpoints available:`);
+  console.log(`  - POST http://localhost:${PORT}/api/users/signin`);
+  console.log(`  - POST http://localhost:${PORT}/api/users/signup`);
+  console.log(`  - GET  http://localhost:${PORT}/api/reports/data/:userEmail/:year`);
+  console.log(`  - POST http://localhost:${PORT}/api/reports/generate-report`);
+  console.log(`  - GET  http://localhost:${PORT}/api/reports/test`);
+  console.log(`  - GET  http://localhost:${PORT}/api-docs\n`);
 });

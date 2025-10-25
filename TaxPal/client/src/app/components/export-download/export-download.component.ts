@@ -27,13 +27,28 @@ export class ExportDownloadComponent {
   generateReport() {
     this.loading = true;
 
+    const userEmail = localStorage.getItem('user_email') || '';
+    const currentYear = new Date().getFullYear();
+
     const body = {
-      reportType: this.selectedReport,
-      format: this.selectedFormat,
-      period: this.selectedPeriod
+      format: this.selectedFormat.toLowerCase(),
+      reportType: this.selectedReport.toLowerCase().replace(/\s+/g, '_'),
+      userEmail: userEmail,
+      data: {
+        userEmail: userEmail,
+        year: currentYear,
+        reports: [], // This will be populated by the backend
+        yearSummary: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          netSavings: 0
+        }
+      },
+      year: currentYear
     };
 
-    this.http.post('/api/reports/export', body, { responseType: 'blob' })
+    // Use the correct endpoint that we created
+    this.http.post('/api/reports/generate-report', body, { responseType: 'blob' })
       .subscribe({
         next: (res: Blob) => {
           this.loading = false;
@@ -54,10 +69,10 @@ export class ExportDownloadComponent {
   }
 
   getMimeType(format: string): string {
-    switch (format) {
-      case 'PDF': return 'application/pdf';
-      case 'Excel': return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      case 'CSV': return 'text/csv';
+    switch (format.toLowerCase()) {
+      case 'pdf': return 'application/pdf';
+      case 'excel': return 'application/vnd.ms-excel';
+      case 'csv': return 'text/csv';
       default: return 'application/octet-stream';
     }
   }

@@ -42,4 +42,18 @@ export class FinancialReportService {
       })
     );
   }
+
+  // Add method to fetch report data
+  getReportData(userEmail: string, year: number): Observable<any> {
+    return this.http.get(`/api/reports/data/${encodeURIComponent(userEmail)}/${year}`);
+  }
+
+  generateReport(data: any): Observable<Blob> {
+    return this.http.post('/api/reports/generate-report', data, {
+      responseType: 'blob',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+  }
 }
