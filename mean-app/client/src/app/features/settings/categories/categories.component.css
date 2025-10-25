@@ -105,3 +105,54 @@
 .category-list::-webkit-scrollbar { width: 6px; }
 .category-list::-webkit-scrollbar-thumb { background: #00a676; border-radius: 6px; }
 .category-list::-webkit-scrollbar-track { background: #f0f0f0; border-radius: 6px; }
+
+
+
+
+/* Error messages below input */
+.error {
+  color: #ff4d4f; /* Red color for errors */
+  font-size: 0.875rem; /* Slightly smaller text */
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+/* Optional: highlight input border on error */
+input.ng-touched.ng-invalid {
+  border: 1px solid #ff4d4f;
+}
+
+/* Optional: smooth transition for border color */
+input {
+  border: 1px solid #ccc;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: border-color 0.3s;
+}
+
+/* Buttons styling (optional) */
+.add-btn {
+  background-color:#00a676;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-btn:hover {
+  background-color:#00a676;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #d9d9d9;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.cancel-btn:hover {
+  background-color: #e6f7ff;
+}

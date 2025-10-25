@@ -28,13 +28,14 @@ export class BudgetFormComponent {
 
   public isFormVisible = signal(false);
   public budgets = signal<Budget[]>([]);
+  public formSubmitted = signal(false); // ✅ Added signal for form validation
 
   public newBudget = signal({
     category: null as string | null,
     amount: null as number | null,
     month: null as string | null,
     description: null as string | null,
-    spent: 0 as number | null  // ✅ Add spent field to signal
+    spent: 0 as number | null
   });
 
   sidebarActive = false;
@@ -59,7 +60,6 @@ export class BudgetFormComponent {
     this.loadCurrentUser();
   }
 
-  // ✅ Load current user and initials
   loadCurrentUser(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
@@ -72,18 +72,11 @@ export class BudgetFormComponent {
     }
   }
 
-  // ✅ Update spent
-  updateNewBudgetSpent(value: number | null) {
-    this.newBudget.update(b => ({ ...b, spent: value ?? 0 }));
-  }
-
-  // ✅ Generate initials like "NK"
   private setUserInitials(fullName: string | null | undefined) {
     if (!fullName) {
       this.userInitials = '';
       return;
     }
-
     const names = fullName.trim().split(' ');
     this.userInitials = names.length === 1
       ? names[0].charAt(0).toUpperCase()
@@ -92,11 +85,8 @@ export class BudgetFormComponent {
 
   fetchBudgets() {
     if (!this.currentUser?.id) return;
-
     this.http.get<Budget[]>(`${this.API_BASE_URL}/${this.currentUser.id}`).subscribe({
-      next: (realBudgets) => {
-        this.budgets.set(realBudgets);
-      },
+      next: (realBudgets) => this.budgets.set(realBudgets),
       error: (err) => {
         console.error('Error fetching budgets:', err);
         this.budgets.set([]);
@@ -105,12 +95,12 @@ export class BudgetFormComponent {
   }
 
   addBudget(): void {
+    this.formSubmitted.set(true); // mark form as submitted
     const budgetData = this.newBudget();
 
-    if (!budgetData.category || !budgetData.amount || !budgetData.month) {
-      console.error('Please fill in all required fields.');
-      return;
-    }
+    // validation
+    if (!budgetData.category?.trim() || !budgetData.month?.trim()) return;
+    if (budgetData.amount == null || isNaN(budgetData.amount) || budgetData.amount <= 0) return;
 
     const remaining = (budgetData.amount ?? 0) - (budgetData.spent ?? 0);
 
@@ -138,9 +128,7 @@ export class BudgetFormComponent {
         this.resetForm();
         this.isFormVisible.set(false);
       },
-      error: (err) => {
-        console.error('Error creating budget:', err);
-      }
+      error: (err) => console.error('Error creating budget:', err)
     });
   }
 
@@ -152,6 +140,7 @@ export class BudgetFormComponent {
       description: null,
       spent: 0
     });
+    this.formSubmitted.set(false); // reset form submission flag
   }
 
   trackByCategory(index: number, budget: Budget) {
@@ -172,19 +161,23 @@ export class BudgetFormComponent {
   }
 
   updateNewBudgetCategory(value: string | null) {
-    this.newBudget.set({ ...this.newBudget(), category: value });
+    this.newBudget.update(b => ({ ...b, category: value }));
   }
 
   updateNewBudgetAmount(value: number | null) {
-    this.newBudget.set({ ...this.newBudget(), amount: value });
+    this.newBudget.update(b => ({ ...b, amount: value }));
   }
 
   updateNewBudgetMonth(value: string | null) {
-    this.newBudget.set({ ...this.newBudget(), month: value });
+    this.newBudget.update(b => ({ ...b, month: value }));
   }
 
   updateNewBudgetDescription(value: string | null) {
-    this.newBudget.set({ ...this.newBudget(), description: value });
+    this.newBudget.update(b => ({ ...b, description: value }));
+  }
+
+  updateNewBudgetSpent(value: number | null) {
+    this.newBudget.update(b => ({ ...b, spent: value ?? 0 }));
   }
 
   toggleCollapse() {
@@ -193,9 +186,7 @@ export class BudgetFormComponent {
 
   logout() {
     this.authService.logout().subscribe({
-      next: () => {
-        this.router.navigate(['/login']);
-      },
+      next: () => this.router.navigate(['/login']),
       error: (err) => {
         console.error('Logout error:', err);
         this.router.navigate(['/login']);
