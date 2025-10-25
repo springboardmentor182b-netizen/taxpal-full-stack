@@ -1,0 +1,81 @@
+<div class="auth-container">
+  <div class="auth-card">
+    <!-- Left Section - Welcome -->
+    <div class="auth-card__welcome">
+      <div class="welcome-content">
+        <h1 class="welcome-title">Welcome Back !</h1>
+        <p class="welcome-subtitle">Don't have an account ?</p>
+        <button 
+          type="button" 
+          class="welcome-button"
+          (click)="navigateToSignup()">
+          Sign Up
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Section - Form -->
+    <div class="auth-card__form">
+      <div class="form-content">
+        <div class="form-header">
+          <h2 class="form-title">Welcome Back to</h2>
+          <h2 class="form-title brand">TaxPal</h2>
+          <p class="form-subtitle">Log in to your account to continue<br>managing your finances</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+          <!-- Email Field -->
+          <div class="form-field">
+            <label class="form-field__label" for="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              class="form-field__input"
+              [class.form-field__input--error]="getFieldError('email')"
+              placeholder="pavi@example.com"
+              formControlName="email"
+            />
+            <div *ngIf="getFieldError('email')" class="form-field__error">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+
+          <!-- Password Field with Forget Password Link -->
+          <div class="password-field-group">
+            <div class="form-field">
+              <div class="password-label-row">
+                <label class="form-field__label" for="password">Password</label>
+                <a (click)="navigateToForgotPassword()" class="forgot-password-link">Forget Password?</a>
+              </div>
+              <input
+                id="password"
+                [type]="showPassword ? 'text' : 'password'"
+                class="form-field__input"
+                [class.form-field__input--error]="getFieldError('password')"
+                placeholder="••••••••••••"
+                formControlName="password"
+              />
+              <div *ngIf="getFieldError('password')" class="form-field__error">
+                {{ getFieldError('password') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div *ngIf="errorMessage" class="error-message">
+            {{ errorMessage }}
+          </div>
+
+          <!-- Submit Button -->
+          <button 
+            type="submit" 
+            class="submit-button"
+            [disabled]="isLoading">
+            <span *ngIf="isLoading" class="loading-spinner"></span>
+            {{ isLoading ? 'Signing in...' : 'Sign in' }}
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

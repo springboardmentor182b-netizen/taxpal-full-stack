@@ -1,0 +1,27 @@
+<form [formGroup]="dashboardForm" (ngSubmit)="submitForm()" class="form-container">
+  <div class="row">
+    <input type="number" formControlName="monthlyIncome" placeholder="Monthly Income" />
+    <input type="number" formControlName="monthlyExpenses" placeholder="Monthly Expenses" />
+    <input type="number" formControlName="estimatedTaxDue" placeholder="Estimated Tax Due" />
+    <input type="number" formControlName="savingsRate" placeholder="Savings Rate (%)" />
+  </div>
+
+  <h4>Transactions</h4>
+  <button type="button" (click)="addTransaction()">+ Add Transaction</button>
+
+  <div formArrayName="transactions">
+    <div *ngFor="let t of transactions.controls; let i = index" [formGroupName]="i">
+      <input type="date" formControlName="date" />
+      <input type="text" formControlName="description" placeholder="Description" />
+      <input type="text" formControlName="category" placeholder="Category" />
+      <input type="number" formControlName="amount" placeholder="Amount" />
+      <select formControlName="type">
+        <option value="Income">Income</option>
+        <option value="Expense">Expense</option>
+      </select>
+      <button type="button" (click)="removeTransaction(i)">Remove</button>
+    </div>
+  </div>
+
+  <button type="submit">Save Dashboard</button>
+</form>

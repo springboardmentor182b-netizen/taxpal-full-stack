@@ -1,0 +1,16 @@
+/* Success Snackbar */
+.mat-mdc-snack-bar-container.success-snackbar {
+    background-color: #43a047 !important; /* Green */
+    color: #fff !important;
+    font-weight: 600;
+    border-radius: 8px !important;
+  }
+  
+  /* Error Snackbar */
+  .mat-mdc-snack-bar-container.error-snackbar {
+    background-color: #e53935 !important; /* Red */
+    color: #fff !important;
+    font-weight: 600;
+    border-radius: 8px !important;
+  }
+  

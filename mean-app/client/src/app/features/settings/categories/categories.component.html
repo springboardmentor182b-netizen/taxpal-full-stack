@@ -1,0 +1,76 @@
+<div *ngIf="showModal" class="modal-overlay">
+  <div class="modal-content">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Category Management</h2>
+      <button class="close-btn" (click)="closeModal()">×</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button [class.active]="selectedTab === 'Expense'" (click)="setTab('Expense')">− Expense</button>
+      <button [class.active]="selectedTab === 'Income'" (click)="setTab('Income')">+ Income</button>
+    </div>
+
+    <!-- Category List -->
+    <ul class="category-list">
+      <li *ngFor="let cat of displayedCategories">
+        <div class="cat-info">
+          <span class="dot"></span>
+          <span class="cat-name">{{ cat.name }}</span>
+          <span *ngIf="!cat._id" class="default-badge">Default</span>
+        </div>
+
+        <div class="actions">
+          <button 
+            (click)="editCategory(cat)" 
+            class="edit-btn" 
+            [disabled]="!cat._id"
+            [title]="!cat._id ? 'Default categories cannot be edited' : 'Edit'">
+            ✎
+          </button>
+          <button 
+            (click)="showDeleteConfirm(cat)" 
+            class="delete-btn" 
+            [disabled]="!cat._id"
+            [title]="!cat._id ? 'Default categories cannot be deleted' : 'Delete'">
+            🗑️
+          </button>
+        </div>
+      </li>
+    </ul>
+
+    <!-- Add/Edit Form -->
+    <form [formGroup]="categoryForm" (ngSubmit)="addOrUpdateCategory()" class="category-form">
+      <input formControlName="name" placeholder="Category Name" />
+      <div class="error" *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.hasError('required')">
+        Category name required
+      </div>
+      <div class="error" *ngIf="categoryForm.hasError('duplicate')">
+        Category already exists for {{ categoryForm.value.type | titlecase }}
+      </div>
+
+      <select formControlName="type">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+
+      <div class="form-buttons">
+        <button type="button" (click)="closeModal()" class="cancel-btn">Cancel</button>
+        <button type="submit" class="add-btn">{{ editingCategory ? 'Update' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div *ngIf="confirmDeleteCategory" class="modal-overlay">
+  <div class="modal-content">
+    <p>Are you sure you want to delete "{{ confirmDeleteCategory.name }}"?</p>
+    <div class="form-buttons">
+      <button (click)="confirmDelete()" class="add-btn">Yes</button>
+      <button (click)="cancelDelete()" class="cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>

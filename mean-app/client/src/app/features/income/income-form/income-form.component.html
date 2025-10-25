@@ -1,0 +1,68 @@
+<!-- src/app/income-card/income-card.component.html -->
+<div class="overlay">
+  <div class="income-card">
+    <button class="close-btn" (click)="closeForm()" aria-label="Close">✕</button>
+
+    <h2 class="form-heading">Record New Income</h2>
+    <p class="form-subtitle">Add details about your income to track your finances better.</p>
+
+    <form [formGroup]="incomeForm" (ngSubmit)="submitForm()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" formControlName="description" placeholder="eg. Web Design Project" />
+          <div class="field-error" *ngIf="incomeForm.get('description')?.invalid && incomeForm.get('description')?.touched">
+            Description must be at least 3 characters.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Amount</label>
+          <input type="number" formControlName="amount" placeholder="$0.00" />
+          <div class="field-error" *ngIf="incomeForm.get('amount')?.hasError('required') && incomeForm.get('amount')?.touched">
+            Amount is required.
+          </div>
+          <div class="field-error" *ngIf="incomeForm.get('amount')?.value === 0">
+            Enter a valid amount.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category</label>
+          <select formControlName="category">
+            <option value="" disabled>Select a category</option>
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+          <div class="field-error" *ngIf="incomeForm.get('category')?.hasError('required') && incomeForm.get('category')?.touched">
+            Category is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" formControlName="date" />
+          <div class="field-error" *ngIf="incomeForm.get('date')?.hasError('required') && incomeForm.get('date')?.touched">
+            Date is required.
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group full-width">
+        <label>Notes (Optional)</label>
+        <textarea formControlName="notes" rows="3" placeholder="Any additional details..."></textarea>
+      </div>
+
+      <!-- ✅ Display form-level error message here -->
+      <div *ngIf="errorMessage" class="form-error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div class="action-buttons">
+        <button type="button" class="btn-cancel" (click)="cancelForm()">Cancel</button>
+        <button type="submit" class="btn-save">Save</button>
+      </div>
+    </form>
+  </div>
+</div>

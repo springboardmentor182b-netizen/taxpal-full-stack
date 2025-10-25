@@ -1,0 +1,174 @@
+<div class="budget-container main-content">
+  <div class="header">
+    <h2 class="heading">Budget Overview</h2>
+    <button class="button-save" (click)="isFormVisible.set(true)">+ Create Budget</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="budget-container">
+      <div class="header">
+        <h2 class="heading">Budgets</h2>
+        <button class="button-save" (click)="isFormVisible.set(true)">Create Budget</button>
+      </div>
+
+      <div class="budget-tables">
+        <span class="left-item" style="color:red;">● Hi, {{ currentUser.fullName }}! Here's your Budget page.</span>
+        <span class="right-item">Budget Health</span>
+      </div>
+
+      <!-- Budget Table -->
+      <div class="budget-table">
+        <h3>Budget List</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Budget</th>
+              <th>Spent</th>
+              <th>Remaining</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let budget of budgets(); trackBy: trackByCategory">
+              <td>{{ budget.category }}</td>
+              <td>{{ budget.amount | currency:'USD' }}</td>
+              <td>{{ budget.spent | currency:'USD' }}</td>
+              <td>{{ budget.remaining | currency:'USD' }}</td>
+              <td
+                [ngClass]="{
+                  'status-good': budget.status === 'Good',
+                  'status-fair': budget.status === 'Fair',
+                  'status-poor': budget.status === 'Poor'
+                }"
+              >
+                {{ budget.status }}
+              </td>
+              <td class="viewBox" (click)="viewBudgetDetails(budget, $event)">View</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Details Popup -->
+      <div
+        *ngIf="selectedBudget"
+        class="popup-details"
+        [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }"
+      >
+        <button class="close-btn" (click)="closePopup()">×</button>
+        <h3 class="heading">Budget Details</h3>
+        <div class="strong">
+          <p><strong>Category:</strong> {{ selectedBudget.category }}</p>
+          <p><strong>Amount:</strong> ${{ selectedBudget.amount }}</p>
+          <p><strong>Month:</strong> {{ selectedBudget.month }}</p>
+          <p><strong>Spent:</strong> ${{ selectedBudget.spent }}</p>
+          <p><strong>Remaining:</strong> ${{ selectedBudget.remaining }}</p>
+          <p><strong>Status:</strong> {{ selectedBudget.status }}</p>
+          <p><strong>Description:</strong> {{ selectedBudget.description || 'N/A' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Creating Budget -->
+  <div class="modal-backdrop" *ngIf="isFormVisible()">
+    <div class="modal">
+      <button class="close-btn" (click)="isFormVisible.set(false); formSubmitted.set(false)">×</button>
+      <h3>Create Budget</h3>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label>Category</label>
+        <select
+          [ngModel]="newBudget().category"
+          (ngModelChange)="updateNewBudgetCategory($event)"
+          [class.invalid-field]="!newBudget().category?.trim() && formSubmitted()"
+        >
+          <option disabled [ngValue]="null">Select a category</option>
+          <option value="Design Project">Design Project</option>
+          <option value="Consulting">Consulting</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Other">Other</option>
+          <option value="Transporting">Transporting</option>
+        </select>
+        <div class="error-message" *ngIf="!newBudget().category?.trim() && formSubmitted()">
+          Please fill in all required fields correctly
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="form-group">
+        <label>Budget Amount</label>
+        <div class="input-prefix">
+          <span>$</span>
+          <input
+            type="number"
+            [ngModel]="newBudget().amount"
+            (ngModelChange)="updateNewBudgetAmount($event)"
+            placeholder="0.00"
+            [class.invalid-field]="((newBudget().amount ?? 0) <= 0) && formSubmitted()"
+          />
+        </div>
+        <div class="error-message" *ngIf="(newBudget().amount ?? 0) <= 0 && formSubmitted()">
+          Enter a valid amount
+        </div>
+      </div>
+
+      <!-- Month -->
+      <div class="form-group">
+        <label>Select Month</label>
+        <input
+          type="month"
+          [ngModel]="newBudget().month"
+          (ngModelChange)="updateNewBudgetMonth($event)"
+          [class.invalid-field]="!newBudget().month?.trim() && formSubmitted()"
+        />
+        <div class="error-message" *ngIf="!newBudget().month?.trim() && formSubmitted()">
+          Please fill in all required fields correctly
+        </div>
+      </div>
+
+      <!-- Spent Amount -->
+      <div class="form-group">
+        <label>Spent Amount (Optional)</label>
+        <div class="input-prefix">
+          <span>$</span>
+          <input
+            type="number"
+            [ngModel]="newBudget().spent"
+            (ngModelChange)="updateNewBudgetSpent($event)"
+            placeholder="0.00"
+            [class.invalid-field]="((newBudget().spent ?? 0) < 0) && formSubmitted()"
+          />
+        </div>
+        <div class="error-message" *ngIf="(newBudget().spent ?? 0) < 0 && formSubmitted()">
+          Spent amount cannot be negative
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="form-group">
+        <label>Description (Optional)</label>
+        <textarea
+          rows="3"
+          placeholder="Add any additional details..."
+          [ngModel]="newBudget().description"
+          (ngModelChange)="updateNewBudgetDescription($event)"
+        ></textarea>
+      </div>
+
+      <!-- Buttons -->
+      <div class="form-actions">
+        <button class="btn-cencel" (click)="isFormVisible.set(false); formSubmitted.set(false)">
+          Cancel
+        </button>
+        <button class="btn-save" (click)="formSubmitted.set(true); addBudget()">
+          Create Budget
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

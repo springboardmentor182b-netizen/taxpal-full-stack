@@ -1,0 +1,66 @@
+<div class="dashboard-root" [class.overlay-open]="sidebarActive">
+
+    <!-- Hamburger for mobile -->
+    <button class="hamburger" aria-label="Open menu" (click)="toggleSidebar()">
+      <svg width="18" height="14" viewBox="0 0 18 14" fill="none">
+        <rect y="0" width="18" height="2" rx="1" fill="#fff"/>
+        <rect y="6" width="18" height="2" rx="1" fill="#fff"/>
+        <rect y="12" width="18" height="2" rx="1" fill="#fff"/>
+      </svg>
+    </button>
+  
+    <!-- Sidebar -->
+    <aside class="sidebar" [class.active]="sidebarActive" [class.collapsed]="collapsed">
+      <div class="sidebar-top">
+        <div class="brand-row">
+          <div class="brand">TaxPal</div>
+          <button class="collapse-btn" title="Collapse sidebar" (click)="toggleCollapse()"
+                  [style.transform]="collapsed ? 'rotate(180deg)' : 'rotate(0deg)'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M9 6L15 12L9 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+  
+      <!-- Navigation -->
+      <nav class="nav">
+        <a class="nav-item" routerLink="/dashboard" routerLinkActive="active" (click)="goToDashboard()"><span class="label">Dashboard</span></a>
+        <a class="nav-item" routerLink="/budgets" routerLinkActive="active"><span class="label">Budgets</span></a>
+        <a class="nav-item" routerLink="/transactions" routerLinkActive="active"><span class="label">Transactions</span></a>
+        <a class="nav-item" routerLink="/tax-estimator" routerLinkActive="active"><span class="label">Tax Estimator</span></a>
+        <a class="nav-item" routerLink="/reports" routerLinkActive="active"><span class="label">Reports</span></a>
+      </nav>
+  
+      <!-- Bottom profile and actions -->
+      <div class="sidebar-bottom">
+        <button class="action settings" routerLink="/settings">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path d="M12 15.5C13.933 15.5 15.5 13.933 15.5 12C15.5 10.067 13.933 8.5 12 8.5C10.067 8.5 8.5 10.067 8.5 12C8.5 13.933 10.067 15.5 12 15.5Z" stroke="white" stroke-width="2"/>
+              <path d="M19.4 15A1.65 1.65 0 0 0 20 13.5V10.5A1.65 1.65 0 0 0 19.4 9L17.6 7.2A1.65 1.65 0 0 0 16 6.6H8A1.65 1.65 0 0 0 6.4 7.2L4.6 9A1.65 1.65 0 0 0 4 10.5V13.5A1.65 1.65 0 0 0 4.6 15L6.4 16.8A1.65 1.65 0 0 0 8 17.4H16A1.65 1.65 0 0 0 17.6 16.8L19.4 15Z" stroke="white" stroke-width="2"/>
+            </svg>
+            <span class="label">Settings</span>
+          </button>
+        <div class="profile">
+          <div class="avatar">{{ userInitials }}</div>
+          <div class="meta">
+            <div class="name">{{ currentUser?.fullName }}</div>
+            <div class="email">{{ currentUser?.email }}</div>
+          </div>
+        </div>
+        <div class="sidebar-actions">
+          <button class="action logout" (click)="logout()">Logout</button>
+        </div>
+      </div>
+    </aside>
+  
+    <!-- Overlay for mobile -->
+    <div class="overlay" *ngIf="sidebarActive" (click)="closeSidebarOverlay()"></div>
+  
+    <!-- Main content -->
+    <main class="main-area">
+      <router-outlet></router-outlet>
+    </main>
+  
+  </div>
+  
