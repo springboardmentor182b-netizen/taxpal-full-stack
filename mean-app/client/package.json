@@ -8,29 +8,17 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
-  },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^20.2.0",
-    "@angular/common": "^20.2.0",
-    "@angular/compiler": "^20.2.0",
-    "@angular/core": "^20.2.0",
-    "@angular/forms": "^20.2.0",
-    "@angular/material": "^20.2.3",
-    "@angular/platform-browser": "^20.2.0",
-    "@angular/platform-browser-dynamic": "^20.2.0",
-    "@angular/router": "^20.2.0",
+    "@angular/animations": "20.3.2",
+    "@angular/common": "20.3.2",
+    "@angular/compiler": "20.3.2",
+    "@angular/core": "20.3.2",
+    "@angular/forms": "20.3.2",
+    "@angular/material": "20.3.2",
+    "@angular/platform-browser": "20.3.2",
+    "@angular/platform-browser-dynamic": "20.3.2",
+    "@angular/router": "20.3.2",
     "@tailwindcss/postcss": "^4.1.13",
     "@types/chart.js": "^2.9.41",
     "body-parser": "^2.2.0",
@@ -47,9 +35,9 @@
     "zone.js": "~0.15.0"
   },
   "devDependencies": {
-    "@angular/build": "^20.2.1",
-    "@angular/cli": "^20.2.1",
-    "@angular/compiler-cli": "^20.2.0",
+    "@angular/build": "20.3.2",
+    "@angular/cli": "20.3.2",
+    "@angular/compiler-cli": "20.3.2",
     "@types/jasmine": "~5.1.0",
     "@types/node": "^24.9.1",
     "jasmine-core": "~5.9.0",

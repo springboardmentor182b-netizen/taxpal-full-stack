@@ -18,6 +18,9 @@ import reportRoutes from "./api/modules/reports/report.routes";
 
 
 const app = express();
+
+
+
 app.use(
   cors({
     origin: "http://localhost:4200",
