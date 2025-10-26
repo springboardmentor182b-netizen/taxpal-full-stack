@@ -393,25 +393,12 @@
     padding: 0 1.5rem;
   }
 
-    justify-content: space-between;
-  }
-
-  .right-container {
-    position: static;
-    right: auto;
-  }
-
-  .auth-buttons {
-    padding-right: 1rem;
-  }
-
   .logo {
     margin-right: 1rem;
   }
 }
 
 /* Medium screens */
-/* Adjust navbar layout for small screens */
 @media (max-width: 768px) {
   .navbar-container {
     padding: 0 1rem;
@@ -451,17 +438,6 @@
 }
 
 /* Mobile breakpoint - CRITICAL FIXES */
-
-  .login-btn {
-    padding: 0.45rem 0.9rem;
-  }
-
-  .login-btn span {
-    display: inline; /* Show text on medium screens */
-  }
-}
-
-/* Hide navigation links and adjust layout for very small screens */
 @media (max-width: 640px) {
   .navbar-container {
     padding: 0 1rem !important;
@@ -601,8 +577,6 @@
     width: 32px !important;
     height: 32px !important;
     padding: 0.4rem !important;
-  .login-btn span {
-    display: none; /* Hide text on smaller screens */
   }
 
   .login-btn {
@@ -618,37 +592,6 @@
 }
 
 /* Floating emoji animations */
-/* Adjust user profile indicator for small screens */
-@media (max-width: 640px) {
-  .user-profile-indicator {
-    margin-right: 0.5rem;
-    padding: 0.4rem 0.6rem;
-  }
-
-  .user-avatar {
-    width: 28px;
-    height: 28px;
-  }
-
-  .user-name {
-    display: none;
-  }
-}
-
-/* Ensure navbar remains accessible and touch-friendly */
-.nav-link:focus,
-.btn:focus,
-.theme-toggle-btn:focus {
-  outline: 3px solid rgba(59, 130, 246, 0.2);
-  outline-offset: 2px;
-}
-
-/* Add hover effects for better interactivity */
-.nav-link:hover,
-.btn:hover {
-  transform: translateY(-1px);
-}
-
 .floating-emoji {
   position: absolute;
   font-size: 1.5rem;
