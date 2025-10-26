@@ -1361,28 +1361,28 @@
   .metrics-row {
     grid-template-columns: repeat(2, 1fr);
   }
-  
+
   .balance-transactions-row,
   .dashboard-grid,
   .charts-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .balance-progress {
     flex-direction: row;
     justify-content: center;
   }
-  
+
   .circular-progress {
     width: 100px;
     height: 100px;
   }
-  
+
   .pie-chart-container {
     width: 200px;
     height: 200px;
   }
-  
+
   .bar {
     width: 20px;
   }
@@ -1394,24 +1394,24 @@
     flex-wrap: wrap;
     justify-content: center;
   }
-  
+
   .top-actions .action-btn {
     width: auto;
   }
-  
+
   .action-buttons {
     flex-direction: column;
   }
-  
+
   .action-btn {
     width: 100%;
     justify-content: center;
   }
-  
+
   .bar {
     width: 18px;
   }
-  
+
   .bar-value {
     font-size: 0.65rem;
   }
@@ -1421,61 +1421,61 @@
   .top-actions .action-buttons {
     flex-direction: column;
   }
-  
+
   .top-actions .action-btn {
     width: 100%;
   }
-  
+
   .metrics-row {
     grid-template-columns: 1fr;
   }
-  
+
   .balance-content {
     flex-direction: column;
     align-items: flex-start;
     gap: 0.25rem;
   }
-  
+
   .balance-progress {
     flex-direction: column;
     align-items: center;
     gap: 1rem;
   }
-  
+
   .circular-progress {
     width: 80px;
     height: 80px;
   }
-  
+
   .pie-chart-container {
     width: 180px;
     height: 180px;
   }
-  
+
   .budget-legend {
     padding: 0 1rem;
   }
-  
+
   .bar-chart {
     height: 200px;
   }
-  
+
   .bar-container {
     height: 150px;
   }
-  
+
   .bar {
     width: 12px;
   }
-  
+
   .bar-value {
     display: none;
   }
-  
+
   .bar:hover .bar-value {
     display: block;
   }
-  
+
   .chart-legend {
     margin-bottom: 1rem;
   }
@@ -1820,3 +1820,30 @@
 .dark .delete-btn:hover {
   background-color: #7f1d1d;
 }
+
+/* Records scroll container used for income/expense tables on dashboard */
+.records-scroll {
+  width: 100%;
+  display: block;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15,23,42,0.08) transparent;
+}
+
+/* Larger available space on wider screens */
+@media (min-width: 900px) {
+  .records-scroll {
+    max-height: 50vh;
+  }
+}
+
+/* Mobile: tighter height so table areas are independently scrollable and usable from bottom */
+@media (max-width: 899px) {
+  .records-scroll {
+    max-height: calc(40vh);
+  }
+}
+
+.records-scroll::-webkit-scrollbar { height:8px; width:8px; }
+.records-scroll::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.08); border-radius: 8px; }
