@@ -16,51 +16,11 @@
           <span>TaxPal</span>
         </a>
       </div>
-      
-      <!-- Mobile Menu Button (Hamburger) -->
-      <button class="mobile-menu-btn" (click)="toggleMobileMenu($event)">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-      
-      <!-- Desktop Navigation Links -->
-      <div class="nav-links desktop-only">
-        <a routerLink="/features" class="nav-link" [class.active]="isActiveRoute('/features')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-          </svg>
-          <span>Features</span>
-        </a>
-        <a routerLink="/plan" class="nav-link" [class.active]="isActiveRoute('/plan')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-          </svg>
-          <span>Plan</span>
-        </a>
-        <a routerLink="/support" class="nav-link" [class.active]="isActiveRoute('/support')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          <span>Support</span>
-        </a>
-        <a routerLink="/about" class="nav-link" [class.active]="isActiveRoute('/about')">
-          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon">
-            <circle cx="12" cy="12" r="10"></circle>
-            <line x1="12" y1="8" x2="12" y2="16"></line>
-            <line x1="8" y1="12" x2="16" y2="12"></line>
-          </svg>
-          <span>About</span>
-        </a>
-      </div>
-      
+
+
+
+
+
       <div class="right-container">
         <button class="theme-toggle-btn" [ngClass]="{ 'dark': isDarkMode }" aria-label="Toggle dark mode" (click)="toggleDarkMode()">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-icon sun-icon">
@@ -78,13 +38,13 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
           </svg>
         </button>
-        
+
         <!-- User Profile Container -->
         <div class="user-profile-container" *ngIf="isUserLoggedIn()">
           <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
             <span>{{ getUserInitial() }}</span>
           </button>
-          
+
           <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
             <div class="profile-section">
               <div class="profile-info centered-profile">
@@ -122,7 +82,7 @@
             </div>
           </div>
         </div>
-        
+
         <!-- Desktop Auth Buttons - Only visible on desktop when NOT logged in -->
         <div class="auth-buttons desktop-only" *ngIf="!isUserLoggedIn()">
           <a class="login-btn btn" (click)="openSignInForm($event)">
@@ -142,41 +102,12 @@
   <!-- Mobile Dropdown Menu -->
   <div class="mobile-dropdown" [class.active]="isMobileMenuOpen">
     <div class="mobile-dropdown-content">
-      <a (click)="navigateTo('/features', $event)" class="mobile-nav-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-        </svg>
-        <span>Features</span>
-      </a>
-      <a (click)="navigateTo('/plan', $event)" class="mobile-nav-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-          <line x1="16" y1="2" x2="16" y2="6"></line>
-          <line x1="8" y1="2" x2="8" y2="6"></line>
-          <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        <span>Plan</span>
-      </a>
-      <a (click)="navigateTo('/support', $event)" class="mobile-nav-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
-          <line x1="12" y1="17" x2="12.01" y2="17"></line>
-        </svg>
-        <span>Support</span>
-      </a>
-      <a (click)="navigateTo('/about', $event)" class="mobile-nav-link">
-        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <line x1="12" y1="8" x2="12" y2="16"></line>
-          <line x1="8" y1="12" x2="16" y2="12"></line>
-        </svg>
-        <span>About</span>
-      </a>
       
+
+
       <!-- Mobile Auth Section -->
       <div class="mobile-dropdown-divider" *ngIf="!isUserLoggedIn()"></div>
-      
+
       <div class="mobile-auth-section" *ngIf="!isUserLoggedIn()">
         <button type="button" class="mobile-nav-link auth-link" (click)="openSignInForm($event); closeMobileMenu()">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -232,14 +163,14 @@
   <div class="mobile-menu-backdrop" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
 
   <!-- Auth components -->
-  <app-sign-in-form 
-    *ngIf="showSignInForm" 
+  <app-sign-in-form
+    *ngIf="showSignInForm"
     (close)="closeAuthForms()"
     (switchToSignUp)="switchToSignUp()"
   ></app-sign-in-form>
 
-  <app-sign-up-form 
-    *ngIf="showSignUpForm" 
+  <app-sign-up-form
+    *ngIf="showSignUpForm"
     (close)="closeAuthForms()"
     (switchToSignIn)="switchToSignIn()"
   ></app-sign-up-form>

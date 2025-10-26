@@ -82,22 +82,22 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   // Add new balance properties
   totalBalance: number = 0;
   balanceChange: number = 0;
-  
+
   private expenseChart: Chart | null = null;
   private chartInitialized: boolean = false;
-  
+
   constructor(private router: Router, private route: ActivatedRoute, private http: HttpClient) {}
 
   ngOnInit() {
     // Get the current route
     const path = this.router.url.split('/')[1] || 'user-profile';
     this.currentRoute = path;
-    
+
     // Set page title
     this.pageTitle = 'Dashboard';
-    
+
     // Check for dark mode
-    this.isDarkMode = document.documentElement.classList.contains('dark') || 
+    this.isDarkMode = document.documentElement.classList.contains('dark') ||
                       document.body.classList.contains('dark-mode');
 
     this.fetchUserProfile();
@@ -134,7 +134,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }
   }
-  
+
   private initializeExpenseChart() {
     // Prevent multiple initializations
     if (this.chartInitialized) {
@@ -246,7 +246,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       this.expenseChart.data.datasets[0].backgroundColor = hasData ? [
         '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
       ] : ['#e5e7eb'];
-      
+
       if (this.expenseChart.options.plugins?.legend) {
         this.expenseChart.options.plugins.legend.display = hasData;
       }
@@ -259,10 +259,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       this.initializeExpenseChart();
     }
   }
-  
+
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
-    
+
     // Update document classes
     if (this.isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -271,17 +271,17 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark-mode');
     }
-    
+
     // Save preference to localStorage
     localStorage.setItem('darkMode', this.isDarkMode.toString());
     this.updateChart(); // Update chart with new theme
   }
-  
+
   showAddIncomeModal() {
     this.isAddIncomeModalVisible = true;
     document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
   }
-  
+
   hideAddIncomeModal(event?: Event) {
     if (event) {
       const target = event.target as HTMLElement;
@@ -294,12 +294,12 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       document.body.style.overflow = ''; // Restore scrolling
     }
   }
-  
+
   showAddExpenseModal() {
     this.isAddExpenseModalVisible = true;
     document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
   }
-  
+
   hideAddExpenseModal(event?: Event) {
     if (event) {
       const target = event.target as HTMLElement;
@@ -312,14 +312,14 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       document.body.style.overflow = ''; // Restore scrolling
     }
   }
-  
+
   submitIncome() {
     // Basic validation only for required fields
     if (!this.incomeForm.title || !this.incomeForm.amount) {
       this.incomeErrorMsg = 'Title and amount are required';
       return;
     }
-    
+
     this.incomeLoading = true;
     this.incomeErrorMsg = '';
     this.incomeSuccessMsg = '';
@@ -342,7 +342,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
             this.incomeList.unshift(response.income);
             this.updateRecentTransactions(); // Update recent transactions list
           }
-          
+
           this.incomeSuccessMsg = 'Income added successfully!';
           this.resetIncomeForm();
           this.hideAddIncomeModal();
@@ -361,7 +361,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       this.expenseErrorMsg = 'Title and amount are required';
       return;
     }
-    
+
     this.expenseLoading = true;
     this.expenseErrorMsg = '';
     this.expenseSuccessMsg = '';
@@ -384,7 +384,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
             this.expenseList.unshift(response.expense);
             this.updateRecentTransactions(); // Update recent transactions list
           }
-          
+
           this.expenseSuccessMsg = 'Expense added successfully!';
           this.resetExpenseForm();
           this.hideAddExpenseModal();
@@ -396,7 +396,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       });
   }
-  
+
   fetchIncomeList() {
     if (!this.userEmail) {
       this.incomeList = [];
@@ -449,13 +449,13 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
-  
+
   fetchUserProfile() {
     // Get the user email from localStorage instead of making an API call
     this.userEmail = localStorage.getItem('user_email') || '';
     this.userName = localStorage.getItem('user_name') || '';
     this.userInitial = this.userName ? this.userName.trim()[0].toUpperCase() : this.userEmail.trim()[0].toUpperCase();
-    
+
     if (this.userEmail) {
       this.fetchIncomeList();
       this.fetchExpenseList();
@@ -468,10 +468,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       ...this.incomeList.map(item => ({...item, type: 'income'})),
       ...this.expenseList.map(item => ({...item, type: 'expense'}))
     ];
-    
+
     // Sort by date (newest first)
     allTransactions.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-    
+
     // Take only the most recent ones
     this.recentTransactions = allTransactions.slice(0, 5);
   }
@@ -479,7 +479,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   prepareChartData() {
     // Get all months from both income and expense lists
     const monthsSet = new Set<string>();
-    
+
     // Process income dates
     this.incomeList.forEach(income => {
       if (income.date) {
@@ -488,7 +488,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
         monthsSet.add(monthYear);
       }
     });
-    
+
     // Process expense dates
     this.expenseList.forEach(expense => {
       if (expense.date) {
@@ -497,10 +497,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
         monthsSet.add(monthYear);
       }
     });
-    
+
     // Convert Set to Array and sort
     const months = Array.from(monthsSet).sort();
-    
+
     // Calculate totals for each month
     this.monthlyData = months.map(month => {
       // Calculate income for this month
@@ -512,7 +512,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
           return incomeMonth === month;
         })
         .reduce((sum, income) => sum + (income.amount || 0), 0);
-      
+
       // Calculate expenses for this month
       const expenseTotal = this.expenseList
         .filter(expense => {
@@ -522,58 +522,58 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
           return expenseMonth === month;
         })
         .reduce((sum, expense) => sum + (expense.amount || 0), 0);
-      
+
       // Format month for display (YYYY-MM to MMM YYYY)
       const [year, monthNum] = month.split('-');
       const monthName = new Date(parseInt(year), parseInt(monthNum) - 1).toLocaleString('default', { month: 'short' });
       const displayMonth = `${monthName} ${year}`;
-      
+
       return {
         month: displayMonth,
         income: incomeTotal,
         expense: expenseTotal
       };
     });
-    
+
     // Find the maximum value for scaling
     this.maxValue = Math.max(
       1, // Ensure we have a non-zero value for empty data
       ...this.monthlyData.map(data => Math.max(data.income, data.expense))
     );
-    
+
     // Create y-axis values (5 steps)
     this.yAxisValues = [0, this.maxValue / 4, this.maxValue / 2, this.maxValue * 3/4, this.maxValue];
   }
-  
+
   // Add this method to limit the number of months displayed
   getDisplayMonths(): { month: string; income: number; expense: number }[] {
     // If we have 6 or fewer months, show them all
     if (this.monthlyData.length <= 6) {
       return this.monthlyData;
     }
-    
+
     // Otherwise, show the most recent 6 months
     return this.monthlyData.slice(-6);
   }
-  
+
   getBarHeight(value: number): number {
     if (!value || !this.maxValue) return 0;
     return (value / this.maxValue) * 100;
   }
-  
+
   formatCurrency(value: number): string {
-    return new Intl.NumberFormat('en-US', { 
-      style: 'currency', 
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
       currency: 'USD',
       maximumFractionDigits: 0
     }).format(value);
   }
-  
+
   hasFinancialData(): boolean {
-    return this.monthlyData.length > 0 && 
+    return this.monthlyData.length > 0 &&
            this.monthlyData.some(data => data.income > 0 || data.expense > 0);
   }
-  
+
   getCurrentDate(): string {
     const now = new Date();
     const year = now.getFullYear();
@@ -581,7 +581,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     const day = String(now.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   }
-  
+
   /**
    * Show tooltip with financial information when hovering over a bar
    */
@@ -590,10 +590,10 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     const month = target.getAttribute('data-month') || '';
     const label = target.getAttribute('data-label') || '';
     const value = target.getAttribute('data-value') || '';
-    
+
     // Update tooltip content
     this.tooltipData = { month, label, value };
-    
+
     // Position tooltip next to the cursor
     const offset = 10; // offset from cursor
     this.tooltipStyle = {
@@ -601,7 +601,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       left: `${event.clientX + offset}px`,
       top: `${event.clientY - offset}px`
     };
-    
+
     // Add visible class after a small delay to ensure smooth animation
     setTimeout(() => {
       const tooltip = document.getElementById('chart-tooltip');
@@ -610,7 +610,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     }, 10);
   }
-  
+
   /**
    * Hide tooltip when not hovering over a bar
    */
@@ -625,20 +625,20 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
   toggleProfileMenu() {
     this.showProfileMenu = !this.showProfileMenu;
   }
-  
+
   closeProfileMenu() {
     this.showProfileMenu = false;
   }
-  
+
   logout() {
     // Clean up chart before logout
     this.destroyChart();
-    
+
     // Clear user data from localStorage
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_id');
-    
+
     // Redirect to the home page
     window.location.href = '/';
   }
@@ -678,7 +678,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentMonthIncome = this.incomeList
       .filter(income => {
         const incomeDate = new Date(income.date);
-        return incomeDate.getMonth() === currentMonth && 
+        return incomeDate.getMonth() === currentMonth &&
                incomeDate.getFullYear() === currentYear;
       })
       .reduce((sum, income) => sum + (income.amount || 0), 0);
@@ -687,7 +687,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     const lastMonthIncome = this.incomeList
       .filter(income => {
         const incomeDate = new Date(income.date);
-        return incomeDate.getMonth() === lastMonth && 
+        return incomeDate.getMonth() === lastMonth &&
                incomeDate.getFullYear() === lastMonthYear;
       })
       .reduce((sum, income) => sum + (income.amount || 0), 0);
@@ -696,7 +696,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     this.currentMonthExpense = this.expenseList
       .filter(expense => {
         const expenseDate = new Date(expense.date);
-        return expenseDate.getMonth() === currentMonth && 
+        return expenseDate.getMonth() === currentMonth &&
                expenseDate.getFullYear() === currentYear;
       })
       .reduce((sum, expense) => sum + (expense.amount || 0), 0);
@@ -705,7 +705,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     const lastMonthExpense = this.expenseList
       .filter(expense => {
         const expenseDate = new Date(expense.date);
-        return expenseDate.getMonth() === lastMonth && 
+        return expenseDate.getMonth() === lastMonth &&
                expenseDate.getFullYear() === lastMonthYear;
       })
       .reduce((sum, expense) => sum + (expense.amount || 0), 0);
@@ -726,13 +726,13 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
     // Calculate savings rate change
     const lastMonthSavings = lastMonthIncome - lastMonthExpense;
     const lastMonthSavingsRate = lastMonthIncome > 0 ? (lastMonthSavings / lastMonthIncome) * 100 : 0;
-    this.savingsRateChange = lastMonthSavingsRate > 0 ? 
+    this.savingsRateChange = lastMonthSavingsRate > 0 ?
       ((this.savingsRate - lastMonthSavingsRate) / lastMonthSavingsRate) * 100 : 0;
 
     // Calculate total balance and balance change
     this.totalBalance = this.currentMonthIncome - this.currentMonthExpense;
     const previousBalance = lastMonthIncome - lastMonthExpense;
-    this.balanceChange = previousBalance !== 0 ? 
+    this.balanceChange = previousBalance !== 0 ?
       ((this.totalBalance - previousBalance) / Math.abs(previousBalance)) * 100 : 0;
   }
 

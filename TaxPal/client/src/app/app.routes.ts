@@ -6,6 +6,7 @@ import { ProfileSettingsComponent } from './components/profile-settings/profile-
 import { TaxEstimatorComponent } from './components/Tax-Estimator/tax-estimator.component';
 import { TaxCalendarComponent } from './components/Tax-Calendar/tax-calendar.component';
 import { ExportDownloadComponent } from './components/export-download/export-download.component';
+import { TransactionComponent } from './components/transactions/transaction.component';
 
 // Define the routes
 export const routes: Routes = [
@@ -22,7 +23,7 @@ export const routes: Routes = [
       import('./components/dashboard/dashboard.component').then((m) => m.DashboardComponent),
   },
   { path: 'user-profile', component: UserProfileComponent, canActivate: [AuthGuard] },
-  { path: 'transactions', component: UserProfileComponent },
+  { path: 'transactions', component: TransactionComponent },
   {
     path: 'budget',
     loadComponent: () =>

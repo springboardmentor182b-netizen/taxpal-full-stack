@@ -4,7 +4,7 @@
     <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
       <span>{{ userInitial }}</span>
     </button>
-    
+
     <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
       <div class="profile-section">
         <div class="profile-info centered-profile">
@@ -42,7 +42,7 @@
       </div>
     </div>
   </div>
-  
+
   <div class="profile-content">
     <!-- Dashboard Header -->
     <div class="dashboard-header">
@@ -94,14 +94,14 @@
         <div class="metric-header">
           <h3>Total Balance</h3>
           <div class="metric-trend">
-            <svg class="trend-icon" [ngClass]="{'up': balanceChange >= 0, 'down': balanceChange < 0}" 
-                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+            <svg class="trend-icon" [ngClass]="{'up': balanceChange >= 0, 'down': balanceChange < 0}"
+                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path [attr.d]="balanceChange >= 0 ? 
-                'M23 6l-9.5 9.5-5-5L1 18' : 
+              <path [attr.d]="balanceChange >= 0 ?
+                'M23 6l-9.5 9.5-5-5L1 18' :
                 'M23 18l-9.5-9.5-5 5L1 6'" />
-              <path [attr.d]="balanceChange >= 0 ? 
-                'M17 6h6v6' : 
+              <path [attr.d]="balanceChange >= 0 ?
+                'M17 6h6v6' :
                 'M17 18h6v-6'" />
             </svg>
             <span class="metric-change" [class.positive]="balanceChange >= 0" [class.negative]="balanceChange < 0">
@@ -118,14 +118,14 @@
         <div class="metric-header">
           <h3>Savings Rate</h3>
           <div class="metric-trend">
-            <svg class="trend-icon" [ngClass]="{'up': savingsRateChange >= 0, 'down': savingsRateChange < 0}" 
-                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" 
+            <svg class="trend-icon" [ngClass]="{'up': savingsRateChange >= 0, 'down': savingsRateChange < 0}"
+                 xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path [attr.d]="savingsRateChange >= 0 ? 
-                'M23 6l-9.5 9.5-5-5L1 18' : 
+              <path [attr.d]="savingsRateChange >= 0 ?
+                'M23 6l-9.5 9.5-5-5L1 18' :
                 'M23 18l-9.5-9.5-5 5L1 6'" />
-              <path [attr.d]="savingsRateChange >= 0 ? 
-                'M17 6h6v6' : 
+              <path [attr.d]="savingsRateChange >= 0 ?
+                'M17 6h6v6' :
                 'M17 18h6v-6'" />
             </svg>
             <span class="metric-change" [class.positive]="savingsRateChange >= 0" [class.negative]="savingsRateChange < 0">
@@ -137,7 +137,7 @@
         <div class="metric-subtitle">of monthly income</div>
       </div>
     </div>
-    
+
     <!-- Quick Actions -->
     <div class="quick-actions top-actions">
       <div class="action-buttons">
@@ -303,13 +303,9 @@
 
     <!-- Income vs Expenses Chart - Removed as per new design -->
 
-    <!-- Welcome Section -->
-    <div class="welcome-section">
-      <h2>Welcome back, {{ userName || 'User' }}</h2>
-      <p class="subtitle">Here's an overview of your tax and financial status</p>
-    </div>
+   
   </div>
-  
+
   <!-- Add Income Modal -->
   <div class="modal-overlay" *ngIf="isAddIncomeModalVisible" (click)="hideAddIncomeModal($event)">
     <div class="modal-container">
@@ -363,7 +359,7 @@
       </div>
     </div>
   </div>
-  
+
   <!-- Add Expense Modal -->
   <div class="modal-overlay" *ngIf="isAddExpenseModalVisible" (click)="hideAddExpenseModal($event)">
     <div class="modal-container">
@@ -441,17 +437,17 @@
       <div *ngIf="!hasFinancialData()" class="no-data-message">
         <p>No financial data available yet. Add income and expenses to see your financial chart.</p>
       </div>
-      
+
       <div *ngIf="hasFinancialData()" class="finance-chart">
         <div class="chart-container">
           <div class="chart-y-axis">
             <div class="axis-value" *ngFor="let value of yAxisValues">{{formatCurrency(value)}}</div>
           </div>
-          
+
           <div class="chart-bars">
             <div class="month-column" *ngFor="let month of getDisplayMonths()">
               <div class="bar-group">
-                <div class="bar income-bar" 
+                <div class="bar income-bar"
                      [style.height.%]="getBarHeight(month.income)"
                      [attr.data-label]="'Income'"
                      [attr.data-value]="formatCurrency(month.income)"
@@ -459,7 +455,7 @@
                      (mouseenter)="showTooltip($event)"
                      (mouseleave)="hideTooltip()">
                 </div>
-                <div class="bar expense-bar" 
+                <div class="bar expense-bar"
                      [style.height.%]="getBarHeight(month.expense)"
                      [attr.data-label]="'Expense'"
                      [attr.data-value]="formatCurrency(month.expense)"
@@ -471,7 +467,7 @@
               <div class="month-label">{{month.month}}</div>
             </div>
           </div>
-          
+
           <div class="chart-legend">
             <div class="legend-item">
               <div class="legend-color income-color"></div>
