@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Income = require('../models/Income');
 const Expense = require('../models/Expense');
+const puppeteer = require('puppeteer'); // Add this line
 
 console.log('✓ Reports routes file loaded');
 
@@ -109,10 +110,28 @@ router.post('/generate-report', async (req, res) => {
         break;
         
       case 'pdf':
-        const pdfContent = generatePDFHTML({ reports, year, yearSummary }, reportType);
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('Content-Disposition', `attachment; filename="${reportType || 'financial'}-report-${year}.html"`);
-        res.send(pdfContent);
+        // Use Puppeteer to generate PDF from HTML
+        const pdfHtml = generatePDFHTML({ reports, year, yearSummary }, reportType);
+
+        // Launch Puppeteer and generate PDF
+        const browser = await puppeteer.launch({
+          headless: 'new', // Use 'new' for Puppeteer v20+
+          args: ['--no-sandbox', '--disable-setuid-sandbox']
+        });
+        const page = await browser.newPage();
+        await page.setContent(pdfHtml, { waitUntil: 'networkidle0' });
+
+        const pdfBuffer = await page.pdf({
+          format: 'A4',
+          printBackground: true,
+          margin: { top: '20mm', bottom: '20mm', left: '10mm', right: '10mm' }
+        });
+
+        await browser.close();
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', `attachment; filename="${reportType || 'financial'}-report-${year}.pdf"`);
+        res.send(pdfBuffer);
         break;
         
       default:

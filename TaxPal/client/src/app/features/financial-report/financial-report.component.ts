@@ -5,6 +5,8 @@ import { FinancialReportService } from './financial-report.service';
 import { HttpClient } from '@angular/common/http';
 import { DarkModeService } from '../../core/services/dark-mode.service';
 import { Subscription } from 'rxjs';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 interface MonthlyReport {
   name: string;
@@ -265,17 +267,21 @@ export class FinancialReportComponent implements OnInit, OnDestroy {
       });
   }
 
-  // Add method to handle actual download
+  // Replace downloadReport for PDF with client-side jsPDF
   downloadReport(): void {
-    const userEmail = localStorage.getItem('user_email') || '';
-    
+    if (this.previewFormat === 'pdf') {
+      this.generateClientPDF();
+      this.closePreview();
+      return;
+    }
+
     // Use the already fetched data from previewData
     const reportData = {
       format: this.previewFormat,
       reportType: this.selectedReportType,
-      userEmail: userEmail,
+      userEmail: this.userEmail,
       data: {
-        userEmail: userEmail,
+        userEmail: this.userEmail,
         reports: this.showQuarterly ? this.quarterlyReports : this.monthlyReports,
         year: this.selectedYear,
         yearSummary: this.yearSummary,
@@ -308,6 +314,51 @@ export class FinancialReportComponent implements OnInit, OnDestroy {
           alert('Failed to generate report. Please try again.');
         }
       });
+  }
+
+  // Add method to generate and download the PDF using jsPDF
+  generateClientPDF(): void {
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text(`Financial Report ${this.selectedYear}`, 14, 18);
+
+    doc.setFontSize(12);
+    doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 26);
+
+    // Prepare table data
+    const reports = this.showQuarterly ? this.quarterlyReports : this.monthlyReports;
+    const tableColumn = this.selectedReportType === 'income'
+      ? ['Period', 'Income', 'Net Income']
+      : ['Period', 'Income', 'Expenses', 'Net Income', 'Transactions'];
+    const tableRows = reports.map(r => this.selectedReportType === 'income'
+      ? [r.name, `$${r.income.toFixed(2)}`, `$${r.netIncome.toFixed(2)}`]
+      : [r.name, `$${r.income.toFixed(2)}`, `$${r.expenses.toFixed(2)}`, `$${r.netIncome.toFixed(2)}`, r.transactions]
+    );
+
+    // Add table using autoTable
+    (doc as any).autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 32,
+      theme: 'grid',
+      headStyles: { fillColor: [59, 130, 246] },
+      styles: { fontSize: 11 }
+    });
+
+    // Add summary
+    let summaryY = (doc as any).lastAutoTable.finalY + 10;
+    doc.setFontSize(13);
+    doc.text('Year Summary:', 14, summaryY);
+    doc.setFontSize(11);
+    doc.text(`Total Income: $${this.yearSummary.totalIncome.toFixed(2)}`, 14, summaryY + 8);
+    doc.text(`Total Expenses: $${this.yearSummary.totalExpenses.toFixed(2)}`, 14, summaryY + 16);
+    doc.text(`Net Savings: $${this.yearSummary.netSavings.toFixed(2)}`, 14, summaryY + 24);
+    doc.text(`Savings Rate: ${this.yearSummary.savingsRate.toFixed(1)}%`, 14, summaryY + 32);
+
+    // Save/download PDF
+    const reportName = this.selectedReportType === 'income' ? 'income-statement' :
+      this.selectedReportType === 'expense' ? 'expense-report' : 'financial-report';
+    doc.save(`${reportName}-${this.selectedYear}.pdf`);
   }
 
   // Add helper methods to get breakdown data
