@@ -1,9 +1,9 @@
 export const REPORT_TYPES: string[] = [
   'Income Statement',
+  'Expense Report',
   'Balance Sheet',
-  'Cash Flow Statement',
-  'Tax Summary',
-  'Expense Report'
+  'Budget Statement',
+  'Tax Summary'
 ];
 
 export const REPORT_FORMATS: string[] = ['PDF', 'CSV'];

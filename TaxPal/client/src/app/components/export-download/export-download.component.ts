@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { NavbarComponent } from '../navbar/navbar.component';
 import { FormsModule } from '@angular/forms';
+import { FinancialReportService } from '../../services/financial-report.service';
 import { REPORT_TYPES, REPORT_FORMATS, REPORT_PERIODS } from '../../constants/report-options.constants';
 
 @Component({
@@ -21,53 +21,35 @@ export class ExportDownloadComponent {
   selectedFormat = this.formats[0];
   selectedPeriod = this.periods[0];
   loading = false;
-  downloadUrl = '';
+  message = '';
 
-  constructor(private http: HttpClient) {}
+  constructor(private reportService: FinancialReportService) {}
 
   generateReport() {
     this.loading = true;
+    this.message = '';
 
     const body = {
+      userId: '12345', // 🔹 Replace with actual logged-in user ID later
       reportType: this.selectedReport,
       format: this.selectedFormat,
       period: this.selectedPeriod
     };
 
-    this.http.post('/api/reports/export', body, { responseType: 'blob' })
-      .subscribe({
-        next: (res: Blob) => {
-          this.loading = false;
-          const blob = new Blob([res], { type: this.getMimeType(this.selectedFormat) });
-          const url = window.URL.createObjectURL(blob);
-          this.downloadUrl = url;
-          this.downloadFile(url);
-
-          // Optional: clear message after few seconds
-          setTimeout(() => this.downloadUrl = '', 4000);
-        },
-        error: (err) => {
-          this.loading = false;
-          console.error('Error generating report:', err);
-          alert('Failed to generate report. Please try again.');
+    this.reportService.generateReport(body).subscribe({
+      next: (res) => {
+        this.loading = false;
+        if (res.success) {
+          this.message = `✅ Report generated successfully (${res.report.reportType})`;
+        } else {
+          this.message = '⚠️ Report generation failed.';
         }
-      });
-  }
-
-  getMimeType(format: string): string {
-    switch (format) {
-      case 'PDF': return 'application/pdf';
-      case 'Excel': return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      case 'CSV': return 'text/csv';
-      default: return 'application/octet-stream';
-    }
-  }
-
-  downloadFile(url: string) {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${this.selectedReport.replace(/\s+/g, '_')}_${this.selectedPeriod.replace(/\s+/g, '_')}.${this.selectedFormat.toLowerCase()}`;
-    a.click();
-    window.URL.revokeObjectURL(url);
+      },
+      error: (err) => {
+        this.loading = false;
+        console.error('Error generating report:', err);
+        this.message = '❌ Failed to generate report. Please try again.';
+      }
+    });
   }
 }
