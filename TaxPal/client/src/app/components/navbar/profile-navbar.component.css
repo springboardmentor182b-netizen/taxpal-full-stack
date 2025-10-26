@@ -505,6 +505,32 @@
 }
 
 /* Mobile devices - Show hamburger menu, hide desktop nav */
+/* Media queries */
+/* Adjust navbar layout for medium screens */
+@media (max-width: 1024px) {
+  .nav-links {
+    position: static;
+    transform: none;
+    margin: 0 auto;
+    justify-content: center;
+    gap: 2rem;
+  }
+
+  .navbar-container {
+    justify-content: space-between;
+  }
+
+  .right-container {
+    position: static;
+    right: auto;
+  }
+
+  .logo {
+    margin-left: 1rem;
+  }
+}
+
+/* Adjust navbar layout for small screens */
 @media (max-width: 768px) {
   .desktop-only {
     display: none !important;
@@ -520,14 +546,32 @@
   }
   .logo {
     margin-right: 1rem;
+
+  .navbar-box {
+    padding: 1rem 1.5rem;
+  }
+
+  .nav-links {
+    gap: 1.5rem;
+  }
+
+  .right-container {
+    gap: 1rem;
+  }
+
+  .logout-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
   }
 }
 
 /* Mobile breakpoint */
+/* Hide navigation links and adjust layout for very small screens */
 @media (max-width: 640px) {
   .nav-links {
     display: none !important;
   }
+
   .logo a {
     font-size: 1.4rem !important;
     display: flex !important;
@@ -537,6 +581,7 @@
     height: 20px !important;
     margin-right: 0.5rem !important;
   }
+
   .navbar-box {
     padding: 0.85rem 0 !important;
   }
@@ -548,5 +593,29 @@
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
+
+  .theme-toggle-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0.4rem;
   }
+
+  .logout-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/* Ensure navbar remains accessible and touch-friendly */
+.nav-link:focus,
+.logout-btn:focus,
+.theme-toggle-btn:focus {
+  outline: 3px solid rgba(59, 130, 246, 0.2);
+  outline-offset: 2px;
+}
+
+/* Add hover effects for better interactivity */
+.nav-link:hover,
+.logout-btn:hover {
+  transform: translateY(-1px);
 }

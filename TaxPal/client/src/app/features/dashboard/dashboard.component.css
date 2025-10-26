@@ -80,12 +80,66 @@ nav.main-nav a.active{color:var(--primary-blue)}
   align-items:start;
 }
 
+/* General grid layout */
+.responsive-grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+}
+
 /* KPI cards row (4 cards full width) */
 .kpi-card{background:var(--card-dark);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
-.kpi-card .card-head{display:flex;justify-content:space-between;align-items:center}
+.kpi-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 .kpi-card h3{margin:0;color:var(--muted);font-size:13px}
 .kpi-card h2{margin:8px 0 0;font-size:22px}
+.kpi-card h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+.kpi-card h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0.5rem 0;
+}
+.kpi-card p {
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin: 0;
+}
+.kpi-card .card-head{display:flex;justify-content:space-between;align-items:center}
+.kpi-card .card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
 .kpi-square{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:white}
+.kpi-square {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  color: #ffffff;
+}
 .kpi-green{background:var(--primary-green)}
 .kpi-red{background:var(--primary-red)}
 .kpi-orange{background:var(--primary-orange)}
@@ -98,17 +152,52 @@ nav.main-nav a.active{color:var(--primary-blue)}
 
 /* Balance card */
 .balance-card{display:flex;gap:16px;align-items:center}
+.balance-card {
+  display: flex;
+  align-items: center;
+}
 .balance-left{flex:1}
 .circle-wrap{width:140px;height:140px;position:relative}
+.circle-wrap {
+  position: relative;
+  width: 140px;
+  height: 140px;
+}
 .circle-wrap svg{transform:rotate(-90deg)}
-.circle-wrap circle{fill:none;stroke-width:10;stroke-linecap:round}
+.circle-wrap .ring-bg {
+  fill: none;
+  stroke: #e5e7eb;
+  stroke-width: 10;
+}
+.circle-wrap .ring-fill {
+  fill: none;
+  stroke: #3b82f6;
+  stroke-width: 10;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: center;
+}
 .ring-bg{stroke:rgba(255,255,255,0.06)}
 .ring-fill{stroke:var(--graph-income)}
 .balance-text{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);text-align:center;color:var(--text-light)}
 
 /* Transactions */
 .transactions-list{list-style:none;padding:0;margin:0}
+.transactions-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 .transaction-item{display:flex;justify-content:space-between;padding:14px;border-radius:8px;background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);border:1px solid rgba(255,255,255,0.02);margin-bottom:12px}
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #f9fafb;
+  margin-bottom: 0.5rem;
+}
 .tx-left{display:flex;gap:12px;align-items:center}
 .tx-meta{display:flex;flex-direction:column}
 .tx-meta small{color:var(--muted)}
@@ -116,17 +205,49 @@ nav.main-nav a.active{color:var(--primary-blue)}
 /* Budget & Pie */
 .budget .label{display:flex;justify-content:space-between}
 .progress-track{height:10px;background:rgba(255,255,255,0.04);border-radius:999px;margin-top:6px;overflow:hidden}
+.progress-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
 .progress-fill{height:100%;background:var(--graph-income)}
+.progress-fill {
+  background: #3b82f6;
+  height: 100%;
+}
 .pie-wrap{text-align:center}
 
 /* Income vs Expenses wide card */
 .wide-card{grid-column:1 / -1;background:var(--card-dark);padding:18px;border-radius:12px}
-.chart-controls{display:flex;justify-content:flex-end;gap:10px;margin-bottom:8px}
-.chip{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,0.02);color:var(--muted);cursor:pointer}
-.chip.active{background:linear-gradient(180deg,var(--card-darker),var(--card-dark));color:var(--text-light);border-color:rgba(255,255,255,0.03)}
+.wide-card {
+  grid-column: span 12;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
 
 /* floating action plus */
 .fab{position:fixed;right:22px;bottom:22px;width:54px;height:54px;border-radius:999px;background:var(--card-dark);display:flex;align-items:center;justify-content:center;border:3px solid rgba(255,255,255,0.02);cursor:pointer}
+.fab {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+.fab:hover {
+  background: #2563eb;
+}
 
 /* small helpers */
 .muted{color:var(--muted)}
@@ -137,4 +258,66 @@ nav.main-nav a.active{color:var(--primary-blue)}
 @media (max-width:1000px){
   .col-span-3{grid-column: span 6}
   .col-span-6{grid-column: span 12}
+}
+@media (max-width: 1024px) {
+  .responsive-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1rem;
+  }
+
+  .kpi-card {
+    grid-column: span 6;
+  }
+
+  .wide-card {
+    grid-column: span 6;
+  }
+}
+
+@media (max-width: 768px) {
+  .responsive-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+  }
+
+  .kpi-card {
+    grid-column: span 4;
+  }
+
+  .wide-card {
+    grid-column: span 4;
+  }
+
+  .transactions-list {
+    padding: 0 0.5rem;
+  }
+
+  .fab {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 480px) {
+  .responsive-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .kpi-card {
+    grid-column: span 2;
+  }
+
+  .wide-card {
+    grid-column: span 2;
+  }
+
+  .transactions-list {
+    padding: 0;
+  }
+
+  .fab {
+    width: 40px;
+    height: 40px;
+  }
 }
