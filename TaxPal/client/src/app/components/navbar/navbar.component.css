@@ -388,11 +388,11 @@
     margin: 0 auto;
     gap: 1.5rem;
   }
-  
+
   .navbar-container {
     padding: 0 1.5rem;
   }
-  
+
   .logo {
     margin-right: 1rem;
   }
@@ -403,34 +403,34 @@
   .navbar-container {
     padding: 0 1rem;
   }
-  
+
   .navbar-box {
     padding: 1rem 0;
   }
-  
+
   .nav-links {
     gap: 1rem;
   }
-  
+
   .nav-link {
     font-size: 0.9rem;
     padding: 0.5rem 0;
   }
-  
+
   .nav-icon {
     width: 14px;
     height: 14px;
   }
-  
+
   .right-container {
     gap: 1rem;
   }
-  
+
   .auth-buttons {
     gap: 0.75rem;
     padding-left: 1rem;
   }
-  
+
   .btn {
     padding: 0.45rem 0.9rem;
     font-size: 0.9rem;
@@ -447,12 +447,12 @@
     justify-content: space-between !important;
     align-items: center !important;
   }
-  
+
   /* Hide nav links on mobile */
   .nav-links {
     display: none !important;
   }
-  
+
   /* Logo - keep visible */
   .logo {
     flex: 0 0 auto !important;
@@ -460,22 +460,22 @@
     margin-left: 0 !important;
     display: block !important;
   }
-  
+
   .logo a {
     font-size: 1.4rem !important;
     display: flex !important;
   }
-  
+
   .calculator-icon {
     width: 20px !important;
     height: 20px !important;
     margin-right: 0.5rem !important;
   }
-  
+
   .navbar-box {
     padding: 0.85rem 0 !important;
   }
-  
+
   /* Right container - MUST BE VISIBLE */
   .right-container {
     display: flex !important;
@@ -486,7 +486,7 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+
   /* Auth buttons - MUST BE VISIBLE */
   .auth-buttons {
     display: flex !important;
@@ -496,7 +496,7 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+
   /* Theme toggle - MUST BE VISIBLE */
   .theme-toggle-btn {
     width: 36px !important;
@@ -507,12 +507,12 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+
   .theme-icon {
     width: 16px !important;
     height: 16px !important;
   }
-  
+
   /* Login button - show only icon on mobile */
   .login-btn {
     padding: 0.5rem !important;
@@ -522,17 +522,17 @@
     visibility: visible !important;
     opacity: 1 !important;
   }
-  
+
   .login-btn span {
     display: none !important;
   }
-  
+
   .login-icon {
     margin-right: 0 !important;
     width: 18px !important;
     height: 18px !important;
   }
-  
+
   /* Register button - MUST BE VISIBLE */
   .register-btn {
     font-size: 0.85rem !important;
@@ -549,42 +549,42 @@
   .navbar-container {
     padding: 0 0.75rem !important;
   }
-  
+
   .logo a {
     font-size: 1.2rem !important;
   }
-  
+
   .calculator-icon {
     width: 18px !important;
     height: 18px !important;
     margin-right: 0.4rem !important;
   }
-  
+
   .right-container {
     gap: 0.5rem !important;
   }
-  
+
   .auth-buttons {
     gap: 0.4rem !important;
   }
-  
+
   .register-btn {
     font-size: 0.8rem !important;
     padding: 0.45rem 0.85rem !important;
   }
-  
+
   .theme-toggle-btn {
     width: 32px !important;
     height: 32px !important;
     padding: 0.4rem !important;
   }
-  
+
   .login-btn {
     min-width: 36px !important;
     min-height: 36px !important;
     padding: 0.45rem !important;
   }
-  
+
   .login-icon {
     width: 16px !important;
     height: 16px !important;
@@ -672,13 +672,13 @@
     padding: 0.4rem 0.6rem;
     gap: 0.5rem;
   }
-  
+
   .user-avatar {
     width: 32px;
     height: 32px;
     font-size: 0.85rem;
   }
-  
+
   .user-name {
     display: none;
   }
@@ -879,28 +879,28 @@
   .desktop-only {
     display: none !important;
   }
-  
+
   .mobile-menu-btn {
     display: flex !important;
   }
-  
+
   .mobile-only {
     display: flex !important;
   }
-  
+
   .right-container {
     gap: 0.75rem;
   }
-  
+
   .nav-links {
     position: static;
     transform: none;
   }
-  
+
   .logo {
     margin-right: 1rem;
   }
-  
+
   .navbar-container {
     padding: 0 1rem;
   }

@@ -27,7 +27,7 @@ export class NavbarComponent implements OnInit {
   ngOnInit() {
     // Check if dark mode is enabled in localStorage
     this.isDarkMode = localStorage.getItem('darkMode') === 'true';
-    
+
     // Apply dark mode to document if needed
     if (this.isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -36,7 +36,7 @@ export class NavbarComponent implements OnInit {
       document.documentElement.classList.remove('dark');
       document.body.classList.remove('dark-mode');
     }
-    
+
     // Also add a global class to body for page-level styling
     if (this.isDarkMode) {
       document.body.classList.add('dark-theme');
@@ -75,7 +75,7 @@ export class NavbarComponent implements OnInit {
 
   toggleDarkMode() {
     this.isDarkMode = !this.isDarkMode;
-    
+
     // Update document classes
     if (this.isDarkMode) {
       document.documentElement.classList.add('dark');
@@ -86,10 +86,10 @@ export class NavbarComponent implements OnInit {
       document.body.classList.remove('dark-mode');
       document.body.classList.remove('dark-theme');
     }
-    
+
     // Save preference to localStorage
     localStorage.setItem('darkMode', this.isDarkMode.toString());
-    
+
     // Dispatch event to notify other components
     const event = new CustomEvent('darkModeChanged', {
       detail: { isDarkMode: this.isDarkMode }
@@ -126,10 +126,10 @@ export class NavbarComponent implements OnInit {
     localStorage.removeItem('user_email');
     localStorage.removeItem('user_name');
     localStorage.removeItem('user_id');
-    
+
     // Close the profile menu
     this.closeProfileMenu();
-    
+
     // Redirect to home page
     window.location.href = '/';
   }
@@ -163,4 +163,3 @@ export class NavbarComponent implements OnInit {
     this.showSignInForm = true;
   }
 }
-
