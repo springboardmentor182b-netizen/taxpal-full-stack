@@ -76,6 +76,12 @@ export class FinancialReportComponent implements OnInit, OnDestroy {
   // Add new property for report type
   selectedReportType: 'income' | 'expense' | 'summary' = 'summary';
 
+  // New properties for user profile
+  userName: string = '';
+  userEmail: string = '';
+  userInitial: string = '';
+  showProfileMenu: boolean = false;
+
   constructor(private financialReportService: FinancialReportService, private http: HttpClient, private darkModeService: DarkModeService) {}
 
   ngOnInit(): void {
@@ -83,6 +89,9 @@ export class FinancialReportComponent implements OnInit, OnDestroy {
       this.isDarkMode = isDark;
     });
     this.userId = localStorage.getItem('user_id') || '';
+    this.userName = localStorage.getItem('user_name') || '';
+    this.userEmail = localStorage.getItem('user_email') || '';
+    this.userInitial = this.userName ? this.userName.charAt(0).toUpperCase() : (this.userEmail.charAt(0).toUpperCase() || 'U');
     this.loadFinancialReport();
   }
 
@@ -484,5 +493,21 @@ export class FinancialReportComponent implements OnInit, OnDestroy {
   generateIncomeStatement(): void {
     this.selectedReportType = 'income';
     this.exportReport('pdf'); // or any format you prefer
+  }
+
+  toggleProfileMenu() {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  closeProfileMenu() {
+    this.showProfileMenu = false;
+  }
+
+  logout() {
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    this.closeProfileMenu();
+    window.location.href = '/';
   }
 }

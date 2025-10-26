@@ -1,4 +1,35 @@
 <div class="budget-page">
+    <!-- Profile Avatar in top right corner -->
+    <div class="hero-user-profile">
+        <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
+            <span>{{ userInitial }}</span>
+        </button>
+        <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
+            <div class="profile-section">
+                <div class="profile-info centered-profile">
+                    <h3>{{ userName || 'User' }}</h3>
+                    <p>{{ userEmail }}</p>
+                </div>
+            </div>
+            <div class="profile-menu-divider"></div>
+            <div class="profile-menu-items">
+                <a routerLink="/user-profile" class="profile-menu-item" (click)="closeProfileMenu()">
+                    <!-- ...dashboard icon svg... -->
+                    <span>Dashboard</span>
+                </a>
+                <a routerLink="/profile-settings" class="profile-menu-item" (click)="closeProfileMenu()">
+                    <!-- ...settings icon svg... -->
+                    <span>Profile Settings</span>
+                </a>
+                <div class="profile-menu-divider"></div>
+                <button type="button" class="profile-menu-item logout-item" (click)="logout()">
+                    <!-- ...logout icon svg... -->
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <main class="budget-main">
         <div class="budget-container">
             <!-- Form Section - Left side -->

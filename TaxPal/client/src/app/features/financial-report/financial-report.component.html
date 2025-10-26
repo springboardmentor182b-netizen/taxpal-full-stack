@@ -187,3 +187,99 @@
     </div>
   </div>
 </div>
+
+<div class="financial-report-page">
+  <!-- Profile Avatar in top right corner -->
+  <div class="hero-user-profile">
+    <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
+      <span>{{ userInitial }}</span>
+    </button>
+    <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
+      <div class="profile-section">
+        <div class="profile-info centered-profile">
+          <h3>{{ userName || 'User' }}</h3>
+          <p>{{ userEmail }}</p>
+        </div>
+      </div>
+      <div class="profile-menu-divider"></div>
+      <div class="profile-menu-items">
+        <a routerLink="/user-profile" class="profile-menu-item" (click)="closeProfileMenu()">
+          <span>Dashboard</span>
+        </a>
+        <a routerLink="/profile-settings" class="profile-menu-item" (click)="closeProfileMenu()">
+          <span>Profile Settings</span>
+        </a>
+        <div class="profile-menu-divider"></div>
+        <button type="button" class="profile-menu-item logout-item" (click)="logout()">
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-content">
+    <div class="report-header">
+      <h1>Financial Report</h1>
+      <div class="year-selector">
+        <label for="year">Year:</label>
+        <select id="year" [(ngModel)]="selectedYear" (change)="onYearSelect($event)">
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+        <button class="toggle-view-btn" (click)="toggleView()">
+          {{ showQuarterly ? 'Show Monthly' : 'Show Quarterly' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="year-summary">
+      <div class="summary-item">
+        <span>Total Income:</span>
+        <strong>${{ yearSummary.totalIncome | number:'1.2-2' }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Total Expenses:</span>
+        <strong>${{ yearSummary.totalExpenses | number:'1.2-2' }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Net Savings:</span>
+        <strong>${{ yearSummary.netSavings | number:'1.2-2' }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Savings Rate:</span>
+        <strong>{{ yearSummary.savingsRate | number:'1.1-1' }}%</strong>
+      </div>
+    </div>
+
+    <div class="reports-table-section">
+      <table class="reports-table" *ngIf="reports.length > 0">
+        <thead>
+          <tr>
+            <th>{{ showQuarterly ? 'Quarter' : 'Month' }}</th>
+            <th>Income</th>
+            <th>Expenses</th>
+            <th>Net Income</th>
+            <th>Transactions</th>
+            <th>Budget Usage</th>
+            <th>Budget</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reports">
+            <td>{{ r.name }}</td>
+            <td>${{ r.income | number:'1.2-2' }}</td>
+            <td>${{ r.expenses | number:'1.2-2' }}</td>
+            <td>${{ r.netIncome | number:'1.2-2' }}</td>
+            <td>{{ r.transactions }}</td>
+            <td>{{ r.budgetUsage | number:'1.0-0' }}%</td>
+            <td>${{ r.budget | number:'1.2-2' }}</td>
+            <td>{{ r.rating }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="reports.length === 0" class="no-data-message">
+        No report data available for this year.
+      </div>
+    </div>
+  </div>
+</div>

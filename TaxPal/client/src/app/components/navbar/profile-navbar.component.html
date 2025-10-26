@@ -27,7 +27,26 @@
           <span>TaxPal</span>
         </a>
       </div>
-      <div class="nav-links">
+      <!-- Mobile Menu Button (Hamburger) -->
+      <button class="mobile-menu-btn" (click)="toggleMobileMenu($event)">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <!-- Desktop Navigation Links -->
+      <div class="nav-links desktop-only">
         <a
           routerLink="/user-profile"
           class="nav-link"
@@ -186,10 +205,136 @@
             <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
           </svg>
         </button>
-        <!-- No logout button here as it's already in the user profile dropdown -->
       </div>
     </div>
   </div>
+  <!-- Mobile Dropdown Menu -->
+  <div class="mobile-dropdown" [class.active]="isMobileMenuOpen">
+    <div class="mobile-dropdown-content">
+      <a (click)="navigateTo('/user-profile', $event)" class="mobile-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="nav-icon"
+        >
+          <rect x="3" y="3" width="7" height="9" />
+          <rect x="14" y="3" width="7" height="5" />
+          <rect x="14" y="12" width="7" height="9" />
+          <rect x="3" y="16" width="7" height="5" />
+        </svg>
+        <span>Dashboard</span>
+      </a>
+      <a (click)="navigateTo('/transactions', $event)" class="mobile-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="nav-icon"
+        >
+          <rect x="2" y="3" width="20" height="18" rx="2" />
+          <path d="M7 8h10" />
+          <path d="M7 13h10" />
+          <path d="M7 18h4" />
+        </svg>
+        <span>Transactions</span>
+      </a>
+      <a (click)="navigateTo('/budget', $event)" class="mobile-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="nav-icon"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M16 12h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8" />
+          <path d="M12 6v2" />
+          <path d="M12 16v2" />
+        </svg>
+        <span>Budget</span>
+      </a>
+      <a (click)="navigateTo('/reports', $event)" class="mobile-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="nav-icon"
+        >
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+          <path d="M14 2v6h6" />
+          <path d="M16 13H8" />
+          <path d="M16 17H8" />
+          <path d="M10 9H8" />
+        </svg>
+        <span>Reports</span>
+      </a>
+      <a (click)="navigateTo('/tax-calendar', $event)" class="mobile-nav-link">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="nav-icon"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+          <line x1="16" y1="2" x2="16" y2="6" />
+          <line x1="8" y1="2" x2="8" y2="6" />
+          <line x1="3" y1="10" x2="21" y2="10" />
+        </svg>
+        <span>Tax Estimator</span>
+      </a>
+      <div class="mobile-dropdown-divider"></div>
+      <button type="button" class="mobile-nav-link logout-link" (click)="logout()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="nav-icon"
+        >
+          <path d="M16 12H8" />
+          <path d="M12 16l-4-4 4-4" />
+        </svg>
+        <span>Logout</span>
+      </button>
+    </div>
+  </div>
+  <!-- Mobile Menu Backdrop -->
+  <div class="mobile-menu-backdrop" [class.active]="isMobileMenuOpen" (click)="closeMobileMenu()"></div>
 </nav>
 
 <!-- Backdrop overlay when menu is open -->
