@@ -48,7 +48,7 @@ app.use("/api/expense", expenseRoutes);
 
 // ✅ Root route
 app.get("/", (req, res) => {
-  res.send("Hello from Express 🚀");
+  res.redirect("/login")
 });
 
 // ✅ Serve Angular build (AFTER API routes)
