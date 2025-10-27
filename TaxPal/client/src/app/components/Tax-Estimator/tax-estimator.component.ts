@@ -3,6 +3,7 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { environment } from '../../../environments/environment';
+import { Router } from '@angular/router';
 
 interface TaxData {
   country: string;
@@ -35,6 +36,7 @@ interface TaxEstimateResponse {
   styleUrls: ['./tax-estimator.component.css']
 })
 export class TaxEstimatorComponent {
+  isDarkMode = false;
   taxData: TaxData = {
     country: 'United States',
     state: '',
@@ -61,10 +63,13 @@ export class TaxEstimatorComponent {
   userId = '';
   userEmail = '';
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private router: Router) {
     // Get user info from localStorage
     this.userId = localStorage.getItem('user_id') || '';
     this.userEmail = localStorage.getItem('user_email') || '';
+
+    // Detect dark mode from document
+    this.isDarkMode = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark-mode');
   }
 
   calculateTax() {
@@ -190,5 +195,9 @@ export class TaxEstimatorComponent {
     this.effectiveRate = null;
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  goBackToCalendar() {
+    this.router.navigate(['/tax-calendar']);
   }
 }
