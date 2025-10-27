@@ -10,7 +10,7 @@ describe('Financial Reports API Comprehensive Tests', () => {
 
   beforeAll(async () => {
     // Connect to test database
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/taxpal-test');
+    await mongoose.connect(process.env.MONGODB_URI || 'MONGODB_URI=mongodb://localhost:27017/taxpal');
     service = new FinancialReportService();
   });
 
@@ -23,7 +23,7 @@ describe('Financial Reports API Comprehensive Tests', () => {
     await FinancialReportModel.deleteMany({});
   });
 
-  // ==================== MODEL TESTS ====================
+  // MODEL TESTS 
   describe('FinancialReport Model Tests', () => {
     it('should create and save a financial report successfully', async () => {
       const validReport = new FinancialReportModel({
@@ -85,7 +85,7 @@ describe('Financial Reports API Comprehensive Tests', () => {
     });
   });
 
-  // ==================== SERVICE TESTS ====================
+  // SERVICE TESTS 
   describe('FinancialReport Service Tests', () => {
     it('should create a new report via service', async () => {
       const reportData = {
@@ -166,7 +166,7 @@ describe('Financial Reports API Comprehensive Tests', () => {
     });
   });
 
-  // ==================== API ENDPOINT TESTS ====================
+  // API ENDPOINT TESTS
   describe('POST /api/v1/financial-reports', () => {
     it('should create a new financial report', async () => {
       const reportData = {
@@ -372,10 +372,10 @@ describe('Financial Reports API Comprehensive Tests', () => {
     });
   });
 
-  // ==================== INTEGRATION TESTS ====================
+  // INTEGRATION TESTS
   describe('Integration Tests - Complete Flow', () => {
     it('should complete full CRUD cycle', async () => {
-      // 1. Create a report
+      // Create a report
       const createResponse = await request(app)
         .post('/api/v1/financial-reports')
         .send({
@@ -388,7 +388,7 @@ describe('Financial Reports API Comprehensive Tests', () => {
 
       const reportId = createResponse.body.report._id;
 
-      // 2. Verify it exists in GET all
+      // Verify it exists in GET all
       const getAllResponse = await request(app)
         .get('/api/v1/financial-reports')
         .expect(200);
@@ -396,28 +396,28 @@ describe('Financial Reports API Comprehensive Tests', () => {
       expect(getAllResponse.body.length).toBe(1);
       expect(getAllResponse.body[0]._id).toBe(reportId);
 
-      // 3. Download the report
+      // Download the report
       const downloadResponse = await request(app)
         .get(`/api/v1/financial-reports/download/${reportId}`)
         .expect(200);
 
       expect(downloadResponse.body._id).toBe(reportId);
 
-      // 4. Export as CSV
+      // Export as CSV
       const csvResponse = await request(app)
         .get('/api/v1/financial-reports/export/csv')
         .expect(200);
 
       expect(csvResponse.text).toContain('Integration Test Report');
 
-      // 5. Delete the report
+      // Delete the report
       const deleteResponse = await request(app)
         .delete(`/api/v1/financial-reports/${reportId}`)
         .expect(200);
 
       expect(deleteResponse.body.message).toBe('Report deleted successfully');
 
-      // 6. Verify it's gone
+      // Verify it's gone
       const finalGetResponse = await request(app)
         .get('/api/v1/financial-reports')
         .expect(200);
@@ -426,7 +426,7 @@ describe('Financial Reports API Comprehensive Tests', () => {
     });
   });
 
-  // ==================== EDGE CASE TESTS ====================
+  // EDGE CASE TESTS
   describe('Edge Case Tests', () => {
     it('should handle very long titles', async () => {
       const longTitle = 'A'.repeat(500);
