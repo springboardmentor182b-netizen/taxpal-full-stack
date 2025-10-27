@@ -91,6 +91,11 @@
 }
 .btn-outline:active { transform: translateY(0.5px); }
 
+/* NEW: Danger button (for Delete All) */
+.btn-danger { background:#ef4444; color:#fff; border:1px solid #ef4444; }
+.btn-danger:hover { background:#dc2626; border-color:#dc2626; }
+.btn-danger:disabled { opacity:.6; cursor:not-allowed; }
+
 /* ===== Main Content ===== */
 .main-content {
   padding: 2rem;
@@ -304,6 +309,7 @@
 }
 .loading-state svg { margin-bottom: 1rem; }
 
+/* ===== Empty State ===== */
 .empty-state {
   display: flex;
   flex-direction: column;
@@ -341,6 +347,7 @@
   margin-bottom: 0.75rem;
 }
 
+/* Type pill */
 .transaction-type {
   display: flex;
   align-items: center;
@@ -356,6 +363,7 @@
 
 .transaction-actions { display: flex; gap: 0.5rem; }
 
+/* Action buttons (single trash button) */
 .action-button {
   background: none;
   border: none;
@@ -364,19 +372,39 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--ink-700);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  width: 2rem;   /* ensures visible clickable area */
+  height: 2rem;  /* ensures visible clickable area */
 }
+.action-button svg { width: 1rem; height: 1rem; }
+.action-button:focus-visible { outline: 2px solid var(--primary-light); outline-offset: 2px; }
+
 .delete-button { color: #ef4444; }
 .delete-button:hover { background-color: #fef2f2; }
 
+/* Card content */
 .transaction-content { display: flex; flex-direction: column; gap: 0.5rem; }
-
 .transaction-category { font-weight: 600; color: var(--ink-900); margin: 0; font-size: 1rem; }
-
 .transaction-amount { font-size: 1.25rem; font-weight: 700; margin: 0; }
-
 .transaction-description { color: var(--ink-700); font-size: 0.875rem; margin: 0; line-height: 1.4; }
-
 .transaction-date { color: #8b95a5; font-size: 0.75rem; margin: 0; }
+
+/* ===== Tailwind-like utility fallbacks (so icons & colors show even without Tailwind) ===== */
+.w-4 { width: 1rem; }
+.h-4 { height: 1rem; }
+
+/* Spin animation for loaders/spinners */
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* Color utilities used in template */
+.text-green-600 { color: #16a34a; }
+.text-red-600 { color: #dc2626; }
+.bg-green-50 { background: #f0fdf4; }
+.bg-red-50 { background: #fef2f2; }
 
 /* =======================================================================
    RESPONSIVE MEDIA QUERIES
