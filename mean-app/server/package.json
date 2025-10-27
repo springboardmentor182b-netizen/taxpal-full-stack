@@ -2,14 +2,11 @@
   "name": "taxpal-server",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {
-      "build": "tsc",
-    "start": "ts-node src/server.ts",
-    "dev": "nodemon src/server.ts",
-    "test": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --runInBand",
-    "test:watch": "cross-env NODE_ENV=test jest --watch --runInBand",
-    "test:coverage": "cross-env NODE_ENV=test jest --coverage --forceExit --detectOpenHandles --runInBand"
-  },
+"scripts": {
+  "build": "tsc",
+  "start": "node dist/server.js",
+  "dev": "nodemon src/server.ts"
+},
   "dependencies": {
     "@angular/animations": "^20.3.4",
     "@angular/cdk": "^20.2.8",
@@ -37,6 +34,7 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
+  
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/body-parser": "^1.19.6",
