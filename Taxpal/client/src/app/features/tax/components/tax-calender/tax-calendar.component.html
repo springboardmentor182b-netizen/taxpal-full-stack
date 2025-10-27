@@ -12,7 +12,7 @@
           <h2 class="form-card-title" style="margin:0;">Quarterly Schedule</h2>
 
           <div style="display:flex; align-items:center; gap:8px;">
-            <!-- ✅ New Delete All Reminders -->
+            <!-- ✅ Delete All Reminders -->
             <button
               type="button"
               class="btn btn-danger"
@@ -58,7 +58,6 @@
                   <div class="card__main">
                     <div class="card__title">
                       <span class="card__title-text">{{ item.title }}</span>
-                      <!-- switch to ngClass for correctness -->
                       <span [ngClass]="badgeClass(item.type)">{{ item.type }}</span>
                     </div>
 
@@ -70,7 +69,7 @@
                       {{ item.note }}
                     </div>
 
-                    <!-- ✅ Actions: only for payments -->
+                    <!-- ✅ Actions -->
                     <div class="card__actions" *ngIf="item.type === 'payment'">
                       <button
                         type="button"
@@ -78,6 +77,17 @@
                         [disabled]="isCompleting(item._id)"
                         (click)="markComplete(item)">
                         {{ isCompleting(item._id) ? 'Completing…' : 'Mark Complete' }}
+                      </button>
+                    </div>
+
+                    <!-- ✅ NEW: Delete single reminder -->
+                    <div class="card__actions" *ngIf="item.type === 'reminder'">
+                      <button
+                        type="button"
+                        class="btn btn-danger"
+                        [disabled]="isDeleting(item._id)"
+                        (click)="deleteReminder(item)">
+                        {{ isDeleting(item._id) ? 'Deleting…' : 'Delete' }}
                       </button>
                     </div>
                   </div>

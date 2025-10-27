@@ -25,8 +25,9 @@ export class TaxCalendarComponent implements OnInit {
   bulkMsg = '';
   bulkBusy = false;
 
-  // track per-item "completing" state
+  // track per-item states
   private completingIds = new Set<string>();
+  private deletingIds = new Set<string>(); // ✅ NEW
 
   ngOnInit(): void {
     this.fetch();
@@ -61,6 +62,11 @@ export class TaxCalendarComponent implements OnInit {
     return !!id && this.completingIds.has(id);
   }
 
+  // ✅ NEW
+  isDeleting(id?: string) {
+    return !!id && this.deletingIds.has(id);
+  }
+
   onClose() {
     this.router.navigate(['/dashboard']);
   }
@@ -69,7 +75,7 @@ export class TaxCalendarComponent implements OnInit {
     this.router.navigate(['/tax-estimator']);
   }
 
-  // ✅ NEW: Delete all reminders
+  // Delete all reminders (bulk)
   deleteAllReminders() {
     if (this.bulkBusy) return;
     if (!confirm('Delete ALL reminder events? This cannot be undone.')) return;
@@ -83,7 +89,7 @@ export class TaxCalendarComponent implements OnInit {
         this.items = this.items.filter(i => i.type !== 'reminder');
         this.bulkMsg = `Deleted ${count} reminder item${count === 1 ? '' : 's'}.`;
         this.bulkBusy = false;
-        // Optional: re-fetch to ensure perfect sync
+        // Optional re-fetch for perfect sync
         this.fetch();
       },
       error: (err) => {
@@ -94,7 +100,7 @@ export class TaxCalendarComponent implements OnInit {
     });
   }
 
-  // ✅ NEW: Mark a payment as complete (delete it on server + remove from UI)
+  // Mark a payment as complete (delete it server-side)
   markComplete(item: TaxCalendarItem) {
     if (!item?._id) return;
     if (this.isCompleting(item._id)) return;
@@ -115,6 +121,32 @@ export class TaxCalendarComponent implements OnInit {
         console.error('[tax-calendar] complete payment failed', err);
         this.completingIds.delete(item._id!);
         this.error = 'Failed to mark payment as complete.';
+        setTimeout(() => (this.error = ''), 3000);
+      }
+    });
+  }
+
+  // ✅ NEW: Delete a single reminder (server + UI)
+  deleteReminder(item: TaxCalendarItem) {
+    if (!item?._id) return;
+    if (this.isDeleting(item._id)) return;
+    if (!confirm('Delete this reminder?')) return;
+
+    this.deletingIds.add(item._id);
+    this.calendarSvc.deleteItem(item._id).subscribe({
+      next: (ok) => {
+        this.deletingIds.delete(item._id!);
+        if (ok) {
+          this.items = this.items.filter(i => i._id !== item._id);
+        } else {
+          this.error = 'Failed to delete reminder.';
+          setTimeout(() => (this.error = ''), 3000);
+        }
+      },
+      error: (err) => {
+        console.error('[tax-calendar] delete reminder failed', err);
+        this.deletingIds.delete(item._id!);
+        this.error = 'Failed to delete reminder.';
         setTimeout(() => (this.error = ''), 3000);
       }
     });
