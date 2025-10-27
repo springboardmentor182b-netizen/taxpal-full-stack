@@ -167,3 +167,36 @@
     width: 100%; /* full-width buttons on mobile */
   }
 }
+
+
+
+
+.field-error {
+  color: #d32f2f;
+  font-size: 13px;
+  margin-top: 4px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.form-error-message {
+  margin-top: 10px;
+  padding: 8px 12px;
+  background-color: #fdecea;
+  color: #d32f2f;
+  border-radius: 6px;
+  text-align: center;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+

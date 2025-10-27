@@ -1,118 +1,168 @@
-import { ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { ExpensesForm } from './expenses-form.component';
-import { ExpenseService } from '../../../services/expense.service';
-import { MatDialogRef } from '@angular/material/dialog';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of, throwError } from 'rxjs';
-import { ReactiveFormsModule } from '@angular/forms';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { Router } from '@angular/router';
+import { ReportsComponent } from './reports.component';
+import { ReportsService } from '../../../services/reports.service';
+import { AuthService } from '../../../features/auth.service';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { RouterTestingModule } from '@angular/router/testing';
 
-describe('ExpensesForm', () => {
-  let component: ExpensesForm;
-  let fixture: ComponentFixture<ExpensesForm>;
-  let expenseServiceSpy: jasmine.SpyObj<ExpenseService>;
-  let dialogRefSpy: jasmine.SpyObj<MatDialogRef<ExpensesForm>>;
+describe('ReportsComponent', () => {
+  let component: ReportsComponent;
+  let fixture: ComponentFixture<ReportsComponent>;
+  let mockReportsService: jasmine.SpyObj<ReportsService>;
+  let mockAuthService: jasmine.SpyObj<AuthService>;
+  let mockRouter: jasmine.SpyObj<Router>;
 
   beforeEach(async () => {
-   
-    expenseServiceSpy = jasmine.createSpyObj('ExpenseService', ['addExpense']);
-    dialogRefSpy = jasmine.createSpyObj('MatDialogRef', ['close']);
+    mockReportsService = jasmine.createSpyObj('ReportsService', [
+      'getReports',
+      'generateReport',
+      'downloadReport'
+    ]);
+
+    mockAuthService = jasmine.createSpyObj('AuthService', ['getCurrentUser']);
+    mockRouter = jasmine.createSpyObj('Router', ['navigate']);
 
     await TestBed.configureTestingModule({
-      imports: [ExpensesForm, ReactiveFormsModule, HttpClientTestingModule], 
-      providers: [
-        { provide: ExpenseService, useValue: expenseServiceSpy },
-        { provide: MatDialogRef, useValue: dialogRefSpy },
+      imports: [
+        CommonModule,
+        FormsModule,
+        RouterTestingModule,
+        ReportsComponent 
       ],
+      providers: [
+        { provide: ReportsService, useValue: mockReportsService },
+        { provide: AuthService, useValue: mockAuthService },
+        { provide: Router, useValue: mockRouter }
+      ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ExpensesForm);
+    fixture = TestBed.createComponent(ReportsComponent);
     component = fixture.componentInstance;
-    fixture.detectChanges();
   });
 
+  
   it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should mark form as invalid when required fields are empty', () => {
-    component.expensesForm.setValue({
-      description: '',
-      amount: null,
-      category: '',
-      date: null,
-      notes: ''
-    });
-    component.expensesForm.markAllAsTouched();
-    component.expensesForm.updateValueAndValidity();
-    fixture.detectChanges();
+  
+  it('should load current user and fetch reports', () => {
+    const user = { id: '1', fullName: 'Pavithra Y', email: 'pav@example.com', username: 'pavi' };
+    mockAuthService.getCurrentUser.and.returnValue(user);
+    mockReportsService.getReports.and.returnValue(of([]));
 
-    expect(component.expensesForm.invalid).toBeTrue();
+    component.loadCurrentUser();
+
+    expect(component.currentUser).toEqual(user);
+    expect(mockReportsService.getReports).toHaveBeenCalledWith('1');
   });
 
-  it('should call addExpense and close dialog on valid form submit', fakeAsync(() => {
-    const mockExpense = {
-      id: 1,
-      description: 'Office Supplies',
-      amount: 500,
-      category: 'Business',
-      date: new Date('2025-10-22'),
-      notes: ''
+  
+  it('should navigate to login if user not logged in', () => {
+    mockAuthService.getCurrentUser.and.returnValue(null);
+
+    component.loadCurrentUser();
+
+    expect(mockRouter.navigate).toHaveBeenCalledWith(['/login']);
+  });
+
+  
+  it('should handle fetchReports error', () => {
+    mockReportsService.getReports.and.returnValue(throwError(() => new Error('Server Error')));
+    component.currentUser.id = '1';
+    component.fetchReports();
+    expect(component.recentReports).toEqual([]);
+  });
+
+  
+  it('should generate report successfully', () => {
+    component.currentUser.id = '1';
+    component.newReport.set({
+      reportType: 'Expense Report',
+      reportPeriod: 'Current Month',
+      format: 'PDF'
+    });
+
+    const mockResponse = {
+      success: true,
+      data: {
+        _id: '123',
+        reportType: 'Expense Report',
+        period: 'Current Month',
+        format: 'PDF'
+      }
     };
 
-    expenseServiceSpy.addExpense.and.returnValue(of({ expense: mockExpense }));
+    mockReportsService.generateReport.and.returnValue(of(mockResponse));
+    component.generateReport();
 
-    component.expensesForm.setValue({
-      description: 'Office Supplies',
-      amount: 500,
-      category: 'Business',
-      date: new Date('2025-10-22'),
-      notes: ''
+    expect(mockReportsService.generateReport).toHaveBeenCalled();
+    expect(component.recentReports.length).toBeGreaterThan(0);
+  });
+
+
+  it('should handle error during report generation', () => {
+    component.currentUser.id = '1';
+    component.newReport.set({
+      reportType: 'Expense Report',
+      reportPeriod: 'Current Month',
+      format: 'PDF'
     });
 
-    component.submitForm();
-    tick();
+    mockReportsService.generateReport.and.returnValue(throwError(() => new Error('Server Error')));
+    spyOn(console, 'error');
 
-    expect(component.expensesForm.valid).toBeTrue();
-    expect(expenseServiceSpy.addExpense).toHaveBeenCalledWith(component.expensesForm.value);
-    expect(dialogRefSpy.close).toHaveBeenCalledWith(mockExpense);
-  }));
+    component.generateReport();
+    expect(console.error).toHaveBeenCalledWith('Error generating report:', jasmine.any(Error));
+  });
 
-  it('should handle error when addExpense fails', fakeAsync(() => {
-    expenseServiceSpy.addExpense.and.returnValue(throwError(() => new Error('Server Error')));
 
-    component.expensesForm.setValue({
-      description: 'Office Supplies',
-      amount: 500,
-      category: 'Business',
-      date: new Date('2025-10-22'),
-      notes: ''
+  it('should download report successfully', () => {
+    const blob = new Blob(['sample'], { type: 'application/pdf' });
+    mockReportsService.downloadReport.and.returnValue(of(blob));
+
+    const report = { 
+      _id: '1', 
+      reportType: 'Expense Report', 
+      period: 'Current Month', 
+      format: 'PDF' 
+    };
+
+    spyOn(document, 'createElement').and.callThrough();
+    component.downloadReport(report);
+
+    expect(mockReportsService.downloadReport).toHaveBeenCalledWith('1', 'PDF');
+  });
+
+  
+  it('should not download report if id or format missing', () => {
+    const report = { reportType: 'Expense Report' } as any;
+    component.downloadReport(report);
+    expect(mockReportsService.downloadReport).not.toHaveBeenCalled();
+  });
+
+
+  it('should reset form', () => {
+    component.newReport.set({
+      reportType: 'Tax Summary',
+      reportPeriod: 'Last Month',
+      format: 'Excel'
     });
+    component.resetForm();
+    expect(component.newReport().reportType).toBeNull();
+  });
 
-    component.submitForm();
-    tick();
+  it('should update report fields correctly', () => {
+    component.updateNewReportType('Income Statement');
+    expect(component.newReport().reportType).toBe('Income Statement');
 
-    expect(expenseServiceSpy.addExpense).toHaveBeenCalled();
-    expect(dialogRefSpy.close).not.toHaveBeenCalled(); 
-  }));
+    component.updateNewReportPeriod('Last Year');
+    expect(component.newReport().reportPeriod).toBe('Last Year');
 
-  it('should reset form and close dialog on cancel', () => {
-    component.expensesForm.setValue({
-      description: 'Test',
-      amount: 100,
-      category: 'Other',
-      date: new Date(),
-      notes: 'Test notes'
-    });
-
-    component.cancelForm();
-
-    const formValue = component.expensesForm.value;
-
-    expect(formValue.description).toBeNull();
-    expect(formValue.amount).toBeNull();
-    expect(formValue.category).toBeNull();
-    expect(formValue.date).toBeNull();
-     expect(formValue.notes).toBeNull(); 
-    expect(dialogRefSpy.close).toHaveBeenCalled();
+    component.updateNewReportFormat('CSV');
+    expect(component.newReport().format).toBe('CSV');
   });
 });

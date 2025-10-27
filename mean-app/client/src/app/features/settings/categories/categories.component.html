@@ -9,12 +9,8 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button [class.active]="selectedTab === 'Expense'" (click)="setTab('Expense')">
-        − Expense
-      </button>
-      <button [class.active]="selectedTab === 'Income'" (click)="setTab('Income')">
-        + Income
-      </button>
+      <button [class.active]="selectedTab === 'Expense'" (click)="setTab('Expense')">− Expense</button>
+      <button [class.active]="selectedTab === 'Income'" (click)="setTab('Income')">+ Income</button>
     </div>
 
     <!-- Category List -->
@@ -35,7 +31,7 @@
             ✎
           </button>
           <button 
-            (click)="deleteCategory(cat)" 
+            (click)="showDeleteConfirm(cat)" 
             class="delete-btn" 
             [disabled]="!cat._id"
             [title]="!cat._id ? 'Default categories cannot be deleted' : 'Delete'">
@@ -48,6 +44,13 @@
     <!-- Add/Edit Form -->
     <form [formGroup]="categoryForm" (ngSubmit)="addOrUpdateCategory()" class="category-form">
       <input formControlName="name" placeholder="Category Name" />
+      <div class="error" *ngIf="categoryForm.get('name')?.touched && categoryForm.get('name')?.hasError('required')">
+        Category name required
+      </div>
+      <div class="error" *ngIf="categoryForm.hasError('duplicate')">
+        Category already exists for {{ categoryForm.value.type | titlecase }}
+      </div>
+
       <select formControlName="type">
         <option value="income">Income</option>
         <option value="expense">Expense</option>
@@ -55,11 +58,19 @@
 
       <div class="form-buttons">
         <button type="button" (click)="closeModal()" class="cancel-btn">Cancel</button>
-        <button type="submit" class="add-btn">
-          {{ editingCategory ? 'Update' : 'Add' }}
-        </button>
+        <button type="submit" class="add-btn">{{ editingCategory ? 'Update' : 'Add' }}</button>
       </div>
     </form>
+  </div>
+</div>
 
+<!-- Delete Confirmation Modal -->
+<div *ngIf="confirmDeleteCategory" class="modal-overlay">
+  <div class="modal-content">
+    <p>Are you sure you want to delete "{{ confirmDeleteCategory.name }}"?</p>
+    <div class="form-buttons">
+      <button (click)="confirmDelete()" class="add-btn">Yes</button>
+      <button (click)="cancelDelete()" class="cancel-btn">Cancel</button>
+    </div>
   </div>
 </div>

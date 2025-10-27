@@ -1,30 +1,26 @@
-/* import dotenv from "dotenv";
-dotenv.config();
+//  import dotenv from "dotenv";
+// dotenv.config();
+// import mongoose from "mongoose";
+// import app from "./app";
 
-import app from "./app";
+// if (process.env.NODE_ENV !== "test") {
+//   console.log("🚀 Connecting to MongoDB Atlas...");
+//   mongoose
+//     .connect(process.env.MONGO_URI!)
+//     .then(() => console.log("✅ MongoDB connected"))
+//     .catch((err) => console.error("❌ MongoDB connection failed:", err));
+// } else {
+//   console.log("🧪 Skipping MongoDB connection for test environment");
+// }
+// const PORT = process.env.PORT || 5000;
 
-if (process.env.NODE_ENV !== "test") {
-  import("./config/db")
-    .then(({ connectDB }) => {
-      connectDB().catch((err) => {
-        console.error("❌ Failed to connect to the database:", err);
-        process.exit(1);
-      });
-    })
-    .catch((err) => {
-      console.error("❌ Could not load DB config:", err);
-      process.exit(1);
-    });
-}
+// app.listen(PORT, () => {
+//   console.log(`🚀 Server running on http://localhost:${PORT}`);
+// });
 
-const PORT = process.env.PORT || 5000;
-
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
-});
-*/
 import dotenv from "dotenv";
 dotenv.config();
+
 
 import app from "./app";
 import { connectDB } from "./config/db";

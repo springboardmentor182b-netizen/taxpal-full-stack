@@ -16,7 +16,6 @@ export class Categories implements OnInit {
   showModal = false;
   selectedTab: 'Income' | 'Expense' = 'Expense';
 
-  /** 🔹 Default categories (always available) */
   defaultCategories: Category[] = [
     { name: 'Salary', type: 'income' },
     { name: 'Freelancing', type: 'income' },
@@ -30,19 +29,17 @@ export class Categories implements OnInit {
     { name: 'Entertainment', type: 'expense' }
   ];
 
-  /** 🔹 User-created categories from backend */
   userCategories: Category[] = [];
-
-  /** 🔹 Categories to display for current tab */
   displayedCategories: Category[] = [];
-
   categoryForm: FormGroup;
   editingCategory: Category | null = null;
+
+  confirmDeleteCategory: Category | null = null; // For delete confirmation modal
 
   constructor(private fb: FormBuilder, private categoryService: CategoryService) {
     this.categoryForm = this.fb.group({
       name: ['', Validators.required],
-      type: ['income', Validators.required] // backend expects lowercase
+      type: ['income', Validators.required]
     });
   }
 
@@ -51,31 +48,27 @@ export class Categories implements OnInit {
     this.loadUserCategories();
   }
 
-  /** 🔹 Load backend categories */
   loadUserCategories() {
     this.categoryService.getCategories().subscribe({
       next: (res) => {
         this.userCategories = res.data;
-        this.filterCategories(); // show categories for selected tab
+        this.filterCategories();
       },
       error: (err) => console.error('Error loading categories:', err)
     });
   }
 
-  /** 🔹 Filter categories based on selected tab */
   filterCategories() {
-    const type = this.selectedTab.toLowerCase(); // 'income' or 'expense'
+    const type = this.selectedTab.toLowerCase();
     this.displayedCategories = [...this.defaultCategories, ...this.userCategories]
       .filter(cat => cat.type === type);
   }
 
-  /** 🔹 Switch tab */
   setTab(tab: 'Income' | 'Expense') {
     this.selectedTab = tab;
     this.filterCategories();
   }
 
-  /** 🔹 Modal control */
   openModal() {
     this.showModal = true;
   }
@@ -84,43 +77,68 @@ export class Categories implements OnInit {
     this.showModal = false;
     this.editingCategory = null;
     this.categoryForm.reset({ type: 'income' });
+    this.categoryForm.setErrors(null);
   }
 
-  /** 🔹 Add or update category */
   addOrUpdateCategory() {
-    if (this.categoryForm.invalid) return;
+    if (this.categoryForm.invalid) {
+      this.categoryForm.markAllAsTouched();
+      return;
+    }
+
     const { name, type } = this.categoryForm.value;
+    const lowerName = name.trim().toLowerCase();
+
+    // Duplicate check only within the same type
+    const allCategories = [...this.defaultCategories, ...this.userCategories];
+    const duplicate = allCategories.find(
+      cat => cat.type === type && cat.name.toLowerCase() === lowerName && cat !== this.editingCategory
+    );
+
+    if (duplicate) {
+      this.categoryForm.setErrors({ duplicate: true });
+      return;
+    }
 
     if (this.editingCategory && this.editingCategory._id) {
-      // Update backend category
       this.categoryService.updateCategory(this.editingCategory._id, { name, type }).subscribe({
         next: () => this.loadUserCategories(),
         error: (err) => console.error('Error updating category:', err)
       });
     } else {
-      // Add new category to backend
       this.categoryService.addCategory({ name, type }).subscribe({
         next: () => this.loadUserCategories(),
         error: (err) => console.error('Error adding category:', err)
       });
     }
+
     this.closeModal();
   }
 
-  /** 🔹 Edit only user-created category */
   editCategory(cat: Category) {
-    if (!cat._id) return; // prevent editing defaults
+    if (!cat._id) return;
     this.editingCategory = cat;
     this.categoryForm.setValue({ name: cat.name, type: cat.type });
     this.openModal();
   }
 
-  /** 🔹 Delete only user-created category */
-  deleteCategory(cat: Category) {
-    if (!cat._id) return; // prevent deleting defaults
-    this.categoryService.deleteCategory(cat._id).subscribe({
-      next: () => this.loadUserCategories(),
-      error: (err) => console.error('Error deleting category:', err)
-    });
+  // Delete confirmation logic
+  showDeleteConfirm(cat: Category) {
+    if (!cat._id) return;
+    this.confirmDeleteCategory = cat;
+  }
+
+  cancelDelete() {
+    this.confirmDeleteCategory = null;
+  }
+
+  confirmDelete() {
+    if (this.confirmDeleteCategory && this.confirmDeleteCategory._id) {
+      this.categoryService.deleteCategory(this.confirmDeleteCategory._id).subscribe({
+        next: () => this.loadUserCategories(),
+        error: (err) => console.error('Error deleting category:', err)
+      });
+    }
+    this.confirmDeleteCategory = null;
   }
 }

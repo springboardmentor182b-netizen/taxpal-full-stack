@@ -6,7 +6,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ExpenseService } from '../../../services/expense.service';
+
 @Component({
   selector: 'app-expense-form',
   standalone: true,
@@ -17,18 +19,22 @@ import { ExpenseService } from '../../../services/expense.service';
     MatButtonModule,
     MatInputModule,
     MatFormFieldModule,
-    MatSelectModule
-  ],templateUrl: './expenses-form.component.html',
+    MatSelectModule,
+    MatSnackBarModule
+  ],
+  templateUrl: './expenses-form.component.html',
   styleUrls: ['./expenses-form.component.scss']
 })
 export class ExpensesForm {
   expensesForm: FormGroup;
-  categories = ['Salary', 'Freelance', 'Business', 'Investments', 'Other'];
+  categories = ['Food', 'Travel', 'Bills', 'Shopping', 'Other'];
+  errorMessage: string = ''; // ✅ For displaying inside form
 
   constructor(
     private fb: FormBuilder,
-    private dialogRef: MatDialogRef<ExpensesForm>,// ✅ inject DialogRef
-    private expenseService:ExpenseService
+    private dialogRef: MatDialogRef<ExpensesForm>,
+    private expenseService: ExpenseService,
+    private snackBar: MatSnackBar
   ) {
     this.expensesForm = this.fb.group({
       description: ['', [Validators.required, Validators.minLength(3)]],
@@ -38,26 +44,53 @@ export class ExpensesForm {
       notes: [''],
     });
   }
+
   closeForm() {
-    this.dialogRef.close();   // ✅ actually closes dialog
+    this.dialogRef.close();
   }
 
   cancelForm() {
     this.expensesForm.reset();
-    this.closeForm();         // ✅ close after cancel
+    this.closeForm();
   }
+
   submitForm() {
-    if (this.expensesForm.valid) {
-      this.expenseService.addExpense(this.expensesForm.value).subscribe({
-        next: (res: any) => { // Change type to any
-          console.log('✅ Expense saved:', res);
-          this.dialogRef.close(res.expense);
-        },
-        error: (err) => {
-          console.error('❌ Error saving income:', err);
-        }
-      });
+    this.errorMessage = '';
+
+    if (this.expensesForm.invalid) {
+      const amountValue = this.expensesForm.get('amount')?.value;
+      if (amountValue === 0) {
+        this.errorMessage = 'Enter a valid amount';
+      } else {
+        this.errorMessage = 'Please fill in all required fields correctly';
+      }
+      return;
     }
+
+    // ✅ Submit valid form
+    this.expenseService.addExpense(this.expensesForm.value).subscribe({
+      next: (res: any) => {
+        console.log('✅ Expense saved:', res);
+
+        this.snackBar.open('✔ Expense saved successfully!', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['success-snackbar']
+        });
+
+        this.dialogRef.close(res.expense);
+      },
+      error: (err) => {
+        console.error('❌ Error saving expense:', err);
+
+        this.snackBar.open('✖ Failed to save expense!', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'right',
+          verticalPosition: 'top',
+          panelClass: ['error-snackbar']
+        });
+      }
+    });
   }
 }
-
