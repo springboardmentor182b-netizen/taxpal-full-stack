@@ -546,6 +546,7 @@
   }
   .logo {
     margin-right: 1rem;
+  }
 
   .navbar-box {
     padding: 1rem 1.5rem;
@@ -593,7 +594,8 @@
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-
+  }
+  
   .theme-toggle-btn {
     width: 32px;
     height: 32px;
