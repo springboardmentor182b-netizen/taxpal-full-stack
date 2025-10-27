@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { SignInFormComponent } from '../signin/sign-in-form.component';
@@ -11,17 +11,18 @@ import { SignUpFormComponent } from '../signup/sign-up-form.component';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, AfterViewInit {
   isDarkMode = false;
   floatingEmojis: { symbol: string; style: any }[] = [];
   showSignInForm = false;
   showSignUpForm = false;
   showProfileMenu = false;
   isMobileMenuOpen = false;
+  isLoggedIn = false;
 
   constructor(
     private router: Router,
-    private cdr: ChangeDetectorRef  // Add this
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -43,6 +44,18 @@ export class NavbarComponent implements OnInit {
     } else {
       document.body.classList.remove('dark-theme');
     }
+
+    this.checkLoginStatus();
+  }
+
+  ngAfterViewInit() {
+    // Move login status check here to avoid ExpressionChangedAfterItHasBeenCheckedError
+    this.checkLoginStatus();
+    this.cdr.detectChanges();
+  }
+
+  checkLoginStatus() {
+    this.isLoggedIn = localStorage.getItem('user_email') !== null;
   }
 
   isActiveRoute(route: string): boolean {

@@ -4,7 +4,7 @@ const SimpleBudgetSchema = new mongoose.Schema({
   userEmail: { 
     type: String, 
     required: true, 
-    index: true // Add index for better query performance
+    index: true
   },
   amount: { type: Number, required: true, min: 0 },
   category: { type: String, default: 'General' },

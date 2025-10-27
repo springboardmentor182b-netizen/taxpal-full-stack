@@ -738,4 +738,23 @@ router.delete('/delete-all-expenses', async (req, res) => {
   }
 });
 
+// Delete a budget by ID and userEmail
+router.delete('/delete-budget/:id', async (req, res) => {
+  const { id } = req.params;
+  const { userEmail } = req.query;
+  if (!id || !userEmail) {
+    return res.status(400).json({ message: 'Budget ID and user email required' });
+  }
+  try {
+    const deleted = await SimpleBudget.findOneAndDelete({ _id: id, userEmail });
+    if (!deleted) {
+      return res.status(404).json({ message: 'Budget not found or not authorized' });
+    }
+    res.json({ message: 'Budget deleted', budget: deleted });
+  } catch (err) {
+    res.status(500).json({ message: 'Error deleting budget', error: err.message });
+  }
+});
+
+
 module.exports = router;
