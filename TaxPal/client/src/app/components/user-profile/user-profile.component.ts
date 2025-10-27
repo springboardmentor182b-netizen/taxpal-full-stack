@@ -341,6 +341,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
           if (response && response.income) {
             this.incomeList.unshift(response.income);
             this.updateRecentTransactions(); // Update recent transactions list
+            this.updateChart(); // Update chart immediately after adding income
           }
 
           this.incomeSuccessMsg = 'Income added successfully!';
@@ -383,6 +384,7 @@ export class UserProfileComponent implements OnInit, AfterViewInit, OnDestroy {
           if (response && response.expense) {
             this.expenseList.unshift(response.expense);
             this.updateRecentTransactions(); // Update recent transactions list
+            this.updateChart(); // Update chart immediately after adding expense
           }
 
           this.expenseSuccessMsg = 'Expense added successfully!';
