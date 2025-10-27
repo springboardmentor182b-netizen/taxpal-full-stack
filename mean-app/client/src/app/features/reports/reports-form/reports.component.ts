@@ -1,5 +1,3 @@
-
-
 import { Component, signal, WritableSignal, ChangeDetectionStrategy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -28,9 +26,9 @@ export interface Report {
   styleUrls: ['./reports.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
+
 export class ReportsComponent implements OnInit {
   public isFormVisible = signal(false);
-
   public newReport: WritableSignal<{
     reportType: string | null;
     reportPeriod: string | null;
@@ -72,7 +70,7 @@ export class ReportsComponent implements OnInit {
     this.userInitials = "";
     return;
   }
-
+  
   const parts = fullName.trim().split(" ");
   this.userInitials = parts
     .map(p => p.charAt(0).toUpperCase())
