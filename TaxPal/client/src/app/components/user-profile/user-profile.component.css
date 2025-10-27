@@ -1831,5 +1831,13 @@
   }
 }
 
-.records-scroll::-webkit-scrollbar { height:8px; width:8px; }
-.records-scroll::-webkit-scrollbar-thumb { background: rgba(15,23,42,0.08); border-radius: 8px; }
+.no-expense-msg {
+  color: #6b7280;
+  text-align: center;
+  padding: 0.5rem 0 0.5rem 0;
+  font-size: 1rem;
+  margin-top: -1.2rem; /* Move message slightly up */
+}
+.dark .no-expense-msg {
+  color: #9ca3af;
+}

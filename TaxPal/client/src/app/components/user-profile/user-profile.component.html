@@ -320,6 +320,9 @@
           <div class="chart-container">
             <canvas id="expenseChart"></canvas>
           </div>
+          <div *ngIf="expenseList.length === 0" class="no-expense-msg">
+            No expenses to display.
+          </div>
         </div>
       </div>
 
