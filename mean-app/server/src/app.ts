@@ -52,7 +52,8 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Serve Angular build (AFTER API routes)
-const clientPath = path.join(__dirname, "../../client/dist/dum/browser");
+const clientPath = path.join(__dirname, "../../client/dist/dum/browser/browser");
+
 app.use(express.static(clientPath));
 
 // ✅ Handle Angular routes (for refreshing or direct links)
