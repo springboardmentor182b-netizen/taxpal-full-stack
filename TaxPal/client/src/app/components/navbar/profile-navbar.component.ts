@@ -10,7 +10,9 @@ import { RouterLink, Router } from '@angular/router';
   styleUrls: ['./profile-navbar.component.css']
 })
 export class ProfileNavbarComponent implements OnInit, OnDestroy {
-  isDarkMode = false;
+  // Add: keep template binding happy and reflect current document theme state
+  isDarkMode: boolean = document.documentElement.classList.contains('dark') || document.body.classList.contains('dark') || false;
+
   floatingEmojis: { symbol: string, style: any }[] = [];
   private emojis = ['💰', '💵', '💸', '💲', '💸', '💸'];
   private maxEmojis = 15;
@@ -19,23 +21,13 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
   isMobileMenuOpen = false;
 
   constructor(private router: Router) {
-    // Check for saved preference on component initialization
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode === 'true') {
-      this.isDarkMode = true;
-      this.applyDarkMode();
-    }
+    // ...existing constructor logic (no dark mode checks)...
   }
 
   ngOnInit() {
     this.startEmojiAnimation();
     
-    // Apply dark mode if needed on component init
-    if (this.isDarkMode) {
-      setTimeout(() => {
-        this.applyDarkMode();
-      }, 100);
-    }
+    // ...existing init logic...
   }
 
   ngOnDestroy() {
@@ -77,35 +69,6 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
     });
   }
 
-  toggleDarkMode() {
-    this.isDarkMode = !this.isDarkMode;
-    
-    setTimeout(() => {
-      this.applyDarkMode();
-    }, 0);
-    
-    localStorage.setItem('darkMode', this.isDarkMode.toString());
-  }
-
-  private applyDarkMode() {
-    if (this.isDarkMode) {
-      document.body.classList.add('dark-mode');
-      document.documentElement.classList.add('dark-mode');
-      document.body.classList.add('dark');
-      document.documentElement.classList.add('dark');
-    } else {
-      document.body.classList.remove('dark-mode');
-      document.documentElement.classList.remove('dark-mode');
-      document.body.classList.remove('dark');
-      document.documentElement.classList.remove('dark');
-    }
-    
-    // Dispatch event for other components
-    window.dispatchEvent(new CustomEvent('darkModeChanged', { 
-      detail: { isDarkMode: this.isDarkMode } 
-    }));
-  }
-  
   isActiveRoute(route: string): boolean {
     return window.location.pathname === route;
   }
