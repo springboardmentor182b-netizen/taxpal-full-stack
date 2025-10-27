@@ -484,6 +484,38 @@
   margin-bottom: 2rem;
 }
 
+/* Two-column dashboard grid for breakdown + chart */
+.dashboard-grid.two-col-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+  align-items: start;
+}
+
+/* Make sections fill height and align nicely */
+.expense-breakdown-section,
+.income-expense-section {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Responsive: stack on mobile */
+@media (max-width: 900px) {
+  .dashboard-grid.two-col-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  .expense-breakdown-section,
+  .income-expense-section {
+    width: 100%;
+    min-width: 0;
+  }
+}
+
 /* Budget Progress Bar Styles */
 .budget-list {
   display: flex;
@@ -728,121 +760,71 @@
   width: 100%;
 }
 
-/* Updated styles for expense pie chart container */
-.expense-pie-container {
-  padding: 1rem;
-  height: 400px;
+/* Finance chart card: reduce max-width for bar chart */
+.finance-chart-card {
+  margin: 2rem 0;
   width: 100%;
+  clear: both;
+  max-width: 700px; /* Reduced from 1200px */
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* Chart container: reduce horizontal padding and gap */
 .chart-container {
+  display: flex;
+  flex: 1;
+  height: 200px;
   position: relative;
-  height: 100%;
-  width: 100%;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  margin-bottom: 3.5rem;
+  max-width: 650px; /* Limit chart width */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 8px; /* Reduce horizontal padding */
 }
 
-.chart-legend {
+/* Chart bars: reduce gap and padding */
+.chart-bars {
   display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.875rem;
-  color: #6b7280;
-}
-
-.legend-color {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-}
-
-.legend-color.income {
-  background-color: #10b981;
-}
-
-.legend-color.expenses {
-  background-color: #ef4444;
-}
-
-/* Bar Chart Styles */
-.bar-chart {
-  display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: flex-end;
-  height: 250px;
-  padding-top: 1rem;
+  flex: 1;
+  gap: 6px; /* Reduced gap */
+  padding: 0 4px; /* Reduced padding */
 }
 
-.month-group {
+/* Month column: reduce min-width for narrow screens */
+.month-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100%;
-}
-
-.bar-container {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  height: 200px;
-  align-items: flex-end;
-}
-
-.bar {
-  cursor: pointer;
-  width: 45%; /* Wider bars */
-  min-width: 12px; /* Ensure minimum width */
-  transition: all 0.2s ease;
+  flex: 1;
+  min-width: 48px; /* Reduced min-width */
   position: relative;
-  min-height: 1px;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
 }
 
-.bar:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+/* Responsive: further reduce chart/card width on small screens */
+@media (max-width: 900px) {
+  .finance-chart-card {
+    max-width: 98vw;
+  }
+  .chart-container {
+    max-width: 98vw;
+  }
 }
 
-.income-bar {
-  background-color: #10b981;
-}
-
-.expense-bar {
-  background-color: #ef4444;
-}
-
-.bar-value {
-  position: absolute;
-  bottom: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 0.7rem;
-  color: #6b7280;
-  font-weight: 600;
-  white-space: nowrap;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-  margin-bottom: 4px;
-}
-
-.bar:hover .bar-value {
-  opacity: 1;
-}
-
-.month-label {
-  margin-top: 0.75rem;
-  font-size: 0.75rem;
-  color: #6b7280;
-  text-align: center;
+@media (max-width: 640px) {
+  .finance-chart-card {
+    max-width: 100vw;
+  }
+  .chart-container {
+    max-width: 100vw;
+    padding: 0 2px;
+  }
+  .month-column {
+    min-width: 36px;
+  }
 }
 
 /* Welcome Section */
@@ -1587,7 +1569,7 @@
   margin: 2rem 0;
   width: 100%;
   clear: both;
-  max-width: 1200px; /* Wider card to use more space */
+  max-width: 700px; /* Reduced from 1200px */
   margin-left: auto;
   margin-right: auto;
 }
@@ -1607,7 +1589,11 @@
   height: 200px;
   position: relative;
   border-bottom: 1px solid var(--border-color, #e5e7eb);
-  margin-bottom: 3.5rem; /* More space for labels below */
+  margin-bottom: 3.5rem;
+  max-width: 650px; /* Limit chart width */
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 8px; /* Reduce horizontal padding */
 }
 
 .chart-y-axis {
@@ -1622,11 +1608,11 @@
 
 .chart-bars {
   display: flex;
-  justify-content: space-around; /* Use space-around instead of space-evenly */
+  justify-content: space-around;
   align-items: flex-end;
   flex: 1;
-  gap: 10px; /* Increased from 0.5rem */
-  padding: 0 20px; /* Add padding on the sides */
+  gap: 6px; /* Reduced gap */
+  padding: 0 4px; /* Reduced padding */
 }
 
 .month-column {
@@ -1634,7 +1620,7 @@
   flex-direction: column;
   align-items: center;
   flex: 1;
-  min-width: 60px; /* Ensure minimum width for narrow screens */
+  min-width: 48px; /* Reduced min-width */
   position: relative;
 }
 
