@@ -749,3 +749,81 @@
   outline: 3px solid rgba(59, 130, 246, 0.2);
   outline-offset: 2px;
 }
+
+/* Mark-as-paid button (upcoming list) - targets the button with title="Mark as paid" inside upcoming-event */
+.upcoming-events .upcoming-event .event-actions .btn[title="Mark as paid"] {
+  background: linear-gradient(180deg,#10b981,#059669);
+  color: #fff;
+  border: 1px solid rgba(5,150,105,0.9);
+  padding: 0.35rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  box-shadow: 0 6px 18px rgba(6,95,70,0.12);
+}
+
+/* Mark-as-paid button (selected-date event card) */
+.events-section .event-card .event-card-actions .btn {
+  background: linear-gradient(180deg,#10b981,#059669);
+  color: #fff;
+  border: 1px solid rgba(5,150,105,0.9);
+  padding: 0.4rem 0.7rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  box-shadow: 0 6px 18px rgba(6,95,70,0.12);
+}
+
+/* Hover / focus / active states */
+.upcoming-events .upcoming-event .event-actions .btn[title="Mark as paid"]:hover,
+.events-section .event-card .event-card-actions .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(6,95,70,0.16);
+  opacity: 0.98;
+}
+
+.upcoming-events .upcoming-event .event-actions .btn[title="Mark as paid"]:focus,
+.events-section .event-card .event-card-actions .btn:focus {
+  outline: 3px solid rgba(16,185,129,0.18);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.upcoming-events .upcoming-event .event-actions .btn[title="Mark as paid"]:disabled,
+.events-section .event-card .event-card-actions .btn:disabled {
+  background: linear-gradient(180deg,#94d3b9,#6fc29a);
+  border-color: rgba(111,194,154,0.8);
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+/* Small icon spacing if you later add an icon inside the button */
+.upcoming-events .upcoming-event .event-actions .btn[title="Mark as paid"] svg,
+.events-section .event-card .event-card-actions .btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: rgba(255,255,255,0.95);
+  flex-shrink: 0;
+}
+
+/* Paid label style (non-interactive) */
+.upcoming-events .upcoming-event .event-actions .paid-label,
+.events-section .event-card .event-card-actions .paid-label {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  background: rgba(16,185,129,0.12);
+  color: #059669;
+  font-weight: 700;
+  border-radius: 6px;
+  font-size: 0.85rem;
+}

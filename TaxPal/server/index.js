@@ -44,6 +44,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Health check route
+app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
+
 // Root route
 app.get('/', (req, res) => {
   res.send('TaxPal API is running');

@@ -14,6 +14,7 @@ interface TaxData {
   retirement: number;
   healthInsurance: number;
   homeOffice: number;
+  dueDate?: string; // ISO date string selected by user
 }
 
 interface TaxEstimateResponse {
@@ -43,7 +44,8 @@ export class TaxEstimatorComponent {
     businessExpenses: 0,
     retirement: 0,
     healthInsurance: 0,
-    homeOffice: 0
+    homeOffice: 0,
+    dueDate: '' // user-selectable due date
   };
 
   estimatedTax: number | null = null;
@@ -81,6 +83,7 @@ export class TaxEstimatorComponent {
       retirement: this.taxData.retirement,
       healthInsurance: this.taxData.healthInsurance,
       homeOffice: this.taxData.homeOffice,
+      dueDate: this.taxData.dueDate || undefined, // include dueDate if specified
       userId: this.userId,
       userEmail: this.userEmail
     };
@@ -133,15 +136,35 @@ export class TaxEstimatorComponent {
       homeOffice: this.taxData.homeOffice,
       taxableIncome: calculationResponse.taxableIncome,
       estimatedTax: calculationResponse.estimatedTax,
-      effectiveRate: calculationResponse.effectiveTaxRate
+      effectiveRate: calculationResponse.effectiveTaxRate,
+      dueDate: this.taxData.dueDate || undefined // persist user chosen due date
     };
 
     console.log('Auto-saving tax estimate:', saveData);
 
     this.http.post(`${this.apiUrl}/tax-estimator/save`, saveData)
       .subscribe({
-        next: (response) => {
+        next: (response: any) => {
           console.log('Tax estimate auto-saved:', response);
+
+          // Dispatch a global event so other components (calendar) update
+          try {
+            const saved = response?.data || response || {};
+            const eventDetail: any = {
+              id: saved._id || saved.id || saved.insertedId || undefined, // include DB id if available
+              userId: this.userId,
+              userEmail: this.userEmail,
+              quarter: this.taxData.quarter,
+              estimatedTax: calculationResponse.estimatedTax,
+              taxableIncome: calculationResponse.taxableIncome,
+              createdAt: saved.createdAt || new Date().toISOString()
+            };
+            if (saved.dueDate) eventDetail.dueDate = saved.dueDate;
+            else if (this.taxData.dueDate) eventDetail.dueDate = this.taxData.dueDate;
+            window.dispatchEvent(new CustomEvent('taxEstimateSaved', { detail: eventDetail }));
+          } catch (err) {
+            console.warn('Failed to dispatch taxEstimateSaved event', err);
+          }
         },
         error: (error) => {
           console.error('Error auto-saving tax estimate:', error);
@@ -159,7 +182,8 @@ export class TaxEstimatorComponent {
       businessExpenses: 0,
       retirement: 0,
       healthInsurance: 0,
-      homeOffice: 0
+      homeOffice: 0,
+      dueDate: '' // user-selectable due date
     };
     this.estimatedTax = null;
     this.taxableIncome = null;

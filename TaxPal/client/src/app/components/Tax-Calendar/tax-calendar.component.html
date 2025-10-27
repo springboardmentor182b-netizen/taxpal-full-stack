@@ -123,6 +123,12 @@
               <span class="event-type">{{ event.type | titlecase }}</span>
             </div>
             <p>{{ event.description }}</p>
+
+            <!-- Add Mark as paid here too -->
+            <div class="event-card-actions">
+              <button class="btn btn-ghost" *ngIf="!event.paid" (click)="markAsPaid(event)">Mark as paid</button>
+              <span *ngIf="event.paid" class="paid-label">Paid</span>
+            </div>
           </div>
         </div>
       </div>
@@ -130,7 +136,12 @@
       <!-- Upcoming events section -->
       <div class="upcoming-events">
         <h3>Upcoming Tax Events</h3>
-        <div class="upcoming-list">
+
+        <!-- Loading / Error states -->
+        <div *ngIf="eventsLoading" class="loading-indicator">Loading upcoming events...</div>
+        <div *ngIf="eventsError" class="error-message">{{ eventsError }}</div>
+
+        <div class="upcoming-list" *ngIf="!eventsLoading">
           <div
             *ngFor="let event of taxEvents | slice : 0 : 5"
             class="upcoming-event"
@@ -146,6 +157,19 @@
             </div>
             <div class="event-priority">
               <span class="priority-badge" [ngClass]="event.priority">{{ event.priority }}</span>
+            </div>
+
+            <!-- Mark as paid control -->
+            <div class="event-actions">
+              <button
+                class="btn btn-ghost"
+                *ngIf="!event.paid"
+                (click)="markAsPaid(event)"
+                title="Mark as paid"
+              >
+                Mark paid
+              </button>
+              <span *ngIf="event.paid" class="paid-label">Paid</span>
             </div>
           </div>
         </div>
