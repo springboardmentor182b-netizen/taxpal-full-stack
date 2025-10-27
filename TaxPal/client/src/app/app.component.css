@@ -1,0 +1,94 @@
+/* Main app container styles */
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #f9fafb; /* Light mode background */
+  color: #1f2937; /* Light mode text */
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+:host.dark-theme {
+  background-color: #111827; /* Dark mode background */
+  color: #f9fafb; /* Dark mode text */
+}
+
+.app-container {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global styles that apply to the entire application */
+::ng-deep body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+::ng-deep body.dark-theme {
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+::ng-deep .dark .content-container,
+::ng-deep .dark-theme .content-container {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+::ng-deep .dark-theme h1, 
+::ng-deep .dark-theme h2, 
+::ng-deep .dark-theme h3 {
+  color: #f9fafb;
+}
+
+::ng-deep .dark-theme p {
+  color: #e5e7eb;
+}
+
+/* Fix for navigation issues */
+.nav-container {
+  position: relative;
+  z-index: 1000;
+}
+
+.content-container {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+/* Fix for z-index stacking context issues */
+.router-outlet-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure clickable elements work properly */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+/* Fix for ios sticky hover states */
+@media (hover: hover) {
+  a:hover, button:hover {
+    opacity: 0.9;
+  }
+}
+
+/* Ensure overlays are clickable */
+.mobile-menu-backdrop.active, 
+.mobile-dropdown.active {
+  touch-action: auto;
+}

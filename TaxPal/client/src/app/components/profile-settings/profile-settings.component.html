@@ -4,7 +4,7 @@
     <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
       <span>{{ userInitial }}</span>
     </button>
-    
+
     <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
       <div class="profile-section">
         <div class="profile-info centered-profile">
@@ -42,14 +42,14 @@
       </div>
     </div>
   </div>
-  
+
   <div class="settings-content">
     <!-- Settings Header -->
     <div class="settings-header">
       <h1>Profile Settings</h1>
       <p class="subtitle">Manage your account information and preferences</p>
     </div>
-    
+
     <!-- Settings Cards -->
     <div class="settings-cards">
       <!-- Profile Information Card -->
@@ -66,18 +66,18 @@
         <div class="card-body">
           <div *ngIf="successMsg" class="success-message">{{ successMsg }}</div>
           <div *ngIf="errorMsg" class="error-message">{{ errorMsg }}</div>
-          
+
           <div class="form-group">
             <label for="name">Name</label>
             <input type="text" id="name" [(ngModel)]="user.name" placeholder="Your name">
           </div>
-          
+
           <div class="form-group">
             <label for="email">Email Address</label>
             <input type="email" id="email" [(ngModel)]="user.email" disabled placeholder="Your email">
             <small class="helper-text">Email address cannot be changed</small>
           </div>
-          
+
           <div class="form-actions">
             <button class="btn btn-primary" (click)="updateProfile()" [disabled]="loading">
               <span *ngIf="loading" class="loader"></span>
@@ -86,7 +86,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Password Card -->
       <div class="settings-card">
         <div class="card-header">
@@ -102,12 +102,12 @@
           <div class="form-group">
             <label for="current-password">Current Password</label>
             <div class="password-input-wrapper">
-              <input [type]="showCurrentPassword ? 'text' : 'password'" 
-                     id="current-password" 
-                     [(ngModel)]="user.currentPassword" 
+              <input [type]="showCurrentPassword ? 'text' : 'password'"
+                     id="current-password"
+                     [(ngModel)]="user.currentPassword"
                      placeholder="Enter current password">
-              <button type="button" 
-                      class="password-toggle" 
+              <button type="button"
+                      class="password-toggle"
                       (click)="togglePasswordVisibility('current')"
                       [attr.aria-label]="showCurrentPassword ? 'Hide password' : 'Show password'">
                 <svg *ngIf="!showCurrentPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -121,16 +121,16 @@
               </button>
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="new-password">New Password</label>
             <div class="password-input-wrapper">
-              <input [type]="showNewPassword ? 'text' : 'password'" 
-                     id="new-password" 
-                     [(ngModel)]="user.newPassword" 
+              <input [type]="showNewPassword ? 'text' : 'password'"
+                     id="new-password"
+                     [(ngModel)]="user.newPassword"
                      placeholder="Enter new password">
-              <button type="button" 
-                      class="password-toggle" 
+              <button type="button"
+                      class="password-toggle"
                       (click)="togglePasswordVisibility('new')"
                       [attr.aria-label]="showNewPassword ? 'Hide password' : 'Show password'">
                 <svg *ngIf="!showNewPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -145,16 +145,16 @@
             </div>
             <small class="helper-text">Password must be at least 8 characters long</small>
           </div>
-          
+
           <div class="form-group">
             <label for="confirm-password">Confirm New Password</label>
             <div class="password-input-wrapper">
-              <input [type]="showConfirmPassword ? 'text' : 'password'" 
-                     id="confirm-password" 
-                     [(ngModel)]="user.confirmPassword" 
+              <input [type]="showConfirmPassword ? 'text' : 'password'"
+                     id="confirm-password"
+                     [(ngModel)]="user.confirmPassword"
                      placeholder="Confirm new password">
-              <button type="button" 
-                      class="password-toggle" 
+              <button type="button"
+                      class="password-toggle"
                       (click)="togglePasswordVisibility('confirm')"
                       [attr.aria-label]="showConfirmPassword ? 'Hide password' : 'Show password'">
                 <svg *ngIf="!showConfirmPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -168,7 +168,7 @@
               </button>
             </div>
           </div>
-          
+
           <div class="form-actions">
             <button class="btn btn-primary" (click)="updatePassword()" [disabled]="loading">
               <span *ngIf="loading" class="loader"></span>
@@ -177,85 +177,15 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Categories Component (child component) -->
       <app-categories></app-categories>
-      
-      <!-- Settings/Preferences Card -->
-      <div class="settings-card">
-        <div class="card-header">
-          <h2>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <circle cx="12" cy="12" r="3"></circle>
-              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-            </svg>
-            Account Preferences
-          </h2>
-        </div>
-        <div class="card-body">
-          <div class="preference-item">
-            <div class="preference-info">
-              <h3>Dark Mode</h3>
-              <p>Enable dark mode for a better viewing experience at night</p>
-            </div>
-            <div class="preference-control">
-              <label class="toggle-switch">
-                <input type="checkbox" [checked]="isDarkMode" disabled>
-                <span class="toggle-slider"></span>
-              </label>
-              <small class="helper-text">Change this in the navbar</small>
-            </div>
-          </div>
-          
-          <div class="preference-item">
-            <div class="preference-info">
-              <h3>Email Notifications</h3>
-              <p>Receive email notifications about account activity</p>
-            </div>
-            <div class="preference-control">
-              <label class="toggle-switch">
-                <input type="checkbox" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-          
-          <div class="preference-item">
-            <div class="preference-info">
-              <h3>Two-Factor Authentication</h3>
-              <p>Add an extra layer of security to your account</p>
-            </div>
-            <div class="preference-control">
-              <button class="btn btn-secondary">Enable</button>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Delete Account Card -->
-      <div class="settings-card danger-card">
-        <div class="card-header">
-          <h2>
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"></polygon>
-              <line x1="12" y1="8" x2="12" y2="12"></line>
-              <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-            Delete Account
-          </h2>
-        </div>
-        <div class="card-body">
-          <p class="danger-text">
-            Permanently delete your account and all associated data. This action cannot be undone.
-          </p>
-          <div class="form-actions">
-            <button class="btn btn-danger">Delete Account</button>
-          </div>
-        </div>
-      </div>
+
+      <div></div>
+
     </div>
   </div>
-  
+
   <!-- Backdrop overlay when profile menu is open -->
   <div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeProfileMenu()"></div>
 </div>

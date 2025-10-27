@@ -1,0 +1,372 @@
+<div class="transactions-page">
+  <header class="transactions-header">
+    <div>
+      <h2>Recent Transactions</h2>
+      <p class="muted">Income and expenses from your account</p>
+    </div>
+    <div class="quick-actions top-actions">
+      <div class="action-buttons">
+        <button class="action-btn income-btn" (click)="showAddIncomeModal($event)">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x="12" y="8" x2="12" y2="16" />
+            <line x="8" y="12" x2="16" y2="12" />
+          </svg>
+          Add Income
+        </button>
+        <button class="action-btn expense-btn" (click)="showAddExpenseModal($event)">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x="8" y="12" x2="16" y2="12" />
+          </svg>
+          Add Expense
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="transactions-main">
+    <div *ngIf="loading" class="loading">Loading transactions...</div>
+    <div *ngIf="!loading && recentTransactions.length === 0" class="empty">
+      No transactions yet.
+    </div>
+
+    <ul class="transactions-list" *ngIf="recentTransactions.length > 0">
+      <li
+        *ngFor="let tx of recentTransactions"
+        class="transaction-item"
+        [class.income]="tx.type === 'income'"
+        [class.expense]="tx.type === 'expense'"
+      >
+        <div class="tx-left">
+          <div
+            class="tx-icon"
+            [class.income]="tx.type === 'income'"
+            [class.expense]="tx.type === 'expense'"
+          >
+            <span *ngIf="tx.type === 'income'">＋</span>
+            <span *ngIf="tx.type === 'expense'">－</span>
+          </div>
+          <div class="tx-meta">
+            <div class="tx-title">{{ tx.title }}</div>
+            <div class="tx-sub">
+              {{ tx.category || '-' }} • {{ tx.date ? (tx.date | date : 'mediumDate') : '-' }}
+            </div>
+          </div>
+        </div>
+        <div class="tx-right">
+          <div
+            class="tx-amount"
+            [class.positive]="tx.type === 'income'"
+            [class.negative]="tx.type === 'expense'"
+          >
+            {{ tx.type === 'income' ? '+' : '-' }}
+            {{ tx.amount | currency : 'USD' : 'symbol' : '1.2-2' }}
+          </div>
+          <div class="tx-actions">
+            <button class="btn-ghost" title="Delete" (click)="deleteTransaction(tx)">🗑</button>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </main>
+
+  <!-- Income Table -->
+  <div class="income-table-section">
+    <div class="table-header">
+      <h3 class="income-table-title">Your Income Records</h3>
+      <button class="delete-all-btn" *ngIf="incomeList.length > 0" (click)="deleteAllIncome()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        Delete All
+      </button>
+    </div>
+    <div class="records-scroll" *ngIf="incomeList.length > 0">
+      <table class="income-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let income of incomeList">
+            <td>{{ income.title }}</td>
+            <td class="income-amount">
+              {{ income.amount | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </td>
+            <td>{{ income.category || '-' }}</td>
+            <td>{{ income.date | date : 'mediumDate' }}</td>
+            <td>{{ income.notes || '-' }}</td>
+            <td class="action-column">
+              <button class="delete-btn" (click)="deleteIncome(income._id)">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="income-table-section">
+    <div class="table-header">
+      <h3 class="income-table-title" style="color: #ef4444">Your Expense Records</h3>
+      <button class="delete-all-btn" *ngIf="expenseList.length > 0" (click)="deleteAllExpenses()">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        </svg>
+        Delete All
+      </button>
+    </div>
+    <div class="records-scroll" *ngIf="expenseList.length > 0">
+      <table class="income-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Date</th>
+            <th>Tax Deductible</th>
+            <th>Notes</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let expense of expenseList">
+            <td>{{ expense.title }}</td>
+            <td class="expense-amount">
+              {{ expense.amount | currency : 'USD' : 'symbol' : '1.2-2' }}
+            </td>
+            <td>{{ expense.category || '-' }}</td>
+            <td>{{ expense.date | date : 'mediumDate' }}</td>
+            <td>{{ expense.taxDeductible || '-' }}</td>
+            <td>{{ expense.notes || '-' }}</td>
+            <td class="action-column">
+              <button class="delete-btn" (click)="deleteExpense(expense._id)">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <path d="M3 6h18"></path>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
+                  <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Income Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="isAddIncomeModalVisible"
+    (click)="hideAddIncomeModal($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Add New Income</h3>
+      <div *ngIf="incomeErrorMsg" class="form-error">{{ incomeErrorMsg }}</div>
+      <div *ngIf="incomeSuccessMsg" class="form-success">{{ incomeSuccessMsg }}</div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input [(ngModel)]="incomeForm.title" placeholder="Freelance project" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount</label>
+          <div class="amount-input">
+            <span class="currency-symbol">$</span>
+            <input type="number" [(ngModel)]="incomeForm.amount" placeholder="0.00" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="incomeForm.date" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="incomeForm.category">
+          <option value="" disabled>Select category</option>
+          <option value="freelance">Freelance Work</option>
+          <option value="consulting">Consulting</option>
+          <option value="contract">Contract Work</option>
+          <option value="services">Services</option>
+          <option value="sale">Product Sale</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea [(ngModel)]="incomeForm.notes" rows="3"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" (click)="hideAddIncomeModal()">Cancel</button>
+        <button class="btn" (click)="submitIncome()" [disabled]="incomeLoading">
+          <span *ngIf="incomeLoading" class="loader"></span>
+          <span *ngIf="!incomeLoading">Add Income</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div
+    class="modal-overlay"
+    *ngIf="isAddExpenseModalVisible"
+    (click)="hideAddExpenseModal($event)"
+    role="dialog"
+    aria-modal="true"
+  >
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Add New Expense</h3>
+      <div *ngIf="expenseErrorMsg" class="form-error">{{ expenseErrorMsg }}</div>
+      <div *ngIf="expenseSuccessMsg" class="form-success">{{ expenseSuccessMsg }}</div>
+
+      <div class="form-group">
+        <label>Title</label>
+        <input [(ngModel)]="expenseForm.title" placeholder="Office supplies" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Amount</label>
+          <div class="amount-input">
+            <span class="currency-symbol">$</span>
+            <input type="number" [(ngModel)]="expenseForm.amount" placeholder="0.00" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" [(ngModel)]="expenseForm.date" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select [(ngModel)]="expenseForm.category">
+          <option value="" disabled>Select category</option>
+          <option value="rent">Rent/Mortgage</option>
+          <option value="utilities">Utilities</option>
+          <option value="business">Business Expenses</option>
+          <option value="food">Food</option>
+          <option value="transportation">Transportation</option>
+          <option value="insurance">Insurance</option>
+          <option value="marketing">Marketing</option>
+          <option value="office">Office Supplies</option>
+          <option value="software">Software & Subscriptions</option>
+          <option value="travel">Travel</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Tax Deductible</label>
+          <select [(ngModel)]="expenseForm.taxDeductible">
+            <option value="" disabled>Select</option>
+            <option value="yes">Yes</option>
+            <option value="no">No</option>
+            <option value="partial">Partially</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea [(ngModel)]="expenseForm.notes" rows="3"></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" (click)="hideAddExpenseModal()">Cancel</button>
+        <button
+          class="btn btn-submit expense-submit"
+          (click)="submitExpense()"
+          [disabled]="expenseLoading"
+        >
+          <span *ngIf="expenseLoading" class="loader"></span>
+          <span *ngIf="!expenseLoading">Add Expense</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

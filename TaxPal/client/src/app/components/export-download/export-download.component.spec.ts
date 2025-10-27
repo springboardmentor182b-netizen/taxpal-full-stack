@@ -27,14 +27,14 @@ describe('ExportDownloadComponent', () => {
   });
 
   it('should call export function when triggered', () => {
-    spyOn(component, 'exportData');
-    component.exportData();
-    expect(component.exportData).toHaveBeenCalled();
+    const spy = spyOn(component as any, 'exportData');
+    (component as any).exportData();
+    expect(spy).toHaveBeenCalled();
   });
 
   it('should show available formats list', () => {
     const formats = ['CSV', 'Excel', 'PDF'];
-    component.availableFormats = formats;
-    expect(component.availableFormats.length).toBe(3);
+    (component as any).availableFormats = formats;
+    expect((component as any).availableFormats.length).toBe(3);
   });
 });

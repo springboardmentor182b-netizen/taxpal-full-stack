@@ -78,6 +78,4 @@ TaxEstimateSchema.methods.calculateTotalCredits = function() {
     return credits.childTax + credits.education + credits.other;
 };
 
-const TaxEstimate = mongoose.model('TaxEstimate', TaxEstimateSchema);
-
-module.exports = TaxEstimate;
+module.exports = mongoose.models.TaxEstimate || mongoose.model('TaxEstimate', TaxEstimateSchema);

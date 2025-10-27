@@ -188,9 +188,9 @@ export class CategoriesComponent implements OnInit {
   
   addCategory(type: 'income' | 'expense') {
     if (type === 'income') {
-      this.incomeCategories.push({ name: 'New Category' });
+      this.incomeCategories.push({ name: '' });
     } else {
-      this.expenseCategories.push({ name: 'New Category' });
+      this.expenseCategories.push({ name: '' });
     }
   }
   

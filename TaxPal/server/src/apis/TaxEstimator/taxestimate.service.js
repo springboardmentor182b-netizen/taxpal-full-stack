@@ -1,5 +1,5 @@
-const TaxEstimate = require('../../models/TaxEstimate');
-const User = require('../../models/User');
+const TaxEstimate = require('../../../models/TaxEstimate');
+const User = require('../../../models/User');
 
 /**
  * Calculate and save tax estimate based on input data

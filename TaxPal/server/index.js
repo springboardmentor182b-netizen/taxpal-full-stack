@@ -25,21 +25,24 @@ console.log('📚 Swagger documentation available at: http://localhost:5000/api-
 
 // Import routes
 const userRoutes = require('./routes/user');
-const taxEstimatorRoutes = require('./routes/taxEstimator');
+app.use('/api/users', userRoutes);
+
+const reportsRouter = require('./routes/reports');
+app.use('/api/reports', reportsRouter);
+
+const taxEstimatorRouter = require('./routes/taxEstimator');
+app.use('/api/tax-estimator', taxEstimatorRouter);
+
+console.log('✓ API routes registered:');
+console.log('  - /api/users/*');
+console.log('  - /api/reports/*');
+console.log('  - /api/tax-estimate/*');
 
 // Debug middleware to log all requests
 app.use((req, res, next) => {
   console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
   next();
 });
-
-// Register routes
-app.use('/api/users', userRoutes);
-app.use('/api/tax-estimator', taxEstimatorRoutes);
-
-console.log('✓ Routes registered:');
-console.log('  - /api/users');
-console.log('  - /api/tax-estimator');
 
 // Root route
 app.get('/', (req, res) => {
@@ -58,9 +61,13 @@ app.use((err, req, res, next) => {
 // Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`✓ API endpoints available:`);
-  console.log(`  - POST http://localhost:${PORT}/api/tax-estimator/calculate`);
-  console.log(`  - POST http://localhost:${PORT}/api/tax-estimator/save`);
-  console.log(`  - GET  http://localhost:${PORT}/api-docs (if Swagger is configured)`);
+  console.log(`\n🚀 Server running on port ${PORT}`);
+  console.log(`\n✓ API endpoints available:`);
+  console.log(`  - POST http://localhost:${PORT}/api/users/signin`);
+  console.log(`  - POST http://localhost:${PORT}/api/users/signup`);
+  console.log(`  - GET  http://localhost:${PORT}/api/reports/data/:userEmail/:year`);
+  console.log(`  - POST http://localhost:${PORT}/api/reports/preview-report`);
+  console.log(`  - POST http://localhost:${PORT}/api/reports/generate-report`);
+  console.log(`  - GET  http://localhost:${PORT}/api/reports/test`);
+  console.log(`  - GET  http://localhost:${PORT}/api-docs\n`);
 });

@@ -18,7 +18,10 @@ export class BudgetComponent implements OnInit {
         'General', 'Housing', 'Food', 'Utilities', 'Transportation', 
         'Healthcare', 'Entertainment', 'Shopping', 'Education', 'Travel', 'Other'
     ];
+    userName: string = '';
     userEmail: string = '';
+    userInitial: string = '';
+    showProfileMenu: boolean = false;
     loading: boolean = false;
     error: string = '';
 
@@ -26,7 +29,9 @@ export class BudgetComponent implements OnInit {
 
     ngOnInit(): void {
         // Get user email from localStorage
+        this.userName = localStorage.getItem('user_name') || '';
         this.userEmail = localStorage.getItem('user_email') || '';
+        this.userInitial = this.userName ? this.userName.charAt(0).toUpperCase() : (this.userEmail.charAt(0).toUpperCase() || 'U');
         
         // If no user email, redirect to login
         if (!this.userEmail) {
@@ -108,5 +113,21 @@ export class BudgetComponent implements OnInit {
                 this.loading = false;
             }
         });
+    }
+
+    toggleProfileMenu() {
+        this.showProfileMenu = !this.showProfileMenu;
+    }
+
+    closeProfileMenu() {
+        this.showProfileMenu = false;
+    }
+
+    logout() {
+        localStorage.removeItem('user_email');
+        localStorage.removeItem('user_name');
+        localStorage.removeItem('user_id');
+        this.closeProfileMenu();
+        window.location.href = '/';
     }
 }

@@ -93,6 +93,12 @@ export class SignInFormComponent implements OnInit, OnDestroy {
   
   async signIn() {
     if (!this.email || !this.password || this.loading) return;
+    
+    // Clear any existing auth data
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    
     this.loading = true;
     this.errorMsg = '';
     this.successMsg = '';

@@ -27,7 +27,6 @@
       </select>
       <button [class.active]="!showQuarterly" (click)="toggleView()">Monthly</button>
       <button [class.active]="showQuarterly" (click)="toggleView()">Quarterly</button>
-      <button class="export-btn" (click)="exportReport('pdf')">Export</button>
     </div>
   </div>
 
@@ -73,6 +72,49 @@
       </div>
     </div>
   </div>
+
+  <!-- Add Report Type Selector -->
+  <div class="report-controls">
+    <div class="report-type-selector">
+      <label for="reportType">Report Type:</label>
+      <select id="reportType" [(ngModel)]="selectedReportType" class="report-select">
+        <option value="summary">Summary Report</option>
+        <option value="income">Income Statement</option>
+        <option value="expense">Expense Report</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Export Buttons Section -->
+  <div class="export-section">
+    <h3>Export Report</h3>
+    <div class="export-buttons">
+      <button (click)="exportReport('pdf')" [disabled]="isGeneratingPreview" class="export-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+          <line x1="16" y1="13" x2="8" y2="13"></line>
+          <line x1="16" y1="17" x2="8" y2="17"></line>
+          <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        Export as PDF
+      </button>
+      <button (click)="exportReport('csv')" [disabled]="isGeneratingPreview" class="export-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        Export as CSV
+      </button>
+      <button (click)="exportReport('excel')" [disabled]="isGeneratingPreview" class="export-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+          <polyline points="14 2 14 8 20 8"></polyline>
+        </svg>
+        Export as Excel
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Yearly Summary Footer -->
@@ -98,6 +140,145 @@
       <div class="summary-item">
         <div class="amount light-blue">{{ yearlyReport.savingRate }}%</div>
         <div class="label">Savings Rate</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="preview-modal" *ngIf="showPreview">
+  <div class="preview-overlay" (click)="closePreview()"></div>
+  <div class="preview-content">
+    <div class="preview-header">
+      <h2>Report Preview</h2>
+      <button class="close-btn" (click)="closePreview()">&times;</button>
+    </div>
+    
+    <div class="preview-body">
+      <!-- Preview content based on format -->
+      <ng-container [ngSwitch]="previewFormat">
+        <div *ngSwitchCase="'pdf'" class="pdf-preview">
+          <h1>Financial Report {{ selectedYear }}</h1>
+          <div class="summary-section">
+            <h2>Year Summary</h2>
+            <p>Total Income: {{ yearSummary.totalIncome | currency }}</p>
+            <p>Total Expenses: {{ yearSummary.totalExpenses | currency }}</p>
+            <p>Net Savings: {{ yearSummary.netSavings | currency }}</p>
+            <p>Savings Rate: {{ yearSummary.savingsRate | number:'1.0-2' }}%</p>
+          </div>
+          <!-- Add more sections as needed -->
+        </div>
+
+        <div *ngSwitchCase="'csv'" class="csv-preview">
+          <pre>{{ generateCSV() }}</pre>
+        </div>
+
+        <div *ngSwitchCase="'excel'" class="excel-preview">
+          <div [innerHTML]="generateExcel()"></div>
+        </div>
+      </ng-container>
+    </div>
+    
+    <div class="preview-footer">
+      <button class="secondary-btn" (click)="closePreview()">Cancel</button>
+      <button class="primary-btn" (click)="downloadReport()">
+        Download {{ previewFormat.toUpperCase() }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="financial-report-page">
+  <!-- Profile Avatar in top right corner -->
+  <div class="hero-user-profile">
+    <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
+      <span>{{ userInitial }}</span>
+    </button>
+    <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
+      <div class="profile-section">
+        <div class="profile-info centered-profile">
+          <h3>{{ userName || 'User' }}</h3>
+          <p>{{ userEmail }}</p>
+        </div>
+      </div>
+      <div class="profile-menu-divider"></div>
+      <div class="profile-menu-items">
+        <a routerLink="/user-profile" class="profile-menu-item" (click)="closeProfileMenu()">
+          <span>Dashboard</span>
+        </a>
+        <a routerLink="/profile-settings" class="profile-menu-item" (click)="closeProfileMenu()">
+          <span>Profile Settings</span>
+        </a>
+        <div class="profile-menu-divider"></div>
+        <button type="button" class="profile-menu-item logout-item" (click)="logout()">
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-content">
+    <div class="report-header">
+      <h1>Financial Report</h1>
+      <div class="year-selector">
+        <label for="year">Year:</label>
+        <select id="year" [(ngModel)]="selectedYear" (change)="onYearSelect($event)">
+          <option *ngFor="let year of years" [value]="year">{{ year }}</option>
+        </select>
+        <button class="toggle-view-btn" (click)="toggleView()">
+          {{ showQuarterly ? 'Show Monthly' : 'Show Quarterly' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="year-summary">
+      <div class="summary-item">
+        <span>Total Income:</span>
+        <strong>${{ yearSummary.totalIncome | number:'1.2-2' }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Total Expenses:</span>
+        <strong>${{ yearSummary.totalExpenses | number:'1.2-2' }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Net Savings:</span>
+        <strong>${{ yearSummary.netSavings | number:'1.2-2' }}</strong>
+      </div>
+      <div class="summary-item">
+        <span>Savings Rate:</span>
+        <strong>{{ yearSummary.savingsRate | number:'1.1-1' }}%</strong>
+      </div>
+    </div>
+
+    <div class="reports-table-section">
+      <table class="reports-table" *ngIf="reports.length > 0">
+        <thead>
+          <tr>
+            <th>{{ showQuarterly ? 'Quarter' : 'Month' }}</th>
+            <th>Income</th>
+            <th>Expenses</th>
+            <th>Net Income</th>
+            <th>Transactions</th>
+            <th>Budget Usage</th>
+            <th>Budget</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of reports">
+            <td>{{ r.name }}</td>
+            <td>${{ r.income | number:'1.2-2' }}</td>
+            <td>${{ r.expenses | number:'1.2-2' }}</td>
+            <td>${{ r.netIncome | number:'1.2-2' }}</td>
+            <td>{{ r.transactions }}</td>
+            <td>{{ r.budgetUsage | number:'1.0-0' }}%</td>
+            <td>${{ r.budget | number:'1.2-2' }}</td>
+            <td>{{ r.rating }}</td>
+          </tr>
+        </tbody>
+      </table>
+      <div *ngIf="reports.length === 0" class="no-data-message">
+        No report data available for this year.
       </div>
     </div>
   </div>

@@ -1,4 +1,35 @@
 <div class="budget-page">
+    <!-- Profile Avatar in top right corner -->
+    <div class="hero-user-profile">
+        <button type="button" class="profile-avatar" (click)="toggleProfileMenu()">
+            <span>{{ userInitial }}</span>
+        </button>
+        <div class="profile-menu-dropdown" *ngIf="showProfileMenu">
+            <div class="profile-section">
+                <div class="profile-info centered-profile">
+                    <h3>{{ userName || 'User' }}</h3>
+                    <p>{{ userEmail }}</p>
+                </div>
+            </div>
+            <div class="profile-menu-divider"></div>
+            <div class="profile-menu-items">
+                <a routerLink="/user-profile" class="profile-menu-item" (click)="closeProfileMenu()">
+                    <!-- ...dashboard icon svg... -->
+                    <span>Dashboard</span>
+                </a>
+                <a routerLink="/profile-settings" class="profile-menu-item" (click)="closeProfileMenu()">
+                    <!-- ...settings icon svg... -->
+                    <span>Profile Settings</span>
+                </a>
+                <div class="profile-menu-divider"></div>
+                <button type="button" class="profile-menu-item logout-item" (click)="logout()">
+                    <!-- ...logout icon svg... -->
+                    <span>Logout</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <main class="budget-main">
         <div class="budget-container">
             <!-- Form Section - Left side -->
@@ -114,10 +145,10 @@
                                 <div>Description</div>
                             </div>
                             <div class="budget-row" *ngFor="let b of budgets">
-                                <div data-label="Amount">${{ b.amount | number:'1.2-2' }}</div>
-                                <div data-label="Category">{{ b.category }}</div>
-                                <div data-label="Date">{{ b.date | date:'MMM dd, yyyy' }}</div>
-                                <div data-label="Description" class="budget-description">{{ b.description }}</div>
+                                <div>${{ b.amount | number:'1.2-2' }}</div>
+                                <div>{{ b.category }}</div>
+                                <div>{{ b.date | date:'MMM dd, yyyy' }}</div>
+                                <div class="budget-description">{{ b.description }}</div>
                             </div>
                         </div>
                     </div>

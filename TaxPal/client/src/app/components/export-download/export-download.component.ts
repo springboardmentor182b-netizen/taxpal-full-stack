@@ -21,29 +21,86 @@ export class ExportDownloadComponent {
   selectedPeriod = this.periods[0];
   loading = false;
   downloadUrl = '';
+  
+  // Preview functionality
+  showPreview = false;
+  previewData: any = null;
+  previewLoading = false;
 
   constructor(private http: HttpClient) {}
 
-  generateReport() {
-    this.loading = true;
+  // Show preview before download
+  showReportPreview() {
+    this.previewLoading = true;
+    
+    const userEmail = localStorage.getItem('user_email') || '';
+    const currentYear = new Date().getFullYear();
 
     const body = {
-      reportType: this.selectedReport,
-      format: this.selectedFormat,
-      period: this.selectedPeriod
+      reportType: this.selectedReport.toLowerCase().replace(/\s+/g, '_'),
+      userEmail: userEmail,
+      data: {
+        userEmail: userEmail,
+        year: currentYear,
+        reports: [],
+        yearSummary: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          netSavings: 0
+        }
+      },
+      year: currentYear
     };
 
-    this.http.post('/api/reports/export', body, { responseType: 'blob' })
+    this.http.post('/api/reports/preview-report', body)
+      .subscribe({
+        next: (response: any) => {
+          this.previewLoading = false;
+          this.previewData = response.data;
+          this.showPreview = true;
+        },
+        error: (err) => {
+          this.previewLoading = false;
+          console.error('Error generating preview:', err);
+          alert('Failed to generate preview. Please try again.');
+        }
+      });
+  }
+
+  closePreview() {
+    this.showPreview = false;
+    this.previewData = null;
+  }
+
+  downloadFromPreview() {
+    if (!this.previewData) return;
+    
+    this.loading = true;
+    
+    const userEmail = localStorage.getItem('user_email') || '';
+
+    const body = {
+      format: this.selectedFormat.toLowerCase(),
+      reportType: this.selectedReport.toLowerCase().replace(/\s+/g, '_'),
+      userEmail: userEmail,
+      data: {
+        userEmail: userEmail,
+        year: this.previewData.year,
+        reports: this.previewData.reports,
+        yearSummary: this.previewData.yearSummary
+      },
+      year: this.previewData.year
+    };
+
+    this.http.post('/api/reports/generate-report', body, { responseType: 'blob' })
       .subscribe({
         next: (res: Blob) => {
           this.loading = false;
+          this.closePreview();
+          
           const blob = new Blob([res], { type: this.getMimeType(this.selectedFormat) });
           const url = window.URL.createObjectURL(blob);
-          this.downloadUrl = url;
           this.downloadFile(url);
-
-          // Optional: clear message after few seconds
-          setTimeout(() => this.downloadUrl = '', 4000);
         },
         error: (err) => {
           this.loading = false;
@@ -53,11 +110,16 @@ export class ExportDownloadComponent {
       });
   }
 
+  generateReport() {
+    // Now this will show preview first
+    this.showReportPreview();
+  }
+
   getMimeType(format: string): string {
-    switch (format) {
-      case 'PDF': return 'application/pdf';
-      case 'Excel': return 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      case 'CSV': return 'text/csv';
+    switch (format.toLowerCase()) {
+      case 'pdf': return 'application/pdf';
+      case 'excel': return 'application/vnd.ms-excel';
+      case 'csv': return 'text/csv';
       default: return 'application/octet-stream';
     }
   }

@@ -16,7 +16,8 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
   private maxEmojis = 15;
   private animationInterval: any;
   showProfileMenu = false; // Add this property
-  
+  isMobileMenuOpen = false;
+
   constructor(private router: Router) {
     // Check for saved preference on component initialization
     const savedDarkMode = localStorage.getItem('darkMode');
@@ -111,5 +112,52 @@ export class ProfileNavbarComponent implements OnInit, OnDestroy {
   
   closeMenu() {
     this.showProfileMenu = false;
+  }
+
+  toggleMobileMenu(event?: Event) {
+    if (event) event.stopPropagation();
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
+  }
+
+  navigateTo(route: string, event?: Event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    this.closeMobileMenu();
+    this.router.navigate([route]);
+  }
+
+  getUserName(): string {
+    return localStorage.getItem('user_name') || 'User';
+  }
+
+  getUserEmail(): string {
+    return localStorage.getItem('user_email') || '';
+  }
+
+  getUserInitial(): string {
+    const name = this.getUserName();
+    return name.charAt(0).toUpperCase();
+  }
+
+  toggleProfileMenu() {
+    this.showProfileMenu = !this.showProfileMenu;
+  }
+
+  closeProfileMenu() {
+    this.showProfileMenu = false;
+  }
+
+  logout() {
+    localStorage.removeItem('user_email');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_id');
+    this.closeProfileMenu();
+    window.location.href = '/';
   }
 }
