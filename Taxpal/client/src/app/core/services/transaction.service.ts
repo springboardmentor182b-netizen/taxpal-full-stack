@@ -3,7 +3,6 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environments';
 
-// ===== Public models
 export interface Transaction {
   _id: string;
   user_id: string;
@@ -55,7 +54,6 @@ export interface TransactionResponse {
   total: number;
 }
 
-// ===== DTOs
 type TransactionDTO = Omit<Transaction, 'date' | 'createdAt' | 'updatedAt'> & {
   date: string;
   createdAt: string;
@@ -79,7 +77,7 @@ export class TransactionService {
   private toISO(d?: Date | string): string | undefined {
     if (!d) return undefined;
     return typeof d === 'string' ? d : d.toISOString();
-    }
+  }
 
   private fromDTO(t: TransactionDTO): Transaction {
     return {
@@ -145,13 +143,11 @@ export class TransactionService {
 
   /** Delete a single transaction by id */
   deleteTransaction(id: string): Observable<{ message: string }> {
-    // Backend now returns 200 { message: 'Transaction deleted' }
     return this.http.delete<{ message: string }>(`${this.API}/${encodeURIComponent(id)}`);
   }
 
   /** Delete ALL transactions for the authenticated user */
   deleteAll(): Observable<{ message: string; deletedCount: number }> {
-    // Backend route: DELETE /api/v1/transactions
     return this.http.delete<{ message: string; deletedCount: number }>(this.API);
   }
 

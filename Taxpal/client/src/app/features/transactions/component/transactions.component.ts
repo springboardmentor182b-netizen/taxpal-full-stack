@@ -8,8 +8,8 @@ import { TransactionService, Transaction, CreateTransactionRequest } from '../..
   selector: 'app-transactions',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
-  templateUrl: './transactions.component.html',
-  styleUrls: ['./transactions.component.css']
+  templateUrl: './transactions.component.html',          // make sure filename matches
+  styleUrls: ['./transactions.component.css']           // make sure filename matches
 })
 export class TransactionsComponent implements OnInit {
   transactions = signal<Transaction[]>([]);
@@ -18,8 +18,11 @@ export class TransactionsComponent implements OnInit {
   isSubmitting = signal(false);
   errorMessage = signal<string | null>(null);
 
-  // for global bulk deletion
+  // bulk delete flag
   isDeletingAll = signal(false);
+
+  // NEW: per-item deleting state (for spinner/disable)
+  private deletingIds = signal<Set<string>>(new Set());
 
   transactionForm: FormGroup;
 
@@ -30,7 +33,6 @@ export class TransactionsComponent implements OnInit {
     { type: 'income', name: 'Business', value: 'business' },
     { type: 'income', name: 'Investment', value: 'investment' },
     { type: 'income', name: 'Other Income', value: 'other_income' },
-
     // Expense categories
     { type: 'expense', name: 'Food & Dining', value: 'food_dining' },
     { type: 'expense', name: 'Transportation', value: 'transportation' },
@@ -109,26 +111,31 @@ export class TransactionsComponent implements OnInit {
     }
   }
 
+  // ========= NEW: delete a single transaction (optimistic UI + spinner) =========
   deleteTransaction(id: string): void {
     if (!id) return;
-    if (confirm('Are you sure you want to delete this transaction?')) {
-      // optimistic UI update with revert on failure
-      const prev = this.transactions();
-      this.transactions.set(prev.filter(t => t._id !== id));
+    if (!confirm('Are you sure you want to delete this transaction?')) return;
 
-      this.transactionService.deleteTransaction(id).subscribe({
-        next: () => {
-          /* no-op: already removed optimistically */
-        },
-        error: () => {
-          // revert UI if backend fails
-          this.transactions.set(prev);
-          this.errorMessage.set('Failed to delete transaction');
-        }
-      });
-    }
+    const prev = this.transactions();                            // snapshot for revert
+    this.transactions.set(prev.filter(t => t._id !== id));       // optimistic remove
+    this.addDeleting(id);
+
+    this.transactionService.deleteTransaction(id).subscribe({
+      next: () => {
+        this.removeDeleting(id);                                 // success; already removed
+      },
+      error: () => {
+        this.transactions.set(prev);                             // revert UI on failure
+        this.removeDeleting(id);
+        this.errorMessage.set('Failed to delete transaction');
+      }
+    });
   }
+  isDeleting(id: string): boolean { return this.deletingIds().has(id); }
+  private addDeleting(id: string) { const s = new Set(this.deletingIds()); s.add(id); this.deletingIds.set(s); }
+  private removeDeleting(id: string) { const s = new Set(this.deletingIds()); s.delete(id); this.deletingIds.set(s); }
 
+  // ========= Delete ALL (already working) =========
   deleteAllTransactions(): void {
     if (!this.transactions().length) return;
     if (!confirm('Delete ALL your transactions? This cannot be undone.')) return;
@@ -136,7 +143,6 @@ export class TransactionsComponent implements OnInit {
     this.isDeletingAll.set(true);
     this.transactionService.deleteAll().subscribe({
       next: (res) => {
-        // If backend says 0 deleted, keep UI as-is and show message
         if (res.deletedCount > 0) {
           this.transactions.set([]);
         } else {
@@ -172,18 +178,21 @@ export class TransactionsComponent implements OnInit {
   }
 
   getTransactionTypeClass(type: string): string {
+    // keep your original utilities so the pill changes color
     return type === 'income' ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
   }
 
   getTransactionIcon(type: string): string {
     return type === 'income'
       ? 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1'
-      : 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z';
+      : 'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 004 0z';
   }
 
   formatCategory(category: string): string {
     return category.replace('_', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase());
   }
+
+  trackById(_index: number, item: Transaction) { return item._id; }
 
   private markFormGroupTouched(): void {
     Object.keys(this.transactionForm.controls).forEach(key => {

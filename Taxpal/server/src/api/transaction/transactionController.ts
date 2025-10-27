@@ -4,7 +4,6 @@ import Transaction from './Transaction.model';
 import { AuthedRequest } from '../auth/auth';
 import mongoose, { Types } from 'mongoose';
 
-// ------- Validators -------
 export const validateTransaction = [
   body('type').isIn(['income', 'expense']).withMessage('type must be income|expense'),
   body('amount').isFloat({ min: 0 }).withMessage('amount must be >= 0'),
@@ -13,7 +12,6 @@ export const validateTransaction = [
   body('date').isISO8601().withMessage('date must be ISO8601').toDate(),
 ];
 
-// ------- Helpers -------
 function toNumber(n: any, fallback: number): number {
   const v = Number(n);
   return Number.isFinite(v) ? v : fallback;
@@ -22,7 +20,6 @@ function toObjectId(id: string): Types.ObjectId | null {
   return mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : null;
 }
 
-// ------- Controllers -------
 export const getTransactions = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
@@ -159,7 +156,6 @@ export const deleteTransaction = async (req: AuthedRequest, res: Response): Prom
     if (!deleted) { res.status(404).json({ error: 'Transaction not found' }); return; }
 
     console.log(`[transactions.delete] user=${userId.toString()} _id=${_id.toString()} -> deleted`);
-    // Return 200 with a body so frontend can safely "next" without nulls
     res.status(200).json({ message: 'Transaction deleted' });
   } catch (err) {
     console.error('[transactions.delete]', err);
@@ -167,7 +163,6 @@ export const deleteTransaction = async (req: AuthedRequest, res: Response): Prom
   }
 };
 
-// Delete ALL transactions for current user
 export const deleteAllTransactions = async (req: AuthedRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) { res.status(401).json({ error: 'Unauthorized' }); return; }
