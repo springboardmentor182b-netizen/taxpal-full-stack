@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import bodyParser from "body-parser";
+import {Server} from "socket.io";
 import { setupSwagger } from "./swagger";
 import userRoutes from "./api/modules/user/user.routes";
 import incomeRoutes from "./api/modules/income/income.routes";
@@ -10,7 +11,7 @@ import categoriesRoutes from "./api/modules/categories/category.routes";
 import taxEstimatorRoutes from "./api/modules/taxEstimator/taxEstimator.route";
 import taxRemindersRoutes from "./api/modules/taxRemainders/taxReminder.routes";
 import reportExportRoutes from "./api/modules/reportexport/reportexport.routes"; 
-
+import notificationRoutes from './api/modules/notifications/notification.routes'
 
 import budgetRoutes from "./api/modules/budget/budget.routes";
 import reportRoutes from "./api/modules/reports/report.routes";
@@ -33,8 +34,10 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 setupSwagger(app);
-
-
+// app.use((req, res, next) => {
+//   req.io = (app as any).io;
+//   next();
+// });
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/categories", categoriesRoutes);
 app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
@@ -46,6 +49,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 app.use("/api/v1/reports", reportRoutes);
+app.use("/api/notifications",notificationRoutes);
 
 // Root route
 app.get("/", (req, res) => {
