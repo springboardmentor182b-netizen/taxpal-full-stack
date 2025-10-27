@@ -827,3 +827,64 @@
   border-radius: 6px;
   font-size: 0.85rem;
 }
+
+/* Strongly scoped Estimate Tax button styles (won't affect other .btn rules) */
+.tax-calendar-container .calendar-header-wrapper .estimate-tax-btn,
+.tax-calendar-container .calendar-header .estimate-tax-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(37,99,235,0.12);
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+  white-space: nowrap;
+  z-index: 5; /* ensure above calendar controls */
+}
+
+/* Icon inside the button */
+.tax-calendar-container .estimate-tax-btn svg {
+  width: 18px;
+  height: 18px;
+  stroke: rgba(255,255,255,0.95);
+  flex-shrink: 0;
+}
+
+/* Hover / active / focus */
+.tax-calendar-container .estimate-tax-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(37,99,235,0.16);
+  opacity: 0.98;
+}
+.tax-calendar-container .estimate-tax-btn:active {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(37,99,235,0.12);
+}
+.tax-calendar-container .estimate-tax-btn:focus {
+  outline: 3px solid rgba(59,130,246,0.18);
+  outline-offset: 3px;
+}
+
+/* Disabled state */
+.tax-calendar-container .estimate-tax-btn:disabled {
+  background: linear-gradient(180deg,#94d3ff,#6fa8ff);
+  cursor: not-allowed;
+  opacity: 0.7;
+  box-shadow: none;
+}
+
+/* Slightly smaller on very small screens */
+@media (max-width: 480px) {
+  .tax-calendar-container .estimate-tax-btn {
+    padding: 0.45rem 0.7rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+  }
+  .tax-calendar-container .estimate-tax-btn svg { width: 16px; height: 16px; }
+}
