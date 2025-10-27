@@ -1,36 +1,39 @@
-<div class="login-container">
-  <div class="login-card">
-    <div class="login-header">
-      <h1 class="login-title">TaxPal</h1>
-      <p class="login-subtitle">Sign in to your account to continue</p>
+<div class="auth-layout">
+  <!-- Left Panel (Form) -->
+  <div class="auth-left">
+    <div class="brand">
+      <h1 class="brand-title">TaxPal</h1>
+      <p class="brand-subtitle">Sign in to continue</p>
     </div>
 
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
-      <!-- Email Field -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Username -->
       <div class="form-group">
-        <label for="email" class="form-label">Email Address</label>
-        <input
-          type="email"
-          id="email"
-          formControlName="email"
-          class="form-input"
-          [class.error]="isFieldInvalid('email')"
-          placeholder="Enter your email"
-        />
+        <label for="email" class="form-label">Username:</label>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-input"
+            [class.error]="isFieldInvalid('email')"
+            placeholder="Enter your username"
+          />
+        </div>
         <div *ngIf="getFieldError('email')" class="error-message">
           {{ getFieldError('email') }}
         </div>
       </div>
 
-      <!-- Password Field -->
+      <!-- Password -->
       <div class="form-group">
-        <label for="password" class="form-label">Password</label>
-        <div class="input-container">
+        <label for="password" class="form-label">Password:</label>
+        <div class="input-wrap">
           <input
             [type]="showPassword() ? 'text' : 'password'"
             id="password"
             formControlName="password"
-            class="form-input"
+            class="form-input has-toggle"
             [class.error]="isFieldInvalid('password')"
             placeholder="Enter your password"
           />
@@ -38,7 +41,7 @@
             type="button"
             class="password-toggle"
             (click)="togglePasswordVisibility()"
-          >
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
             {{ showPassword() ? 'Hide' : 'Show' }}
           </button>
         </div>
@@ -47,38 +50,35 @@
         </div>
       </div>
 
-      <!-- Options -->
-      <div class="form-options">
-        <label class="checkbox-container">
-          <input type="checkbox" class="checkbox-input" />
-          <span class="checkbox-label">Remember me</span>
-        </label>
-        <!-- UPDATED: use routerLink -->
-        <a routerLink="/forgot-password" class="forgot-password">Forgot password?</a>
-      </div>
-
-      <!-- Global Error Message -->
+      <!-- Global Error -->
       <div *ngIf="errorMessage()" class="error-banner">
         {{ errorMessage() }}
       </div>
 
-      <!-- Login Button -->
-      <button
-        type="submit"
-        class="login-button"
-        [disabled]="isLoading() || loginForm.invalid"
-      >
-        <span *ngIf="!isLoading()">Sign In</span>
+      <!-- Submit -->
+      <button type="submit" class="login-button" [disabled]="isLoading() || loginForm.invalid">
+        <span *ngIf="!isLoading()">Login</span>
         <span *ngIf="isLoading()">Signing in...</span>
       </button>
+
+      <!-- Register -->
+      <p class="signup-note">
+        Don’t have an account?
+        <a routerLink="/register" class="signup-link">Register</a>
+      </p>
     </form>
 
-    <!-- Register Link -->
-    <div class="signup-link">
-      <p>
-        Don't have an account?
-        <a routerLink="/register" class="signup-text">Sign up</a>
-      </p>
+    <div class="corner-blob" aria-hidden="true"></div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="auth-right">
+    <div class="artwrap">
+      <img
+        src="../../../../../assets//images//Login_bg Image.jpg"
+        alt="Tax planning illustration"
+        class="art"
+      />
     </div>
   </div>
 </div>
