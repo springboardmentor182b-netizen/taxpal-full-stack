@@ -6,27 +6,36 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:5000/api/v1/dashboard'; // backend endpoint
+  // 🔹 Update this to your actual deployed backend URL if needed
+  private apiUrl = 'http://localhost:5000/api/v1/dashboard'; 
 
   constructor(private http: HttpClient) {}
 
-  // Create new dashboard
+  // 🔹 Create new dashboard
   createDashboard(data: any): Observable<any> {
     return this.http.post(this.apiUrl, data);
   }
 
-  // Get dashboard for a specific user
+  // 🔹 Get dashboard for a specific user
   getDashboard(userId: string): Observable<any> {
-    console.log('Fetching dashboard for userId:', userId); // ✅ log userId
+    console.log('Fetching dashboard for userId:', userId);
     return this.http.get(`${this.apiUrl}/${userId}`);
   }
 
-  // Update existing dashboard (or create if missing)
+  // 🔹 Update existing dashboard (or create if missing)
   updateDashboard(userId: string, data: any): Observable<any> {
     return this.http.put<any>(`${this.apiUrl}/${userId}`, data);
   }
+
+  // 🔹 Upsert dashboard (create or update automatically)
   upsertDashboard(userId: string, data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
   }
-  
+
+  // 🔹 Delete a specific transaction
+  deleteTransaction(dashboardId: string, txId: string): Observable<any> {
+    // This should match your backend route:
+    // router.delete('/:dashboardId/transactions/:txId', deleteTransaction)
+    return this.http.delete(`${this.apiUrl}/${dashboardId}/transactions/${txId}`);
+  }
 }
