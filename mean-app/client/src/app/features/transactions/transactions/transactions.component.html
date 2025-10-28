@@ -1,0 +1,39 @@
+<div *ngIf="loading">Loading transactions...</div>
+<div class="transactions-container">
+  <!-- Heading + Description -->
+  <div class="transactions-header">
+    <h2 class="transactions-heading">Your Transactions</h2>
+    <p class="transactions-subheading">
+      Keep track of all your income and expenses here. You can remove any transaction if needed.
+    </p>
+  </div>
+
+<table *ngIf="!loading && transactions.length > 0">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Description</th>
+      <th>Category</th>
+      <th>Amount</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let tx of transactions">
+      <td>{{ tx.date | date:'mediumDate' }}</td>
+      <td>{{ tx.description }}</td>
+      <td>{{ tx.category }}</td>
+      <td [ngClass]="{'text-red-500': tx.type === 'Expense', 'text-green-500': tx.type === 'Income'}">
+        ${{ tx.amount | number:'1.2-2' }}
+      </td>
+      <td>
+        <!-- Only show Remove for dashboard transactions -->
+        <button class="remove-button"*ngIf="tx._id" (click)="removeTransaction(tx._id)">Remove</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!loading && transactions.length === 0" class="no-results">
+  No transactions found.
+</div>
