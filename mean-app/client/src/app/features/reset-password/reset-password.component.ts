@@ -29,7 +29,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     private authService: AuthService
   ) {
     this.resetPasswordForm = this.formBuilder.group({
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
   }
@@ -37,12 +37,11 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Get the reset token from the route
     this.resetToken = this.route.snapshot.params['token'];
-    
     if (!this.resetToken) {
       this.errorMessage = 'Invalid reset link. Please request a new password reset.';
     }
 
-    // Subscribe to loading state
+    // Subscribe to loading state if AuthService provides it
     if (this.authService.isLoading$) {
       this.authService.isLoading$
         .pipe(takeUntil(this.destroy$))
@@ -55,21 +54,22 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  // Validator to check passwords match
   passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password');
+    const newPassword = form.get('newPassword');
     const confirmPassword = form.get('confirmPassword');
-    
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
+
+    if (newPassword && confirmPassword && newPassword.value !== confirmPassword.value) {
       confirmPassword.setErrors({ passwordMismatch: true });
       return { passwordMismatch: true };
     }
-    
+
     if (confirmPassword?.errors?.['passwordMismatch']) {
       const errors = { ...confirmPassword.errors };
       delete errors['passwordMismatch'];
       confirmPassword.setErrors(Object.keys(errors).length ? errors : null);
     }
-    
+
     return null;
   }
 
@@ -77,23 +77,23 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     if (this.resetPasswordForm.valid && this.resetToken) {
       this.isLoading = true;
       this.errorMessage = '';
-      
+
       try {
-        const password = this.resetPasswordForm.get('password')?.value;
+        const newPassword = this.resetPasswordForm.get('newPassword')?.value;
         const confirmPassword = this.resetPasswordForm.get('confirmPassword')?.value;
-        
-        await this.resetPassword(this.resetToken, password, confirmPassword);
-        
+
+        await this.resetPassword(this.resetToken, newPassword, confirmPassword);
+
         this.showSuccessMessage = true;
         this.resetPasswordForm.reset();
-        
+
         // Redirect to login after 3 seconds
         setTimeout(() => {
           this.router.navigate(['/login'], {
             queryParams: { message: 'Password reset successfully. Please log in with your new password.' }
           });
         }, 3000);
-        
+
       } catch (error: any) {
         console.error('Error resetting password:', error);
         this.handleResetError(error);
@@ -143,7 +143,7 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      'password': 'Password',
+      'newPassword': 'New Password',
       'confirmPassword': 'Confirm Password'
     };
     return labels[fieldName] || this.capitalizeFirst(fieldName);
@@ -153,8 +153,8 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  togglePasswordVisibility(field: 'password' | 'confirmPassword'): void {
-    if (field === 'password') {
+  togglePasswordVisibility(field: 'newPassword' | 'confirmPassword'): void {
+    if (field === 'newPassword') {
       this.showPassword = !this.showPassword;
     } else {
       this.showConfirmPassword = !this.showConfirmPassword;
@@ -169,19 +169,13 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     this.router.navigate(['/forgot-password']);
   }
 
-  private async resetPassword(token: string, password: string, confirmPassword: string): Promise<void> {
+  private async resetPassword(token: string, newPassword: string, confirmPassword: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      this.authService.resetPassword(token, password, confirmPassword)
+      this.authService.resetPassword(token, newPassword, confirmPassword)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
-          next: (response) => {
-            console.log('Password reset successfully:', response);
-            resolve();
-          },
-          error: (error) => {
-            console.error('Error resetting password:', error);
-            reject(error);
-          }
+          next: () => resolve(),
+          error: (error) => reject(error)
         });
     });
   }

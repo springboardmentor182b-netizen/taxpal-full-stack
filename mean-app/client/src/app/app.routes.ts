@@ -22,6 +22,13 @@ export const routes: Routes = [
 
   // Main Layout with child routes
   {
+    path: 'transactions',
+    loadComponent: () =>
+      import('./features/transactions/transactions/transactions.component').then(
+        (m) => m.TransactionsComponent
+      )
+  },
+  {
   path: 'reports',
   loadComponent: () =>
     import('./features/reports/reports-form/reports.component').then(

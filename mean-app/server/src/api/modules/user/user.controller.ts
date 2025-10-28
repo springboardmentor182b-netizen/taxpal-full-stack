@@ -42,19 +42,14 @@ export const login = async (req: Request, res: Response) => {
 };
 
 // FORGOT PASSWORD (placeholder)
-// FORGOT PASSWORD (should send email)
 export const forgot = async (req: Request, res: Response) => {
-  console.log("Received email:", req.body.email);  // 👈 check value
   try {
-    const response = await generateResetToken(req.body.email);
+    const response = await forgotPassword(req.body.email);
     res.status(200).json(response);
   } catch (err: any) {
-    console.error(err.message);  // 👈 log error
     res.status(400).json({ error: err.message });
   }
 };
-
-
 
 // REQUEST RESET
 export const requestReset = async (req: Request, res: Response) => {
@@ -69,14 +64,12 @@ export const requestReset = async (req: Request, res: Response) => {
 // RESET PASSWORD
 export const reset = async (req: Request, res: Response) => {
   try {
-    const { password, confirmPassword } = req.body;   // 👈 match Angular
     const token = req.params.token;
+    const { newPassword, confirmPassword } = req.body;
 
-    const response = await resetPassword(token, password, confirmPassword);
+    const response = await resetPassword(token, newPassword, confirmPassword);
     res.status(200).json(response);
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
 };
-
-
