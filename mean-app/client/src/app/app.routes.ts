@@ -31,6 +31,13 @@ export const routes: Routes = [
     loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
   },
   {
+    path: 'transactions',
+    loadComponent: () =>
+      import('./features/transactions/transactions/transactions.component').then(
+        (m) => m.TransactionsComponent
+      )
+  },
+  {
   path: 'reports',
   loadComponent: () =>
     import('./features/reports/reports-form/reports.component').then(
