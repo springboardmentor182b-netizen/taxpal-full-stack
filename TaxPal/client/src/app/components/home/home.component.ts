@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterLink, RouterModule } from '@angular/router';
 import { SignInFormComponent } from '../signin/sign-in-form.component';
 import { SignUpFormComponent } from '../signup/sign-up-form.component';
-import { NavbarComponent } from '../navbar/navbar.component';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterModule, SignInFormComponent, SignUpFormComponent, NavbarComponent],
+  imports: [CommonModule, RouterLink, RouterModule, SignInFormComponent, SignUpFormComponent],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

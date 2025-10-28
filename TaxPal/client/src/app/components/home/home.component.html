@@ -1,7 +1,4 @@
 <div class="home-container" [ngClass]="{'dark': isDarkMode}">
-  <!-- Navbar Component -->
-  <app-navbar></app-navbar>
-
   <!-- Hero Section -->
   <div class="hero-section">
     <!-- User Profile Area - Top Right -->
@@ -95,19 +92,6 @@
   <!-- Backdrop overlay when profile menu is open -->
   <div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeProfileMenu()"></div>
 </div>
-
-<!-- Auth Modals -->
-<app-sign-in-form 
-  *ngIf="showSignInForm" 
-  (close)="closeAuthForms()"
-  (switchToSignUp)="switchToSignUp()"
-></app-sign-in-form>
-
-<app-sign-up-form 
-  *ngIf="showSignUpForm" 
-  (close)="closeAuthForms()"
-  (switchToSignIn)="switchToSignIn()"
-></app-sign-up-form>
 
 <!-- Auth Modals -->
 <app-sign-in-form 
