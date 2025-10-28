@@ -130,4 +130,23 @@ export class BudgetComponent implements OnInit {
         this.closeProfileMenu();
         window.location.href = '/';
     }
+
+    deleteBudget(budgetId: string) {
+        if (!budgetId || !this.userEmail) return;
+        if (!confirm('Are you sure you want to delete this budget?')) return;
+        this.loading = true;
+        this.error = '';
+        // Use the correct API endpoint and pass userEmail for security
+        this.http.delete(`/api/users/delete-budget/${budgetId}?userEmail=${encodeURIComponent(this.userEmail)}`).subscribe({
+            next: () => {
+                // Remove from local budgets array
+                this.budgets = this.budgets.filter(b => b._id !== budgetId);
+                this.loading = false;
+            },
+            error: (err) => {
+                this.error = err?.error?.message || 'Failed to delete budget';
+                this.loading = false;
+            }
+        });
+    }
 }

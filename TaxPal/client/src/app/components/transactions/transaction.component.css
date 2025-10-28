@@ -159,6 +159,7 @@ body.light-mode{
   align-items: center;
   gap: 12px;
   min-width: 0;
+  flex: 1;
 }
 .tx-icon {
   width:48px;
@@ -181,6 +182,7 @@ body.light-mode{
 }
 .tx-meta {
   min-width: 0;
+  flex: 1;
 }
 .tx-title {
   font-weight: 600;
@@ -197,6 +199,7 @@ body.light-mode{
   display:flex;
   gap:8px;
   align-items:center;
+  flex-wrap: wrap;
 }
 
 /* Right side: amount and actions */
@@ -205,6 +208,7 @@ body.light-mode{
   align-items: center;
   gap: 12px;
   margin-left: auto;
+  flex-shrink: 0;
 }
 .tx-amount {
   font-weight: 700;
@@ -232,7 +236,7 @@ body.light-mode{
 }
 .btn-ghost:hover { background: rgba(2,6,23,0.04); color: #0f172a; }
 
-/* Modal overrides (keep concise, consistent) */
+/* Modal overrides */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -242,54 +246,90 @@ body.light-mode{
   background: rgba(2,6,23,0.45);
   z-index: 1200;
   padding: 20px;
+  overflow-y: auto;
 }
 .modal {
   width: 100%;
-  max-width: 680px;
+  max-width: 500px;
   background: #ffffff;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   box-shadow: 0 20px 50px rgba(2,6,23,0.12);
+  margin: auto;
+  max-height: 90vh;
+  overflow-y: auto;
 }
-.modal h3 { margin: 0 0 12px 0; font-size: 18px; }
-.form-group { margin-bottom: 10px; }
-.form-row { display:flex; gap:10px; }
-.form-row .form-group { flex:1; }
-input[type="text"], input[type="number"], input[type="date"], textarea {
+.modal h3 { 
+  margin: 0 0 16px 0; 
+  font-size: 20px;
+  font-weight: 600;
+}
+.form-group { 
+  margin-bottom: 14px; 
+}
+.form-row { 
+  display:flex; 
+  gap:12px; 
+}
+.form-row .form-group { 
+  flex:1; 
+}
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+input[type="text"], 
+input[type="number"], 
+input[type="date"], 
+textarea,
+select {
   width:100%;
   padding:10px 12px;
   border:1px solid #e6e9ef;
   border-radius:8px;
   font-size:14px;
   background:#fff;
+  font-family: inherit;
 }
-textarea { min-height:84px; resize:vertical; }
+textarea { 
+  min-height:84px; 
+  resize:vertical; 
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
 
-/* Records scroll container: independent scrolling for income / expense lists */
+/* Records scroll container */
 .records-scroll {
   width: 100%;
   display: block;
+  overflow-x: auto;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* smooth native scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(15,23,42,0.08) transparent;
 }
 
-/* Desktop / large tablet: allow larger scroll area if needed */
 @media (min-width: 900px) {
   .records-scroll {
-    max-height: 50vh; /* allow table to expand, but still scroll when very long */
+    max-height: 50vh;
   }
 }
 
-/* Mobile and small screens: tighter height so scrolling is usable from bottom */
 @media (max-width: 899px) {
   .records-scroll {
-    max-height: calc(40vh); /* visible area ~40% of viewport height */
+    max-height: calc(40vh);
   }
 }
 
-/* Add small visual hint for overflow (optional) */
 .records-scroll::-webkit-scrollbar {
   height: 8px;
   width: 8px;
@@ -297,21 +337,6 @@ textarea { min-height:84px; resize:vertical; }
 .records-scroll::-webkit-scrollbar-thumb {
   background: rgba(15,23,42,0.08);
   border-radius: 8px;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-  .tx-icon { width:44px; height:44px; font-size:16px; }
-  .tx-amount { min-width: 90px; font-size:14px; }
-  .transactions-page { padding: 16px; }
-  .actions { width:100%; justify-content:flex-start; }
-  .transactions-header { align-items:flex-start; gap:8px; }
-  .modal { max-width: 92%; padding: 12px; }
-}
-@media (max-width: 520px) {
-  .transaction-item { flex-direction: column; align-items:flex-start; gap:10px; padding:12px; }
-  .tx-right { width:100%; display:flex; justify-content:space-between; align-items:center; }
-  .tx-amount { text-align:left; }
 }
 
 /* Quick Actions */
@@ -324,12 +349,14 @@ textarea { min-height:84px; resize:vertical; }
 
 /* Top Actions Specific Styles */
 .top-actions {
-  margin-bottom: 2rem;
-  padding: 1rem 1.5rem;
+  margin-bottom: 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .top-actions .action-buttons {
-  justify-content: center;
+  justify-content: flex-end;
 }
 
 .action-buttons {
@@ -351,6 +378,7 @@ textarea { min-height:84px; resize:vertical; }
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .action-btn:hover {
@@ -532,26 +560,12 @@ textarea { min-height:84px; resize:vertical; }
   background-color: #252f3f;
 }
 
-/* Modal Styles - Updated for more compact size */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 100;
-  backdrop-filter: blur(4px);
-}
-
+/* Modal Styles - Compact & Responsive */
 .modal-container {
   background-color: white;
   border-radius: 0.75rem;
   width: 90%;
-  max-width: 450px; /* Reduced from 500px */
+  max-width: 450px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
   overflow: hidden;
   animation: modalFadeIn 0.3s ease-out;
@@ -563,7 +577,7 @@ textarea { min-height:84px; resize:vertical; }
 }
 
 .modal-header {
-  padding: 1.25rem 1.5rem; /* Reduced vertical padding */
+  padding: 1.25rem 1.5rem;
   border-bottom: 1px solid #e5e7eb;
 }
 
@@ -571,7 +585,7 @@ textarea { min-height:84px; resize:vertical; }
   font-size: 1.25rem;
   font-weight: 600;
   color: #111827;
-  margin: 0 0 0.25rem 0; /* Reduced bottom margin */
+  margin: 0 0 0.25rem 0;
 }
 
 .modal-subtitle {
@@ -581,47 +595,9 @@ textarea { min-height:84px; resize:vertical; }
 }
 
 .modal-body {
-  padding: 1.25rem 1.5rem; /* Reduced vertical padding */
-  max-height: 65vh; /* Maximum height to prevent overflow on small screens */
-  overflow-y: auto; /* Add scrolling if needed */
-}
-
-.form-group {
-  margin-bottom: 1rem; /* Reduced from 1.25rem */
-}
-
-.form-row {
-  display: flex;
-  gap: 1rem;
-}
-
-.form-group label {
-  display: block;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-  margin-bottom: 0.375rem; /* Reduced from 0.5rem */
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: 0.625rem 0.75rem; /* Reduced padding */
-  border: 1px solid #d1d5db;
-  border-radius: 0.375rem;
-  font-size: 0.875rem;
-  color: #111827;
-  background-color: white;
-  transition: border-color 0.2s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  padding: 1.25rem 1.5rem;
+  max-height: 65vh;
+  overflow-y: auto;
 }
 
 .amount-input {
@@ -641,22 +617,16 @@ textarea { min-height:84px; resize:vertical; }
   padding-left: 1.75rem;
 }
 
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px; /* Reduced from 100px */
-  max-height: 150px;
-}
-
 .modal-footer {
-  padding: 1rem 1.5rem; /* Reduced padding */
+  padding: 1rem 1.5rem;
   display: flex;
   justify-content: flex-end;
-  gap: 0.75rem; /* Reduced gap */
+  gap: 0.75rem;
   border-top: 1px solid #e5e7eb;
 }
 
 .btn-cancel {
-  padding: 0.5rem 1rem; /* More compact button */
+  padding: 0.5rem 1rem;
   background-color: white;
   border: 1px solid #d1d5db;
   border-radius: 0.375rem;
@@ -672,7 +642,7 @@ textarea { min-height:84px; resize:vertical; }
 }
 
 .btn-submit {
-  padding: 0.5rem 1rem; /* More compact button */
+  padding: 0.5rem 1rem;
   background-color: #10b981;
   border: 1px solid #059669;
   border-radius: 0.375rem;
@@ -687,7 +657,6 @@ textarea { min-height:84px; resize:vertical; }
   background-color: #059669;
 }
 
-/* Modal Submit Button Variations */
 .btn-submit.expense-submit {
   background-color: #ef4444;
   border-color: #dc2626;
@@ -698,7 +667,8 @@ textarea { min-height:84px; resize:vertical; }
 }
 
 /* Dark Mode for Modal */
-.dark .modal-container {
+.dark .modal-container,
+.dark .modal {
   background-color: #1f2937;
   border-color: #374151;
 }
@@ -707,7 +677,8 @@ textarea { min-height:84px; resize:vertical; }
   border-bottom-color: #374151;
 }
 
-.dark .modal-header h2 {
+.dark .modal-header h2,
+.dark .modal h3 {
   color: #f9fafb;
 }
 
@@ -805,139 +776,14 @@ textarea { min-height:84px; resize:vertical; }
   to { transform: rotate(360deg); }
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-  .metrics-row {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .balance-transactions-row,
-  .dashboard-grid,
-  .charts-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .balance-progress {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .circular-progress {
-    width: 100px;
-    height: 100px;
-  }
-
-  .pie-chart-container {
-    width: 200px;
-    height: 200px;
-  }
-
-  .bar {
-    width: 20px;
-  }
-}
-
-@media (max-width: 768px) {
-  .top-actions .action-buttons {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .top-actions .action-btn {
-    width: auto;
-  }
-
-  .action-buttons {
-    flex-direction: column;
-  }
-
-  .action-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .bar {
-    width: 18px;
-  }
-
-  .bar-value {
-    font-size: 0.65rem;
-  }
-}
-
-@media (max-width: 640px) {
-  .top-actions .action-buttons {
-    flex-direction: column;
-  }
-
-  .top-actions .action-btn {
-    width: 100%;
-  }
-
-  .metrics-row {
-    grid-template-columns: 1fr;
-  }
-
-  .balance-content {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-
-  .balance-progress {
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .circular-progress {
-    width: 80px;
-    height: 80px;
-  }
-
-  .pie-chart-container {
-    width: 180px;
-    height: 180px;
-  }
-
-  .budget-legend {
-    padding: 0 1rem;
-  }
-
-  .bar-chart {
-    height: 200px;
-  }
-
-  .bar-container {
-    height: 150px;
-  }
-
-  .bar {
-    width: 12px;
-  }
-
-  .bar-value {
-    display: none;
-  }
-
-  .bar:hover .bar-value {
-    display: block;
-  }
-
-  .chart-legend {
-    margin-bottom: 1rem;
-  }
-}
-
-/* Income Table Styles */
+/* Income/Expense Table Styles */
 .income-table-section {
   margin: 2.5rem 0 2rem 0;
   background: #fff;
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px rgba(0,0,0,0.08);
   padding: 2rem 1.5rem;
-  max-width: 900px;
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
 }
@@ -954,6 +800,7 @@ textarea { min-height:84px; resize:vertical; }
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 0.5rem;
+  min-width: 600px;
 }
 
 .income-table th, .income-table td {
@@ -967,6 +814,7 @@ textarea { min-height:84px; resize:vertical; }
   color: #374151;
   font-weight: 600;
   border-bottom: 2px solid #e5e7eb;
+  white-space: nowrap;
 }
 
 .income-table tr:nth-child(even) {
@@ -1020,7 +868,6 @@ textarea { min-height:84px; resize:vertical; }
   color: #9ca3af;
 }
 
-/* Expense Table Styles */
 .expense-amount {
   color: #ef4444;
   font-weight: 600;
@@ -1029,190 +876,14 @@ textarea { min-height:84px; resize:vertical; }
   color: #f87171;
 }
 
-/* ONLY USE THIS CUSTOM CHART STYLING - REMOVE ANY OTHER CHART CSS */
-
-/* Custom finance chart styles */
-.finance-chart-card {
-  margin: 2rem 0;
-  width: 100%;
-  clear: both;
-  max-width: 1200px; /* Wider card to use more space */
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.finance-chart {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  height: 250px;
-  width: 100%;
-  position: relative;
-}
-
-.chart-container {
-  display: flex;
-  flex: 1;
-  height: 200px;
-  position: relative;
-  border-bottom: 1px solid var(--border-color, #e5e7eb);
-  margin-bottom: 3.5rem; /* More space for labels below */
-}
-
-.chart-y-axis {
-  display: flex;
-  flex-direction: column-reverse;
-  justify-content: space-between;
-  padding-right: 10px;
-  color: var(--text-muted, #6b7280);
-  font-size: 0.75rem;
-  width: 60px; /* Keep this narrow */
-}
-
-.chart-bars {
-  display: flex;
-  justify-content: space-around; /* Use space-around instead of space-evenly */
-  align-items: flex-end;
-  flex: 1;
-  gap: 10px; /* Increased from 0.5rem */
-  padding: 0 20px; /* Add padding on the sides */
-}
-
-.month-column {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  min-width: 60px; /* Ensure minimum width for narrow screens */
-  position: relative;
-}
-
-.bar-group {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: flex-end;
-  height: 180px;
-  gap: 4px;
-}
-
-.bar {
-  cursor: pointer;
-  width: 45%; /* Wider bars */
-  min-width: 12px; /* Ensure minimum width */
-  transition: all 0.2s ease;
-  position: relative;
-  min-height: 1px;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-}
-
-.bar:hover {
-  opacity: 0.9;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.income-bar {
-  background-color: rgba(75, 192, 192, 0.8); /* Slightly more opaque */
-  border: 1px solid rgba(75, 192, 192, 1);
-}
-
-.expense-bar {
-  background-color: rgba(255, 99, 132, 0.8); /* Slightly more opaque */
-  border: 1px solid rgba(255, 99, 132, 1);
-}
-
-.month-label {
-  position: absolute;
-  bottom: -2rem; /* More space below */
-  text-align: center;
-  font-size: 0.8rem; /* Larger font */
-  color: var(--text-muted, #6b7280);
-  white-space: nowrap;
-  overflow: visible; /* Allow text to overflow */
-  text-overflow: clip;
-  width: 100%;
-  left: 0;
-  transform: rotate(-15deg); /* Rotate labels to prevent overlap */
-  transform-origin: center top;
-}
-
-.chart-legend {
-  display: flex;
-  justify-content: center;
-  gap: 2rem;
-  padding-top: 0.5rem;
-  position: absolute;
-  bottom: -3rem; /* Position further below the month labels */
-  left: 0;
-  width: 100%;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-}
-
-/* Move the title slightly higher */
-.finance-chart-card .card-header {
-  padding-top: 12px;
-  padding-bottom: 12px;
-}
-
-.chart-title {
-  margin-top: 0;
-  margin-bottom: 0;
-  font-size: 1.3rem;
-}
-
-/* Improved tooltip styling */
-.chart-tooltip {
-  position: fixed;
-  display: none;
-  background: var(--card-dark, #1e293b);
-  color: var(--text-light, #f9fafb);
-  padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 0.85rem;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  pointer-events: none;
-  z-index: 1000;
-  max-width: 200px;
-  opacity: 0;
-  transition: opacity 0.2s;
-  border: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-}
-
-.chart-tooltip.visible {
-  display: block;
-  opacity: 1;
-}
-
-.tooltip-month {
-  font-weight: 600;
-  margin-bottom: 4px;
-  border-bottom: 1px solid var(--border-color, rgba(255, 255, 255, 0.1));
-  padding-bottom: 4px;
-}
-
-.tooltip-value {
-  white-space: nowrap;
-}
-
 /* Table header with delete all button */
 .table-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.25rem;
+  gap: 1rem;
+  flex-wrap: wrap;
 }
 
 /* Delete all button */
@@ -1227,6 +898,7 @@ textarea { min-height:84px; resize:vertical; }
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .delete-all-btn:hover {
@@ -1269,34 +941,8 @@ textarea { min-height:84px; resize:vertical; }
 .dark .delete-btn:hover {
   background-color: #7f1d1d;
 }
+
 /* Transactions */
-.transactions-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  border-radius: 0.5rem;
-  border-bottom: 1px solid #f3f4f6;
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.transaction-item:hover {
-  background-color: #f9fafb;
-  transform: translateY(-2px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.transaction-item:last-child {
-  border-bottom: none;
-}
-
 .transaction-info h4 {
   font-size: 0.875rem;
   font-weight: 500;
@@ -1329,22 +975,323 @@ textarea { min-height:84px; resize:vertical; }
   color: #ef4444;
 }
 
-/* Dashboard Grid - Two Column Layout */
-.dashboard-grid {
-  display: block;
-  margin-bottom: 2rem;
-}
 /* Income trend icon specific styles */
 .metric-card:first-child .trend-icon {
-  color: #10b981 !important; /* Green color for income */
+  color: #10b981 !important;
 }
 
-/* Expense trend icon specific styles */
 .metric-card:nth-child(2) .trend-icon {
-  color: #ef4444 !important; /* Red color for expense */
+  color: #ef4444 !important;
 }
 
-/* Hover effect for trend icons */
 .metric-trend:hover .trend-icon {
   transform: scale(1.1);
+}
+
+/* ============================================
+   RESPONSIVE BREAKPOINTS
+   ============================================ */
+
+/* Tablet and below (900px) */
+@media (max-width: 900px) {
+  .transactions-page { 
+    padding: 16px; 
+  }
+  
+  .transactions-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+  
+  .top-actions {
+    width: 100%;
+  }
+  
+  .top-actions .action-buttons {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .tx-icon { 
+    width:44px; 
+    height:44px; 
+    font-size:16px; 
+  }
+  
+  .tx-amount { 
+    min-width: 90px; 
+    font-size:14px; 
+  }
+  
+  .modal { 
+    max-width: 92%; 
+    padding: 16px; 
+  }
+  
+  .income-table-section {
+    padding: 1.5rem 1rem;
+  }
+  
+  .income-table th,
+  .income-table td {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile and small screens (640px) */
+@media (max-width: 640px) {
+  .transactions-page {
+    padding: 12px;
+  }
+  
+  .transactions-header h2 {
+    font-size: 20px;
+  }
+  
+  .action-buttons {
+    width: 100%;
+  }
+  
+  .action-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .transaction-item { 
+    flex-direction: column; 
+    align-items:flex-start; 
+    gap:10px; 
+    padding:12px; 
+  }
+  
+  .tx-left {
+    width: 100%;
+  }
+  
+  .tx-right { 
+    width:100%; 
+    display:flex; 
+    justify-content:space-between; 
+    align-items:center; 
+  }
+  
+  .tx-amount { 
+    text-align:left;
+    min-width: auto;
+  }
+  
+  .tx-sub {
+    font-size: 12px;
+  }
+  
+  /* Modal responsive */
+  .modal {
+    padding: 14px;
+    max-width: 95%;
+  }
+  
+  .modal h3 {
+    font-size: 18px;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .modal-actions .btn,
+  .modal-actions .btn-cancel,
+  .modal-actions .btn-submit {
+    width: 100%;
+  }
+  
+  /* Table responsive */
+  .income-table-section {
+    padding: 1rem 0.75rem;
+    margin: 1.5rem 0;
+  }
+  
+  .table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+  
+  .income-table-title {
+    font-size: 1.1rem;
+  }
+  
+  .delete-all-btn {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .income-table {
+    min-width: 550px;
+  }
+  
+  .income-table th,
+  .income-table td {
+    padding: 0.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra small screens (480px) */
+@media (max-width: 480px) {
+  .transactions-page {
+    padding: 8px;
+  }
+  
+  .transactions-header h2 {
+    font-size: 18px;
+  }
+  
+  .transactions-header .muted {
+    font-size: 12px;
+  }
+  
+  .tx-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+  }
+  
+  .tx-title {
+    font-size: 14px;
+  }
+  
+  .tx-sub {
+    font-size: 11px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+  }
+  
+  .tx-amount {
+    font-size: 13px;
+  }
+  
+  .btn-ghost {
+    padding: 4px 6px;
+    font-size: 16px;
+  }
+  
+  .modal {
+    padding: 12px;
+    border-radius: 8px;
+  }
+  
+  .modal h3 {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .form-group {
+    margin-bottom: 10px;
+  }
+  
+  .form-group label {
+    font-size: 13px;
+    margin-bottom: 4px;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+  
+  textarea {
+    min-height: 70px;
+  }
+  
+  .modal-actions {
+    margin-top: 12px;
+    padding-top: 12px;
+  }
+  
+  .action-btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.8rem;
+  }
+  
+  .income-table-section {
+    padding: 0.75rem 0.5rem;
+  }
+  
+  .income-table-title {
+    font-size: 1rem;
+  }
+  
+  .income-table {
+    min-width: 500px;
+    font-size: 0.8rem;
+  }
+  
+  .income-table th,
+  .income-table td {
+    padding: 0.4rem;
+  }
+  
+  .delete-all-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .delete-all-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+  
+  .delete-btn svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* Landscape mobile optimization */
+@media (max-height: 600px) and (orientation: landscape) {
+  .modal {
+    max-height: 85vh;
+  }
+  
+  .modal-body {
+    max-height: 50vh;
+  }
+  
+  .form-group {
+    margin-bottom: 8px;
+  }
+  
+  textarea {
+    min-height: 60px;
+  }
+}
+
+/* Print styles */
+@media print {
+  .transactions-header .quick-actions,
+  .btn-ghost,
+  .delete-all-btn,
+  .delete-btn,
+  .modal-overlay {
+    display: none !important;
+  }
+  
+  .transactions-page {
+    padding: 0;
+  }
+  
+  .transaction-item {
+    break-inside: avoid;
+  }
 }

@@ -272,155 +272,12 @@
       </div>
     </div>
 
-    <!-- Income Table -->
-    <div class="income-table-section">
-      <div class="table-header">
-        <h3 class="income-table-title">Your Income Records</h3>
-        <button class="delete-all-btn" *ngIf="incomeList.length > 0" (click)="deleteAllIncome()">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M3 6h18"></path>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-          Delete All
-        </button>
-      </div>
-      <div class="records-scroll" *ngIf="incomeList.length > 0">
-        <table class="income-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Amount</th>
-              <th>Category</th>
-              <th>Date</th>
-              <th>Notes</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let income of incomeList">
-              <td>{{ income.title }}</td>
-              <td class="income-amount">
-                {{ income.amount | currency : 'USD' : 'symbol' : '1.2-2' }}
-              </td>
-              <td>{{ income.category || '-' }}</td>
-              <td>{{ income.date | date : 'mediumDate' }}</td>
-              <td>{{ income.notes || '-' }}</td>
-              <td class="action-column">
-                <button class="delete-btn" (click)="deleteIncome(income._id)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- Expense Table -->
-    <div class="income-table-section">
-      <div class="table-header">
-        <h3 class="income-table-title" style="color: #ef4444">Your Expense Records</h3>
-        <button class="delete-all-btn" *ngIf="expenseList.length > 0" (click)="deleteAllExpenses()">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M3 6h18"></path>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-            <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-          Delete All
-        </button>
-      </div>
-      <div class="records-scroll" *ngIf="expenseList.length > 0">
-        <table class="income-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Amount</th>
-              <th>Category</th>
-              <th>Date</th>
-              <th>Tax Deductible</th>
-              <th>Notes</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let expense of expenseList">
-              <td>{{ expense.title }}</td>
-              <td class="expense-amount">
-                {{ expense.amount | currency : 'USD' : 'symbol' : '1.2-2' }}
-              </td>
-              <td>{{ expense.category || '-' }}</td>
-              <td>{{ expense.date | date : 'mediumDate' }}</td>
-              <td>{{ expense.taxDeductible || '-' }}</td>
-              <td>{{ expense.notes || '-' }}</td>
-              <td class="action-column">
-                <button class="delete-btn" (click)="deleteExpense(expense._id)">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <path d="M3 6h18"></path>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                    <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                  </svg>
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
     <!-- Total Balance and Recent Transactions Row -->
     <div class="balance-transactions-row">
-      <!-- Remove Total Balance Card -->
-
       <!-- Recent Transactions -->
       <div class="dashboard-section">
         <div class="section-header">
           <h3>Recent Transactions</h3>
-          <a href="#" class="view-all-link">View All</a>
         </div>
         <div class="transactions-list">
           <ng-container *ngIf="recentTransactions.length > 0; else noTransactions">
@@ -451,10 +308,10 @@
       </div>
     </div>
 
-    <!-- Dashboard Grid - Now only showing Expense Breakdown -->
-    <div class="dashboard-grid">
-      <!-- Expense Breakdown as Pie Chart -->
-      <div class="dashboard-section">
+    <!-- Dashboard Grid - Expense Breakdown (left) and Income vs Expense Chart (right) -->
+    <div class="dashboard-grid two-col-grid">
+      <!-- Expense Breakdown as Pie Chart (left) -->
+      <div class="dashboard-section expense-breakdown-section">
         <div class="section-header">
           <h3>Expense Breakdown</h3>
         </div>
@@ -462,13 +319,79 @@
           <div class="chart-container">
             <canvas id="expenseChart"></canvas>
           </div>
+          <div *ngIf="expenseList.length === 0" class="no-expense-msg">
+            No expenses to display.
+          </div>
         </div>
       </div>
 
-      <!-- Remove Budget Progress section -->
-    </div>
+      <!-- Income vs Expenses Chart (right) -->
+      <div class="dashboard-section income-expense-section">
+        <div class="card finance-chart-card">
+          <div class="card-header">
+            <h2 class="chart-title">Monthly Income & Expenses</h2>
+          </div>
+          <div class="card-body" style="padding-bottom: 60px">
+            <div *ngIf="!hasFinancialData()" class="no-data-message">
+              <p>No financial data available yet. Add income and expenses to see your financial chart.</p>
+            </div>
+            <div *ngIf="hasFinancialData()" class="finance-chart">
+              <div class="chart-container">
+                <div class="chart-y-axis">
+                  <div class="axis-value" *ngFor="let value of yAxisValues">
+                    {{ formatCurrency(value) }}
+                  </div>
+                </div>
 
-    <!-- Income vs Expenses Chart - Removed as per new design -->
+                <div class="chart-bars">
+                  <div class="month-column" *ngFor="let month of getDisplayMonths()">
+                    <div class="bar-group">
+                      <div
+                        class="bar income-bar"
+                        [style.height.%]="getBarHeight(month.income)"
+                        [attr.data-label]="'Income'"
+                        [attr.data-value]="formatCurrency(month.income)"
+                        [attr.data-month]="month.month"
+                        (mouseenter)="showTooltip($event)"
+                        (mouseleave)="hideTooltip()"
+                      ></div>
+                      <div
+                        class="bar expense-bar"
+                        [style.height.%]="getBarHeight(month.expense)"
+                        [attr.data-label]="'Expense'"
+                        [attr.data-value]="formatCurrency(month.expense)"
+                        [attr.data-month]="month.month"
+                        (mouseenter)="showTooltip($event)"
+                        (mouseleave)="hideTooltip()"
+                      ></div>
+                    </div>
+                    <div class="month-label">{{ month.month }}</div>
+                  </div>
+                </div>
+
+                <div class="chart-legend">
+                  <div class="legend-item">
+                    <div class="legend-color income-color"></div>
+                    <div class="legend-label">Income</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-color expense-color"></div>
+                    <div class="legend-label">Expenses</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Add tooltip element -->
+        <div id="chart-tooltip" class="chart-tooltip" [ngStyle]="tooltipStyle">
+          <div class="tooltip-month" *ngIf="tooltipData.month">{{ tooltipData.month }}</div>
+          <div class="tooltip-value" *ngIf="tooltipData.label">
+            <strong>{{ tooltipData.label }}:</strong> {{ tooltipData.value }}
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Add Income Modal -->
@@ -626,74 +549,3 @@
       </div>
     </div>
   </div>
-
-  <!-- Replace your existing chart implementation with this one -->
-  <div class="card finance-chart-card">
-    <div class="card-header">
-      <h2 class="chart-title">Monthly Income & Expenses</h2>
-    </div>
-    <div class="card-body" style="padding-bottom: 60px">
-      <div *ngIf="!hasFinancialData()" class="no-data-message">
-        <p>No financial data available yet. Add income and expenses to see your financial chart.</p>
-      </div>
-
-      <div *ngIf="hasFinancialData()" class="finance-chart">
-        <div class="chart-container">
-          <div class="chart-y-axis">
-            <div class="axis-value" *ngFor="let value of yAxisValues">
-              {{ formatCurrency(value) }}
-            </div>
-          </div>
-
-          <div class="chart-bars">
-            <div class="month-column" *ngFor="let month of getDisplayMonths()">
-              <div class="bar-group">
-                <div
-                  class="bar income-bar"
-                  [style.height.%]="getBarHeight(month.income)"
-                  [attr.data-label]="'Income'"
-                  [attr.data-value]="formatCurrency(month.income)"
-                  [attr.data-month]="month.month"
-                  (mouseenter)="showTooltip($event)"
-                  (mouseleave)="hideTooltip()"
-                ></div>
-                <div
-                  class="bar expense-bar"
-                  [style.height.%]="getBarHeight(month.expense)"
-                  [attr.data-label]="'Expense'"
-                  [attr.data-value]="formatCurrency(month.expense)"
-                  [attr.data-month]="month.month"
-                  (mouseenter)="showTooltip($event)"
-                  (mouseleave)="hideTooltip()"
-                ></div>
-              </div>
-              <div class="month-label">{{ month.month }}</div>
-            </div>
-          </div>
-
-          <div class="chart-legend">
-            <div class="legend-item">
-              <div class="legend-color income-color"></div>
-              <div class="legend-label">Income</div>
-            </div>
-            <div class="legend-item">
-              <div class="legend-color expense-color"></div>
-              <div class="legend-label">Expenses</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add tooltip element -->
-  <div id="chart-tooltip" class="chart-tooltip" [ngStyle]="tooltipStyle">
-    <div class="tooltip-month" *ngIf="tooltipData.month">{{ tooltipData.month }}</div>
-    <div class="tooltip-value" *ngIf="tooltipData.label">
-      <strong>{{ tooltipData.label }}:</strong> {{ tooltipData.value }}
-    </div>
-  </div>
-
-  <!-- Backdrop overlay when profile menu is open -->
-  <div class="menu-backdrop" *ngIf="showProfileMenu" (click)="closeProfileMenu()"></div>
-</div>

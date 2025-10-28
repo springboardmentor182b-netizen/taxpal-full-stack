@@ -1,8 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const TaxEstimate = require('../models/TaxEstimate');
+const mongoose = require('mongoose');
 
-console.log('✓ Tax Estimator routes file loaded');
+let TaxEstimate;
+try {
+  TaxEstimate = require('../src/apis/TaxEstimator/taxestimate.model');
+} catch (e) {
+  console.error('TaxEstimate model require failed:', e.message);
+  TaxEstimate = null;
+}
+
+if (!TaxEstimate) {
+  console.warn('TaxEstimate model not available; tax estimator routes will return 500 on save/fetch.');
+}
 
 /**
  * @swagger
@@ -76,7 +86,7 @@ console.log('✓ Tax Estimator routes file loaded');
  *       500:
  *         description: Server error
  */
-router.post('/calculate', (req, res) => {
+router.post('/calculate', async (req, res) => {
   try {
     console.log('=== TAX CALCULATION REQUEST ===');
     console.log('Request body:', req.body);
@@ -188,9 +198,9 @@ router.post('/calculate', (req, res) => {
  */
 router.post('/save', async (req, res) => {
   try {
-    console.log('=== SAVE TAX ESTIMATE REQUEST ===');
-    console.log('Request body:', req.body);
-    
+    if (!TaxEstimate) return res.status(500).json({ error: 'TaxEstimate model not configured on server' });
+
+    const payload = req.body || {};
     const {
       userId,
       userEmail,
@@ -205,55 +215,44 @@ router.post('/save', async (req, res) => {
       homeOffice,
       taxableIncome,
       estimatedTax,
-      effectiveRate
-    } = req.body;
+      effectiveRate,
+      dueDate
+    } = payload;
 
-    // Validate required fields
-    if (!userEmail) {
-      return res.status(400).json({ message: 'User email is required' });
-    }
-    
-    if (!income || income <= 0) {
-      return res.status(400).json({ message: 'Valid income is required' });
+    if (!userId || !userEmail) {
+      return res.status(400).json({ error: 'userId and userEmail are required' });
     }
 
-    // Create new document
-    const taxEstimate = new TaxEstimate({
-      userId: userId || undefined,
-      userEmail: userEmail.toLowerCase(),
-      country: country || 'United States',
-      state: state || '',
-      status: status || 'Single',
-      quarter: quarter || 'Q1',
-      income: parseFloat(income),
-      businessExpenses: parseFloat(businessExpenses || 0),
-      retirement: parseFloat(retirement || 0),
-      healthInsurance: parseFloat(healthInsurance || 0),
-      homeOffice: parseFloat(homeOffice || 0),
-      taxableIncome: parseFloat(taxableIncome || 0),
-      estimatedTax: parseFloat(estimatedTax || 0),
-      effectiveRate: parseFloat(effectiveRate || 0)
+    // Parse dueDate if present
+    let parsedDue = null;
+    if (dueDate) {
+      const d = new Date(dueDate);
+      if (!isNaN(d.getTime())) parsedDue = d;
+    }
+
+    const doc = new TaxEstimate({
+      userId,
+      userEmail,
+      country,
+      state,
+      status,
+      quarter,
+      income: Number(income) || 0,
+      businessExpenses: Number(businessExpenses) || 0,
+      retirement: Number(retirement) || 0,
+      healthInsurance: Number(healthInsurance) || 0,
+      homeOffice: Number(homeOffice) || 0,
+      taxableIncome: Number(taxableIncome) || 0,
+      estimatedTax: Number(estimatedTax) || 0,
+      effectiveRate: Number(effectiveRate) || 0,
+      dueDate: parsedDue
     });
 
-    // Save to MongoDB
-    const savedEstimate = await taxEstimate.save();
-    
-    console.log('✓ Tax estimate saved to MongoDB!');
-    console.log('Document ID:', savedEstimate._id);
-    console.log('Collection:', TaxEstimate.collection.name);
-    
-    res.status(201).json({ 
-      success: true,
-      message: 'Tax estimate saved successfully', 
-      data: savedEstimate
-    });
+    const saved = await doc.save();
+    return res.status(201).json({ success: true, data: saved });
   } catch (error) {
-    console.error('✗ Error saving tax estimate:', error);
-    res.status(500).json({ 
-      success: false,
-      message: 'Server error while saving tax estimate',
-      error: error.message 
-    });
+    console.error('Error saving tax estimate:', error);
+    return res.status(500).json({ error: 'Failed to save tax estimate' });
   }
 });
 
@@ -285,9 +284,81 @@ router.post('/save', async (req, res) => {
  *       500:
  *         description: Server error
  */
+router.get('/user/:userId', async (req, res) => {
+  try {
+    if (!TaxEstimate) return res.status(500).json({ error: 'TaxEstimate model not configured on server' });
+
+    const { userId } = req.params;
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: 'Invalid or missing userId' });
+    }
+
+    const estimates = await TaxEstimate.find({ userId }).sort({ dueDate: 1, createdAt: 1 }).lean();
+    return res.json(Array.isArray(estimates) ? estimates : []);
+  } catch (error) {
+    console.error('Error fetching tax estimates for user:', error);
+    return res.status(500).json({ error: 'Failed to fetch tax estimates' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/tax-estimator/mark-paid:
+ *   post:
+ *     summary: Mark a tax estimate as paid
+ *     tags: [Tax Estimator]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - id
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 format: uuid
+ *                 example: 550e8400-e29b-41d4-a716-446655440000
+ *     responses:
+ *       200:
+ *         description: Tax estimate marked as paid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 updated:
+ *                   $ref: '#/components/schemas/TaxEstimate'
+ *       400:
+ *         description: Invalid input
+ *       500:
+ *         description: Server error
+ */
+router.post('/mark-paid', async (req, res) => {
+  try {
+    if (!TaxEstimate) return res.status(500).json({ error: 'TaxEstimate model not configured on server' });
+
+    const id = req.body?.id ?? req.body?._id;
+    if (!id) return res.status(400).json({ error: 'Missing id' });
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(400).json({ error: 'Invalid id' });
+
+    const deleted = await TaxEstimate.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ error: 'Tax estimate not found' });
+
+    return res.json({ success: true, deletedId: id });
+  } catch (error) {
+    console.error('Error deleting tax estimate:', error);
+    return res.status(500).json({ error: 'Failed to delete tax estimate' });
+  }
+});
 
 console.log('✓ Tax Estimator routes registered:');
-console.log('  - POST /calculate');
-console.log('  - POST /save');
+console.log('  - POST /api/tax-estimator/calculate');
+console.log('  - POST /api/tax-estimator/save');
+console.log('  - GET  /api/tax-estimator/user/:userId');
+console.log('  - POST /api/tax-estimator/mark-paid');
 
 module.exports = router;
