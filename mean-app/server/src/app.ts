@@ -48,7 +48,7 @@ app.use("/api/expense", expenseRoutes);
 
 // ✅ Root route
 app.get("/", (req, res) => {
-  res.redirect("/login")
+  res.send("🚀 Server running on clind side")
 });
 
 // ✅ Serve Angular build (AFTER API routes)
