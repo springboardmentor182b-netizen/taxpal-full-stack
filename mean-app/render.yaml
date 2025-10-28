@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: taxpal-server
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    rootDir: mean-app/server
+    envVars:
+      - key: NODE_ENV
+        value: production
