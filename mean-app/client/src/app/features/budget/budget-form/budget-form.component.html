@@ -1,75 +1,68 @@
 <div class="budget-container main-content">
   <div class="header">
-    <h2 class="heading">Budget Overview</h2>
-    <button class="button-save" (click)="isFormVisible.set(true)">+ Create Budget</button>
+    <h2 class="heading">Budgets</h2>
+    <button class="button-save" (click)="isFormVisible.set(true)">Create Budget</button>
   </div>
 
-  <!-- Main Content -->
-  <div class="main-content">
-    <div class="budget-container">
-      <div class="header">
-        <h2 class="heading">Budgets</h2>
-        <button class="button-save" (click)="isFormVisible.set(true)">Create Budget</button>
-      </div>
+  <div class="budget-tables">
+    <span class="left-item" style="color:red;">● Hi, {{ currentUser.fullName }}! Here's your Budget page.</span>
+    <span class="right-item">Budget Health</span>
+  </div>
 
-      <div class="budget-tables">
-        <span class="left-item" style="color:red;">● Hi, {{ currentUser.fullName }}! Here's your Budget page.</span>
-        <span class="right-item">Budget Health</span>
-      </div>
+  <!-- Budget Table -->
+  <div class="budget-table">
+    <h3>Budget List</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Budget</th>
+          <th>Spent</th>
+          <th>Remaining</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let budget of budgets(); trackBy: trackByCategory">
+          <td>{{ budget.category }}</td>
+          <td>{{ budget.amount | currency:'USD' }}</td>
+          <td>{{ budget.spent | currency:'USD' }}</td>
+          <td>{{ budget.remaining | currency:'USD' }}</td>
+          <td
+            [ngClass]="{
+              'status-good': budget.status === 'Good',
+              'status-fair': budget.status === 'Fair',
+              'status-poor': budget.status === 'Poor'
+            }"
+          >
+            {{ budget.status }}
+          </td>
+          <td class="actions">
+            <button class="viewBox"  (click)="viewBudgetDetails(budget, $event)">View</button>
+            <button class="deleteBox"  (click)="deleteBudget(budget)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-      <!-- Budget Table -->
-      <div class="budget-table">
-        <h3>Budget List</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Budget</th>
-              <th>Spent</th>
-              <th>Remaining</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let budget of budgets(); trackBy: trackByCategory">
-              <td>{{ budget.category }}</td>
-              <td>{{ budget.amount | currency:'USD' }}</td>
-              <td>{{ budget.spent | currency:'USD' }}</td>
-              <td>{{ budget.remaining | currency:'USD' }}</td>
-              <td
-                [ngClass]="{
-                  'status-good': budget.status === 'Good',
-                  'status-fair': budget.status === 'Fair',
-                  'status-poor': budget.status === 'Poor'
-                }"
-              >
-                {{ budget.status }}
-              </td>
-              <td class="viewBox" (click)="viewBudgetDetails(budget, $event)">View</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Details Popup -->
-      <div
-        *ngIf="selectedBudget"
-        class="popup-details"
-        [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }"
-      >
-        <button class="close-btn" (click)="closePopup()">×</button>
-        <h3 class="heading">Budget Details</h3>
-        <div class="strong">
-          <p><strong>Category:</strong> {{ selectedBudget.category }}</p>
-          <p><strong>Amount:</strong> ${{ selectedBudget.amount }}</p>
-          <p><strong>Month:</strong> {{ selectedBudget.month }}</p>
-          <p><strong>Spent:</strong> ${{ selectedBudget.spent }}</p>
-          <p><strong>Remaining:</strong> ${{ selectedBudget.remaining }}</p>
-          <p><strong>Status:</strong> {{ selectedBudget.status }}</p>
-          <p><strong>Description:</strong> {{ selectedBudget.description || 'N/A' }}</p>
-        </div>
-      </div>
+  <!-- Details Popup -->
+  <div
+    *ngIf="selectedBudget"
+    class="popup-details"
+    [ngStyle]="{ top: popupPosition.top + 'px', left: popupPosition.left + 'px' }"
+  >
+    <button class="close-btn" (click)="closePopup()">×</button>
+    <h3 class="heading">Budget Details</h3>
+    <div class="strong">
+      <p><strong>Category:</strong> {{ selectedBudget.category }}</p>
+      <p><strong>Amount:</strong> ${{ selectedBudget.amount }}</p>
+      <p><strong>Month:</strong> {{ selectedBudget.month }}</p>
+      <p><strong>Spent:</strong> ${{ selectedBudget.spent }}</p>
+      <p><strong>Remaining:</strong> ${{ selectedBudget.remaining }}</p>
+      <p><strong>Status:</strong> {{ selectedBudget.status }}</p>
+      <p><strong>Description:</strong> {{ selectedBudget.description || 'N/A' }}</p>
     </div>
   </div>
 

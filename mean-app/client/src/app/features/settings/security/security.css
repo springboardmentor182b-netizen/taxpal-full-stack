@@ -1,0 +1,150 @@
+/* ===== SECURITY CONTAINER ===== */
+.security-container {
+  max-width: 700px;              /* bigger width */
+  width: 90%;                     /* responsive width */
+  margin: 2.5rem auto;            /* more spacing from top/bottom */
+  background: #fff;
+  padding: 2.5rem;                /* increased padding */
+  border-radius: 12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.15); /* stronger shadow */
+  font-family: "Segoe UI", sans-serif;
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+/* ===== HEADINGS ===== */
+h2 {
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #008080;               /* modern accent color */
+  font-size: 2rem;
+}
+
+h3 {
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+/* ===== TEXT ===== */
+p, small {
+  color: #555;
+  font-size: 1rem;
+}
+
+/* ===== SECTIONS ===== */
+.security-section {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 1.5rem;
+}
+
+/* ===== LISTS ===== */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0.6rem 0;
+  font-size: 1rem;
+}
+
+/* ===== BUTTONS ===== */
+.btn {
+  background: #007bff;
+  border: none;
+  color: white;
+  padding: 0.6rem 1.2rem;       /* bigger button */
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  font-size: 1rem;
+}
+
+.btn:hover {
+  background: #0056b3;
+}
+
+.btn-small {
+  font-size: 0.9rem;
+  padding: 0.4rem 0.8rem;
+}
+
+/* ===== STATUS ===== */
+.enabled {
+  color: green;
+  font-weight: 500;
+}
+
+.disabled {
+  color: red;
+  font-weight: 500;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .security-container {
+    max-width: 650px;
+    padding: 2rem;
+  }
+  h2 {
+    font-size: 1.8rem;
+  }
+  h3 {
+    font-size: 1.1rem;
+  }
+  li {
+    font-size: 0.95rem;
+  }
+  .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .security-container {
+    width: 95%;
+    padding: 1.8rem;
+  }
+  h2 {
+    font-size: 1.6rem;
+  }
+  h3 {
+    font-size: 1rem;
+  }
+  li {
+    flex-direction: column;
+    align-items: flex-start;
+    font-size: 0.95rem;
+  }
+  .btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 0.5rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .security-container {
+    padding: 1.5rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+  }
+  h3 {
+    font-size: 0.95rem;
+  }
+  li {
+    font-size: 0.9rem;
+  }
+  .btn, .btn-small {
+    font-size: 0.85rem;
+    padding: 0.4rem 0.8rem;
+  }
+}

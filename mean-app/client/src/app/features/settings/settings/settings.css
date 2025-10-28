@@ -1,68 +1,131 @@
 /* General Container */
 .settings-container {
   display: flex;
+  flex-direction: column; /* Stack navbar and content vertically */
   height: 100vh;
   font-family: 'Segoe UI', sans-serif;
   background: #f0f4f8;
 }
 
-/* Sidebar */
-.settings-menu {
-  width: 280px;
+/* Horizontal Navbar */
+.settings-menu-horizontal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background: #ffffff;
-  padding: 25px 20px;
-  box-shadow: 2px 0 10px rgba(0,0,0,0.05);
-  border-radius: 0 15px 15px 0;
-}
-.menu-title {
-  font-size: 22px;
-  color: #008080;
-  margin-bottom: 25px;
-  font-weight: bold;
-}
-.title {
-  font-size: 10px;
-  color: #008080;
-  margin-bottom: 25px;
-  font-weight: bold;
+  padding: 15px 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  border-radius: 0 0 15px 15px;
+  flex-wrap: wrap;
 }
 
-.settings-menu ul {
+/* Title */
+.settings-menu-horizontal .menu-title {
+  font-size: 22px;
+  color: #008080;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+/* Menu Items */
+.settings-menu-horizontal ul {
+  display: flex;
   list-style: none;
   padding: 0;
   margin: 0;
+  flex-wrap: wrap;
 }
-.settings-menu li {
-  margin-bottom: 18px;
+
+.settings-menu-horizontal li {
+  margin-left: 25px;
 }
-.settings-menu a {
+
+.settings-menu-horizontal a {
   display: flex;
   align-items: center;
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   color: #444;
   font-weight: 500;
   transition: all 0.3s;
+  white-space: nowrap;
 }
-.settings-menu a.active {
+
+.settings-menu-horizontal a.active {
   background: #008080;
   color: #fff;
 }
-.settings-menu a:hover {
+
+.settings-menu-horizontal a:hover {
   background: #e0f7f1;
   color: #008080;
 }
-.settings-menu .icon {
+
+.settings-menu-horizontal .icon {
   width: 20px;
   height: 20px;
-  margin-right: 12px;
+  margin-right: 8px;
   stroke: currentColor;
 }
 
-
-/* Right Content */
+/* Content below navbar */
 .settings-content {
   flex: 1;
   padding: 40px;
   overflow-y: auto;
+  width: 100%;
+  max-width: 1200px; /* Keep content within a readable width */
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+
+/* ===== Responsive Styles ===== */
+@media (max-width: 1024px) {
+  .settings-menu-horizontal {
+    padding: 12px 20px;
+  }
+  .settings-menu-horizontal li {
+    margin-left: 15px;
+  }
+  .settings-content {
+    padding: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-menu-horizontal {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .settings-menu-horizontal ul {
+    flex-direction: column;
+    width: 100%;
+  }
+  .settings-menu-horizontal li {
+    margin: 5px 0;
+  }
+  .settings-content {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-menu-horizontal {
+    padding: 10px 15px;
+  }
+  .settings-menu-horizontal .menu-title {
+    font-size: 18px;
+  }
+  .settings-menu-horizontal a {
+    font-size: 14px;
+    padding: 6px 10px;
+  }
+  .settings-menu-horizontal .icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 6px;
+  }
+  .settings-content {
+    padding: 15px;
+  }
 }

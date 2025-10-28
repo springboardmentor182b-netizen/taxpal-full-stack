@@ -6,27 +6,35 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:5000/api/v1/dashboard'; // backend endpoint
+  private apiUrl = 'http://localhost:5000/api/v1/dashboard';
 
   constructor(private http: HttpClient) {}
 
-  // Create new dashboard
+  // Get dashboard for a specific user
+  getDashboard(userId: string): Observable<any> {
+    return this.http.get(`${this.apiUrl}/${userId}`);
+  }
+
+  // Replace the dashboard completely (updates all fields and transactions)
+  updateDashboard(userId: string, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
+  }
+
+  // Only create a new dashboard if needed
   createDashboard(data: any): Observable<any> {
     return this.http.post(this.apiUrl, data);
   }
 
-  // Get dashboard for a specific user
-  getDashboard(userId: string): Observable<any> {
-    console.log('Fetching dashboard for userId:', userId); // ✅ log userId
-    return this.http.get(`${this.apiUrl}/${userId}`);
-  }
-
-  // Update existing dashboard (or create if missing)
-  updateDashboard(userId: string, data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${userId}`, data);
-  }
-  upsertDashboard(userId: string, data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
-  }
-  
+  // Add a single transaction to the dashboard
+addTransaction(dashboardId: string, txData: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/${dashboardId}/transaction`, txData);
 }
+
+  deleteTransaction(dashboardId: string, txId: string): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/${dashboardId}/transaction/${txId}`);
+}
+}
+
+
+
+

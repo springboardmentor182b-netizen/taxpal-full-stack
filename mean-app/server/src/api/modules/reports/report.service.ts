@@ -1,17 +1,15 @@
-// server/src/api/modules/reports/report.service.ts
-//new
 
 import Report, { IReportDocument } from "./report.model";
 import { ReportType, ReportPeriod, ReportFormat, ReportStatus } from "./report.types";
 import PDFDocument from "pdfkit";
-
 import fs from "fs";
 import path from "path";
-
-console.log('Report schema paths:', Object.keys(Report.schema.paths));
+import { Income } from "../income/income.model";
+import { Expense } from "../expense/expense.model";
+import { Budget } from "../budget/budget.model";
+import mongoose from "mongoose";
 
 class ReportService {
-
   private calculateDateRange(period: ReportPeriod, customPeriod?: { startDate: Date; endDate: Date }) {
     const now = new Date();
     let startDate: Date;
@@ -53,9 +51,7 @@ class ReportService {
         break;
 
       case ReportPeriod.CUSTOM:
-        if (!customPeriod) {
-          throw new Error("Custom period dates are required");
-        }
+        if (!customPeriod) throw new Error("Custom period dates are required");
         startDate = new Date(customPeriod.startDate);
         endDate = new Date(customPeriod.endDate);
         break;
@@ -65,6 +61,24 @@ class ReportService {
     }
 
     return { startDate, endDate };
+  }
+
+  // Helper method to get months in range for Budget queries
+  private getMonthsInRange(startDate: Date, endDate: Date): string[] {
+    const months: string[] = [];
+    const current = new Date(startDate);
+    
+    while (current <= endDate) {
+      
+      const year = current.getFullYear();
+      const month = String(current.getMonth() + 1).padStart(2, '0');
+      months.push(`${year}-${month}`);
+      
+      // Move to next month
+      current.setMonth(current.getMonth() + 1);
+    }
+    
+    return months;
   }
 
   private async generateReportData(
@@ -80,54 +94,83 @@ class ReportService {
       charts: []
     };
 
-
     try {
-      switch (reportType) {
-        case ReportType.INCOME_STATEMENT:
-          reportData.summary = {
-            totalIncome: 0,
-            totalExpense: 0,
-            netIncome: 0,
-            message: "No income data found for this period"
-          };
-          break;
+      const userObjectId = new mongoose.Types.ObjectId(userId);
 
-        case ReportType.EXPENSE_REPORT:
-          reportData.summary = {
-            totalExpense: 0,
-            message: "No expense data found for this period"
-          };
-          break;
+      if (reportType === ReportType.INCOME_STATEMENT) {
+        const incomes = await Income.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
+        const expenses = await Expense.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
 
-        case ReportType.TAX_SUMMARY:
-          reportData.summary = {
-            totalIncome: 0,
-            totalExpense: 0,
-            taxableIncome: 0,
-            taxLiability: 0,
-            message: "No data found for tax calculation"
-          };
-          break;
+        const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
 
-        case ReportType.BUDGET_ANALYSIS:
-          reportData.summary = {
-            totalBudget: 0,
-            totalSpent: 0,
-            remaining: 0,
-            message: "No budget data found"
-          };
-          break;
+        reportData.summary = {
+          totalIncome,
+          totalExpense,
+          netIncome: totalIncome - totalExpense
+        };
 
-        case ReportType.CASH_FLOW:
-          reportData.summary = {
-            openingBalance: 0,
-            totalIncome: 0,
-            totalExpense: 0,
-            netCashFlow: 0,
-            closingBalance: 0,
-            message: "No cash flow data found"
-          };
-          break;
+        reportData.details = { incomes, expenses };
+      }
+
+      if (reportType === ReportType.EXPENSE_REPORT) {
+        const expenses = await Expense.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+        reportData.summary = { totalExpense };
+        reportData.details = expenses;
+      }
+
+      if (reportType === ReportType.TAX_SUMMARY) {
+        const incomes = await Income.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
+        const expenses = await Expense.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
+
+        const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+        const taxableIncome = totalIncome - totalExpense;
+        const taxRate = 0.1; // example 10%
+        const taxLiability = taxableIncome > 0 ? taxableIncome * taxRate : 0;
+
+        reportData.summary = { totalIncome, totalExpense, taxableIncome, taxLiability };
+        reportData.details = { incomes, expenses };
+      }
+
+      if (reportType === ReportType.BUDGET_ANALYSIS) {
+        // Convert date range to month format (YYYY-MM)
+        const months = this.getMonthsInRange(startDate, endDate);
+        
+        // Query budgets by month instead of date
+        const budgets = await Budget.find({ 
+          userId: userObjectId, 
+          month: { $in: months } 
+        }).lean();
+        
+        const totalBudget = budgets.reduce((sum, b) => sum + (b.amount || 0), 0);
+        const totalSpent = budgets.reduce((sum, b) => sum + (b.spent || 0), 0);
+
+        reportData.summary = { 
+          totalBudget, 
+          totalSpent, 
+          remaining: totalBudget - totalSpent 
+        };
+        reportData.details = budgets;
+      }
+
+      if (reportType === ReportType.CASH_FLOW) {
+        const incomes = await Income.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
+        const expenses = await Expense.find({ userId: userObjectId, date: { $gte: startDate, $lte: endDate } }).lean();
+
+        const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0);
+        const totalExpense = expenses.reduce((sum, e) => sum + e.amount, 0);
+
+        reportData.summary = {
+          openingBalance: 0, 
+          totalIncome,
+          totalExpense,
+          netCashFlow: totalIncome - totalExpense,
+          closingBalance: totalIncome - totalExpense
+        };
+        reportData.details = { incomes, expenses };
       }
 
       return reportData;
@@ -151,11 +194,8 @@ class ReportService {
 
       const fileName = `${reportType.replace(/\s+/g, "_")}_${Date.now()}.pdf`;
       const filePath = path.join(__dirname, "../../../public/reports", fileName);
-
-      // Ensure folder exists
       fs.mkdirSync(path.dirname(filePath), { recursive: true });
 
-      // Generate PDF
       const doc = new PDFDocument();
       doc.pipe(fs.createWriteStream(filePath));
 
@@ -165,7 +205,6 @@ class ReportService {
       doc.moveDown();
       doc.text("Summary:");
       doc.moveDown();
-
       for (const key in reportData.summary) {
         doc.text(`${key}: ${reportData.summary[key]}`);
       }
@@ -188,7 +227,6 @@ class ReportService {
     }
   }
 
-  // Create new report
   async createReport(data: {
     userId: string;
     reportType: ReportType;
@@ -217,52 +255,33 @@ class ReportService {
     }
   }
 
-  // Get all user reports with pagination
   async getUserReports(userId: string, page = 1, limit = 10) {
     const skip = (page - 1) * limit;
-
     const reports = await Report.find({ userId })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
       .lean();
-
     const total = await Report.countDocuments({ userId });
-
-    return {
-      reports,
-      pagination: {
-        total,
-        page,
-        limit,
-        totalPages: Math.ceil(total / limit)
-      }
-    };
+    return { reports, pagination: { total, page, limit, totalPages: Math.ceil(total / limit) } };
   }
 
-  // Get report by ID
   async getReportById(reportId: string, userId: string): Promise<IReportDocument | null> {
     return await Report.findOne({ _id: reportId, userId });
   }
 
-  // Delete report
   async deleteReport(reportId: string, userId: string): Promise<boolean> {
     const result = await Report.deleteOne({ _id: reportId, userId });
     return result.deletedCount > 0;
   }
 
-  // Get statistics
   async getReportStats(userId: string) {
     const stats = await Report.aggregate([
       { $match: { userId } },
       { $group: { _id: "$status", count: { $sum: 1 } } }
     ]);
-
-    return stats.reduce((acc: any, stat: any) => {
-      acc[stat._id] = stat.count;
-      return acc;
-    }, {});
+    return stats.reduce((acc: any, stat: any) => { acc[stat._id] = stat.count; return acc; }, {});
   }
 }
-
+  
 export default new ReportService();

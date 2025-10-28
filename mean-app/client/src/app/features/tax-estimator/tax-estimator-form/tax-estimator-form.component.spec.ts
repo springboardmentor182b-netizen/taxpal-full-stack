@@ -92,10 +92,10 @@ describe('TaxEstimatorFormComponent', () => {
 
   it('should track month and reminder correctly', () => {
     const month = { month: 'June 2025', reminders: [] };
-    const reminder = { id: 1, date: 'Jun 1', title: 'Test', description: '', type: 'payment' as 'payment' | 'reminder' };
+    const reminder = { id: '1', date: 'Jun 1', title: 'Test', description: '', type: 'payment' as 'payment' | 'reminder' };
 
     expect(component.trackByMonth(0, month)).toBe('June 2025');
-    expect(component.trackByReminderId(0, reminder)).toBe(1);
+    expect(component.trackByReminderId(0, reminder)).toBe('1');
   });
 
   it('should load current user on init', () => {

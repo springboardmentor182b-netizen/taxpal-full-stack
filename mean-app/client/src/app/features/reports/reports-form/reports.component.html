@@ -1,15 +1,18 @@
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
 <!-- Main Content -->
 <div class="reports-container">
   <h2>Financial Reports</h2>
   <p class="subtitle">Generate and download your financial reports</p>
 
+  <!-- Generate Report Form -->
   <div class="generate-report card">
-    <h3>Generate Report</h3>
     <form (ngSubmit)="addReport()" class="report-form">
       <div class="form-group">
         <label for="reportType">Report Type</label>
         <select id="reportType" [ngModel]="newReport().reportType" (ngModelChange)="updateNewReportType($event)"
           name="reportType" required>
+          <option value="">Select Type</option>
           <option value="Income Statement">Income Statement</option>
           <option value="Expense Report">Expense Report</option>
           <option value="Tax Summary">Tax Summary</option>
@@ -22,6 +25,7 @@
         <label for="period">Period</label>
         <select id="period" [ngModel]="newReport().reportPeriod" (ngModelChange)="updateNewReportPeriod($event)"
           name="period" required>
+          <option value="">Select Period</option>
           <option value="Current Month">Current Month</option>
           <option value="Last Month">Last Month</option>
           <option value="Current Quarter">Current Quarter</option>
@@ -49,6 +53,7 @@
     </form>
   </div>
 
+  <!-- Recent Reports Table -->
   <div class="recent-reports card">
     <h3>Recent Reports</h3>
     <table>
@@ -67,15 +72,65 @@
         </tr>
         <tr *ngFor="let report of recentReports">
           <td>{{ report.reportType }}</td>
-          <!-- <td>{{ report.generatedAt | date:'short' }}</td> -->
           <td>
             {{ report.generatedAt ? (report.generatedAt | date:'short') : report.status }}
           </td>
           <td>{{ report.period }}</td>
           <td>{{ report.format }}</td>
-          <td><button (click)="downloadReport(report)">Download</button></td>
+          <td class="action-cell">
+            <button class="action-btn preview-btn" (click)="previewReport(report)" title="Preview">
+              👁️ Preview
+            </button>
+            <button class="action-btn download-btn" (click)="downloadReport(report)" title="Download">
+              ⬇️ Download
+            </button>
+          </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <!-- Preview Modal -->
+  <div class="preview-modal" *ngIf="showPreviewModal()" (click)="closePreview()">
+    <div class="preview-content" (click)="$event.stopPropagation()">
+      <!-- Header -->
+      <div class="preview-header">
+        <div class="preview-title">
+          <span class="icon">📄</span>
+          <div>
+            <h3>{{ selectedReport?.reportType }}</h3>
+            <p class="preview-subtitle">{{ selectedReport?.period }} • {{ selectedReport?.format }}</p>
+          </div>
+        </div>
+        <div class="preview-actions">
+          <button class="icon-btn print-btn" (click)="printReport()" title="Print">
+            🖨️ Print
+          </button>
+          <button class="icon-btn close-btn" (click)="closePreview()" title="Close">
+            ✖️
+          </button>
+        </div>
+      </div>
+
+      <!-- PDF Viewer -->
+      <div class="preview-body">
+        <iframe 
+          id="previewIframe"
+          [src]="previewUrl" 
+          frameborder="0"
+          class="pdf-viewer">
+        </iframe>
+      </div>
+
+      <!-- Footer -->
+      <div class="preview-footer">
+        <button class="footer-btn download-btn" (click)="downloadReport(selectedReport!)">
+          ⬇️ Download Report
+        </button>
+        <button class="footer-btn cancel-btn" (click)="closePreview()">
+          Cancel
+        </button>
+      </div>
+    </div>
   </div>
 </div>

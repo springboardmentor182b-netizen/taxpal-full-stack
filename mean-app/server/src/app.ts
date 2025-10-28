@@ -22,8 +22,8 @@ app.use(
   cors({
     origin: "http://localhost:4200",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Origin", "X-Requested-With"],
   })
 );
 app.use(bodyParser.json());
@@ -42,7 +42,6 @@ app.use("/api/v1/reportexports", reportExportRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
-app.use("/api/v1/reports", reportRoutes);
 
 // Root route
 app.get("/", (req, res) => {

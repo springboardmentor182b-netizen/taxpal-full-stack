@@ -1,3 +1,26 @@
-<div>
-<p class="pare">profile works!</p>
-</div>
+<div class="profile-container" *ngIf="user; else noUser">
+    <div class="profile-card">
+      <img
+        *ngIf="user.profilePicture; else defaultAvatar"
+        [src]="user.profilePicture"
+        alt="Profile Picture"
+        class="profile-pic"
+      />
+      <ng-template #defaultAvatar>
+        <img src="assets/default-avatar.png" alt="Default Avatar" class="profile-pic" />
+      </ng-template>
+  
+      <h2>{{ user.fullName }}</h2>
+      <p><strong>Username:</strong> {{ user.username }}</p>
+      <p><strong>Email:</strong> {{ user.email }}</p>
+      <p *ngIf="user.role"><strong>Role:</strong> {{ user.role }}</p>
+      <p *ngIf="user.lastLogin"><strong>Last Login:</strong> {{ user.lastLogin | date:'medium' }}</p>
+    </div>
+  </div>
+  
+  <ng-template #noUser>
+    <div class="no-user">
+      <p>No user logged in. Please log in to view your profile.</p>
+    </div>
+  </ng-template>
+  

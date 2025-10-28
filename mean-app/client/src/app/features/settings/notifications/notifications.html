@@ -1,1 +1,14 @@
-<p>notifications works!</p>
+<div class="notifications-container p-4">
+  <h3>🔔 Notifications</h3>
+
+  <div *ngFor="let n of notifications" class="notification-item" [class.read]="n.isRead">
+    <h4>{{ n.title }}</h4>
+    <p>{{ n.message }}</p>
+    <small>{{ n.createdAt | date:'short' }}</small>
+    <button *ngIf="!n.isRead" (click)="markAsRead(n._id)">Mark as Read</button>
+  </div>
+
+  <div *ngIf="notifications.length === 0" class="no-notifs">
+    <p>No notifications yet </p>
+  </div>
+</div>
