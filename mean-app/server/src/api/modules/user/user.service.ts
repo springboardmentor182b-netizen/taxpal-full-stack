@@ -60,6 +60,8 @@ export const generateResetToken = async (email: string) => {
   user.resetTokenExpiry = new Date(Date.now() + 3600000); // 1 hour
   await user.save();
 
+  console.log("Generated token for user:", token);
+
   const resetLink = `${process.env.FRONTEND_URL}/reset-password/${token}`;
 const html = `
   <p>Hello ${user.fullName},</p>
