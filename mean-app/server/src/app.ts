@@ -56,7 +56,7 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Serve Angular frontend
-const clientPath = path.resolve(__dirname, "../../client/dist/dum/browser"); // ✅ Corrected path
+const clientPath = path.resolve(__dirname, "../client/dist/dum/browser"); // ✅ Corrected path
 app.use(express.static(clientPath));
 
 // ✅ For Angular routing (refresh issue fix)
