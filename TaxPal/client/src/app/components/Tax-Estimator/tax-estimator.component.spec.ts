@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { FormsModule } from '@angular/forms';
 import { TaxEstimatorComponent } from './tax-estimator.component';
+import { environment } from '../../../environments/environment';
 
 describe('TaxEstimatorComponent', () => {
   let component: TaxEstimatorComponent;
@@ -9,10 +11,8 @@ describe('TaxEstimatorComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [
-        TaxEstimatorComponent,
-        HttpClientTestingModule
-      ]
+      declarations: [TaxEstimatorComponent],
+      imports: [HttpClientTestingModule, FormsModule],
     }).compileComponents();
 
     fixture = TestBed.createComponent(TaxEstimatorComponent);
@@ -25,63 +25,76 @@ describe('TaxEstimatorComponent', () => {
     httpMock.verify();
   });
 
-  it('should create', () => {
+  it('should create the component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with default taxData', () => {
-    expect(component.taxData.country).toBe('United States');
-    expect(component.taxData.state).toBe('');
-    expect(component.taxData.status).toBe('Single');
-    expect(component.taxData.quarter).toBe('Q2');
-    expect(component.taxData.income).toBe(0);
-    expect(component.taxData.businessExpenses).toBe(0);
-    expect(component.taxData.retirement).toBe(0);
-    expect(component.taxData.healthInsurance).toBe(0);
-    expect(component.taxData.homeOffice).toBe(0);
-  });
-
-  it('should initialize estimatedTax as null', () => {
-    expect(component.estimatedTax).toBeNull();
-  });
-
-  it('should calculate tax correctly', () => {
-    component.taxData.income = 10000;
-    component.taxData.businessExpenses = 2000;
-    component.taxData.retirement = 1000;
-    component.taxData.healthInsurance = 500;
-    component.taxData.homeOffice = 300;
+  // Test Case 1: Tax Calculation Test
+  it('should calculate tax successfully and display results', () => {
+    component.taxData.income = 50000;
+    component.taxData.businessExpenses = 5000;
+    component.taxData.retirement = 3000;
+    component.taxData.healthInsurance = 2000;
+    component.taxData.homeOffice = 1000;
 
     component.calculateTax();
 
-    const expectedTaxable = 10000 - (2000 + 1000 + 500 + 300);
-    const expectedTax = expectedTaxable * 0.15;
-    expect(component.estimatedTax).toBe(expectedTax);
+    const req = httpMock.expectOne(`${environment.apiUrl}/tax-estimator/calculate`);
+    expect(req.request.method).toBe('POST');
+    expect(req.request.body).toEqual({
+      income: 50000,
+      businessExpenses: 5000,
+      retirement: 3000,
+      healthInsurance: 2000,
+      homeOffice: 1000,
+      status: 'Single'
+    });
+
+    const mockResponse = {
+      taxableIncome: 35000,
+      estimatedTax: 5250,
+      effectiveTaxRate: 10.5,
+      breakdown: { federalIncomeTax: 3937.5, selfEmploymentTax: 1312.5 }
+    };
+
+    req.flush(mockResponse);
+
+    expect(component.estimatedTax).toBe(5250);
+    expect(component.taxableIncome).toBe(35000);
+    expect(component.effectiveRate).toBe(10.5);
+    expect(component.successMessage).toBe('Tax calculation successful!');
+    expect(component.loading).toBe(false);
   });
 
-  it('should calculate tax with zero deductions', () => {
-    component.taxData.income = 10000;
-    component.taxData.businessExpenses = 0;
-    component.taxData.retirement = 0;
-    component.taxData.healthInsurance = 0;
-    component.taxData.homeOffice = 0;
+  // Test Case 2: Form Validation Test
+  it('should validate required fields and show error for missing income', () => {
+    component.taxData.income = 0; // Missing required income (using 0 instead of null)
+    component.taxData.businessExpenses = 1000;
 
     component.calculateTax();
 
-    expect(component.estimatedTax).toBe(10000 * 0.15);
+    const req = httpMock.expectOne(`${environment.apiUrl}/tax-estimator/calculate`);
+    expect(req.request.method).toBe('POST');
+
+    const errorResponse = { message: 'Income is required' };
+    req.flush(errorResponse, { status: 400, statusText: 'Bad Request' });
+
+    expect(component.errorMessage).toBe('Income is required');
+    expect(component.loading).toBe(false);
+    expect(component.successMessage).toBe('');
   });
 
-  it('should calculate tax with deductions exceeding income', () => {
-    component.taxData.income = 1000;
-    component.taxData.businessExpenses = 500;
-    component.taxData.retirement = 600;
-    component.taxData.healthInsurance = 100;
-    component.taxData.homeOffice = 200;
+  it('should handle API error responses gracefully', () => {
+    component.taxData.income = 50000;
 
     component.calculateTax();
 
-    const expectedTaxable = 1000 - (500 + 600 + 100 + 200);
-    const expectedTax = expectedTaxable * 0.15;
-    expect(component.estimatedTax).toBe(expectedTax);
+    const req = httpMock.expectOne(`${environment.apiUrl}/tax-estimator/calculate`);
+    expect(req.request.method).toBe('POST');
+
+    req.flush({ message: 'Server error' }, { status: 500, statusText: 'Server Error' });
+
+    expect(component.errorMessage).toBe('Server error');
+    expect(component.loading).toBe(false);
   });
 });
