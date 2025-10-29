@@ -32,6 +32,11 @@ export class DashboardService {
     return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
   }
 
+  // 🔹 Add a single transaction to the dashboard
+  addTransaction(dashboardId: string, txData: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${dashboardId}/transactions`, txData);
+  }
+
   // 🔹 Delete a specific transaction
   deleteTransaction(dashboardId: string, txId: string): Observable<any> {
     // This should match your backend route:
