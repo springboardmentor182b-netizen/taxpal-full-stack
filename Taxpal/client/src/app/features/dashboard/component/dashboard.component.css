@@ -333,3 +333,144 @@
 .badge-debit  { background: #fdecec; color: #b91c1c; }
 
 .recent-empty { padding: 14px; color: #667085; font-size: 14px; }
+
+/* === Recent Transactions: mobile-friendly, no horizontal scroll === */
+@media (max-width: 900px) {
+  /* allow the table to shrink; stop forcing a scrollbar */
+  .recent-table { min-width: 0; table-layout: fixed; }
+  .recent-table-wrap { overflow: visible; }
+  .recent-table th, .recent-table td {
+    white-space: normal;           /* let text wrap */
+    text-overflow: clip;
+  }
+}
+
+@media (max-width: 640px) {
+  /* hide header and convert rows into cards */
+  .recent-table thead { display: none; }
+
+  .recent-table,
+  .recent-table tbody,
+  .recent-table tr,
+  .recent-table td { display: block; width: 100%; }
+
+  .recent-table tr {
+    margin-bottom: 12px;
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  }
+
+  /* label–value layout per cell */
+  .recent-table td {
+    display: grid;
+    grid-template-columns: 120px 1fr;  /* label | value */
+    gap: 8px;
+    border: 0;
+    padding: 8px 0;
+    align-items: center;
+  }
+
+  /* Prefer data-label if you add it in HTML; else we inject labels via nth-child */
+  .recent-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #475569;
+  }
+  .recent-table td:nth-child(1)::before { content: "Date"; }
+  .recent-table td:nth-child(2)::before { content: "Description"; }
+  .recent-table td:nth-child(3)::before { content: "Category"; }
+  .recent-table td:nth-child(4)::before { content: "Amount"; }
+  .recent-table td:nth-child(5)::before { content: "Type"; }
+
+  /* reset special desktop alignments for Amount/Type so the grid looks clean */
+  .recent-table th:nth-child(4),
+  .recent-table td:nth-child(4),
+  .recent-table th:nth-child(5),
+  .recent-table td:nth-child(5) {
+    text-align: left !important;
+    padding-right: 0;
+    min-width: 0;
+  }
+}
+
+/* ===================== BUDGET SECTION ===================== */
+
+/* Base table styles (desktop) */
+.budget-table-wrap { width: 100%; overflow: auto; }
+.budget-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 720px;              /* desktop width; released in media queries */
+  table-layout: auto;
+}
+.budget-table th, .budget-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f2f7;
+  color: #334155;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  text-align: left;
+}
+.budget-table thead th { background: #f7f8ff; font-weight: 600; color: #475569; }
+
+/* === Budget table: responsive, no horizontal scroll === */
+@media (max-width: 900px) {
+  .budget-table { min-width: 0; table-layout: fixed; }
+  .budget-table-wrap { overflow: visible; }
+  .budget-table th, .budget-table td {
+    white-space: normal;
+    text-overflow: clip;
+  }
+}
+
+@media (max-width: 640px) {
+  .budget-table thead { display: none; }
+
+  .budget-table,
+  .budget-table tbody,
+  .budget-table tr,
+  .budget-table td { display: block; width: 100%; }
+
+  .budget-table tr {
+    margin-bottom: 12px;
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 10px;
+    padding: 10px 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  }
+
+  .budget-table td {
+    display: grid;
+    grid-template-columns: 130px 1fr;   /* label | value */
+    gap: 8px;
+    border: 0;
+    padding: 8px 0;
+    align-items: center;
+    text-align: left !important;
+    padding-right: 0;
+    min-width: 0;
+  }
+
+  /* Prefer data-label on each <td>; fallback labels below */
+  .budget-table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #475569;
+  }
+  .budget-table td:nth-child(1)::before { content: "Category"; }
+  .budget-table td:nth-child(2)::before { content: "Budget"; }
+  .budget-table td:nth-child(3)::before { content: "Spent"; }
+  .budget-table td:nth-child(4)::before { content: "Remaining"; }
+  .budget-table td:nth-child(5)::before { content: "Period"; }
+  .budget-table td:nth-child(6)::before { content: "Actions"; }
+
+  .budget-table .progress,
+  .budget-table .chip { max-width: 100%; }
+}

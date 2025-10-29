@@ -99,7 +99,7 @@
   <div class="top-bar">
     <!-- Hamburger (mobile/tablet only) -->
     <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">
-      --
+      ☰
     </button>
 
     <h1><strong>Dashboard</strong></h1>
@@ -124,7 +124,7 @@
     <div class="card">
       <h3>Monthly Income</h3>
       <p>${{ cards.income.amount | number : '1.0-2' }}</p>
-      <p> <b>^</b> {{ cards.income.changePct | number : '1.0-2' }}% from last month</p>
+      <p>{{ cards.income.changePct | number : '1.0-2' }}% from last month</p>
     </div>
     <div class="card">
       <h3>Monthly Expenses</h3>

@@ -2,11 +2,12 @@ import { Component, signal, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
 import { AuthService } from '@/app/core/services/auth.service';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterModule],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.css'],
   encapsulation: ViewEncapsulation.None
@@ -17,7 +18,7 @@ export class ForgotPasswordComponent {
   message = signal<string | null>(null);
   error = signal<string | null>(null);
 
-  constructor(private fb: FormBuilder, private auth: AuthService) {
+  constructor(private fb: FormBuilder, private auth: AuthService,private router: Router) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
