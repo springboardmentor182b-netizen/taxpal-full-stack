@@ -47,7 +47,6 @@
                 step="0.01"
                 required
               />
-              <div class="error" *ngIf="errors.amount" role="alert">{{ errors.amount }}</div>
             </div>
           </div>
         </div>
@@ -71,7 +70,6 @@
               <option value="gift">Gift</option>
               <option value="other">Other</option>
             </select>
-            <div class="error" *ngIf="errors.category">{{ errors.category }}</div>
           </div>
 
           <div class="form-group">
@@ -90,7 +88,6 @@
                 <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
                 <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
               </svg>
-              <div class="error" *ngIf="errors.date">{{ errors.date }}</div>
             </div>
           </div>
         </div>
