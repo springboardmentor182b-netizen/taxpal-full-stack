@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { ReportsService } from '../../../services/reports.service';
 import { AuthService } from '../../../features/auth.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-reports',
@@ -44,7 +45,7 @@ export class ReportsComponent implements OnInit {
     this.isLoading = true;
     
     setTimeout(() => {
-      this.generatedReportUrl = 'http://localhost:5000/reports/sample.pdf';
+      this.generatedReportUrl = `${environment.apiUrl}/reports/sample.pdf`;
       this.isLoading = false;
     }, 500);
   }
