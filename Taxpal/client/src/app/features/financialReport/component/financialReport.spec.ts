@@ -19,7 +19,7 @@ describe('FinancialReportsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      // ✅ Standalone component goes in imports, not declarations
+      //  Standalone component goes in imports, not declarations
       imports: [FinancialReportsComponent, HttpClientTestingModule, RouterTestingModule],
       providers: [FinancialReportService],
     }).compileComponents();
