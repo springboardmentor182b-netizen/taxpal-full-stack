@@ -1,17 +1,19 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, HostListener } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   FinancialReportService,
   CreateFinancialReportDto,
   FinancialReport,
 } from '../../../core/services/financialReport.service';
+import { AuthService, User } from '../../../core/services/auth.service';
+import { BudgetsListComponent } from '../../budgets/component/budgets-list.component';
 
 @Component({
   selector: 'app-financial-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink, BudgetsListComponent],
   templateUrl: './financialReport.html',
   styleUrls: ['./financialReport.css'],
 })
@@ -19,6 +21,14 @@ export class FinancialReportsComponent implements OnInit {
   private router = inject(Router);
   private location = inject(Location);
   private reportsSvc = inject(FinancialReportService);
+  public  auth = inject(AuthService);
+
+  // Drawer state (same as dashboard)
+  mobileNavOpen = false;
+  showBudget = false;
+
+  // User (for profile block)
+  user: User | null = null;
 
   // UI model
   reportType: 'income-statement' | 'balance-sheet' | 'cash-flow' = 'income-statement';
@@ -32,20 +42,48 @@ export class FinancialReportsComponent implements OnInit {
   recent: FinancialReport[] = [];
   errorMsg = '';
 
-  ngOnInit(): void {
-    this.fetchRecent();
+  constructor() {
+    this.auth.currentUser$.subscribe(u => (this.user = u));
+    this.user = this.auth.getCurrentUser();
   }
 
-  // ⨉ button handler
+  ngOnInit(): void { this.fetchRecent(); }
+
+  /* ============ Drawer helpers (copied from dashboard) ============ */
+  toggleMobileNav(): void { this.mobileNavOpen = !this.mobileNavOpen; this.lockScroll(this.mobileNavOpen); }
+  closeMobileNav(): void  { this.mobileNavOpen = false; this.lockScroll(false); }
+  closeMobileNavIfSmall(): void { if (window.innerWidth <= 1024) this.closeMobileNav(); }
+  private lockScroll(lock: boolean) { try { document.body.style.overflow = lock ? 'hidden' : ''; } catch {} }
+
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(e: KeyboardEvent) { if (e.key === 'Escape' && this.mobileNavOpen) this.closeMobileNav(); }
+
+  @HostListener('window:resize')
+  onResize() { if (window.innerWidth > 1024 && this.mobileNavOpen) this.closeMobileNav(); }
+
+  /* ============ Profile initials ============ */
+  get firstInitial(): string {
+    const s = (this.user?.name || this.user?.email || 'U').trim();
+    return s ? s[0].toUpperCase() : 'U';
+  }
+  get secondInitial(): string {
+    const n = this.user?.name?.trim();
+    if (!n) return '';
+    const parts = n.split(/\s+/);
+    return (parts[1]?.[0] ?? '').toUpperCase();
+  }
+
+  /* ============ Budget modal ============ */
+  openBudget() { this.showBudget = true; }
+  closeBudget() { this.showBudget = false; }
+
+  /* ============ Close page/back ============ */
   onClose() {
-    // Go back if possible, else to dashboard
-    if (history.length > 1) {
-      this.location.back();
-    } else {
-      this.router.navigate(['/dashboard']);
-    }
+    if (history.length > 1) this.location.back();
+    else this.router.navigate(['/dashboard']);
   }
 
+  /* ============ Reports CRUD ============ */
   resetForm() {
     this.reportType = 'income-statement';
     this.period = 'current-month';
@@ -56,14 +94,8 @@ export class FinancialReportsComponent implements OnInit {
   fetchRecent() {
     this.loadingList = true;
     this.reportsSvc.listReports().subscribe({
-      next: (res) => {
-        this.recent = res || [];
-        this.loadingList = false;
-      },
-      error: (e) => {
-        this.errorMsg = e?.error?.message || 'Failed to load reports';
-        this.loadingList = false;
-      },
+      next: (res) => { this.recent = res || []; this.loadingList = false; },
+      error: (e) => { this.errorMsg = e?.error?.message || 'Failed to load reports'; this.loadingList = false; },
     });
   }
 
