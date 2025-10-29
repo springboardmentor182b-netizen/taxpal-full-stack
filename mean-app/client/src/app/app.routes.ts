@@ -28,15 +28,15 @@ export const routes: Routes = [
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard)
       },
       {
         path: 'income',
-        loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeFormComponent)
+        loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeForm)
       },
       {
         path: 'expenses',
-        loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesFormComponent)
+        loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesForm)
       },
       {
         path: 'transactions',
@@ -93,17 +93,17 @@ export const routes: Routes = [
   // Direct routes (for backwards compatibility)
   {
     path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard),
     canActivate: [AuthGuard]
   },
   {
     path: 'income',
-    loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeFormComponent),
+    loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeForm),
     canActivate: [AuthGuard]
   },
   {
     path: 'expenses',
-    loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesFormComponent),
+    loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesForm),
     canActivate: [AuthGuard]
   },
   {
