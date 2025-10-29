@@ -22,61 +22,49 @@ export const routes: Routes = [
 
   // Main Layout with child routes
   {
-    path: 'transactions',
-    loadComponent: () =>
-      import('./features/transactions/transactions/transactions.component').then(
-        (m) => m.TransactionsComponent
-      )
-  },
-  {
-  path: 'reports',
-  loadComponent: () =>
-    import('./features/reports/reports-form/reports.component').then(
-      m => m.ReportsComponent
-    )
-},
-  { 
-    path: 'budgets', 
-    loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
-  },
-   
-{
-  path: 'tax-estimator',
-  loadComponent: () =>
-    import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
-      .then(m => m.TaxEstimatorFormComponent)
-},
-    
-  {
-    path: 'settings',
-    loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
+    path: 'main',
+    component: MainLayout,
     canActivate: [AuthGuard],
     children: [
-      { 
-        path: 'dashboard', 
-        loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard),
-        canActivate: [AuthGuard]
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.DashboardComponent)
       },
-      { 
-        path: 'dashboard-form', 
-        loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm),
-        canActivate: [AuthGuard]
+      {
+        path: 'income',
+        loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeFormComponent)
+      },
+      {
+        path: 'expenses',
+        loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesFormComponent)
+      },
+      {
+        path: 'transactions',
+        loadComponent: () =>
+          import('./features/transactions/transactions/transactions.component').then(
+            (m) => m.TransactionsComponent
+          )
       },
       {
         path: 'reports',
-        loadComponent: () => import('./features/reports/reports-form/reports.component').then(m => m.ReportsComponent),
-        canActivate: [AuthGuard]
+        loadComponent: () =>
+          import('./features/reports/reports-form/reports.component').then(
+            m => m.ReportsComponent
+          )
       },
-    
       { 
         path: 'budgets', 
-        loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent),
-        canActivate: [AuthGuard]
+        loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
+      },
+      {
+        path: 'tax-estimator',
+        loadComponent: () =>
+          import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
+            .then(m => m.TaxEstimatorFormComponent)
       },
       {
         path: 'settings',
         loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
-        canActivate: [AuthGuard],
         children: [
           {
             path: 'profile',
@@ -97,10 +85,81 @@ export const routes: Routes = [
           },
           { path: '', redirectTo: 'profile', pathMatch: 'full' }
         ]
-      }
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
- 
+
+  // Direct routes (for backwards compatibility)
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'income',
+    loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'expenses',
+    loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'transactions',
+    loadComponent: () =>
+      import('./features/transactions/transactions/transactions.component').then(
+        (m) => m.TransactionsComponent
+      ),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'reports',
+    loadComponent: () =>
+      import('./features/reports/reports-form/reports.component').then(
+        m => m.ReportsComponent
+      ),
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'budgets', 
+    loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'tax-estimator',
+    loadComponent: () =>
+      import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
+        .then(m => m.TaxEstimatorFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
+    canActivate: [AuthGuard],
+    children: [
+      {
+        path: 'profile',
+        loadComponent: () => import('./features/settings/profile/profile').then(m => m.Profile)
+      },
+      {
+        path: 'categories',
+        loadComponent: () => import('./features/settings/categories/categories.component').then(m => m.Categories),
+        runGuardsAndResolvers: 'always'
+      },
+      {
+        path: 'notifications',
+        loadComponent: () => import('./features/settings/notifications/notifications').then(m => m.Notifications)
+      },
+      {
+        path: 'security',
+        loadComponent: () => import('./features/settings/security/security').then(m => m.Security)
+      },
+      { path: '', redirectTo: 'profile', pathMatch: 'full' }
+    ]
+  },
+
   // Legacy route redirects (for backwards compatibility)
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
