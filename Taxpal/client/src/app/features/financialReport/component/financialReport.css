@@ -16,6 +16,14 @@
   background:var(--bg);
   color:var(--ink);
   min-height:100%;
+  position: relative; /* for close button positioning */
+}
+
+/* Make the Close (X) scroll with content, not fixed */
+button[aria-label="Close"]{
+  position: absolute !important;
+  top:16px !important;
+  right:24px !important;
 }
 
 .page-title{
@@ -67,9 +75,7 @@ select{
   outline:none;
 }
 
-.form-actions{
-  display:flex; gap:10px; align-items:center;
-}
+.form-actions{ display:flex; gap:10px; align-items:center; }
 
 .btn{
   height:40px; padding:0 14px; border-radius:10px; border:none;
@@ -81,9 +87,15 @@ select{
 
 .error{ color:#c0392b; margin-top:12px; }
 
+/* ---------- Table (desktop/default) ---------- */
 .table-wrapper{ overflow:auto; border:1px solid var(--panel); border-radius:10px; }
 table{ width:100%; border-collapse:collapse; }
-th, td{ padding:12px 14px; border-bottom:1px solid var(--panel); text-align:left; }
+th, td{
+  padding:12px 14px; border-bottom:1px solid var(--panel); text-align:left;
+  word-break: normal;            /* don't split characters */
+  overflow-wrap: break-word;     /* wrap at spaces/long tokens */
+  white-space: normal;
+}
 thead th{ background:var(--panel); color:var(--ink-2); font-weight:700; }
 .actions-col{ width:160px; }
 .row-actions{ display:flex; gap:10px; }
@@ -111,93 +123,121 @@ button[aria-label="Close"]:hover svg { stroke: #656ED3; }
    RESPONSIVE MEDIA QUERIES
    ========================= */
 
-/* Phones & small devices (≤ 480px) */
-@media (max-width:480px){
+/* Phones & small tablets (≤ 767px): card rows, NO horizontal scroll */
+@media (max-width:767px){
+
   .page{ padding:14px; }
   .page-title{ font-size:22px; margin-bottom:6px; }
   .page-subtitle{ margin-bottom:14px; }
-
   .card{ padding:12px; border-radius:12px; }
 
-  /* stack form grid */
-  .grid{
-    grid-template-columns: 1fr;
-    gap:10px;
-  }
-  .form-actions{
-    width:100%;
-    justify-content:stretch;
-    gap:8px;
-  }
-  .form-actions .btn{
-    width:100%;
-  }
+  /* form stacks */
+  .grid{ grid-template-columns: 1fr; gap:10px; }
+  .form-actions{ width:100%; justify-content:stretch; gap:8px; }
+  .form-actions .btn{ width:100%; }
   select{ width:100%; }
 
-  /* compact table */
-  th, td{ padding:10px 12px; font-size:14px; }
-  .actions-col{ width:110px; }
-  .row-actions{ flex-wrap:wrap; gap:8px; }
-  .table-wrapper{ border-radius:8px; }
+  /* table becomes stacked cards */
+  .table-wrapper{
+    overflow-x:hidden;          /* ensure no side scroll */
+    border:0;                   /* rows get their own borders */
+  }
+  table{ display:block; width:100%; border:0; }
+  thead{ display:none; }
 
-  .empty{ padding:20px; }
+  tbody{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
 
-  /* make long content fit better */
+  /* default: single-column rows for narrow phones (prevents squishing text) */
+  tbody tr{
+    display:grid;
+    grid-template-columns: 1fr;
+    row-gap:10px;
+    padding:12px;
+    border:1px solid var(--panel);
+    border-radius:12px;
+    background:var(--panel-2);
+    box-shadow:0 2px 8px rgba(37,41,90,.06);
+  }
+
+  /* each cell shows label + value on one line, value can wrap nicely */
+  td{
+    display:grid;
+    grid-template-columns: max-content minmax(0,1fr);
+    align-items:center;
+    column-gap:10px;
+    padding:0;
+    border:0;
+  }
+  td::before{
+    content: attr(data-label);
+    font-weight:700;
+    color:var(--ink-2);
+    opacity:.85;
+    white-space:nowrap;         /* labels do not wrap */
+  }
+
+  /* Actions row spans full width at bottom */
+  td.row-actions{
+    grid-column: 1 / -1;
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:2px;
+  }
+  td.row-actions::before{
+    content:"Actions";
+    margin-right:auto;
+    font-weight:700;
+    color:var(--ink-2);
+    opacity:.85;
+    white-space:nowrap;
+  }
+
   .link{ font-size:14px; }
+  .empty{ padding:20px; }
 }
 
-/* Very small phones (≤ 360px) */
+/* Wider phones / small tablets (600–767px): allow two columns per row */
+@media (min-width:600px) and (max-width:767px){
+  tbody tr{ grid-template-columns: 1fr 1fr; }
+  td.row-actions{ grid-column:1 / -1; }
+}
+
+/* Very small phones (≤ 360px): label above value */
 @media (max-width:360px){
   .page{ padding:12px; }
   .page-title{ font-size:20px; }
   .card{ padding:10px; }
-  th, td{ padding:8px 10px; }
-  .actions-col{ width:96px; }
-}
 
-/* Small tablets (481px–767px) */
-@media (min-width:481px) and (max-width:767px){
-  .page{ padding:18px; }
-  .page-title{ font-size:24px; }
-  .card{ padding:14px; }
-
-  /* two columns + actions below */
-  .grid{
-    grid-template-columns: 1fr 1fr;
-    gap:12px;
+  td{
+    grid-template-columns: 1fr;   /* stack label over value */
+    row-gap:4px;
   }
-  .form-actions{
-    grid-column: 1 / -1;          /* span both columns */
-    justify-content:flex-end;
+  td::before{
+    white-space:normal;
+    opacity:.9;
   }
-  select{ min-width:180px; }
-  th, td{ padding:12px; font-size:15px; }
-  .actions-col{ width:130px; }
+  td.row-actions{
+    justify-content:flex-start;
+  }
 }
 
 /* Tablets (768px–1024px) */
 @media (min-width:768px) and (max-width:1024px){
   .page{ padding:22px; }
   .page-title{ font-size:26px; }
-
-  /* three data cols + actions */
-  .grid{
-    grid-template-columns: 1fr 1fr 1fr;
-    gap:12px;
-  }
-  .form-actions{
-    grid-column: 1 / -1;
-    justify-content:flex-end;
-  }
-
+  .grid{ grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+  .form-actions{ grid-column: 1 / -1; justify-content:flex-end; }
   .actions-col{ width:150px; }
 }
 
 /* Small desktops (1025px–1279px) */
 @media (min-width:1025px) and (max-width:1279px){
-  .grid{
-    grid-template-columns: 1fr 1fr 1fr auto; /* default */
-  }
+  .grid{ grid-template-columns: 1fr 1fr 1fr auto; }
 }
 
 /* Large desktops (≥ 1280px) */
@@ -208,7 +248,7 @@ button[aria-label="Close"]:hover svg { stroke: #656ED3; }
   .table-wrapper{ border-radius:12px; }
 }
 
-/* Short landscape viewports (e.g., phones with keyboard open) */
+/* Short landscape viewports */
 @media (max-height:600px) and (orientation:landscape){
   .grid{ grid-template-columns: 1fr 1fr; }
   .form-actions{ grid-column: 1 / -1; }
