@@ -97,8 +97,8 @@
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .header-cta{
-  justify-self:end;
-  margin-left:610px;              /* desktop pushes CTAs to the right */
+  justify-self:end;               /* ⬅️ responsive-friendly push to the right */
+  margin-left:0;                  /* ⬅️ removed brittle 610px offset */
   display:flex; gap:12px; flex-wrap:wrap;
 }
 
@@ -187,6 +187,11 @@
 .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:8px; border-bottom:1px solid #EBEFFF; }
 .close-x{ background:none; border:1px solid #EBEFFF; width:32px; height:32px; border-radius:8px; cursor:pointer; }
 
+/* ===================  ≤ 1280px (small desktops / large tablets)  =================== */
+@media (max-width:1280px){
+  .calendar__list{ grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
+}
+
 /* ===================  ≤ 1024px (Tablets & down)  =================== */
 @media (max-width:1024px){
 
@@ -200,37 +205,33 @@
   .sidebar.open{ transform:translateX(0); }
   .close-mobile{ display:inline-flex; align-items:center; justify-content:center; }
 
-  /* ===== Two-row header per mobile mock =====
-     Row 1: [hamburger] [left-aligned title]
-     Row 2: [full-width stacked CTAs]                                      */
+  /* Two-row header on mobile/tablet */
   .top-bar{
     display:grid;
     grid-template-columns:40px 1fr;      /* hamburger | title */
-    grid-template-rows:auto auto;        /* row1: title; row2: CTAs */
+    grid-template-rows:auto auto;        /* row1 title; row2 CTAs */
     column-gap:12px; row-gap:12px;
     align-items:center;
-    margin-bottom:0;
   }
   .hamburger{ grid-column:1; grid-row:1; align-self:center; justify-self:start; }
   .top-title{
     grid-column:2; grid-row:1;
-    text-align:left;                     /* left aligned beside hamburger */
+    text-align:left;
     margin:0;
     font-size:clamp(20px,4.4vw,28px);
     align-self:center;
   }
 
-  /* CTAs stacked below title (full width under header) */
   .header-cta{
     grid-column:1 / -1; grid-row:2;
-    margin:0;                             /* cancel desktop offset */
+    margin:0;
     display:flex; flex-direction:column; gap:12px;
     width:100%;
     justify-self:stretch; align-self:start;
   }
   .header-cta .btn{ width:100%; }
 
-  /* Hide any card-header inline actions on small screens */
+  /* Hide inline actions inside card headers on small screens */
   .form-card-header .header-actions{ display:none; }
 
   .main{ padding:14px; }
@@ -240,17 +241,16 @@
 
 /* ===================  ≤ 840px (Large phones / small tablets)  =================== */
 @media (max-width:840px){
-  .calendar__list{ grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
+  .calendar__list{ grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); }
 }
 
 /* ===================  ≤ 600px (Phones)  =================== */
 @media (max-width:600px){
-  /* inherits two-row header from ≤1024px */
   .header-cta{ margin-top:2px; }
   .header-cta .btn{ width:100%; }
 
   .main{ padding:12px; }
-  .form-section{ padding:12px; margin-top:6px; } /* small buffer under buttons */
+  .form-section{ padding:12px; margin-top:6px; }
   .form-card{ padding:16px; border-radius:14px; }
   .form-card-header{ grid-template-columns:1fr; align-items:start; }
   .header-actions{ justify-content:flex-start; }
@@ -259,7 +259,7 @@
   .menu a{ font-size:14px; padding:10px 14px; }
   .card{ padding:14px; }
 
-  /* Budgets list → vertical cards */
+  /* ===== Budgets list → vertical cards (no horizontal scroll) ===== */
   :host ::ng-deep .budgets-list-host .table-wrap,
   :host ::ng-deep .budgets-list-host .table-responsive{ overflow-x:visible !important; }
 
@@ -281,7 +281,7 @@
 
   :host ::ng-deep .budgets-list-host td{
     display:grid;
-    grid-template-columns:120px 1fr;
+    grid-template-columns:120px 1fr;  /* label | value */
     align-items:start;
     gap:6px 10px;
     padding:10px 4px;
@@ -297,18 +297,20 @@
     display:flex; justify-content:flex-end; align-items:center;
   }
 
+  /* Use data-label if provided; otherwise fallback via nth-child below */
   :host ::ng-deep .budgets-list-host td::before{
     content:attr(data-label);
     color:#25295A; font-weight:700; white-space:nowrap;
   }
-  :host ::ng-deep .budgets-list-host td:nth-child(1)::before{ content:attr(data-label, "Name"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(2)::before{ content:attr(data-label, "Category"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(3)::before{ content:attr(data-label, "Amount"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(4)::before{ content:attr(data-label, "Period"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(5)::before{ content:attr(data-label, "Start"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(6)::before{ content:attr(data-label, "End"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(7)::before{ content:attr(data-label, "Notes"); }
-  :host ::ng-deep .budgets-list-host td:nth-child(8)::before{ content:attr(data-label, "Actions"); }
+  /* Fallback labels (edit these to match your column order) */
+  :host ::ng-deep .budgets-list-host td:nth-child(1)::before{ content:"Name"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(2)::before{ content:"Category"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(3)::before{ content:"Amount"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(4)::before{ content:"Period"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(5)::before{ content:"Start"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(6)::before{ content:"End"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(7)::before{ content:"Notes"; }
+  :host ::ng-deep .budgets-list-host td:nth-child(8)::before{ content:"Actions"; }
 
   :host ::ng-deep .budgets-list-host td > *:last-child{ text-align:right; }
   :host ::ng-deep .budgets-list-host td:nth-child(3) > *:last-child{ white-space:nowrap; }

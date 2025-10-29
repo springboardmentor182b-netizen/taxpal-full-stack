@@ -16,7 +16,6 @@
       line-height: 0;
     "
   >
-    <!-- X Icon (uses palette #534CA4 / #656ED3 on hover via inline) -->
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
          style="stroke:#534CA4; transition: stroke .15s ease">
       <path d="M6 6l12 12M18 6L6 18" stroke-width="2" stroke-linecap="round"/>
@@ -90,11 +89,19 @@
         </thead>
         <tbody>
           <tr *ngFor="let r of recent">
-            <td>{{ r.name || (r.reportType | titlecase) }}</td>
-            <td>{{ r.createdAt | date:'medium' }}</td>
-            <td>{{ r.periodLabel }}</td>
-            <td>{{ r.format.toUpperCase() }}</td>
-            <td class="row-actions">
+            <td data-label="Report Name">
+              {{ r.name || (r.reportType | titlecase) }}
+            </td>
+            <td data-label="Generated">
+              {{ r.createdAt | date:'medium' }}
+            </td>
+            <td data-label="Period">
+              {{ r.periodLabel }}
+            </td>
+            <td data-label="Format">
+              {{ r.format.toUpperCase() }}
+            </td>
+            <td class="row-actions" data-label="Actions">
               <button class="link" (click)="openInExport(r)">Preview</button>
               <button class="link danger" (click)="deleteReport(r)">Delete</button>
             </td>
