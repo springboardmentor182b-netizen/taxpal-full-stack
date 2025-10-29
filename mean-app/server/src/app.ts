@@ -45,7 +45,7 @@ app.use(express.urlencoded({ extended: true }));
 // ✅ Swagger setup
 setupSwagger(app);
 
-// ✅ Routes
+// ✅ API Routes
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/categories", categoriesRoutes);
 app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
@@ -63,28 +63,9 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Serve Angular frontend (robust lookup)
-// __dirname is server/src, go up two levels to reach mean-app/client/dist
 const clientDistBase = path.resolve(__dirname, "../../client/dist");
 
-// candidate output folders commonly produced by Angular builds in monorepos
-let candidates: string[] = [];
-try {
-  candidates = [
-    path.join(clientDistBase, "dum", "browser"),
-    path.join(clientDistBase, "dum"),
-    // fallback: add any directory under client/dist
-    ...fs
-      .readdirSync(clientDistBase, { withFileTypes: true })
-      .filter((d) => d.isDirectory())
-      .map((d) => path.join(clientDistBase, d.name)),
-  ];
-} catch (e) {
-  // clientDistBase may not exist yet
-  candidates = [path.join(clientDistBase)];
-}
-
 // Recursively search for an index.html under clientDistBase and use its parent folder
-let clientPath: string | null = null;
 function findIndexHtml(start: string, maxDepth = 6): string | null {
   const stack: Array<{ dir: string; depth: number }> = [
     { dir: start, depth: 0 },
@@ -96,7 +77,7 @@ function findIndexHtml(start: string, maxDepth = 6): string | null {
     let entries: fs.Dirent[] = [];
     try {
       entries = fs.readdirSync(dir, { withFileTypes: true });
-    } catch (e) {
+    } catch {
       continue;
     }
 
@@ -113,29 +94,30 @@ function findIndexHtml(start: string, maxDepth = 6): string | null {
   return null;
 }
 
+let clientPath: string | null = null;
+
 try {
   const found = findIndexHtml(clientDistBase, 8);
   if (found) {
     clientPath = path.dirname(found);
-    console.log("Found index.html at", found);
+    console.log("✅ Found Angular index.html at:", found);
   }
-} catch (e) {
-  // ignore
+} catch {
+  console.warn("⚠️ Could not find built frontend files.");
 }
 
-if (!clientPath) {
-  console.warn("⚠️ Frontend build not found. Looked in candidates:", candidates);
-  console.warn(
-    "Run 'cd client && ng build --configuration production' and ensure the built files are present under client/dist/<project-name>"
-  );
-} else {
+if (clientPath) {
   console.log("✅ Serving static files from:", clientPath);
   app.use(express.static(clientPath));
 
-  // For Angular routing (refresh issue fix)
+  // ✅ For Angular routing (refresh issue fix)
   app.get("*", (req, res) => {
     res.sendFile(path.join(clientPath!, "index.html"));
   });
+} else {
+  console.warn(
+    "⚠️ Frontend build not found. Run 'cd client && ng build --configuration production' to build it."
+  );
 }
 
 export default app;
