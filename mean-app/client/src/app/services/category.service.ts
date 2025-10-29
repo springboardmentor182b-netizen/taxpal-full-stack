@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment';
 
 export interface Category {
   _id?: string;            // user-created categories will have _id
@@ -16,7 +15,7 @@ export interface Category {
   providedIn: 'root'
 })
 export class CategoryService {
-  private apiUrl = `${environment.apiUrl}/categories`; // backend base URL
+  private apiUrl = 'http://localhost:5000/api/v1/categories'; // backend base URL
 
   constructor(private http: HttpClient) {}
 

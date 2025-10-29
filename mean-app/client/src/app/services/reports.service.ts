@@ -6,7 +6,7 @@
 
 // @Injectable({ providedIn: 'root' })
 // export class ReportsService {
-//   private apiUrl = `${environment.apiUrl}/reports`;
+//   private apiUrl = 'http://localhost:5000/api/v1/reports';
 
 //   constructor(private http: HttpClient) {}
 
@@ -55,11 +55,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Report } from '../features/reports/reports-form/reports.component';
-import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
-  private apiUrl = `${environment.apiUrl}/reports`;
+  private apiUrl = 'http://localhost:5000/api/v1/reports';
 
   constructor(private http: HttpClient) {}
 

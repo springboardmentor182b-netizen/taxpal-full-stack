@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { AuthService, User } from '../../../features/auth.service';
-import { environment } from '../../../../environments/environment';
 
 export interface Budget {
   category: string;
@@ -25,7 +24,7 @@ export interface Budget {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BudgetFormComponent {
-  private readonly API_BASE_URL = `${environment.apiUrl}/budgets`;
+  private readonly API_BASE_URL = 'http://localhost:5000/api/v1/budgets';
 
   public isFormVisible = signal(false);
   public budgets = signal<Budget[]>([]);
