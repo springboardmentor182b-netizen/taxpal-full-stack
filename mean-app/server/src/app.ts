@@ -128,5 +128,13 @@ if (!clientPath) {
     res.sendFile(path.join(clientPath!, 'index.html'));
   });
 }
+// ✅ Serve Angular frontend
+const clientPath = path.resolve(__dirname, "../client/dist/dum/browser"); // ✅ Corrected path
+app.use(express.static(clientPath));
+
+// ✅ For Angular routing (refresh issue fix)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientPath, "index.html"));
+});
 
 export default app;
