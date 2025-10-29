@@ -6,35 +6,36 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'http://localhost:5000/api/v1/dashboard';
+  // 🔹 Update this to your actual deployed backend URL if needed
+  private apiUrl = 'http://localhost:5000/api/v1/dashboard'; 
 
   constructor(private http: HttpClient) {}
 
-  // Get dashboard for a specific user
-  getDashboard(userId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/${userId}`);
-  }
-
-  // Replace the dashboard completely (updates all fields and transactions)
-  updateDashboard(userId: string, data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
-  }
-
-  // Only create a new dashboard if needed
+  // 🔹 Create new dashboard
   createDashboard(data: any): Observable<any> {
     return this.http.post(this.apiUrl, data);
   }
 
-  // Add a single transaction to the dashboard
-addTransaction(dashboardId: string, txData: any): Observable<any> {
-  return this.http.post(`${this.apiUrl}/${dashboardId}/transaction`, txData);
-}
+  // 🔹 Get dashboard for a specific user
+  getDashboard(userId: string): Observable<any> {
+    console.log('Fetching dashboard for userId:', userId);
+    return this.http.get(`${this.apiUrl}/${userId}`);
+  }
 
+  // 🔹 Update existing dashboard (or create if missing)
+  updateDashboard(userId: string, data: any): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/${userId}`, data);
+  }
+
+  // 🔹 Upsert dashboard (create or update automatically)
+  upsertDashboard(userId: string, data: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
+  }
+
+  // 🔹 Delete a specific transaction
   deleteTransaction(dashboardId: string, txId: string): Observable<any> {
-  return this.http.delete(`${this.apiUrl}/${dashboardId}/transaction/${txId}`);
+    // This should match your backend route:
+    // router.delete('/:dashboardId/transactions/:txId', deleteTransaction)
+    return this.http.delete(`${this.apiUrl}/${dashboardId}/transactions/${txId}`);
+  }
 }
-}
-
-
-
-
