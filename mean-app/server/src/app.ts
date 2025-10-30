@@ -22,16 +22,22 @@ import reportRoutes from "./api/modules/reports/report.routes";
 // =========================================================
 const app = express();
 
-// Middleware
+// ✅ Middleware
 app.use(
   cors({
     origin: [
       "http://localhost:4200",
-      "https://taxpal-full-stack.onrender.com"
+      "https://taxpal-full-stack.onrender.com",
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "Origin",
+      "X-Requested-With",
+    ],
   })
 );
 
@@ -70,9 +76,6 @@ app.get("/", (req, res) => {
 // =========================================================
 const clientDistBase = path.resolve(__dirname, "../../client/dist");
 
-let clientPath: string | null = null;
-
-// Search recursively for index.html
 function findIndexHtml(start: string, maxDepth = 6): string | null {
   const stack: Array<{ dir: string; depth: number }> = [{ dir: start, depth: 0 }];
 
@@ -99,6 +102,8 @@ function findIndexHtml(start: string, maxDepth = 6): string | null {
   return null;
 }
 
+let clientPath: string | null = null;
+
 try {
   const found = findIndexHtml(clientDistBase, 8);
   if (found) {
@@ -115,7 +120,7 @@ try {
 if (clientPath) {
   app.use(express.static(clientPath));
 
-  // For Angular routing (handle refresh, 404 fallback)
+  // ✅ Angular routing fix for refresh & 404s
   app.get("*", (req, res) => {
     res.sendFile(path.join(clientPath!, "index.html"));
   });

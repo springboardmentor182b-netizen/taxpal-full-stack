@@ -1,1 +1,33 @@
-<p>security works!</p>
+<div class="security-container">
+    <h2> Security Settings</h2>
+  
+    <section class="security-section">
+      <h3>Password</h3>
+      <p>Last changed: {{ lastPasswordChange | date:'longDate' }}</p>
+      <button class="btn btn-primary">Change Password</button>
+    </section>
+  
+    <section class="security-section">
+      <h3>Two-Factor Authentication</h3>
+      <p>Status: 
+        <strong [ngClass]="{'enabled': twoFactorEnabled, 'disabled': !twoFactorEnabled}">
+          {{ twoFactorEnabled ? 'Enabled' : 'Disabled' }}
+        </strong>
+      </p>
+      <button class="btn" (click)="toggleTwoFactor()">
+        {{ twoFactorEnabled ? 'Disable 2FA' : 'Enable 2FA' }}
+      </button>
+    </section>
+  
+    <section class="security-section">
+      <h3>Trusted Devices</h3>
+      <ul>
+        <li *ngFor="let device of trustedDevices">
+          <span>{{ device.name }}</span>
+          <small>Last used: {{ device.lastUsed }}</small>
+          <button class="btn btn-small" (click)="revokeDevice(device)">Revoke</button>
+        </li>
+      </ul>
+    </section>
+  </div>
+  

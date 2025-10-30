@@ -10,9 +10,9 @@ const routes: Routes = [
 
 @NgModule({
   imports: [
-    RouterModule.forChild(routes), // setup child routes
+    RouterModule.forChild(routes),  // setup child routes
+    TaxEstimatorFormComponent       // import standalone component
   ],
   exports: [RouterModule]
 })
 export class TaxEstimatorModule { }
-

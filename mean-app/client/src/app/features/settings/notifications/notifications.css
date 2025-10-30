@@ -1,0 +1,128 @@
+/* ===== CONTAINER ===== */
+.notifications-container {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15); /* slightly bigger shadow */
+  max-width: 700px;          /* increased max width */
+  width: 90%;
+  margin: 30px auto;         /* more margin for spacing */
+  padding: 2rem;             /* increased padding */
+  box-sizing: border-box;
+  transition: all 0.3s;
+}
+
+/* ===== HEADING ===== */
+h3 {
+  font-size: 1.8rem;          /* bigger font */
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: #008080;
+}
+
+/* ===== NOTIFICATION ITEM ===== */
+.notification-item {
+  padding: 16px 18px;          /* bigger padding */
+  margin-bottom: 14px;
+  border-left: 4px solid #007bff;
+  background: #f9f9f9;
+  border-radius: 8px;          /* slightly bigger radius */
+  transition: all 0.3s ease;
+  font-size: 1rem;             /* slightly bigger text */
+}
+
+.notification-item.read {
+  opacity: 0.7;
+  border-left-color: #888;
+}
+
+.notification-item:hover {
+  background: #eef6ff;
+}
+
+/* ===== BUTTON ===== */
+button {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 18px;          /* bigger button */
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #0056b3;
+}
+
+/* ===== EMPTY STATE ===== */
+.no-notifs {
+  text-align: center;
+  color: gray;
+  font-style: italic;
+  padding: 30px 0;
+  font-size: 1.1rem;
+}
+
+/* ===== RESPONSIVE BREAKPOINTS ===== */
+@media (max-width: 1024px) {
+  .notifications-container {
+    max-width: 650px;
+    padding: 1.8rem;
+  }
+
+  h3 {
+    font-size: 1.6rem;
+  }
+
+  .notification-item {
+    font-size: 0.95rem;
+    padding: 14px 16px;
+  }
+
+  button {
+    padding: 9px 16px;
+  }
+}
+
+@media (max-width: 768px) {
+  .notifications-container {
+    max-width: 90%;
+    padding: 1.5rem;
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  .notification-item {
+    font-size: 0.95rem;
+    padding: 12px 14px;
+  }
+
+  button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notifications-container {
+    padding: 1rem;
+  }
+
+  h3 {
+    font-size: 1.3rem;
+  }
+
+  .notification-item {
+    font-size: 0.9rem;
+    padding: 10px 12px;
+  }
+
+  button {
+    font-size: 0.9rem;
+    padding: 8px 12px;
+  }
+}

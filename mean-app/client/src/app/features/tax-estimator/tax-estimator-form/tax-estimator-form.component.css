@@ -1,461 +1,573 @@
-/* Layout wrapper (Left as is) */
+/* ====== GENERAL LAYOUT ====== */
 .layout {
-    width: 100%;
-    height: 100vh;
-    background: #f9fafb;
-    overflow: hidden;
-    font-family: 'Inter', sans-serif;
-    color: #333;
+  width: 100%;
+  min-height: 100vh;
+  background: #f9fafb;
+  overflow-x: hidden;
+  font-family: 'Inter', sans-serif;
+  color: #333;
 }
 
-/* Sidebar fixed on left (Left as is) */
-.sidebar {
-    grid-column: 1 / 2;/* Explicitly place it in the first column */
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100vh;
-    width: 240px;
-    background: linear-gradient(180deg, #2fa79a 0%, #1f776e 100%);
-    color: #fff;
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    transition: all 0.28s cubic-bezier(.2, .9, .2, 1);
-    z-index: 900;
-    gap: 14px;
-    border-radius:0 12px 12px 0;
-      
-}
-
-/* Collapsed sidebar (Left as is) */
-.sidebar.collapsed {
-    width: 80px;
-}
-/* brand + collapse button */
-.sidebar-top .brand-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-/* Sidebar sections (Left as is) */
-.brand {
-   font-size: 20px;
-  font-weight: 700;
-}
-.collapse-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: none;
-    color: #fff;
-    padding: 8px;
-    border-radius: 8px;
-    display: inline-block;
-    align-items: center;
-    cursor: pointer;
-
- 
-}
-/* nav */
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 8px;
-  border-radius: 10px;
-  color: rgba(255,255,255,0.95);
-  text-decoration: none;
-  cursor: pointer;
-  font-size: 15px;
-}
-.action-settings{
-    display: flex;
-    align-items:center;
-    gap:10px;
-    padding: 10px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
-    font-weight:600;
-}
-.nav-item:hover,
-.active-link {
-    background: rgba(255, 255, 255, 0.1);
-}
-
-.sidebar-bottom {
-    margin-top: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-}
-
-.profile {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
-.meta .name {
-    font-weight: 600;
-}
-.label {
-    white-space: nowrap;
-  color:#fff
-}
-
-.meta .email {
-    font-size: 13px;
-    opacity: 0.8;
-}
-
-.logout {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ff7b7b;
-    border: none;
-    padding: 10px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* MAIN CONTENT AREA */
+/* ====== MAIN CONTENT ====== */
 .main-content {
-    position: relative;
- 
-    padding: 0; 
-    height: 100vh;
-    overflow-y: auto;
-    background: #f9fafb;
-    transition: margin-left 0.3s ease;
-}
-
-.content-wrapper {
-    padding: 24px;
-    max-width: 1400px;
+  position: relative;
+  padding: 0;
+  min-height: 100vh;
+  overflow-y: auto;
+  background: #f9fafb;
+  transition: margin-left 0.3s ease;
 }
 
 .sidebar.collapsed ~ .main-content {
-    margin-left: 80px;
+  margin-left: 0;
 }
 
+.content-wrapper {
+  padding: 16px;
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ====== HEADER ====== */
 .main-header {
-    background: #ffffff;
-    padding: 24px;
-    border-bottom: 1px solid #e5e7eb;
+  background: #ffffff;
+  padding: 20px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .main-title {
-    font-size: 24px;
-    font-weight: 700;
-    margin: 0;
-    color:#8b9df6;
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 700;
+  color: #8b9df6;
+  line-height: 1.2;
 }
 
 .main-subtitle {
-    font-size: 14px;
-    color: Tomato;
-    margin: 4px 0 0 0;
+  font-size: clamp(12px, 3vw, 14px);
+  color: tomato;
+  margin-top: 4px;
+  line-height: 1.4;
 }
 
-/* Tax Nav Tabs */
+/* ====== TAX NAVIGATION TABS ====== */
 .tax-nav {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
 }
 
 .tax-nav-btn {
-    background: none;
-    border: none;
-    padding: 10px 0;
-    font-size: 16px;
-    cursor: pointer;
-    color: #6b7280;
-    border-bottom: 2px solid transparent;
+  background: none;
+  border: none;
+  padding: 8px 12px;
+  font-size: clamp(14px, 3.5vw, 16px);
+  cursor: pointer;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  flex: 1;
+  min-width: fit-content;
+  max-width: 200px;
 }
 
 .tax-nav-btn.active {
-    color: #1f776e;
-    border-bottom-color: #1f776e;
-    font-weight: 600;
+  color: #1f776e;
+  border-bottom-color: #1f776e;
+  font-weight: 600;
 }
-.heading{
-    color: var(--color-primary-500);
-}
-/* --- Tax Calculator Specific Styles --- */
 
-
-
-/* KEY: Set up the side-by-side layout */
+/* ====== TAX FORM SECTION ====== */
 .tax-form-card {
-    display: flex;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    min-height: 550px;
-    overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: auto;
+  overflow: hidden;
+  width: 100%;
 }
 
-/* LEFT SIDE: Form Fields */
 .tax-form-left {
-    flex: 3; /* Takes up approximately 75% of the space */
-    padding: 32px;
-    border-right: 1px solid #e5e7eb;
+  flex: 1;
+  padding: 24px 20px;
+  border-right: none;
+  border-bottom: 1px solid #e5e7eb;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* RIGHT SIDE: Tax Summary */
 .tax-summary-right {
-    flex: 1; /* Takes up approximately 25% of the space */
-    padding: 32px;
-    background: #f9fafb;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--color-primary-500);
-    width: 100vh;
+  flex: 1;
+  padding: 24px 20px;
+  background: #f9fafb;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: #1f776e;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-/* Form Headings and Subtitles */
+/* Headings */
 .tax-form-left h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-top: 0;
-}
-
-.form-subtitle {
-    color: #6b7280;
-    font-size: 14px;
-    margin-bottom: 24px;
+  font-size: clamp(18px, 4.5vw, 20px);
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .form-section-title {
-    font-size: 16px;
-    font-weight: 600;
-    margin: 20px 0 12px 0;
-    padding-bottom: 4px;
-    border-bottom: 1px solid #e5e7eb;
-    color: #1f776e;
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 600;
+  color: #1f776e;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 16px 0 10px 0;
+  padding-bottom: 4px;
+  line-height: 1.4;
 }
 
-/* Form Fields Layout */
+/* Form Fields */
 .form-group-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+  width: 100%;
 }
 
 .form-group-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+  width: 100%;
 }
 
 .form-field {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-.form-field.full-width {
-    width: 100%;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .form-field label {
-    font-size: 14px;
-    color: #374151;
-    margin-bottom: 6px;
+  font-size: clamp(13px, 3.2vw, 14px);
+  color: #374151;
+  margin-bottom: 6px;
+  line-height: 1.4;
 }
 
-.form-field input, .form-field select {
-    padding: 10px 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 16px;
-    color: #111827;
+.form-field input,
+.form-field select {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: #111827;
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 44px;
 }
 
-.calculate-btn{
-    padding: 10px 20px;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-    border: none;
-    background-color: #16a34a !important; /* Green background */
-    color: white !important;
-    flex: 1;
-    min-width: 100px;
-    transition: background-color 0.3s ease;
-    margin-left: 51rem;
+.calculate-btn {
+  padding: 14px 24px;
+  border-radius: 6px;
+  font-size: clamp(14px, 3.5vw, 16px);
+  cursor: pointer;
+  border: none;
+  background-color: #16a34a;
+  color: white;
+  transition: 0.3s ease;
+  width: 100%;
+  display: block;
+  min-height: 48px;
+  font-weight: 600;
 }
 
 .calculate-btn:hover {
-    background-color: #15803d !important; /* darker shade on hover */
+  background-color: #15803d;
 }
 
-/* Tax Summary Section */
+/* ====== SUMMARY BOX ====== */
 .summary-title {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 16px 0;
-    text-align: center;
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.3;
 }
 
 .summary-box {
-    text-align: center;
-    padding: 24px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    background: #ffffff;
-    margin-top: 0;
-    height: 100%; /* KEY: Fills the available vertical space */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-   max-width: 100vh;
-}
-
-.summary-box p {
-    color: #6b7280;
-    font-size: 14px;
-}
-
-.summary-icon {
-    font-size: 32px;
-    color: #9ca3af;
-    margin-bottom: 12px;
+  text-align: center;
+  padding: 20px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .result-amount {
-    font-size: 28px;
-    font-weight: 700;
-    color: #1f776e;
-    margin-top: 10px;
+  font-size: clamp(22px, 6vw, 28px);
+  font-weight: 700;
+  color: #1f776e;
+  line-height: 1.2;
 }
 
-/* --- Calendar View Styles --- */
-
+/* ====== TAX CALENDAR ====== */
 .tax-calendar-container {
-  
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    padding: 24px;
-    margin-left: 50px;
-   
-    
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  padding: 24px 20px;
+  margin-top: 32px;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.tax-calendar-container:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12);
 }
 
 .tax-calendar-container h2 {
-    font-size: 20px;
-    font-weight: 600;
-    margin-top: 0;
-    margin-bottom: 20px;
+  font-size: clamp(18px, 4.5vw, 22px);
+  font-weight: 700;
+  color: #1f776e;
+  margin-bottom: 20px;
+  text-align: center;
+  line-height: 1.3;
 }
 
 .month-title {
-    font-size: 18px;
-    font-weight: 700;
-    margin: 24px 0 16px 0;
-    color:rgb(255, 99, 71);
-    padding-bottom: 8px;
-    border-bottom: 1px solid #e5e7eb;
-    
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 600;
+  color: tomato;
+  margin-bottom: 12px;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #f3f4f6;
+  line-height: 1.3;
 }
 
 .reminder-card {
-    display: flex;
-    align-items: center;
-    padding: 16px;
-    margin-bottom: 12px;
-    border-radius: 8px;
-    border: 1px solid #e5e7eb;
-    background: #fcfcfc;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 16px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background: #fefefe;
+  transition: 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  gap: 8px;
+}
+
+.reminder-card:hover {
+  background: #f0fdfa;
 }
 
 .reminder-card.payment {
-    border-left: 4px solid #f59e0b; /* Amber */
+  border-left: 4px solid #f59e0b;
 }
 
 .reminder-card.reminder {
-    border-left: 4px solid #3b82f6; /* Blue */
+  border-left: 4px solid #3b82f6;
 }
 
 .reminder-date {
-    font-weight: 600;
-    color: #1f776e;
-    flex-shrink: 0;
-    width: 100px;
+  font-weight: 700;
+  color: #1f776e;
+  font-size: clamp(13px, 3.2vw, 14px);
+  text-align: left;
+  line-height: 1.4;
 }
 
 .reminder-details {
-    flex-grow: 1;
-    padding: 0 16px;
+  flex: 1;
+  margin-left: 0;
+  width: 100%;
 }
 
 .reminder-title {
-    font-weight: 600;
-    margin: 0 0 4px 0;
+  font-weight: 600;
+  color: #111827;
+  font-size: clamp(14px, 3.5vw, 15px);
+  margin-bottom: 4px;
+  line-height: 1.3;
 }
 
 .reminder-description {
-    font-size: 14px;
-    color: #6b7280;
+  font-size: clamp(12px, 3vw, 13px);
+  color: #6b7280;
+  line-height: 1.4;
 }
 
 .reminder-type-tag {
-    padding: 4px 10px;
-    border-radius: 9999px;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: capitalize;
-    flex-shrink: 0;
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: clamp(11px, 2.8vw, 12px);
+  font-weight: 700;
+  text-transform: capitalize;
+  display: inline-block;
+  margin-bottom: 8px;
 }
 
 .reminder-card.payment .reminder-type-tag {
-    background: #fde68a;
-    color: #b45309;
+  background: #fde68a;
+  color: #b45309;
 }
 
 .reminder-card.reminder .reminder-type-tag {
-    background: #bfdbfe;
-    color: #1e40af;
+  background: #bfdbfe;
+  color: #1e40af;
 }
 
-/* Responsive adjustment */
-@media (max-width: 900px) {
-    .tax-form-card {
-        flex-direction: column;
-    }
-    .tax-form-left {
-        border-right: none;
-        border-bottom: 1px solid #e5e7eb;
-    }
-    .tax-summary-right {
-        min-height: auto;
-    }
-    .summary-box {
-        height: auto;
-    }
+/* ====== TAX CALENDAR BUTTONS ====== */
+.btn-mark-done {
+  background: #1f776e;
+  color: #ffffff;
+  font-size: clamp(12px, 3vw, 13px);
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  min-height: 42px;
+  margin-top: 8px;
+}
+
+.btn-mark-done:hover {
+  background: #17635b;
+  transform: translateY(-1px);
+}
+
+.btn-mark-done.done {
+  background: #16a34a;
+  color: #fff;
+}
+
+.btn-mark-done.loading {
+  background: #d1d5db;
+  color: #374151;
+  cursor: wait;
+}
+
+/* ====== RESPONSIVE IMPROVEMENTS ====== */
+
+/* Tablet and larger mobile devices */
+@media (min-width: 480px) {
+  .content-wrapper {
+    padding: 20px;
+  }
+  
+  .main-header {
+    padding: 20px;
+  }
+  
+  .tax-nav-btn {
+    flex: none;
+  }
+  
+  .reminder-card {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .reminder-date {
+    min-width: 80px;
+    text-align: center;
+    margin-bottom: 0;
+  }
+  
+  .reminder-details {
+    margin-left: 0;
+  }
+  
+  .reminder-type-tag {
+    margin-bottom: 0;
+  }
+  
+  .btn-mark-done {
+    width: auto;
+    min-width: 120px;
+    margin-top: 0;
+  }
+}
+
+/* Small tablets and larger */
+@media (min-width: 768px) {
+  .content-wrapper {
+    padding: 24px;
+  }
+  
+  .main-header {
+    padding: 24px;
+  }
+  
+  .tax-form-left,
+  .tax-summary-right {
+    padding: 28px 24px;
+  }
+  
+  .tax-calendar-container {
+    padding: 28px 24px;
+  }
+  
+  .form-group-row {
+    flex-direction: row;
+  }
+  
+  .form-group-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .calculate-btn {
+    width: auto;
+    margin-left: auto;
+    min-width: 160px;
+  }
+  
+  .reminder-card {
+    align-items: flex-start;
+  }
+  
+  .reminder-details {
+    margin-left: 12px;
+  }
+}
+
+/* Desktop and larger screens */
+@media (min-width: 1024px) {
+  .tax-form-card {
+    flex-direction: row;
+  }
+  
+  .tax-form-left {
+    border-right: 1px solid #e5e7eb;
+    border-bottom: none;
+  }
+  
+  .sidebar.collapsed ~ .main-content {
+    margin-left: 80px;
+  }
+  
+  .form-group-grid {
+    gap: 20px;
+  }
+  
+  .tax-nav {
+    justify-content: flex-start;
+  }
+  
+  .main-header {
+    text-align: left;
+  }
+}
+
+/* Large desktop screens */
+@media (min-width: 1200px) {
+  .content-wrapper {
+    padding: 32px;
+  }
+  
+  .tax-form-left,
+  .tax-summary-right {
+    padding: 32px;
+  }
+  
+  .tax-calendar-container {
+    padding: 32px;
+  }
+  
+  .form-group-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+}
+
+/* Very small mobile devices */
+@media (max-width: 360px) {
+  .content-wrapper {
+    padding: 12px;
+  }
+  
+  .main-header {
+    padding: 16px 12px;
+  }
+  
+  .tax-form-left,
+  .tax-summary-right {
+    padding: 16px 12px;
+  }
+  
+  .tax-calendar-container {
+    padding: 16px 12px;
+    margin-top: 24px;
+  }
+  
+  .tax-nav {
+    gap: 8px;
+  }
+  
+  .tax-nav-btn {
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+}
+
+/* Fix for very tall screens */
+@media (min-height: 1000px) {
+  .main-content {
+    min-height: 100vh;
+  }
+  
+  .tax-form-card {
+    min-height: 600px;
+  }
+}
+
+/* High contrast support for accessibility */
+@media (prefers-contrast: high) {
+  .tax-form-card,
+  .tax-calendar-container,
+  .summary-box {
+    border: 2px solid #000;
+  }
+  
+  .reminder-card {
+    border-width: 1px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .main-content,
+  .tax-calendar-container,
+  .reminder-card,
+  .btn-mark-done,
+  .calculate-btn {
+    transition: none;
+  }
+  
+  .btn-mark-done:hover {
+    transform: none;
+  }
 }
