@@ -1,0 +1,133 @@
+<!-- expense-modal.html -->
+<div class="modal-overlay" *ngIf="isOpen" (click)="onClose()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <!-- Close -->
+    <button type="button" class="close-btn" (click)="onClose()" aria-label="Close">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <!-- Header -->
+    <div class="modal-header">
+      <h2>Record New Expense</h2>
+    </div>
+
+    <!-- Form -->
+    <div class="form-container">
+      <h3>Add Expense</h3>
+
+      <form (ngSubmit)="onSave()" #expenseForm="ngForm" novalidate>
+        <!-- Row 1 -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="description">Description</label>
+            <input
+              type="text"
+              id="description"
+              name="description"
+              [(ngModel)]="formData.description"
+              placeholder="Eg, Grocery shopping"
+              required
+              #descriptionRef="ngModel"
+            />
+            <small class="error" *ngIf="descriptionRef.invalid && (descriptionRef.dirty || descriptionRef.touched)">
+              Description is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="amount">Amount</label>
+            <div class="amount-input">
+              <span class="currency">$</span>
+              <input
+                type="number"
+                id="amount"
+                name="amount"
+                [(ngModel)]="formData.amount"
+                placeholder="0.00"
+                step="0.01"
+                min="0.01"
+                inputmode="decimal"
+                (keydown)="blockInvalidAmountKeys($event)"
+                (input)="onAmountInput($event)"
+                required
+                #amountRef="ngModel"
+              />
+            </div>
+            <small class="error" *ngIf="amountRef.invalid && (amountRef.dirty || amountRef.touched)">
+              {{ amountRef.errors?.['required'] ? 'Amount is required.' : 'Amount must be greater than 0.' }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Row 2 -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Category</label>
+            <select
+              id="category"
+              name="category"
+              [(ngModel)]="formData.category"
+              required
+              #categoryRef="ngModel"
+            >
+              <option value="">Select a category</option>
+              <option value="food">Food & Dining</option>
+              <option value="transport">Transportation</option>
+              <option value="shopping">Shopping</option>
+              <option value="entertainment">Entertainment</option>
+              <option value="bills">Bills & Utilities</option>
+              <option value="healthcare">Healthcare</option>
+              <option value="other">Other</option>
+            </select>
+            <small class="error" *ngIf="categoryRef.invalid && (categoryRef.dirty || categoryRef.touched)">
+              Category is required.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="date">Date</label>
+            <div class="date-input">
+              <input
+                type="date"
+                id="date"
+                name="date"
+                [(ngModel)]="formData.date"
+                required
+                #dateRef="ngModel"
+              />
+              <svg class="calendar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
+                <line x1="16" y1="2" x2="16" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="8" y1="2" x2="8" y2="6" stroke="currentColor" stroke-width="2"/>
+                <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <small class="error" *ngIf="dateRef.invalid && (dateRef.dirty || dateRef.touched)">
+              Date is required.
+            </small>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="form-group">
+          <label for="notes">Notes (Optional)</label>
+          <textarea
+            id="notes"
+            name="notes"
+            [(ngModel)]="formData.notes"
+            placeholder="Add any additional notes"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="form-actions">
+          <button type="button" class="btn-cancel" (click)="onClose()">Cancel</button>
+          <button type="submit" class="btn-save" [disabled]="!expenseForm.form.valid">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

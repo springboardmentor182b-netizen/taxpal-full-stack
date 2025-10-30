@@ -1,0 +1,396 @@
+/* === Base / Layout (match modal+form scheme) ======================= */
+.list-shell {
+  padding: 16px;
+  max-width: 980px;
+  color: #0f172a;                 /* base text */
+}
+
+/* Header */
+.list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid #eef2f7;
+  padding-bottom: 12px;
+}
+.list-header h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #656ed3;                 /* purple title */
+  letter-spacing: -0.02em;
+}
+
+/* Header actions + filters */
+.actions { display: flex; align-items: center; gap: 10px; }
+.filters { display: flex; align-items: center; gap: 8px; }
+
+/* Inputs in filters → match form inputs */
+.filters input[type="month"],
+.filters select {
+  appearance: none;
+  width: auto;
+  padding: 10px 12px;
+  border: 2px solid black;        /* bold black border */
+  border-radius: 8px;
+  font-size: 14px;
+  background: #e8e9ec;            /* gray input bg */
+  color: #0f172a;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.filters select { padding-right: 36px; }
+.filters input[type="month"]:focus,
+.filters select:focus {
+  border-color: #8B7FF7;          /* purple focus */
+  box-shadow: 0 0 0 3px rgba(139, 127, 247, 0.10);
+}
+
+/* === Table ========================================================= */
+.table-wrap {
+  overflow: auto;
+  background: #ffffff;            /* white card bg */
+  border-radius: 16px;            /* match modal radius */
+  border: none;                   /* remove thin border */
+  box-shadow:
+    0 20px 25px -5px rgba(0, 0, 0, 0.10),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04); /* modal-like shadows */
+}
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.table th, .table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+.table thead th {
+  background: #f8fafc;
+  text-align: left;
+  font-weight: 600;
+  color: #111113;
+}
+.table tbody tr:hover {
+  background: #f9fafb;
+}
+.table .num { text-align: right; }
+.table .w-actions { width: 140px; }
+
+/* Empty state + Loading */
+.empty {
+  text-align: center;
+  color: #494b50;
+  padding: 24px 0;
+}
+.loading {
+  padding: 12px;
+  color: #475569;
+}
+
+/* === Buttons (match modal scheme) ================================= */
+.btn {
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  min-width: 90px;
+  transition: all 0.2s ease;
+}
+.btn-sm {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+}
+
+/* Primary */
+.btn-primary {
+  background: #656ed3;            /* purple */
+  color: #ffffff;
+}
+.btn-primary:hover {
+  background: #656ed3;
+  transform: translateY(-1px);
+}
+.btn-primary:disabled {
+  background: #656ed3;
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Ghost (neutral) */
+.btn-ghost {
+  background: #F3F4F6;
+  color: black;
+}
+.btn-ghost:hover { background: #E5E7EB; }
+
+/* Outline (optional) */
+.btn-outline {
+  background: #ffffff;
+  color: #0f172a;
+  border: 2px solid black;
+}
+.btn-outline:hover { background: #F3F4F6; }
+
+/* Danger */
+.btn-danger {
+  background: #ef4444;
+  color: #fff;
+}
+.btn-danger:hover { filter: brightness(0.95); }
+
+/* === Modal (reuse dashboard modal, aligned to form scheme) ========= */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.35);
+  z-index: 1000;                        /* ensure behind shell/content */
+}
+.modal-shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  z-index: 1001;                        /* above backdrop */
+}
+.modal-content {
+  position: relative;                   /* <<< anchor for .modal-close */
+  width: min(860px, 92vw);              /* align with form max width */
+  background: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  padding: 16px;                        /* inner spacing to match list shell */
+}
+
+/* === Snackbars (reuse) ============================================ */
+.snack-success { background: #155724; color: #fff; }
+.snack-error   { background: #721c24; color: #fff; }
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Phones & small devices (≤ 480px) */
+@media (max-width: 480px) {
+  .list-shell { padding: 12px; }
+
+  .list-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    text-align: left;
+  }
+  .list-header h2 { font-size: 22px; }
+
+  .actions, .filters {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .filters input[type="month"],
+  .filters select {
+    width: 100%;
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .table-wrap { border-radius: 12px; }
+  .table th, .table td {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+  .table .w-actions { width: 96px; }
+
+  .btn { width: 100%; min-width: 0; }
+  .btn-sm { width: auto; } /* keep small buttons inline where needed */
+
+  .modal-shell { padding: 12px; }
+  .modal-content {
+    width: 96vw;
+    padding: 14px;
+    border-radius: 12px;
+  }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width: 360px) {
+  .list-header h2 { font-size: 20px; }
+  .table th, .table td { padding: 8px 10px; }
+  .table .w-actions { width: 88px; }
+}
+
+/* Small tablets (481px–767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .list-shell { padding: 14px; }
+
+  .list-header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .actions, .filters { flex-wrap: wrap; }
+  .filters input[type="month"],
+  .filters select { min-width: 180px; }
+
+  .table th, .table td { padding: 12px; font-size: 15px; }
+  .table .w-actions { width: 110px; }
+
+  .modal-shell { padding: 16px; }
+  .modal-content { width: 94vw; padding: 16px; }
+}
+
+/* Tablets (768px–1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .list-shell { padding: 16px 20px; max-width: 100%; }
+  .list-header h2 { font-size: 26px; }
+
+  .table th, .table td { padding: 12px 14px; }
+  .table .w-actions { width: 130px; }
+
+  .modal-content { width: min(820px, 92vw); padding: 20px; }
+}
+
+/* Small desktops (1025px–1279px) */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .list-shell { max-width: 1040px; }
+  .table .w-actions { width: 140px; }
+}
+
+/* Large desktops (≥ 1280px) */
+@media (min-width: 1280px) {
+  .list-shell { max-width: 1180px; }
+  .table th, .table td { padding: 14px 16px; }
+  .table .w-actions { width: 160px; }
+}
+
+/* Short landscape viewports (e.g., phones with keyboard open) */
+@media (max-height: 600px) and (orientation: landscape) {
+  .modal-shell { padding: 12px; }
+  .modal-content {
+    width: 96vw;
+    max-height: calc(100vh - 24px);
+  }
+}
+
+/* Close button for the modal */
+.modal-close{
+  position:absolute;
+  top:16px;
+  right:16px;
+  width:32px;
+  height:32px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  background:transparent;
+  color:#6B7280;        /* slate-500 */
+  border-radius:8px;
+  cursor:pointer;
+  line-height:1;
+  font-size:20px;       /* size of × if using text */
+  transition:background-color .2s ease,color .2s ease,transform .2s ease;
+  z-index: 10;          /* above modal contents */
+}
+.modal-close:hover{ background:#F3F4F6; color:#374151; }
+.modal-close:focus-visible{
+  outline:2px solid transparent;
+  box-shadow:0 0 0 3px rgba(139,127,247,0.20);
+}
+
+/* ---------- Responsive sizing for the close button ---------- */
+@media (max-width:480px){
+  .modal-close{ top:8px; right:8px; width:24px; height:24px; border-radius:6px; font-size:16px; }
+}
+@media (max-width:360px){
+  .modal-close{ top:6px; right:6px; width:22px; height:22px; font-size:14px; }
+}
+@media (min-width:481px) and (max-width:767px){
+  .modal-close{ top:12px; right:12px; width:28px; height:28px; font-size:18px; }
+}
+@media (max-height:600px) and (orientation:landscape){
+  .modal-close{ top:8px; right:8px; }
+}
+
+/* ============================================================
+   BUDGET LIST: NO HORIZONTAL SCROLL ON MOBILE
+   Converts the .table into stacked “cards” on small screens.
+   ============================================================ */
+
+/* Let content wrap and remove forced scrolling on narrower screens */
+@media (max-width: 900px) {
+  .table-wrap { overflow: visible; }
+  .table th, .table td {
+    white-space: normal;
+    text-overflow: clip;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Card layout on phones */
+@media (max-width: 640px) {
+  /* Hide headers; each cell gets its own label */
+  .table thead { display: none; }
+
+  .table,
+  .table tbody,
+  .table tr,
+  .table td { display: block; width: 100%; }
+
+  .table tr {
+    margin: 12px 12px 0;
+    background: #fff;
+    border: 1px solid #eef2f7;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.06);
+  }
+
+  /* Label–value grid inside each cell */
+  .table td {
+    display: grid;
+    grid-template-columns: 130px 1fr;   /* label | value */
+    gap: 8px;
+    border: 0;
+    padding: 8px 0;
+    align-items: center;
+    text-align: left !important;
+    min-width: 0;
+  }
+
+  /* Prefer data-label; if absent, fall back to nth-child labels.
+     Update the labels below to match your column order if needed. */
+  .table td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: #475569;
+  }
+  .table td:nth-child(1)::before { content: "Category"; }
+  .table td:nth-child(2)::before { content: "Budget"; }
+  .table td:nth-child(3)::before { content: "Spent"; }
+  .table td:nth-child(4)::before { content: "Remaining"; }
+  .table td:nth-child(5)::before { content: "Period"; }
+  .table td:nth-child(6)::before { content: "Actions"; }
+
+  /* Reset right-aligned numeric cells for stacked view */
+  .table .num { text-align: left; }
+
+  /* Actions row: keep buttons inline and wrap nicely */
+  .table .w-actions,
+  .table td:last-child {
+    width: auto;
+  }
+  .table td:last-child > * {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

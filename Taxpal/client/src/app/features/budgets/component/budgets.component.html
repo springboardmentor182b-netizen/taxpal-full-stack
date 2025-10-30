@@ -1,0 +1,89 @@
+<div class="budgets-container">
+  <main class="main-content">
+    <section class="form-section">
+      <div class="form-card" role="dialog" aria-labelledby="createBudgetTitle" aria-modal="true">
+        <div class="form-card-header">
+          <h2 id="createBudgetTitle" class="form-card-title">Create New Budget</h2>
+          <button class="icon-btn" type="button" aria-label="Close" (click)="goBack()">×</button>
+        </div>
+
+        <!-- Bind to Angular form -->
+        <form class="budget-form" [formGroup]="form" (ngSubmit)="onSubmit()" autocomplete="off">
+          <!-- Row 1: Category & Amount -->
+          <div class="grid grid-2">
+            <div class="form-group">
+              <label for="category">Category</label>
+              <div class="select-wrap" [class.invalid]="isInvalid('category')">
+                <select id="category" class="input" formControlName="category">
+                  <option value="" disabled>Select a category</option>
+                  <option *ngFor="let c of categories; trackBy: trackByCategory" [value]="c">{{ c }}</option>
+                </select>
+                <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" fill="none"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <small class="error" *ngIf="isInvalid('category')">Please choose a category.</small>
+            </div>
+
+            <div class="form-group">
+              <label for="amount">Budget Amount</label>
+              <div class="currency-wrap" [class.invalid]="isInvalid('amount')">
+                <span class="currency-prefix">$</span>
+                <input
+                  id="amount"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  placeholder="0.00"
+                  class="input pl-currency"
+                  formControlName="amount"
+                  inputmode="decimal"
+                  (keydown)="blockInvalidAmountKeys($event)"
+                  (input)="onAmountInput($event)"
+                  (wheel)="$event.target.blur()" />
+              </div>
+              <small class="error" *ngIf="isInvalid('amount')">Enter a non-negative amount.</small>
+            </div>
+          </div>
+
+          <!-- Row 2: Month -->
+          <div class="grid grid-1">
+            <div class="form-group">
+              <label for="month">Month</label>
+              <input
+                id="month"
+                type="month"
+                class="input"
+                formControlName="month"
+                [class.invalid]="isInvalid('month')" />
+              <small class="error" *ngIf="isInvalid('month')">Select the budget month.</small>
+            </div>
+          </div>
+
+          <!-- Row 3: Description -->
+          <div class="form-group">
+            <label for="description">Description (Optional)</label>
+            <textarea
+              id="description"
+              rows="4"
+              class="input textarea"
+              formControlName="description"
+              placeholder="Add any additional details..."></textarea>
+          </div>
+
+          <!-- Actions -->
+          <div class="actions">
+            <button type="button" class="btn btn-ghost" (click)="goBack()">Cancel</button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="form.invalid || submitting">
+              {{ submitting ? 'Saving…' : 'Create Budget' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+</div>

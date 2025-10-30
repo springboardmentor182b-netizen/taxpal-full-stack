@@ -1,0 +1,92 @@
+<div class="auth-layout">
+  <!-- Left Panel (Form) -->
+  <div class="auth-left">
+    <div class="brand">
+      <h1 class="brand-title">TaxPal</h1>
+      <p class="brand-subtitle">Sign in to continue</p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <!-- Username -->
+      <div class="form-group">
+        <label for="email" class="form-label">Username:</label>
+        <div class="input-wrap">
+          <input
+            type="email"
+            id="email"
+            formControlName="email"
+            class="form-input"
+            [class.error]="isFieldInvalid('email')"
+            placeholder="Enter your username"
+          />
+        </div>
+        <div *ngIf="getFieldError('email')" class="error-message">
+          {{ getFieldError('email') }}
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="form-group">
+        <label for="password" class="form-label">Password:</label>
+        <div class="input-wrap">
+          <input
+            [type]="showPassword() ? 'text' : 'password'"
+            id="password"
+            formControlName="password"
+            class="form-input has-toggle"
+            [class.error]="isFieldInvalid('password')"
+            placeholder="Enter your password"
+          />
+          <button
+            type="button"
+            class="password-toggle"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        <div *ngIf="getFieldError('password')" class="error-message">
+          {{ getFieldError('password') }}
+        </div>
+      </div>
+
+      <!-- Forgot password -->
+      <a
+        routerLink="/forgot-password"
+        class="signup-link"
+        style="align-self:flex-start;margin-top:4px;margin-bottom:6px; font-size: 15px;"
+        >Forgot password?</a
+      >
+
+      <!-- Global Error -->
+      <div *ngIf="errorMessage()" class="error-banner">
+        {{ errorMessage() }}
+      </div>
+
+      <!-- Submit -->
+      <button type="submit" class="login-button" [disabled]="isLoading() || loginForm.invalid">
+        <span *ngIf="!isLoading()">Login</span>
+        <span *ngIf="isLoading()">Signing in...</span>
+      </button>
+
+      <!-- Register -->
+      <p class="signup-note">
+        Don’t have an account?
+        <a routerLink="/register" class="signup-link">Register</a>
+      </p>
+    </form>
+
+    <div class="corner-blob" aria-hidden="true"></div>
+  </div>
+
+  <!-- Right Panel -->
+  <div class="auth-right">
+    <div class="artwrap">
+      <img
+        src="../../../../../assets/images/Login_bg_image.png"
+        alt="Tax planning illustration"
+        class="art"
+      />
+    </div>
+  </div>
+</div>

@@ -1,0 +1,213 @@
+<!-- ===== Mobile drawer overlay (same as Dashboard) ===== -->
+<div
+  class="drawer-overlay"
+  *ngIf="mobileNavOpen || showBudget"
+  (click)="mobileNavOpen ? closeMobileNav() : closeBudget()"
+  [class.open]="mobileNavOpen || showBudget">
+</div>
+
+<!-- ===== Sidebar ===== -->
+<div class="sidebar" [class.open]="mobileNavOpen" role="navigation" aria-label="Primary">
+  <button type="button" class="close-mobile" aria-label="Close menu" (click)="closeMobileNav()">✕</button>
+
+  <div>
+    <h1><strong>TaxPal</strong></h1>
+
+    <div class="menu">
+      <a
+        routerLink="/dashboard"
+        routerLinkActive="active"
+        #rlaDash="routerLinkActive"
+        [attr.aria-current]="rlaDash.isActive ? 'page' : null"
+        (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" fill="currentColor"/>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <a
+        routerLink="/transactions"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        #rlaTx="routerLinkActive"
+        [attr.aria-current]="rlaTx.isActive ? 'page' : null"
+        (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z" fill="currentColor" opacity=".25"/>
+          <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor" />
+          <path d="M15 11h7v2h-7z" fill="currentColor" opacity=".1" />
+        </svg>
+        <span>Transactions</span>
+      </a>
+
+      <a
+        routerLink="/tax-calendar"
+        routerLinkActive="active"
+        #rlaTax="routerLinkActive"
+        [attr.aria-current]="rlaTax.isActive ? 'page' : null"
+        (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 12h8M8 16h8M8 8h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Tax Estimator</span>
+      </a>
+
+      <a href="#" (click)="openBudget(); closeMobileNavIfSmall(); $event.preventDefault()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a9 9 0 1 0 9 9h-9V3Z" fill="currentColor" opacity=".2" />
+          <path d="M12 3v9h9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        </svg>
+        <span>Budgets</span>
+      </a>
+
+      <a
+        routerLink="/financial-reports"
+        routerLinkActive="active"
+        #rlaRep="routerLinkActive"
+        [attr.aria-current]="rlaRep.isActive ? 'page' : null"
+        (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 14h8M8 18h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Reports</span>
+      </a>
+    </div>
+  </div>
+
+  <div class="profile">
+    <div class="profile-top">
+      <div class="avatar">{{ firstInitial }}{{ secondInitial }}</div>
+      <div class="who">
+        <div class="name">{{ user?.name || 'User' }}</div>
+        <div class="email">{{ user?.email || '—' }}</div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a
+        [routerLink]="['/settings/categories']"
+        class="action"
+        routerLinkActive="active"
+        #rlaSet="routerLinkActive"
+        [attr.aria-current]="rlaSet.isActive ? 'page' : null"
+        (click)="closeMobileNavIfSmall()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96c-.62-.24-1.2-.57-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62-.24-1.2-.57-1.73-1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02 .67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53 .42 1.11 .76 1.73 1l.36 2.54a.5.5 0 0 0 .5 .43h3.84a.5.5 0 0 0 .5-.43l.36-2.54c.62-.24 1.2-.57 1.73-1l2.39 .96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
+        </svg>
+        <span>Settings</span>
+      </a>
+
+      <a href="#" class="action" (click)="auth.logout(); closeMobileNavIfSmall(); $event.preventDefault()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+        </svg>
+        <span>Log Out</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Main content (Transactions) ===== -->
+<div class="main">
+  <!-- Sticky top bar (title + actions) -->
+  <div class="top-bar top-bar--sticky">
+    <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">☰</button>
+
+    <h1><strong>Transactions</strong></h1>
+
+    <div>
+      <!-- <a routerLink="/dashboard" class="btn btn-outline">Back to Dashboard</a> -->
+      <button
+        class="btn btn-danger"
+        [disabled]="isDeletingAll() || isLoading() || !transactions().length"
+        (click)="deleteAllTransactions()">
+        {{ isDeletingAll() ? 'Deleting…' : 'Delete All' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Transactions List -->
+  <section class="transactions-section">
+    <div class="section-header">
+      <h2 class="section-title">Recent Transactions</h2>
+      <div class="section-actions">
+        <span class="transaction-count">{{ transactions().length }} transactions</span>
+      </div>
+    </div>
+
+    <div class="transactions-list">
+      <div *ngIf="isLoading()" class="loading-state">
+        <svg class="animate-spin h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p>Loading transactions...</p>
+      </div>
+
+      <div *ngIf="!isLoading() && transactions().length === 0" class="empty-state">
+        <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+        </svg>
+        <h3 class="empty-title">No transactions yet</h3>
+        <p class="empty-description">Start by adding your first transaction to track your finances.</p>
+      </div>
+
+      <div *ngIf="!isLoading() && transactions().length > 0" class="transactions-grid">
+        <div *ngFor="let transaction of transactions(); trackBy: trackById" class="transaction-card">
+          <div class="transaction-header">
+            <div class="transaction-type" [ngClass]="getTransactionTypeClass(transaction.type)">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      [attr.d]="getTransactionIcon(transaction.type)"></path>
+              </svg>
+              <span>{{ transaction.type === 'income' ? 'Income' : 'Expense' }}</span>
+            </div>
+
+            <div class="transaction-actions">
+              <button
+                class="action-button delete-button"
+                [disabled]="isDeleting(transaction._id)"
+                (click)="deleteTransaction(transaction._id)"
+                title="Delete transaction"
+                [attr.aria-label]="'Delete transaction ' + (transaction.description || transaction.category)">
+                <svg *ngIf="!isDeleting(transaction._id)" class="w-4 h-4" fill="none" stroke="currentColor"
+                     viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <svg *ngIf="isDeleting(transaction._id)" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none" opacity="0.25"></circle>
+                  <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" fill="none"></path>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="transaction-content">
+            <h4 class="transaction-category">{{ formatCategory(transaction.category) }}</h4>
+            <p class="transaction-amount" [ngClass]="transaction.type === 'income' ? 'text-green-600' : 'text-red-600'">
+              {{ transaction.type === 'income' ? '+' : '-' }}${{ transaction.amount.toFixed(2) }}
+            </p>
+            <p *ngIf="transaction.description" class="transaction-description">{{ transaction.description }}</p>
+            <p class="transaction-date">{{ transaction.date | date:'MMM d, y' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===== Budgets Modal ===== -->
+<div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <app-budgets-list></app-budgets-list>
+  </div>
+</div>

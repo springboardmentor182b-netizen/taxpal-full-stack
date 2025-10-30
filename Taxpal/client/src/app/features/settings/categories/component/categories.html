@@ -1,0 +1,138 @@
+<!-- Sidebar (acts as drawer on mobile/tablet) -->
+<div id="settings-sidebar" class="sidebar" [class.open]="mobileNavOpen">
+  <div class="logo">
+    <h1>Settings</h1>
+    <p>Manage your account settings and preferences</p>
+  </div>
+
+  <div class="menu-section" (click)="closeDrawer()">
+    <a class="menu-item" routerLink="/settings/profile" routerLinkActive="active">
+      <i></i> Profile
+    </a>
+    <a class="menu-item active" routerLink="/settings/categories" routerLinkActive="active">
+      <i></i> Categories
+    </a>
+  </div>
+</div>
+
+<!-- Drawer backdrop (mobile/tablet only) -->
+<div class="drawer-backdrop" [class.show]="mobileNavOpen" (click)="closeDrawer()"></div>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Sticky header -->
+  <div class="header header--sticky">
+    <div class="header-left">
+      <!-- Hamburger (hidden on desktop by CSS) -->
+      <button
+        type="button"
+        class="btn btn-menu"
+        aria-label="Open menu"
+        [attr.aria-expanded]="mobileNavOpen"
+        aria-controls="settings-sidebar"
+        (click)="toggleDrawer()"
+      >☰</button>
+
+      <h2>Category Management</h2>
+    </div>
+
+    <div class="user-actions">
+      <!-- <a
+        class="btn btn-settings"
+        routerLink="/dashboard"
+        aria-label="Close and go to dashboard"
+        title="Close"
+        (click)="closeDrawer()"
+      >Back to Dashboard</a> -->
+
+      <button class="btn btn-settings" (click)="loadCategories()" [disabled]="isLoading">
+        {{ isLoading ? 'Refreshing...' : 'Refresh' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Error / offline message -->
+  <div *ngIf="error" class="error-message" aria-live="polite">
+    {{ error }}
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading && categories.length === 0" class="loading-state">
+    Loading categories...
+  </div>
+
+  <div class="category-management" *ngIf="!isLoading || categories.length > 0">
+    <div class="category-section">
+      <h3>Expense Categories</h3>
+      <ul class="category-list" id="expense-categories">
+        <li
+          *ngFor="let category of getExpenseCategories(); trackBy: trackById"
+          class="category-item"
+          [class.edit-mode]="isEditing && currentEditId === category._id"
+          (click)="closeDrawer()"
+        >
+          <span class="category-name">{{ category.name }}</span>
+          <div class="category-actions">
+            <button class="edit-btn" (click)="startEdit(category._id!)" [disabled]="isLoading">Edit</button>
+            <button class="delete-btn" (click)="deleteCategory(category._id!)" [disabled]="isLoading">Delete</button>
+          </div>
+        </li>
+        <li *ngIf="getExpenseCategories().length === 0" class="no-categories">
+          No expense categories found
+        </li>
+      </ul>
+    </div>
+
+    <div class="category-section">
+      <h3>Income Categories</h3>
+      <ul class="category-list" id="income-categories">
+        <li
+          *ngFor="let category of getIncomeCategories(); trackBy: trackById"
+          class="category-item"
+          [class.edit-mode]="isEditing && currentEditId === category._id"
+          (click)="closeDrawer()"
+        >
+          <span class="category-name">{{ category.name }}</span>
+          <div class="category-actions">
+            <button class="edit-btn" (click)="startEdit(category._id!)" [disabled]="isLoading">Edit</button>
+            <button class="delete-btn" (click)="deleteCategory(category._id!)" [disabled]="isLoading">Delete</button>
+          </div>
+        </li>
+        <li *ngIf="getIncomeCategories().length === 0" class="no-categories">
+          No income categories found
+        </li>
+      </ul>
+    </div>
+
+    <div class="add-category-form">
+      <h3>{{ isEditing ? 'Update Category' : 'Add New Category' }}</h3>
+
+      <div class="form-group">
+        <label for="category-name">Category Name</label>
+        <input
+          id="category-name"
+          type="text"
+          [(ngModel)]="categoryName"
+          [disabled]="isLoading"
+          placeholder="Enter category name"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="category-type">Category Type</label>
+        <select id="category-type" [(ngModel)]="categoryType" [disabled]="isLoading">
+          <option value="expense">Expense</option>
+          <option value="income">Income</option>
+        </select>
+      </div>
+
+      <button class="btn-add" (click)="handleAddCategory()" [disabled]="isLoading || !categoryName.trim()">
+        {{ isLoading ? 'Processing...' : (isEditing ? 'Update Category' : 'Add Category') }}
+      </button>
+
+      <button *ngIf="isEditing" class="btn-cancel" (click)="cancelEdit()" [disabled]="isLoading">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,194 @@
+<!-- Split Auth Layout (same look as Login) -->
+<div class="auth-layout">
+  <!-- LEFT : Form -->
+  <section class="auth-left">
+    <div class="brand">
+      <h1 class="brand-title">TaxPal</h1>
+      <p class="brand-subtitle">Create your account to get started</p>
+    </div>
+
+    <div class="register-card">
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="register-form">
+        <!-- Name -->
+        <div class="form-group">
+          <label for="name" class="form-label">Full Name</label>
+          <div class="input-container">
+            <input
+              type="text"
+              id="name"
+              formControlName="name"
+              class="form-input"
+              [class.error]="isFieldInvalid('name')"
+              placeholder="Enter your full name"
+              autocomplete="name"
+            />
+          </div>
+          <div *ngIf="getFieldError('name')" class="error-message">
+            {{ getFieldError('name') }}
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email" class="form-label">Email Address</label>
+          <div class="input-container">
+            <input
+              type="email"
+              id="email"
+              formControlName="email"
+              class="form-input"
+              [class.error]="isFieldInvalid('email')"
+              placeholder="Enter your email"
+              autocomplete="email"
+            />
+          </div>
+          <div *ngIf="getFieldError('email')" class="error-message">
+            {{ getFieldError('email') }}
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="form-group">
+          <label for="password" class="form-label">Password</label>
+          <div class="input-container">
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              id="password"
+              formControlName="password"
+              class="form-input has-toggle"
+              [class.error]="isFieldInvalid('password')"
+              placeholder="Create a password"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+              <svg *ngIf="!showPassword()" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg *ngIf="showPassword()" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="getFieldError('password')" class="error-message">
+            {{ getFieldError('password') }}
+          </div>
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">Confirm Password</label>
+          <div class="input-container">
+            <input
+              [type]="showConfirmPassword() ? 'text' : 'password'"
+              id="confirmPassword"
+              formControlName="confirmPassword"
+              class="form-input has-toggle"
+              [class.error]="isFieldInvalid('confirmPassword')"
+              placeholder="Confirm your password"
+              autocomplete="new-password"
+            />
+            <button
+              type="button"
+              class="password-toggle"
+              (click)="toggleConfirmPasswordVisibility()"
+              [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'">
+              <svg *ngIf="!showConfirmPassword()" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+              </svg>
+              <svg *ngIf="showConfirmPassword()" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"/>
+              </svg>
+            </button>
+          </div>
+          <div *ngIf="getFieldError('confirmPassword')" class="error-message">
+            {{ getFieldError('confirmPassword') }}
+          </div>
+        </div>
+
+        <!-- Country -->
+        <div class="form-group">
+          <label for="country" class="form-label">Country</label>
+          <select
+            id="country"
+            formControlName="country"
+            class="form-input"
+            [class.error]="isFieldInvalid('country')">
+            <option value="US">United States</option>
+            <option value="CA">Canada</option>
+            <option value="UK">United Kingdom</option>
+            <option value="AU">Australia</option>
+          </select>
+          <div *ngIf="getFieldError('country')" class="error-message">
+            {{ getFieldError('country') }}
+          </div>
+        </div>
+
+        <!-- Income Bracket -->
+        <div class="form-group">
+          <label for="income_bracket" class="form-label">Income Bracket</label>
+          <select
+            id="income_bracket"
+            formControlName="income_bracket"
+            class="form-input"
+            [class.error]="isFieldInvalid('income_bracket')">
+            <option value="low">Low Income</option>
+            <option value="middle">Middle Income</option>
+            <option value="high">High Income</option>
+          </select>
+          <div *ngIf="getFieldError('income_bracket')" class="error-message">
+            {{ getFieldError('income_bracket') }}
+          </div>
+        </div>
+
+        <!-- Error banner -->
+        <div *ngIf="errorMessage()" class="error-banner">
+          <svg class="error-icon" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"/>
+          </svg>
+          {{ errorMessage() }}
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          class="register-button"
+          [disabled]="isLoading() || registerForm.invalid">
+          <span *ngIf="!isLoading()">Create Account</span>
+          <span *ngIf="isLoading()" class="loading-content">
+            <svg class="animate-spin" width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" opacity=".25"></circle>
+              <path d="M4 12a8 8 0 018-8" fill="currentColor" opacity=".75"></path>
+            </svg>
+            Creating account...
+          </span>
+        </button>
+      </form>
+
+      <div class="signin-link">
+        <p>Already have an account? <a routerLink="/login" class="signin-text">Sign in</a></p>
+      </div>
+    </div>
+
+    <span class="corner-blob" aria-hidden="true"></span>
+  </section>
+
+  <!-- RIGHT : Illustration -->
+  <aside class="auth-right">
+    <div class="artwrap">
+      <!-- use the same illustration you used on login -->
+      <img class="art" src="../../../../../assets/images/Register_bg-image.png" alt="Tax illustration" />
+    </div>
+  </aside>
+</div>

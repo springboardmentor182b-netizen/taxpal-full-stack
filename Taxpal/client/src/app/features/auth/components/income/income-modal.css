@@ -1,0 +1,314 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.close-btn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  color: #6B7280;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #F3F4F6;
+  color: #374151;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.modal-header h2 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #656ed3;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.modal-header p {
+  font-size: 16px;
+  color: #323236;
+  margin: 0;
+  font-weight: 400;
+}
+
+.form-container h3 {
+  font-size: 32px;
+  font-weight: 600;
+  color: #656ed3;
+  margin: 0 0 32px 0;
+  letter-spacing: -0.02em;
+}
+
+/* =========================
+   GRID + ALIGNMENT FIXES
+   ========================= */
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)); /* equal, shrinkable tracks */
+  gap: 24px;
+  margin-bottom: 24px;
+  align-items: start;
+}
+
+/* every direct child in the grid stretches and allows its inputs to fill */
+.form-row > * {
+  min-width: 0;                 /* critical for equal widths */
+  display: flex;
+  flex-direction: column;
+}
+
+/* wrappers for amount/date must stretch too */
+.amount-input,
+.date-input {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  min-width: 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.form-group label {
+  font-size: 16px;
+  font-weight: 600;
+  color: #111113;
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* normalize control widths & heights so rows align perfectly */
+.form-group input,
+.form-group select,
+.form-group textarea,
+.amount-input input,
+.date-input input {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-height: 52px;             /* same visual height across inputs/selects */
+  padding: 14px 16px;
+  border: 2px solid black ;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #e8e9ec;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+  line-height: 1.25;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 120px;
+  grid-column: 1 / -1;          /* Notes spans full width like budget form */
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus,
+.amount-input input:focus,
+.date-input input:focus {
+  outline: none;
+  border-color: #8B7FF7;
+  box-shadow: 0 0 0 3px rgba(139, 127, 247, 0.1);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+  color: #494b50;
+}
+
+/* currency + calendar icons */
+.currency {
+  position: absolute;
+  left: 16px;
+  color: #717681;
+  font-size: 16px;
+  font-weight: 500;
+  z-index: 1;
+}
+.amount-input input { padding-left: 32px; }
+
+.calendar-icon {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  pointer-events: none;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.btn-cancel,
+.btn-save {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  min-width: 100px;
+}
+
+.btn-cancel {
+  background: #F3F4F6;
+  color: black;
+}
+.btn-cancel:hover {
+  background: #E5E7EB;
+  color: black;
+}
+
+.btn-save {
+  background: #656ed3;
+  color: white;
+}
+.btn-save:hover:not(:disabled) {
+  background: #656ed3;
+  transform: translateY(-1px);
+}
+.btn-save:disabled {
+  background: #656ed3;
+  cursor: not-allowed;
+}
+
+/* ------------------------------
+   RESPONSIVE MEDIA QUERIES
+   ------------------------------ */
+
+/* Phones & small devices (≤ 480px) */
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 16px;
+    margin: 14px;
+    border-radius: 12px;
+  }
+  .modal-header { margin-bottom: 20px; }
+  .modal-header h2 { font-size: 22px; }
+  .modal-header p  { font-size: 14px; }
+  .form-container h3 { font-size: 22px; margin-bottom: 20px; }
+
+  .form-row { grid-template-columns: 1fr; gap: 14px; }
+  .form-group textarea { grid-column: 1 / -1; }
+
+  .form-actions { flex-direction: column; gap: 12px; }
+  .btn-cancel, .btn-save { width: 100%; min-width: 0; }
+
+  /* keep close icon from overlapping the title */
+  .close-btn {
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    font-size: 16px; /* if × is text */
+  }
+}
+
+/* Very small phones (≤ 360px) */
+@media (max-width: 360px) {
+  .modal-content { padding: 14px; margin: 12px; }
+  .modal-header h2 { font-size: 20px; }
+  .close-btn { top: 8px; right: 8px; width: 22px; height: 22px; font-size: 14px; }
+}
+
+/* Small tablets (481px–767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+  .modal-content { padding: 20px; margin: 18px; }
+  .form-row { grid-template-columns: 1fr; gap: 16px; }
+  .close-btn { top: 12px; right: 12px; width: 28px; height: 28px; font-size: 18px; }
+}
+
+/* Tablets (768px–1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .modal-content { padding: 28px; margin: 24px; max-width: 720px; }
+  .form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+}
+
+/* Small desktops (1025px–1279px) */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .modal-content { max-width: 900px; }
+  .form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+}
+
+/* Large desktops (≥ 1280px) */
+@media (min-width: 1280px) {
+  .modal-content { max-width: 960px; }
+  .form-row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+}
+
+/* Ultra-wide (≥ 1440px) – optional 3 columns for dense forms */
+@media (min-width: 1440px) {
+  .modal-content { max-width: 1024px; }
+  .form-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+}
+
+/* Short landscape viewports */
+@media (max-height: 600px) and (orientation: landscape) {
+  .modal-content {
+    max-height: calc(100vh - 32px);
+    margin: 12px;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .modal-header { margin-bottom: 20px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .close-btn,
+  .btn-cancel,
+  .btn-save,
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    transition: none !important;
+  }
+}

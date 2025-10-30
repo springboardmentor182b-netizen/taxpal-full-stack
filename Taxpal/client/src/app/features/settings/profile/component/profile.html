@@ -1,0 +1,98 @@
+<!-- Sidebar (drawer on mobile/tablet) -->
+<div class="sidebar" [class.open]="mobileNavOpen">
+  <div class="logo">
+    <h1>Settings</h1>
+    <p>Manage your account settings and preferences</p>
+  </div>
+
+  <div class="menu-section" (click)="closeDrawer()">
+    <a class="menu-item active" routerLink="/settings/profile" routerLinkActive="active">
+      <i></i> Profile
+    </a>
+    <a class="menu-item" routerLink="/settings/categories" routerLinkActive="active">
+      <i></i> Categories
+    </a>
+  </div>
+</div>
+
+<!-- Backdrop for drawer -->
+<div class="drawer-backdrop" [class.show]="mobileNavOpen" (click)="closeDrawer()"></div>
+
+<div class="main-content">
+  <!-- ✅ Sticky header -->
+  <div class="header header--sticky">
+    <div class="header-left">
+      <!-- Hamburger (only shows on ≤1024px) -->
+      <button
+        type="button"
+        class="btn-menu"
+        aria-label="Open menu"
+        [attr.aria-expanded]="mobileNavOpen"
+        (click)="toggleDrawer()"
+      >☰</button>
+
+      <h2>Profile</h2>
+    </div>
+
+    <!-- ✕ Close button (top-right) -->
+    <div class="user-actions">
+      <a
+        class="btn-icon close-btn"
+        routerLink="/dashboard"
+        aria-label="Close and go to dashboard"
+        title="Close"
+        (click)="closeDrawer()"
+      >✕</a>
+    </div>
+  </div>
+
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+  <div *ngIf="loading" class="loading-state">Loading profile…</div>
+
+  <div class="profile-card" *ngIf="!loading">
+    <div class="avatar-row">
+      <div class="avatar">{{ (model.name || 'U').charAt(0) }}</div>
+      <div class="user-meta">
+        <div class="user-name">{{ model.name || 'User' }}</div>
+        <div class="user-email">{{ model.email }}</div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="field">
+        <label>Full name</label>
+        <input [readonly]="viewOnly" [(ngModel)]="model.name" type="text" placeholder="Your full name" />
+      </div>
+
+      <div class="field">
+        <label>Email address</label>
+        <input [readonly]="viewOnly" [(ngModel)]="model.email" type="email" placeholder="you@example.com" />
+      </div>
+
+      <div class="field">
+        <label>Country</label>
+        <input [readonly]="viewOnly" [(ngModel)]="model.country" type="text" placeholder="US" />
+      </div>
+
+      <div class="field">
+        <label>Income bracket</label>
+        <select [disabled]="viewOnly" [(ngModel)]="model.income_bracket">
+          <option value="low">Low</option>
+          <option value="middle">Middle</option>
+          <option value="high">High</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button *ngIf="viewOnly" class="btn btn-primary" (click)="enableEdit()">Edit Profile</button>
+
+      <ng-container *ngIf="!viewOnly">
+        <button class="btn btn-primary" (click)="save()" [disabled]="saving">
+          {{ saving ? 'Saving…' : 'Update Profile' }}
+        </button>
+        <button class="btn btn-secondary" (click)="cancel()" [disabled]="saving">Cancel</button>
+      </ng-container>
+    </div>
+  </div>
+</div>

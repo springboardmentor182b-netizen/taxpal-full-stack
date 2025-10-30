@@ -1,0 +1,149 @@
+<!-- Mobile drawer overlay -->
+<div
+  class="drawer-overlay"
+  *ngIf="mobileNavOpen"
+  (click)="closeMobileNav()"
+  [class.open]="mobileNavOpen">
+</div>
+
+<!-- Sidebar (acts as off-canvas on small screens) -->
+<div class="sidebar" [class.open]="mobileNavOpen" role="navigation" aria-label="Primary">
+  <!-- Mobile close button -->
+  <button type="button" class="close-mobile" aria-label="Close menu" (click)="closeMobileNav()">✕</button>
+
+  <div>
+    <h1><strong>TaxPal</strong></h1>
+
+    <div class="menu">
+      <!-- Dashboard -->
+      <a routerLink="/dashboard" (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1v-9.5Z" fill="currentColor"/>
+        </svg>
+        <span>Dashboard</span>
+      </a>
+
+      <!-- Transactions -->
+      <a routerLink="/transactions" (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z" fill="currentColor" opacity=".25"/>
+          <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor" />
+          <path d="M15 11h7v2h-7z" fill="currentColor" opacity=".1" />
+        </svg>
+        <span>Transactions</span>
+      </a>
+
+      <!-- Tax Estimator -->
+      <a routerLink="/tax-calendar" (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 12h8M8 16h8M8 8h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Tax Estimator</span>
+      </a>
+
+      <!-- Budgets (opens modal) -->
+      <a href="#" (click)="openBudget(); closeMobileNavIfSmall(); $event.preventDefault()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 3a9 9 0 1 0 9 9h-9V3Z" fill="currentColor" opacity=".2" />
+          <path d="M12 3v9h9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.2" fill="none"/>
+        </svg>
+        <span>Budgets</span>
+      </a>
+
+      <!-- Reports -->
+      <a routerLink="/financial-reports" (click)="closeMobileNavIfSmall()">
+        <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
+          <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
+          <path d="M8 14h8M8 18h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span>Reports</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Profile -->
+  <div class="profile">
+    <div class="profile-top">
+      <div class="avatar">{{ firstInitial }}{{ secondInitial }}</div>
+      <div class="who">
+        <div class="name">{{ user?.name || 'User' }}</div>
+        <div class="email">{{ user?.email || '—' }}</div>
+      </div>
+    </div>
+
+    <div class="profile-actions">
+      <a [routerLink]="['/settings/categories']" class="action" (click)="closeMobileNavIfSmall()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M19.14 12.94a7.96 7.96 0 0 0 .06-1 7.96 7.96 0 0 0-.06-1l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96c-.62-.24-1.2-.57-1.73-1l-.36-2.54a.5.5 0 0 0-.5-.43h-3.84a.5.5 0 0 0-.5.43l-.36 2.54c-.62-.24-1.2-.57-1.73-1l-2.39-.96a.5.5 0 0 0-.6.22L2.77 8.72a.5.5 0 0 0 .12.64L4.92 11a7.96 7.96 0 0 0-.06 1c0 .34.02 .67.06 1l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32a.5.5 0 0 0 .6.22l2.39-.96c.53 .42 1.11 .76 1.73 1l.36 2.54a.5.5 0 0 0 .5 .43h3.84a.5.5 0 0 0 .5-.43l-.36-2.54c.62-.24 1.2-.57 1.73-1l2.39 .96a.5.5 0 0 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64L19.14 12.94ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"/>
+        </svg>
+        <span>Settings</span>
+      </a>
+
+      <a href="#" class="action" (click)="auth.logout(); closeMobileNavIfSmall(); $event.preventDefault()">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M16 17v-2h-5v-2h5V11l3 3-3 3ZM4 20h8a2 2 0 0 0 2-2v-2h-2v2H4V6h8v2h2V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2Z"/>
+        </svg>
+        <span>Log Out</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- Main -->
+<div class="main">
+  <!-- Top bar (sticky) -->
+  <div class="top-bar">
+    <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">☰</button>
+    <h1><strong>Report Preview</strong></h1>
+    <div></div>
+  </div>
+
+  <!-- Keep the original close button (top-right) -->
+  <button
+    type="button"
+    aria-label="Close"
+    (click)="onClose()"
+    title="Close"
+    class="close-x">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M6 6l12 12M18 6L6 18" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div class="page">
+    <section class="card">
+      <div class="toolbar">
+        <button class="btn" (click)="print()" [disabled]="!previewable || loading">Print</button>
+        <button class="btn btn-primary" (click)="download()" [disabled]="loading">Download</button>
+      </div>
+
+      <div class="preview" *ngIf="!loading && previewable && previewUrl">
+        <iframe [src]="previewUrl" title="report preview"></iframe>
+      </div>
+
+      <div class="preview placeholder" *ngIf="!loading && !previewable">
+        <div class="empty-icon">📄</div>
+        <div class="empty-text">
+          Select a report to preview<br/>
+          <small>Generated reports will appear here for review before downloading</small><br/>
+          <small>(CSV/XLSX don’t support inline preview – use Download)</small>
+        </div>
+      </div>
+
+      <div *ngIf="loading" class="loading">Building preview…</div>
+      <p class="error" *ngIf="errorMsg">{{ errorMsg }}</p>
+    </section>
+  </div>
+
+  <!-- Budget Modal -->
+  <div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
+  <div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <app-budgets-list></app-budgets-list>
+    </div>
+  </div>
+</div>

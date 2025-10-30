@@ -1,0 +1,245 @@
+/* ================== Color System (your requested scheme) ================== */
+:root{
+  --primary:#656ED3;      /* 1 */
+  --primary-light:#AFB3FF;/* 3 */
+  --primary-dark:#534CA4; /* 4 */
+  --accent:#838CF1;       /* 8 */
+  --surface:#FBFBFB;      /* 2/10 */
+  --surface-2:#EBEFFF;    /* 9 */
+  --ink-1000:#000000;     /* 5 */
+  --ink-900:#1A1A1A;      /* 7 */
+  --ink-700:#25295A;      /* 6 */
+  --border:#EBEFFF;       /* 9 */
+}
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overflow-x:hidden}
+
+/* Sidebar (pinned on desktop, drawer on ≤1024px) */
+.sidebar{
+  width:250px;background-color:var(--ink-700);color:#fff;padding:20px 0;height:100vh;position:fixed;left:0;top:0;overflow-y:auto;
+  z-index:1100; /* sits above sticky header and backdrop */
+  transition:transform .25s ease;
+}
+.logo{padding:0 20px 20px;border-bottom:1px solid var(--primary-light);margin-bottom:20px}
+.logo h1{font-size:24px;font-weight:600;color:#fff}
+.logo p{font-size:14px;color:var(--primary-light);margin-top:5px}
+.menu-section{margin-bottom:30px}
+.menu-item{padding:12px 20px;cursor:pointer;transition:background-color .2s,color .2s;display:flex;align-items:center;color:#fff;text-decoration:none}
+.menu-item:hover{background-color:var(--primary-dark)}
+.menu-item.active{background-color:var(--primary);border-left:4px solid var(--primary-light)}
+.menu-item i{margin-right:10px;width:20px;text-align:center}
+
+/* Drawer backdrop (mobile/tablet only, shown when sidebar is open) */
+.drawer-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1095; /* above sticky header, below sidebar */
+  opacity:0;pointer-events:none;transition:opacity .2s ease;
+}
+.drawer-backdrop.show{opacity:1;pointer-events:auto}
+
+/* Main content fills the remaining width on desktop */
+.main-content{
+  margin-left:250px;width:calc(100vw - 250px);max-width:calc(100vw - 250px);
+  padding:30px;background-color:var(--surface);box-sizing:border-box;min-height:100vh;
+}
+
+/* Header */
+.header{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border);width:100%;
+}
+.header h2{color:var(--ink-700);font-weight:600;font-size:28px}
+.header-left{display:flex;align-items:center;gap:12px;}
+.user-actions{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+
+/* ✅ Sticky header (never overlaps with drawer or modals due to z-index ladder) */
+.header--sticky{
+  position:sticky;top:0;z-index:1080; /* below drawer/backdrop, above page content */
+  background:var(--surface);
+  padding-top:14px; /* extra breathing so the border aligns nicely when stuck */
+}
+
+/* Buttons */
+.btn{padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:500;transition:all .2s;border:none;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.btn-settings{background-color:var(--surface);color:var(--primary);border:1px solid var(--primary)}
+.btn-settings:hover{background-color:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-logout{background-color:var(--primary);color:#fff}
+.btn-logout:hover{background-color:var(--primary-dark)}
+
+/* Mobile hamburger (visibility controlled in media queries) */
+.btn-menu{
+  height:38px;width:38px;border-radius:8px;border:1px solid var(--border);
+  background:#5c62d6; color:#fff;cursor:pointer;font-size:20px;line-height:1;
+  align-items:center;justify-content:center;
+}
+.btn-menu:hover{background:var(--surface-2)}
+
+/* Icon-style button (used by ✕ close) */
+.btn-icon{padding:0;width:38px;height:38px;border-radius:10px;font-size:20px;line-height:1;text-align:center}
+
+/* Hide hamburger by default on desktop */
+.btn.btn-menu{display:none}
+
+/* Category management container */
+.category-management{
+  background-color:#fff;border-radius:12px;padding:30px;box-shadow:0 4px 20px rgba(0,0,0,.08);
+  width:100%;max-width:100%
+}
+.category-section{margin-bottom:30px}
+.category-section h3{color:var(--primary);margin-bottom:20px;font-weight:600;font-size:20px}
+
+/* Full-width list */
+.category-list{
+  list-style:none;display:grid;grid-template-columns:1fr;gap:16px;padding:0;width:100%;max-width:100%
+}
+.category-item{
+  padding:15px 20px;border:1px solid var(--border);border-radius:12px;margin:0;
+  display:flex;justify-content:space-between;align-items:center;transition:all .2s;background-color:#fff;width:100%;
+  flex-wrap:nowrap;
+}
+.category-item:hover{background-color:var(--surface-2);border-color:var(--primary-light);transform:translateY(-1px)}
+.category-item.edit-mode{background-color:var(--surface-2);border-color:var(--primary)}
+.category-name{font-weight:500;color:var(--ink-900);overflow-wrap:anywhere}
+.category-actions{display:flex;gap:16px;flex-wrap:wrap}
+.category-actions button{background:none;border:none;cursor:pointer;color:var(--ink-900);font-size:14px;padding:6px 12px;border-radius:6px;transition:all .2s}
+.category-actions .edit-btn:hover{color:var(--primary);background-color:rgba(101,110,211,.12)}
+.category-actions .delete-btn:hover{color:#e53e3e;background-color:rgba(229,62,62,.1)}
+
+/* Add/Edit form */
+.add-category-form{
+  margin-top:40px;padding:25px;background-color:var(--surface-2);border-radius:12px;border:1px solid var(--border);
+  width:100%;max-width:100%
+}
+.add-category-form h3{color:var(--ink-700);margin-bottom:20px;font-size:18px}
+.form-group{margin-bottom:20px}
+.form-group label{display:block;margin-bottom:8px;font-weight:500;color:var(--ink-900)}
+.form-group input,.form-group select{
+  width:100%;padding:12px;border:1px solid var(--border);border-radius:8px;font-size:14px;
+  transition:border-color .2s,box-shadow .2s,background-color .2s;background-color:#fff;color:var(--ink-900)
+}
+.form-group input:focus,.form-group select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 3px rgba(101,110,211,.18)}
+.btn-add{background-color:var(--primary);color:#fff;padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-weight:500;font-size:14px;transition:background-color .2s,transform .06s ease-in}
+.btn-add:hover{background-color:var(--primary-dark)}
+.btn-add:active{transform:translateY(1px)}
+.btn-cancel{background-color:var(--primary-light);color:var(--ink-700);padding:12px 24px;border:none;border-radius:8px;cursor:pointer;font-weight:500;font-size:14px;margin-left:10px;transition:background-color .2s}
+.btn-cancel:hover{background-color:#cfd4ff}
+
+/* States */
+.loading-state{text-align:center;padding:20px;color:var(--primary);font-style:italic}
+.error-message{background-color:#fed7d7;color:#c53030;padding:12px;border-radius:6px;margin-bottom:20px;border-left:4px solid #fc8181}
+.no-categories{text-align:center;padding:20px;color:var(--ink-900);font-style:italic;background-color:var(--surface-2);border-radius:6px}
+button:disabled{opacity:.6;cursor:not-allowed}
+input:disabled,select:disabled{opacity:.6;background-color:var(--surface-2);color:var(--ink-900)}
+button[aria-label="Close"]:hover svg{stroke:var(--primary)}
+
+/* ===== Modal / Dialog z-index (sits above everything) ===== */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(1px);z-index:1300;}
+.modal-shell{position:fixed;inset:0;padding:24px;display:flex;align-items:center;justify-content:center;z-index:1305;}
+.modal-content{
+  width:min(96vw,880px);max-height:88vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;
+  box-shadow:0 20px 25px -5px rgba(0,0,0,.10), 0 10px 10px -5px rgba(0,0,0,.04);
+  z-index:1310;
+}
+/* Optional: prevent background scroll if you toggle a class in TS */
+.main-content.modal-open{overflow:hidden;max-height:100vh}
+
+/* =========================
+   RESPONSIVE MEDIA QUERIES
+   ========================= */
+
+/* Large tablets / small desktops (≤1280px): relax paddings, allow 2-column lists */
+@media (max-width:1280px){
+  .main-content{padding:24px}
+  .category-list{grid-template-columns:repeat(2,minmax(260px,1fr))}
+}
+
+/* Phones & tablets (≤1024px): use drawer + show hamburger */
+@media (max-width:1024px){
+  .btn.btn-menu{display:inline-flex}
+
+  .sidebar{
+    width:min(86vw,320px);
+    transform:translateX(-100%);
+    box-shadow:0 10px 40px rgba(0,0,0,.25);
+  }
+  .sidebar.open{transform:translateX(0)}
+
+  .main-content{
+    margin-left:0;width:100vw;max-width:100vw;
+    padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .header{padding-bottom:14px;margin-bottom:20px}
+  .header h2{font-size:24px}
+
+  .user-actions{gap:12px}
+  .category-list{grid-template-columns:1fr}
+
+  /* Keep actions on the same row as the name on mobile */
+  .category-item{
+    flex-direction:row;
+    align-items:center;
+    gap:12px;
+    flex-wrap:nowrap;
+  }
+  .category-name{flex:1;min-width:0;}
+  .category-actions{
+    align-self:auto;
+    margin-left:auto;
+    display:flex;
+    gap:16px;
+    flex-wrap:nowrap;
+  }
+
+  .btn-settings.btn-icon{width:34px;height:34px;font-size:18px}
+}
+
+/* Phablets (≤768px): stack header sections and spread buttons */
+@media (max-width:768px){
+  .header{flex-direction:column;align-items:stretch;gap:10px}
+  .header-left{justify-content:space-between}
+  .user-actions{justify-content:flex-start}
+  .category-management{padding:24px}
+}
+
+/* Small phones (≤600px): full-width buttons, tighter cards */
+@media (max-width:600px){
+  .header h2{font-size:22px}
+  .btn-settings{padding:9px 12px}
+  .user-actions .btn{width:100%}
+  .user-actions{gap:10px}
+
+  .category-management{padding:20px}
+  .category-item{padding:12px 14px}
+  .category-actions{gap:10px}
+}
+
+/* Very small phones (≤480px) */
+@media (max-width:480px){
+  .btn-settings.btn-icon{width:28px;height:28px;font-size:16px;border-radius:8px}
+  .add-category-form .btn-add,
+  .add-category-form .btn-cancel{display:block;width:100%;margin-left:0}
+  .add-category-form .btn-cancel{margin-top:12px}
+}
+
+/* Tiny phones (≤360px) */
+@media (max-width:360px){
+  .header h2{font-size:20px}
+  .category-actions button{padding:6px 10px;font-size:13px}
+}
+
+/* ≥1440px: breathing room */
+@media (min-width:1440px){
+  .main-content{padding:36px}
+  .category-list{grid-template-columns:repeat(2,minmax(300px,1fr))}
+}
+
+/* Short landscape viewports */
+@media (max-height:600px) and (orientation:landscape){
+  .header{margin-bottom:16px}
+  .category-management{padding:22px}
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}

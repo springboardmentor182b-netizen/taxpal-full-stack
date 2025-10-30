@@ -1,0 +1,213 @@
+:root{
+  --primary:#656ED3;
+  --bg:#FBFBFB;
+  --panel:#EBEFFF;
+  --panel-2:#FBFBFB;
+  --ink:#25295A;
+  --ink-2:#1A1A1A;
+}
+
+/* ====== App layout (match Dashboard) ====== */
+:host{
+  display:flex;
+  height:100vh;
+  overflow:hidden;
+  font-family:Arial, sans-serif;
+  background:var(--bg);
+}
+
+/* ---------------- Sidebar (desktop default) ---------------- */
+.sidebar{
+  width:250px;
+  background:#FBFBFB;
+  color:#25295A;
+  height:100%;
+  padding:15px 0;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+  flex-shrink:0;
+  position:relative; /* for the mobile close button */
+}
+.sidebar h1{
+  text-align:center;
+  margin-bottom:20px;
+  color:#25295A;
+  font-size:34px;
+}
+.menu a{
+  display:flex; align-items:center; gap:10px;
+  color:#25295A; padding:10px 15px; text-decoration:none;
+  font-size:16px; border-radius:8px;
+}
+.menu a:hover{ background:#534CA4; color:#FBFBFB; }
+.menu a .nav-ic{ width:18px; height:18px; flex:0 0 18px; color:currentColor; }
+
+/* Profile */
+.profile{
+  margin-top:auto; padding:12px 12px 8px; border-top:1px solid #e9e9ef;
+  background:#F5F6FF; border-radius:10px; margin:12px;
+}
+.profile-top{ display:grid; grid-template-columns:44px 1fr; gap:10px; align-items:center; }
+.avatar{
+  width:44px; height:44px; border-radius:50%;
+  display:grid; place-items:center; font-weight:700; color:#fff; background:#5c62d6;
+  letter-spacing:.5px;
+}
+.who .name{ font-weight:700; color:#2d335f; line-height:1.2; }
+.who .email{ font-size:12px; color:#6c6f91; margin-top:2px; word-break:break-all; }
+.profile-actions{
+  display:grid; grid-template-columns:1fr 1fr; gap:8px 14px; padding:10px 2px 2px; margin-top:6px;
+}
+.profile-actions .action{
+  display:inline-flex; align-items:center; gap:8px; text-decoration:none; font-size:14px;
+  color:#404574; padding:4px 2px; border-radius:8px; transition:background .15s ease, color .15s ease;
+}
+.profile-actions .action:hover{ background:#ECEEFF; color:#2d335f; }
+.profile-actions .action svg{ width:18px; height:18px; fill:currentColor; }
+
+/* Drawer overlay (for mobile) */
+.drawer-overlay{
+  position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(1px);
+  z-index:998; display:none;
+}
+.close-mobile{
+  display:none; position:absolute; right:10px; top:10px; width:30px; height:30px;
+  border-radius:8px; border:1px solid #e6e8ff; background:#fff; color:#25295A;
+  cursor:pointer; font-size:18px;
+}
+
+/* ---------------- Main content ---------------- */
+.main{
+  flex:1; padding:15px; display:flex; flex-direction:column; gap:10px;
+  overflow:auto; background:#EBEFFF; margin-left:0;
+}
+
+/* Sticky header bar */
+.top-bar{
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  position:sticky; top:0;
+  z-index:996;                  /* below drawer overlay (998) & mobile sidebar (999), above page content */
+  background:#EBEFFF;           /* solid bg so content doesn’t show through */
+  border-bottom:1px solid #e6e8ff;
+  padding:10px 12px;
+}
+.top-bar h1{ font-size:34px; color:#2d3e50; }
+
+/* Hamburger */
+.hamburger{
+  display:none; width:40px; height:40px; border:1px solid #e6e8ff; border-radius:8px;
+  background:#5c62d6; color:#fff;cursor:pointer; align-items:center; justify-content:center; gap:4px;
+}
+
+/* Keep your export page styles */
+.page{ padding:24px; background:var(--bg); min-height:100%; color:var(--ink); }
+.card{
+  background:var(--panel-2);
+  border:1px solid var(--panel);
+  border-radius:14px;
+  padding:12px;
+  box-shadow:0 2px 8px rgba(37,41,90,.06);
+}
+.toolbar{ display:flex; gap:10px; justify-content:flex-end; margin-bottom:10px; }
+.btn{
+  height:38px; padding:0 14px; border-radius:10px; border:1px solid var(--panel);
+  background:#fff; color:var(--ink-2); font-weight:600; cursor:pointer;
+}
+.btn-primary{ background:#656ED3; color:#fff; border-color:var(--primary); }
+.preview{ height:66vh; border:1px dashed var(--panel); border-radius:12px; overflow:hidden; background:#fff; }
+.preview iframe{ width:100%; height:100%; border:0; }
+.placeholder{
+  display:flex; align-items:center; justify-content:center; gap:12px; height:300px;
+  background:#fff; border:1px dashed var(--panel); border-radius:12px; color:#7a7f9a; text-align:center;
+}
+.empty-icon{ font-size:32px; }
+.loading{ padding:14px; opacity:.8; }
+.error{ color:#c0392b; margin-top:10px; }
+
+/* Close (X) button */
+.close-x{
+  position:fixed; top:16px; right:24px; background:transparent; border:none; cursor:pointer; padding:8px; line-height:0;
+  z-index:997; /* above sticky header, below overlay/sidebar/modal */
+}
+.close-x svg{ stroke:#534CA4; transition:stroke .15s ease; }
+.close-x:hover svg{ stroke:#656ED3; }
+
+/* ====== Modal (Budgets) ====== */
+/* Raise modal above everything, including sticky header and overlay */
+.modal-backdrop{
+  position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(1px); z-index:1000;
+}
+.modal-shell{
+  position:fixed; inset:0; padding:24px; display:flex; align-items:center; justify-content:center; z-index:1005;
+}
+.modal-content{
+  width:min(96vw, 880px); max-height:88vh; overflow:auto; background:#fff; border-radius:16px;
+  padding:20px; box-shadow:0 20px 25px -5px rgba(0,0,0,.10), 0 10px 10px -5px rgba(0,0,0,.04);
+}
+
+/* ================== RESPONSIVE ================== */
+/* Tablets and down: turn sidebar into a drawer */
+@media (max-width:1024px){
+  .hamburger{ display:inline-flex; }
+  .top-bar h1{ font-size:28px; }
+
+  .sidebar{
+    position:fixed; top:0; left:0; height:100vh; width:280px;
+    transform:translateX(-100%); transition:transform .25s ease; z-index:999;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+  }
+  .sidebar.open{ transform:translateX(0); }
+  .drawer-overlay.open{ display:block; }
+  .close-mobile{ display:inline-flex; align-items:center; justify-content:center; }
+  .menu a{ font-size:15px; padding:10px 14px; }
+  .profile{ margin:12px; }
+}
+
+@media (max-width:768px){
+  .top-bar h1{ font-size:24px; }
+}
+
+@media (max-width:480px){
+  .page{ padding:14px; }
+  .top-bar h1{ font-size:20px; }
+  .toolbar{ justify-content:flex-start; flex-wrap:wrap; gap:8px; }
+  .btn{ height:36px; padding:0 12px; }
+  .card{ padding:10px; border-radius:12px; }
+  .preview{ height:55vh; border-radius:10px; }
+  .placeholder{ height:220px; gap:10px; }
+  .empty-icon{ font-size:28px; }
+}
+
+/* Very small phones */
+@media (max-width:360px){
+  .page{ padding:12px; }
+  .toolbar{ gap:6px; }
+  .btn{ width:100%; }
+  .preview{ height:50vh; }
+  .placeholder{ height:200px; }
+}
+
+/* Tablets */
+@media (min-width:768px) and (max-width:1024px){
+  .page{ padding:22px; }
+  .preview{ height:64vh; }
+}
+
+/* Large desktops */
+@media (min-width:1280px){
+  .page{ padding:28px; }
+  .preview{ height:70vh; }
+  .placeholder{ height:320px; }
+}
+
+/* Short landscape viewports */
+@media (max-height:600px) and (orientation:landscape){
+  .preview{ height:52vh; }
+  .placeholder{ height:180px; }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion:reduce){
+  *{ transition:none !important; animation:none !important; }
+}

@@ -1,0 +1,217 @@
+/* ===== Desktop/Tablet: NO page scroll. Mobile (<900px): allow scroll. ===== */
+body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:#1A1A1A; }
+*{overflow:hidden;}
+/* ===== Split layout (same look as login) ===== */
+.auth-layout{
+  height:100vh;                          /* single screen on desktop */
+  display:grid;
+  grid-template-columns:56% 44%;
+  background:#FBFBFB;                    /* light surface */
+}
+
+/* Mobile: stack and allow scroll */
+@media (max-width:900px){
+  body { overflow:auto; }
+  .auth-layout{
+    grid-template-columns:1fr;
+    height:auto;
+    min-height:100vh;
+  }
+}
+
+/* ===== Left pane ===== */
+.auth-left{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  padding:40px clamp(20px,5vw,72px);     /* tighter to fit all fields */
+  background:#EEF0FF;                    /* light bluish surface (like login) */
+}
+
+/* Brand */
+.brand{ margin:0 0 16px 0; }
+.brand-title{
+  margin:0 0 6px;
+  font-size:clamp(28px,5vw,44px);
+  font-weight:800;
+  color:#656ED3;                          /* primary */
+  text-align:center;
+}
+.brand-subtitle{
+  margin:0;
+  color:#6b6f85;
+  font-size:14px;
+  text-align:center;
+  margin-bottom: 5%;
+}
+
+/* ===== Registration card & TWO-COLUMN form ===== */
+.register-card{ width:min(640px,100%); }
+
+/* Two columns on desktop/tablet (fits everything on one page) */
+.register-form{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap:20px;
+  row-gap:14px;
+}
+
+/* Each field group */
+.form-group{ display:flex; flex-direction:column; gap:6px; }
+
+/* Make labels compact but readable */
+.form-label{ font-size:14px; font-weight:600; color:#25295A; } /* ink-700 */
+
+/* Inputs */
+.input-container{ position:relative; display:flex; align-items:center; width:100%; }
+.form-input{
+  width:100%;
+  padding:10px 16px;
+  border:2px solid #EBEFFF;               /* same as login */
+  border-radius:999px;                     /* pill inputs */
+  background:#ffffff;
+  font-size:14px;
+  line-height:22px;
+  transition: box-shadow .15s ease, border-color .15s ease, background .15s ease;
+}
+.form-input.has-toggle{ padding-right:88px; }
+.form-input:focus{
+  outline:none;
+  border-color:#656ED3;
+  box-shadow:0 0 0 4px rgba(101,110,211,.12);
+}
+.form-input.error{
+  border-color:#ef4444;
+  background:#fef2f2;
+  box-shadow:0 0 0 4px rgba(239,68,68,.12);
+}
+
+/* Left icon (email) */
+.input-icon{ position:absolute; left:12px; color:#9ca3af; }
+.input-container .form-input{ padding-left:40px; }
+
+/* Password toggle inside field */
+.password-toggle{
+  position:absolute;
+  right:10px;
+  top:50%;
+  transform:translateY(-50%);
+  height:30px;
+  padding:0 12px;
+  border:none;
+  border-radius:999px;
+  background:transparent;
+  color:#8b90a8;
+  cursor:pointer;
+  line-height:30px;
+}
+.password-toggle:hover{ color:#6b6f85; }
+
+/* Errors */
+.error-message{ color:#dc2626; font-size:12px; margin-top:2px; }
+
+/* Error banner and submit row span both columns */
+.error-banner{
+  grid-column:1 / -1;
+  display:flex; align-items:center; gap:8px;
+  border:1px solid #fecaca;
+  background:#fef2f2;
+  color:#b91c1c;
+  padding:10px 12px;
+  border-radius:12px;
+  font-size:13px;
+}
+.error-icon{ width:16px; height:16px; }
+
+/* Submit */
+.register-button{
+  grid-column:1 / -1;                     /* full width across two columns */
+  margin-top:4px;
+  width:100%;
+  padding:12px 16px;
+  border:none;
+  border-radius:999px;
+  background:#656ED3;                     /* primary */
+  color:#ffffff;
+  font-weight:700;
+  letter-spacing:.2px;
+  cursor:pointer;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px;
+}
+.register-button:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 12px 24px -10px rgba(101,110,211,.6);
+}
+.register-button:disabled{ opacity:.6; cursor:not-allowed; transform:none; box-shadow:none; }
+.animate-spin{ animation:spin 1s linear infinite; }
+@keyframes spin{ from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+/* Sign-in line full width */
+.signin-link{
+  grid-column:1 / -1;
+  text-align:left;
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #EBEFFF;
+  text-align:  center;
+}
+.signin-link p{ color:#6b6f85; font-size:14px; margin:0; }
+.signin-text{ color:#656ED3; font-weight:700; text-decoration:none; }
+.signin-text:hover{ text-decoration:underline; }
+
+/* Put specific fields side-by-side automatically in two columns */
+.form-group:nth-of-type(1),
+.form-group:nth-of-type(2),
+.form-group:nth-of-type(3),
+.form-group:nth-of-type(4),
+.form-group:nth-of-type(5),
+.form-group:nth-of-type(6){ grid-column:auto; }
+
+/* If you need any field to be full width on desktop, uncomment:
+.form-group--full { grid-column: 1 / -1; }
+*/
+
+/* Decorative blob */
+.corner-blob{
+  position:absolute;
+  left:clamp(-140px,-8vw,-80px);
+  bottom:clamp(-100px,-6vw,-60px);
+  width:clamp(220px,28vw,340px);
+  height:clamp(120px,16vw,180px);
+  background:#AFB3FF;                      /* primary-light */
+  border-radius:999px;
+  transform:rotate(35deg);
+  opacity:.55;
+  pointer-events:none;
+}
+
+/* ===== Right pane (lavender + divider) ===== */
+.auth-right{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#AFB3FF;                      /* lavender panel */
+  overflow:hidden;
+  padding:0 clamp(16px,3vw,32px);
+}
+.auth-right::before{
+  content:'';
+  position:absolute; left:0; top:0; bottom:0;
+  width:10px;
+  background:linear-gradient(to right, rgba(0,0,0,.06), rgba(0,0,0,.02), transparent);
+}
+
+/* Artwork — keep contained so it never causes scroll */
+.artwrap{ width:min(540px,86%); max-height:78%; display:flex; align-items:center; justify-content:center; }
+.art{ width:100%; height:auto; object-fit:contain; filter:drop-shadow(0 18px 28px rgba(0,0,0,.18)); }
+
+/* ===== Mobile: single column + scroll allowed ===== */
+@media (max-width:900px){
+  .auth-right{ order:2; min-height:260px; }
+  .register-form{ grid-template-columns:1fr; }
+  .register-button, .error-banner, .signin-link{ grid-column:1 / -1; }
+  .signin-link{ text-align:center; }
+}
