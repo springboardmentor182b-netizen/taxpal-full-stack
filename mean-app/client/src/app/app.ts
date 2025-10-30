@@ -15,6 +15,12 @@ export class App implements OnInit {
   constructor(private themeService: ThemeService) {}
 
   ngOnInit() {
-    this.themeService.applyTheme(); // ✅ use the injected service
+    console.log('🎯 App component initialized');
+    try {
+      this.themeService.applyTheme(); // ✅ use the injected service
+      console.log('✅ Theme applied successfully');
+    } catch (error) {
+      console.error('❌ Theme application failed:', error);
+    }
   }
 }

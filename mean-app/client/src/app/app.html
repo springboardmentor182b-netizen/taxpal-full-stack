@@ -1,7 +1,23 @@
 
 
+<div class="app-container">
+  <div style="min-height: 100vh; display: flex; flex-direction: column;">
+    <!-- Loading indicator for debugging -->
+    <div id="loading-indicator" style="position: fixed; top: 20px; left: 20px; background: #007bff; color: white; padding: 10px; border-radius: 5px; z-index: 9999;">
+      Loading Angular app...
+    </div>
+    <router-outlet></router-outlet>
+  </div>
+</div>
 
-
-
-
-<router-outlet />
+<script>
+  // Hide loading indicator once Angular loads
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(() => {
+      const indicator = document.getElementById('loading-indicator');
+      if (indicator) {
+        indicator.style.display = 'none';
+      }
+    }, 2000);
+  });
+</script>

@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 
+
 describe('ReportsComponent', () => {
   let component: ReportsComponent;
   let fixture: ComponentFixture<ReportsComponent>;
@@ -98,7 +99,6 @@ describe('ReportsComponent', () => {
 
     mockReportsService.generateReport.and.returnValue(of(mockResponse));
     component.generateReport();
-
     expect(mockReportsService.generateReport).toHaveBeenCalled();
     expect(component.recentReports.length).toBeGreaterThan(0);
   });
