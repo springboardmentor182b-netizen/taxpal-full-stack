@@ -5,6 +5,7 @@ import path from "path";
 import fs from "fs";
 import { setupSwagger } from "./swagger";
 
+// ✅ Import all route modules
 import userRoutes from "./api/modules/user/user.routes";
 import incomeRoutes from "./api/modules/income/income.routes";
 import expenseRoutes from "./api/modules/expense/expense.routes";
@@ -16,7 +17,9 @@ import reportExportRoutes from "./api/modules/reportexport/reportexport.routes";
 import budgetRoutes from "./api/modules/budget/budget.routes";
 import reportRoutes from "./api/modules/reports/report.routes";
 
-// ✅ Core setup
+// =========================================================
+// ✅ Express App Setup
+// =========================================================
 const app = express();
 
 // ✅ Middleware
@@ -42,10 +45,14 @@ app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ Swagger setup
+// =========================================================
+// ✅ Swagger Setup
+// =========================================================
 setupSwagger(app);
 
+// =========================================================
 // ✅ API Routes
+// =========================================================
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/categories", categoriesRoutes);
 app.use("/api/v1/tax-estimates", taxEstimatorRoutes);
@@ -57,19 +64,20 @@ app.use("/api/user", userRoutes);
 app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 
-// ✅ Root route
+// =========================================================
+// ✅ Root Route
+// =========================================================
 app.get("/", (req, res) => {
-  res.send("🚀 Server running successfully!");
+  res.send("🚀 TaxPal Server is running successfully!");
 });
 
-// ✅ Serve Angular frontend (robust lookup)
+// =========================================================
+// ✅ Angular Frontend Serving Logic
+// =========================================================
 const clientDistBase = path.resolve(__dirname, "../../client/dist");
 
-// Recursively search for an index.html under clientDistBase and use its parent folder
 function findIndexHtml(start: string, maxDepth = 6): string | null {
-  const stack: Array<{ dir: string; depth: number }> = [
-    { dir: start, depth: 0 },
-  ];
+  const stack: Array<{ dir: string; depth: number }> = [{ dir: start, depth: 0 }];
 
   while (stack.length > 0) {
     const { dir, depth } = stack.pop()!;
@@ -100,24 +108,29 @@ try {
   const found = findIndexHtml(clientDistBase, 8);
   if (found) {
     clientPath = path.dirname(found);
-    console.log("✅ Found Angular index.html at:", found);
+    console.log("✅ Found frontend build at:", clientPath);
   }
-} catch {
-  console.warn("⚠️ Could not find built frontend files.");
+} catch (e) {
+  console.warn("⚠️ Error while searching for frontend build:", e);
 }
 
+// =========================================================
+// ✅ Serve Angular if built
+// =========================================================
 if (clientPath) {
-  console.log("✅ Serving static files from:", clientPath);
   app.use(express.static(clientPath));
 
-  // ✅ For Angular routing (refresh issue fix)
+  // ✅ Angular routing fix for refresh & 404s
   app.get("*", (req, res) => {
     res.sendFile(path.join(clientPath!, "index.html"));
   });
 } else {
-  console.warn(
-    "⚠️ Frontend build not found. Run 'cd client && ng build --configuration production' to build it."
-  );
+  console.warn("⚠️ Frontend build not found.");
+  console.warn("➡️ Run this command to build it:");
+  console.warn("   cd client && ng build --configuration production");
 }
 
+// =========================================================
+// ✅ Export App
+// =========================================================
 export default app;
