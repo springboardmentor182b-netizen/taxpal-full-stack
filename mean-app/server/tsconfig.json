@@ -10,7 +10,5 @@
     "resolveJsonModule": true
   },
   "include": ["src/**/*.ts"],
-  "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "dist","src/tests", "**/*.test.ts"]
-
+  "exclude": ["node_modules", "dist", "src/tests", "**/*.test.ts"]
 }
