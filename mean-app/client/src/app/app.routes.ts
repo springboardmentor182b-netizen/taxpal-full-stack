@@ -20,63 +20,47 @@ export const routes: Routes = [
     loadComponent: () => import('./features/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
 
-  // Main Layout with child routes
+  // Main application layout (protected by AuthGuard)
   {
-    path: 'transactions',
-    loadComponent: () =>
-      import('./features/transactions/transactions/transactions.component').then(
-        (m) => m.TransactionsComponent
-      )
-  },
-  {
-  path: 'reports',
-  loadComponent: () =>
-    import('./features/reports/reports-form/reports.component').then(
-      m => m.ReportsComponent
-    )
-},
-  { 
-    path: 'budgets', 
-    loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
-  },
-   
-{
-  path: 'tax-estimator',
-  loadComponent: () =>
-    import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
-      .then(m => m.TaxEstimatorFormComponent)
-},
-    
-  {
-    path: 'settings',
-    loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
+    path: '',
+    component: MainLayout,
     canActivate: [AuthGuard],
     children: [
-      { 
-        path: 'dashboard', 
-        loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard),
-        canActivate: [AuthGuard]
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard)
       },
-      { 
-        path: 'dashboard-form', 
-        loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm),
-        canActivate: [AuthGuard]
+      {
+        path: 'dashboard-form',
+        loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
+      },
+      {
+        path: 'income',
+        loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeForm)
+      },
+      {
+        path: 'expenses',
+        loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesForm)
+      },
+      {
+        path: 'transactions',
+        loadComponent: () => import('./features/transactions/transactions/transactions.component').then(m => m.TransactionsComponent)
       },
       {
         path: 'reports',
-        loadComponent: () => import('./features/reports/reports-form/reports.component').then(m => m.ReportsComponent),
-        canActivate: [AuthGuard]
+        loadComponent: () => import('./features/reports/reports-form/reports.component').then(m => m.ReportsComponent)
       },
-    
-      { 
-        path: 'budgets', 
-        loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent),
-        canActivate: [AuthGuard]
+      {
+        path: 'budgets',
+        loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
+      },
+      {
+        path: 'tax-estimator',
+        loadComponent: () => import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component').then(m => m.TaxEstimatorFormComponent)
       },
       {
         path: 'settings',
         loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
-        canActivate: [AuthGuard],
         children: [
           {
             path: 'profile',
@@ -97,16 +81,17 @@ export const routes: Routes = [
           },
           { path: '', redirectTo: 'profile', pathMatch: 'full' }
         ]
-      }
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
     ]
   },
- 
-  // Legacy route redirects (for backwards compatibility)
+
+  // Redirects for legacy routes (backward compatibility)
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
   { path: 'features/forgot-password', redirectTo: '/forgot-password' },
   { path: 'features/reset-password/:token', redirectTo: '/reset-password/:token' },
-  
-  // Wildcard route - redirect to login for any unknown routes
+
+  // Wildcard route - redirect to login for unknown routes
   { path: '**', redirectTo: '/login' }
 ];
