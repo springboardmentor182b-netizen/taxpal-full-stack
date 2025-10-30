@@ -60,6 +60,7 @@ export class MainLayout {
       this.router.navigate(['/budgets']);
     });
   }
+ 
 goToTaxEtimator() {
     this.router.navigateByUrl('/', { skipLocationChange: true }).then(() => {
       this.router.navigate(['/tax-estimator']);

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { DashboardService } from '../../../services/dashboard.service';
 import { MatDialogRef } from '@angular/material/dialog';
+
 @Component({
   selector: 'app-dashboard-form',
   templateUrl: './dashboard-form.component.html',
@@ -15,7 +16,6 @@ export class DashboardForm implements OnInit {
   dashboardForm: FormGroup;
   userId: string = '';
 
-  // Optional dialog reference (will be undefined if used as a page)
   constructor(
     private fb: FormBuilder,
     private dashboardService: DashboardService,
@@ -34,45 +34,49 @@ export class DashboardForm implements OnInit {
   ngOnInit(): void {
     const currentUser = sessionStorage.getItem('current_user') || localStorage.getItem('current_user');
     if (!currentUser) return console.error('No user logged in.');
-  
+
     this.userId = JSON.parse(currentUser).id;
-  
-    // Fetch dashboard for the current user
+
     this.dashboardService.getDashboard(this.userId).subscribe({
       next: (dashboard) => {
-        if (dashboard) {
-          // PATCH the form with existing dashboard data
-          this.dashboardForm.patchValue({
-            monthlyIncome: dashboard.monthlyIncome,
-            monthlyExpenses: dashboard.monthlyExpenses,
-            estimatedTaxDue: dashboard.estimatedTaxDue,
-            savingsRate: dashboard.savingsRate
+        if (!dashboard) return;
+
+        // Patch main form fields
+        this.dashboardForm.patchValue({
+          monthlyIncome: dashboard.monthlyIncome,
+          monthlyExpenses: dashboard.monthlyExpenses,
+          estimatedTaxDue: dashboard.estimatedTaxDue,
+          savingsRate: dashboard.savingsRate
+        });
+
+        // Clear transactions to avoid duplicates
+        while (this.transactions.length) {
+          this.transactions.removeAt(0);
+        }
+
+        // Populate transactions
+        if (dashboard.transactions?.length) {
+          dashboard.transactions.forEach((tx: any) => {
+            this.transactions.push(this.fb.group({
+              date: [tx.date ? tx.date.split('T')[0] : '', Validators.required], // YYYY-MM-DD
+              description: [tx.description],
+              category: [tx.category],
+              amount: [tx.amount, Validators.required],
+              type: [tx.type, Validators.required]
+            }));
           });
-  
-          // Populate transactions if exist
-          if (dashboard.transactions && dashboard.transactions.length > 0) {
-            dashboard.transactions.forEach((tx: any) => {
-              this.transactions.push(this.fb.group({
-                date: [tx.date, Validators.required],
-                description: [tx.description],
-                category: [tx.category],
-                amount: [tx.amount, Validators.required],
-                type: [tx.type, Validators.required]
-              }));
-            });
-          }
-        } else {
-          console.log('No dashboard yet, user can create one.');
         }
       },
-      error: () => console.log('Error fetching dashboard, show form.')
+      error: () => console.error('Error fetching dashboard')
     });
   }
 
+  // Getter for transactions FormArray
   get transactions(): FormArray {
     return this.dashboardForm.get('transactions') as FormArray;
   }
 
+  // Add a new transaction
   addTransaction(): void {
     this.transactions.push(this.fb.group({
       date: ['', Validators.required],
@@ -83,29 +87,51 @@ export class DashboardForm implements OnInit {
     }));
   }
 
-  removeTransaction(index: number): void {
+  removeTransaction(index: number, txId: string): void {
+  if (!txId) {
+    // If transaction is new and not saved yet, just remove from form
     this.transactions.removeAt(index);
+    return;
   }
 
+  this.dashboardService.deleteTransaction(this.userId, txId).subscribe({
+    next: () => {
+      console.log('Transaction deleted successfully');
+      this.transactions.removeAt(index);
+    },
+    error: (err) => console.error('Error deleting transaction', err)
+  });
+}
+
+  // Submit the form
   submitForm(): void {
     if (!this.userId) return console.error('Cannot save dashboard, userId missing.');
 
     if (this.dashboardForm.valid) {
-      const payload = { ...this.dashboardForm.value, user: this.userId };
-      this.dashboardService.upsertDashboard(this.userId, payload).subscribe({
+      const payload = {
+        monthlyIncome: this.dashboardForm.value.monthlyIncome,
+        monthlyExpenses: this.dashboardForm.value.monthlyExpenses,
+        estimatedTaxDue: this.dashboardForm.value.estimatedTaxDue,
+        savingsRate: this.dashboardForm.value.savingsRate,
+        transactions: this.dashboardForm.value.transactions,
+        user: this.userId
+      };
+
+      // Use updateDashboard to replace the entire dashboard
+      this.dashboardService.updateDashboard(this.userId, payload).subscribe({
         next: () => {
           console.log('Dashboard saved successfully');
 
-          // If opened as a dialog → close it safely
           if (this.dialogRef) {
             this.dialogRef.close(this.dashboardForm.value);
           } else {
-            // If standalone page → redirect to dashboard
             this.router.navigate(['/dashboard']);
           }
         },
         error: (err) => console.error('Error saving dashboard', err)
       });
+    } else {
+      console.warn('Form is invalid');
     }
   }
 }

@@ -20,15 +20,19 @@ export const routes: Routes = [
     loadComponent: () => import('./features/reset-password/reset-password.component').then(m => m.ResetPasswordComponent)
   },
 
-  // Main Layout with child routes
+  // Main application layout (protected by AuthGuard)
   {
-    path: 'main',
+    path: '',
     component: MainLayout,
     canActivate: [AuthGuard],
     children: [
       {
         path: 'dashboard',
         loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard)
+      },
+      {
+        path: 'dashboard-form',
+        loadComponent: () => import('./features/dashboard-form/dashboard-form/dashboard-form.component').then(m => m.DashboardForm)
       },
       {
         path: 'income',
@@ -40,27 +44,19 @@ export const routes: Routes = [
       },
       {
         path: 'transactions',
-        loadComponent: () =>
-          import('./features/transactions/transactions/transactions.component').then(
-            (m) => m.TransactionsComponent
-          )
+        loadComponent: () => import('./features/transactions/transactions/transactions.component').then(m => m.TransactionsComponent)
       },
       {
         path: 'reports',
-        loadComponent: () =>
-          import('./features/reports/reports-form/reports.component').then(
-            m => m.ReportsComponent
-          )
+        loadComponent: () => import('./features/reports/reports-form/reports.component').then(m => m.ReportsComponent)
       },
-      { 
-        path: 'budgets', 
+      {
+        path: 'budgets',
         loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent)
       },
       {
         path: 'tax-estimator',
-        loadComponent: () =>
-          import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
-            .then(m => m.TaxEstimatorFormComponent)
+        loadComponent: () => import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component').then(m => m.TaxEstimatorFormComponent)
       },
       {
         path: 'settings',
@@ -90,82 +86,12 @@ export const routes: Routes = [
     ]
   },
 
-  // Direct routes (for backwards compatibility)
-  {
-    path: 'dashboard',
-    loadComponent: () => import('./features/dashboard/dashboard/dashboard.component').then(m => m.Dashboard),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'income',
-    loadComponent: () => import('./features/income/income-form/income-form.component').then(m => m.IncomeForm),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'expenses',
-    loadComponent: () => import('./features/expenses/expenses-form/expenses-form.component').then(m => m.ExpensesForm),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'transactions',
-    loadComponent: () =>
-      import('./features/transactions/transactions/transactions.component').then(
-        (m) => m.TransactionsComponent
-      ),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'reports',
-    loadComponent: () =>
-      import('./features/reports/reports-form/reports.component').then(
-        m => m.ReportsComponent
-      ),
-    canActivate: [AuthGuard]
-  },
-  { 
-    path: 'budgets', 
-    loadComponent: () => import('./features/budget/budget-form/budget-form.component').then(m => m.BudgetFormComponent),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'tax-estimator',
-    loadComponent: () =>
-      import('./features/tax-estimator/tax-estimator-form/tax-estimator-form.component')
-        .then(m => m.TaxEstimatorFormComponent),
-    canActivate: [AuthGuard]
-  },
-  {
-    path: 'settings',
-    loadComponent: () => import('./features/settings/settings/settings.component').then(m => m.Settings),
-    canActivate: [AuthGuard],
-    children: [
-      {
-        path: 'profile',
-        loadComponent: () => import('./features/settings/profile/profile').then(m => m.Profile)
-      },
-      {
-        path: 'categories',
-        loadComponent: () => import('./features/settings/categories/categories.component').then(m => m.Categories),
-        runGuardsAndResolvers: 'always'
-      },
-      {
-        path: 'notifications',
-        loadComponent: () => import('./features/settings/notifications/notifications').then(m => m.Notifications)
-      },
-      {
-        path: 'security',
-        loadComponent: () => import('./features/settings/security/security').then(m => m.Security)
-      },
-      { path: '', redirectTo: 'profile', pathMatch: 'full' }
-    ]
-  },
-
-  // Legacy route redirects (for backwards compatibility)
+  // Redirects for legacy routes (backward compatibility)
   { path: 'features/login', redirectTo: '/login' },
   { path: 'features/signup', redirectTo: '/signup' },
   { path: 'features/forgot-password', redirectTo: '/forgot-password' },
   { path: 'features/reset-password/:token', redirectTo: '/reset-password/:token' },
-  
-  // Wildcard route - redirect to login for any unknown routes
+
+  // Wildcard route - redirect to login for unknown routes
   { path: '**', redirectTo: '/login' }
 ];

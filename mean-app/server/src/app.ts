@@ -27,8 +27,14 @@ app.use(
       "https://taxpal-full-stack.onrender.com",
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "Accept",
+      "Origin",
+      "X-Requested-With",
+    ],
   })
 );
 
@@ -59,9 +65,11 @@ app.get("/", (req, res) => {
 // ✅ Serve Angular frontend (robust lookup)
 const clientDistBase = path.resolve(__dirname, "../../client/dist");
 
-// Try to locate the built Angular index.html dynamically
+// Recursively search for an index.html under clientDistBase and use its parent folder
 function findIndexHtml(start: string, maxDepth = 6): string | null {
-  const stack: Array<{ dir: string; depth: number }> = [{ dir: start, depth: 0 }];
+  const stack: Array<{ dir: string; depth: number }> = [
+    { dir: start, depth: 0 },
+  ];
 
   while (stack.length > 0) {
     const { dir, depth } = stack.pop()!;
@@ -87,6 +95,7 @@ function findIndexHtml(start: string, maxDepth = 6): string | null {
 }
 
 let clientPath: string | null = null;
+
 try {
   const found = findIndexHtml(clientDistBase, 8);
   if (found) {
@@ -98,9 +107,10 @@ try {
 }
 
 if (clientPath) {
+  console.log("✅ Serving static files from:", clientPath);
   app.use(express.static(clientPath));
 
-  // For Angular routing (handle refresh URLs)
+  // ✅ For Angular routing (refresh issue fix)
   app.get("*", (req, res) => {
     res.sendFile(path.join(clientPath!, "index.html"));
   });

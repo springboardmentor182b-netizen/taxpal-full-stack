@@ -7,6 +7,7 @@ import { AuthService, User } from '../../../features/auth.service';
 import { environment } from '../../../../environments/environment';
 
 export interface Budget {
+  _id?: string; // <-- added for delete
   category: string;
   amount: number;
   spent: number;
@@ -29,7 +30,7 @@ export class BudgetFormComponent {
 
   public isFormVisible = signal(false);
   public budgets = signal<Budget[]>([]);
-  public formSubmitted = signal(false); // ✅ Added signal for form validation
+  public formSubmitted = signal(false);
 
   public newBudget = signal({
     category: null as string | null,
@@ -96,10 +97,9 @@ export class BudgetFormComponent {
   }
 
   addBudget(): void {
-    this.formSubmitted.set(true); // mark form as submitted
+    this.formSubmitted.set(true);
     const budgetData = this.newBudget();
 
-    // validation
     if (!budgetData.category?.trim() || !budgetData.month?.trim()) return;
     if (budgetData.amount == null || isNaN(budgetData.amount) || budgetData.amount <= 0) return;
 
@@ -141,11 +141,11 @@ export class BudgetFormComponent {
       description: null,
       spent: 0
     });
-    this.formSubmitted.set(false); // reset form submission flag
+    this.formSubmitted.set(false);
   }
 
   trackByCategory(index: number, budget: Budget) {
-    return budget.category;
+    return budget._id ?? budget.category;
   }
 
   viewBudgetDetails(budget: Budget, event: MouseEvent) {
@@ -197,5 +197,22 @@ export class BudgetFormComponent {
 
   closeSidebarOverlay() {
     this.sidebarActive = false;
+  }
+
+  deleteBudget(budget: Budget & { _id?: string }) {
+    if (!budget._id) return;
+    if (!confirm(`Are you sure you want to delete the budget for ${budget.category}?`)) return;
+
+    this.http.delete(`${this.API_BASE_URL}/${budget._id}`).subscribe({
+      next: () => {
+        this.budgets.update(budgets => budgets.filter(b => (b as any)._id !== budget._id));
+        if (this.selectedBudget?._id === budget._id) this.closePopup();
+        alert('Budget deleted successfully');
+      },
+      error: (err) => {
+        console.error('Failed to delete budget:', err);
+        alert('Could not delete budget. Please try again.');
+      }
+    });
   }
 }
