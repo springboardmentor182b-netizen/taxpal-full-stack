@@ -5,7 +5,7 @@ import path from "path";
 import fs from "fs";
 import { setupSwagger } from "./swagger";
 
-// ✅ Import all route modules
+// ✅ Import route modules
 import userRoutes from "./api/modules/user/user.routes";
 import incomeRoutes from "./api/modules/income/income.routes";
 import expenseRoutes from "./api/modules/expense/expense.routes";
@@ -22,12 +22,11 @@ import reportRoutes from "./api/modules/reports/report.routes";
 // =========================================================
 const app = express();
 
-// ✅ Middleware
 app.use(
   cors({
     origin: [
       "http://localhost:4200",
-      "https://taxpal-full-stack.onrender.com",
+      "https://taxpal-full-stack1-sh9q.onrender.com",
     ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
@@ -65,20 +64,12 @@ app.use("/api/income", incomeRoutes);
 app.use("/api/expense", expenseRoutes);
 
 // =========================================================
-// ✅ Root Route
-// =========================================================
-app.get("/", (req, res) => {
-  res.send("🚀 TaxPal Server is running successfully!");
-});
-
-// =========================================================
 // ✅ Angular Frontend Serving Logic
 // =========================================================
 const clientDistBase = path.resolve(__dirname, "../../client/dist");
 
 function findIndexHtml(start: string, maxDepth = 6): string | null {
   const stack: Array<{ dir: string; depth: number }> = [{ dir: start, depth: 0 }];
-
   while (stack.length > 0) {
     const { dir, depth } = stack.pop()!;
     if (depth > maxDepth) continue;
@@ -88,7 +79,6 @@ function findIndexHtml(start: string, maxDepth = 6): string | null {
     } catch {
       continue;
     }
-
     for (const entry of entries) {
       const full = path.join(dir, entry.name);
       if (entry.isFile() && entry.name.toLowerCase() === "index.html") {
@@ -115,12 +105,17 @@ try {
 }
 
 // =========================================================
-// ✅ Serve Angular if built
+// ✅ Serve Angular + Redirect Root to /login
 // =========================================================
 if (clientPath) {
   app.use(express.static(clientPath));
 
-  // ✅ Angular routing fix for refresh & 404s
+  // ✅ Redirect root ("/") to Angular /login route
+  app.get("/", (req, res) => {
+    res.redirect("/login");
+  });
+
+  // ✅ Angular routing fallback for SPA
   app.get("*", (req, res) => {
     res.sendFile(path.join(clientPath!, "index.html"));
   });
