@@ -4,6 +4,8 @@
   "main": "server.js",
 "scripts": {
   "build": "tsc",
+  "build:client": "echo \"Building client...\" && cd ../client && npm ci --no-audit --no-fund && npm run build -- --configuration production || ng build --configuration production",
+  "postinstall": "npm run build:client || true",
   "start": "node dist/server.js",
   "dev": "nodemon src/server.ts"
 },
