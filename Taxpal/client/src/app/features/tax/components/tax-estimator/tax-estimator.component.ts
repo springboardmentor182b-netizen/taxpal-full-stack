@@ -8,7 +8,7 @@ import {
   EstimatorInput,
   TaxSummary,
 } from '@/app/core/services/tax-estimator.service';
-import { TaxCalendarService } from '@/app/core/services/tax-calendar.service';
+  import { TaxCalendarService } from '@/app/core/services/tax-calendar.service';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { BudgetsListComponent } from '../../../budgets/component/budgets-list.component';
@@ -59,8 +59,7 @@ export class TaxEstimatorComponent implements OnInit {
   activeTab: 'form' | 'summary' = 'form';
   switchTab(tab: 'form' | 'summary') {
     this.activeTab = tab;
-    // ensure the summary reflects current inputs even if user never pressed Calculate
-    if (tab === 'summary') this.summary = this.computeLocalSummary();
+    if (tab === 'summary') this.summary = this.computeLocalSummary(); // ensure up-to-date
   }
 
   /* ===== Estimator form state ===== */
@@ -80,7 +79,7 @@ export class TaxEstimatorComponent implements OnInit {
   snacks: Snack[] = [];
   private newId(): string {
     // @ts-ignore
-    if (typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+    if (typeof crypto !== 'undefined' && (crypto as any).randomUUID) return (crypto as any).randomUUID();
     return Math.random().toString(36).slice(2) + Date.now().toString(36);
   }
   showSnack(text: string, kind: SnackKind = 'info', durationMs = 3000) {
@@ -102,6 +101,7 @@ export class TaxEstimatorComponent implements OnInit {
       state: ['California', Validators.required],
       status: ['Single', Validators.required],
       quarter: ['Q2', Validators.required],
+      // Non-negative numeric controls
       grossIncome: [0, [Validators.min(0)]],
       businessExpenses: [0, [Validators.min(0)]],
       retirement: [0, [Validators.min(0)]],
@@ -125,10 +125,13 @@ export class TaxEstimatorComponent implements OnInit {
       if (!states.includes(current)) this.form.get('state')!.setValue(states[0] ?? '');
     });
 
-    // 🔧 Live local summary so Estimated Tax is never stuck at 0.00 when inputs change
+    // Live local summary when any value changes
     this.form.valueChanges.subscribe(() => {
       this.summary = this.computeLocalSummary();
     });
+
+    // Ensure summary is initialized (not 0) for default values
+    this.summary = this.computeLocalSummary();
   }
 
   /** Read user from whatever your AuthService exposes (tolerant to variations) */
@@ -174,11 +177,46 @@ export class TaxEstimatorComponent implements OnInit {
     this.router.navigate(['/tax-calendar']);
   }
 
+  /** Block characters that could create negatives or scientific notation */
+  blockInvalidNumberKeys(evt: KeyboardEvent) {
+    const blocked = ['-', '+', 'e', 'E'];
+    if (blocked.includes(evt.key)) {
+      evt.preventDefault();
+    }
+  }
+
+  /** Sanitize pasted/typed values so they are always non-negative decimals */
+  onNumberInput(control: keyof EstimatorInput, event: Event) {
+    const input = event.target as HTMLInputElement;
+    const raw = input.value ?? '';
+
+    // Keep digits and a single dot; drop minus/plus/letters (e.g., "1e2" -> "12")
+    let cleaned = raw.replace(/[^0-9.]/g, '');
+    cleaned = cleaned.replace(/(\..*)\./g, '$1'); // only one dot
+
+    const n = cleaned === '' ? NaN : parseFloat(cleaned);
+    if (!Number.isFinite(n)) {
+      this.form.get(String(control))?.setValue(0, { emitEvent: false });
+      input.value = '';
+      // Keep summary fresh
+      this.summary = this.computeLocalSummary();
+      return;
+    }
+
+    const clamped = Math.max(0, n); // non-negative
+    // Set control value without creating loops; reflect clamped string into input
+    this.form.get(String(control))?.setValue(clamped, { emitEvent: false });
+    input.value = String(clamped);
+
+    // Live recompute
+    this.summary = this.computeLocalSummary();
+  }
+
   /** Calculate via backend (saves record), then add calendar events automatically */
   calc(): void {
     const v = this.form.value as EstimatorInput;
 
-    // 1) Always compute a local (US-style) estimate for display (never 0 if taxable > 0)
+    // 1) Always compute a local estimate for display (never stuck at 0 if taxable > 0)
     this.summary = this.computeLocalSummary();
 
     // 2) Proceed with backend call (for persistence & calendar)
@@ -192,14 +230,22 @@ export class TaxEstimatorComponent implements OnInit {
         this.status = 'success';
         this.showSnack('Done! Server calculated your tax and saved a record.', 'success');
 
-        // Only adopt the server summary if it looks valid (non-zero)
-        if (serverSummary && isFinite(serverSummary.estimatedTax) && serverSummary.estimatedTax > 0) {
-          this.summary = {
-            gross: Number(serverSummary.gross) || this.summary.gross,
-            deductions: Number(serverSummary.deductions) || this.summary.deductions,
-            taxable: Number(serverSummary.taxable) || this.summary.taxable,
-            estimatedTax: Number(serverSummary.estimatedTax) || this.summary.estimatedTax,
-          };
+        // Prefer valid server result; otherwise keep local
+        const valid =
+          serverSummary &&
+          [serverSummary.gross, serverSummary.deductions, serverSummary.taxable, serverSummary.estimatedTax]
+            .every(x => typeof x === 'number' && isFinite(x as number));
+
+        if (valid) {
+          // If server yields 0 but local is > 0, keep local (prevents confusing zeros)
+          const local = this.computeLocalSummary();
+          const serverEst = Number(serverSummary.estimatedTax) || 0;
+          this.summary = serverEst > 0 ? {
+            gross: Number(serverSummary.gross) || local.gross,
+            deductions: Number(serverSummary.deductions) || local.deductions,
+            taxable: Number(serverSummary.taxable) || local.taxable,
+            estimatedTax: serverEst
+          } : local;
         }
 
         // After success, create Calendar events (payment + reminder)
@@ -245,12 +291,12 @@ export class TaxEstimatorComponent implements OnInit {
    */
   private computeLocalSummary(): TaxSummary {
     const n = (x: any) => (isFinite(+x) ? +x : 0);
-    const gross = n(this.form.value.grossIncome);
+    const gross = Math.max(0, n(this.form.value.grossIncome));
     const deductions =
-      n(this.form.value.businessExpenses) +
-      n(this.form.value.retirement) +
-      n(this.form.value.health) +
-      n(this.form.value.homeOffice);
+      Math.max(0, n(this.form.value.businessExpenses)) +
+      Math.max(0, n(this.form.value.retirement)) +
+      Math.max(0, n(this.form.value.health)) +
+      Math.max(0, n(this.form.value.homeOffice));
 
     const taxable = Math.max(0, gross - deductions);
 

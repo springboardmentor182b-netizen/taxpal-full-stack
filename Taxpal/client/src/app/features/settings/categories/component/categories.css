@@ -17,7 +17,8 @@ body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overf
 
 /* Sidebar (pinned on desktop, drawer on ≤1024px) */
 .sidebar{
-  width:250px;background-color:var(--ink-700);color:#fff;padding:20px 0;height:100vh;position:fixed;left:0;top:0;overflow-y:auto;z-index:1100;
+  width:250px;background-color:var(--ink-700);color:#fff;padding:20px 0;height:100vh;position:fixed;left:0;top:0;overflow-y:auto;
+  z-index:1100; /* sits above sticky header and backdrop */
   transition:transform .25s ease;
 }
 .logo{padding:0 20px 20px;border-bottom:1px solid var(--primary-light);margin-bottom:20px}
@@ -31,21 +32,31 @@ body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overf
 
 /* Drawer backdrop (mobile/tablet only, shown when sidebar is open) */
 .drawer-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1090;opacity:0;pointer-events:none;transition:opacity .2s ease;
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1095; /* above sticky header, below sidebar */
+  opacity:0;pointer-events:none;transition:opacity .2s ease;
 }
 .drawer-backdrop.show{opacity:1;pointer-events:auto}
 
 /* Main content fills the remaining width on desktop */
 .main-content{
   margin-left:250px;width:calc(100vw - 250px);max-width:calc(100vw - 250px);
-  padding:30px;background-color:var(--surface);box-sizing:border-box;min-height:100vh
+  padding:30px;background-color:var(--surface);box-sizing:border-box;min-height:100vh;
 }
 
 /* Header */
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border);width:100%}
+.header{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid var(--border);width:100%;
+}
 .header h2{color:var(--ink-700);font-weight:600;font-size:28px}
-.header-left{display:flex;align-items:center;gap:12px}
+.header-left{display:flex;align-items:center;gap:12px;}
 .user-actions{display:flex;align-items:center;gap:15px;flex-wrap:wrap}
+
+/* ✅ Sticky header (never overlaps with drawer or modals due to z-index ladder) */
+.header--sticky{
+  position:sticky;top:0;z-index:1080; /* below drawer/backdrop, above page content */
+  background:var(--surface);
+  padding-top:14px; /* extra breathing so the border aligns nicely when stuck */
+}
 
 /* Buttons */
 .btn{padding:10px 20px;border-radius:6px;cursor:pointer;font-weight:500;transition:all .2s;border:none;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
@@ -57,7 +68,7 @@ body{background-color:var(--surface);color:var(--ink-900);min-height:100vh;overf
 /* Mobile hamburger (visibility controlled in media queries) */
 .btn-menu{
   height:38px;width:38px;border-radius:8px;border:1px solid var(--border);
-  background:#fff;color:var(--ink-900);cursor:pointer;font-size:20px;line-height:1;
+  background:#5c62d6; color:#fff;cursor:pointer;font-size:20px;line-height:1;
   align-items:center;justify-content:center;
 }
 .btn-menu:hover{background:var(--surface-2)}
@@ -120,6 +131,17 @@ button:disabled{opacity:.6;cursor:not-allowed}
 input:disabled,select:disabled{opacity:.6;background-color:var(--surface-2);color:var(--ink-900)}
 button[aria-label="Close"]:hover svg{stroke:var(--primary)}
 
+/* ===== Modal / Dialog z-index (sits above everything) ===== */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(1px);z-index:1300;}
+.modal-shell{position:fixed;inset:0;padding:24px;display:flex;align-items:center;justify-content:center;z-index:1305;}
+.modal-content{
+  width:min(96vw,880px);max-height:88vh;overflow:auto;background:#fff;border-radius:16px;padding:20px;
+  box-shadow:0 20px 25px -5px rgba(0,0,0,.10), 0 10px 10px -5px rgba(0,0,0,.04);
+  z-index:1310;
+}
+/* Optional: prevent background scroll if you toggle a class in TS */
+.main-content.modal-open{overflow:hidden;max-height:100vh}
+
 /* =========================
    RESPONSIVE MEDIA QUERIES
    ========================= */
@@ -152,22 +174,21 @@ button[aria-label="Close"]:hover svg{stroke:var(--primary)}
   .user-actions{gap:12px}
   .category-list{grid-template-columns:1fr}
 
-  /* ===== CHANGED: keep actions on the SAME LINE with the category on mobile ===== */
+  /* Keep actions on the same row as the name on mobile */
   .category-item{
-    flex-direction:row;            /* was column */
-    align-items:center;            /* center vertically */
+    flex-direction:row;
+    align-items:center;
     gap:12px;
     flex-wrap:nowrap;
   }
-  .category-name{flex:1;min-width:0;}  /* push actions to the right */
+  .category-name{flex:1;min-width:0;}
   .category-actions{
-    align-self:auto;               /* was flex-end */
+    align-self:auto;
     margin-left:auto;
     display:flex;
     gap:16px;
     flex-wrap:nowrap;
   }
-  /* ============================================================================ */
 
   .btn-settings.btn-icon{width:34px;height:34px;font-size:18px}
 }

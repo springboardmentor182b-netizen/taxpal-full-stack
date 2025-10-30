@@ -73,24 +73,27 @@
   flex:1; padding:0 16px 16px; display:flex; flex-direction:column; gap:12px;
   overflow-y:auto; -webkit-overflow-scrolling:touch; background:#EBEFFF; margin-left:0; min-height:0;
   padding-bottom:calc(env(safe-area-inset-bottom,0px) + 96px);
+  transition: transform .25s ease;               /* allow slide when drawer opens */
+  will-change: transform;
 }
 
-/* ============ Header ============ */
-/* Desktop default: title left, actions right (no hamburger). Sticky so it doesn't move on scroll. */
+/* ============ Header (STICKY) ============ */
 .top-bar{
-  position:sticky; top:0; z-index:1002;
+  position:-webkit-sticky; position:sticky;
+  top:0;
+  z-index:1002;                     /* header stays above page content */
   background:#EBEFFF;
   border-bottom:1px solid #e6e8ff;
   box-shadow:0 2px 8px rgba(0,0,0,.04);
 
   display:grid;
-  grid-template-columns:1fr auto; /* 2 cols on desktop (no hamburger) */
+  grid-template-columns:1fr auto;   /* desktop: title left, actions right */
   align-items:center;
   gap:12px;
-  padding:12px 0 12px;
+  padding:12px 0;
 }
 .hamburger{
-  display:none; /* shown on ≤1024px */
+  display:none;                     /* shown on ≤1024px */
   width:40px; height:40px;
   border:1px solid #e6e8ff; border-radius:10px;
   background:#5c62d6; color:#FBFBFB; cursor:pointer;
@@ -98,42 +101,34 @@
 }
 .top-title{
   margin:0; color:#25295A; line-height:1;
-  font-size:clamp(20px, 2.2vw, 32px);
+  font-size:clamp(22px, 2.4vw, 34px); font-weight:800;
   white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  justify-self:start; text-align:left;
 }
 .header-cta{
   justify-self:end;
   display:flex; gap:12px; flex-wrap:nowrap;
 }
 .header-cta .btn{
-  min-width:auto; padding:.5rem .75rem; font-size:14px;
+  min-width:auto; padding:.55rem .9rem; font-size:14px;
 }
 
 /* Drawer overlay & mobile close */
-.drawer-overlay{ position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(1px); z-index:998; display:none; pointer-events:none; }
+.drawer-overlay{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.35); backdrop-filter:blur(1px);
+  display:none; pointer-events:none;
+  z-index:2000;                     /* above header; below sidebar */
+}
 .drawer-overlay.open{ display:block; pointer-events:auto; }
+
 .close-mobile{ display:none; position:absolute; right:10px; top:10px; width:34px; height:34px; border-radius:8px; border:1px solid #e6e8ff; background:#fff; color:#25295A; cursor:pointer; font-size:18px; }
 
 /* ====== Page content ====== */
 .budgets-container{ min-height:auto; background:transparent; color:#0f172a; display:flex; flex-direction:column; }
 .main-content{ flex:1; }
 
-/* ===== Generic page header (used in cards) ===== */
-.page-header{
-  width:100%;
-  margin:0; padding:0;
-  display:grid;
-  grid-template-columns:1fr auto;
-  column-gap:16px;
-}
-.page-title{
-  margin:0; color:#25295A; line-height:1;
-  font-size:clamp(22px, 2.4vw, 34px); font-weight:800;
-  white-space:nowrap;
-}
-.btn-back svg{ width:18px; height:18px; }
-
-/* Sections & cards */
+/* ===== Section & cards ===== */
 .form-section{ display:block; padding:16px; }
 .form-card{
   width:100%; max-width:none; background:#fff;
@@ -141,8 +136,6 @@
   box-shadow:0 20px 25px -5px rgba(0,0,0,0.10), 0 10px 10px -5px rgba(0,0,0,0.04);
   border:1px solid #EBEFFF;
 }
-
-/* “Quarterly Schedule” + action */
 .form-card-header{
   display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px;
   margin-bottom:12px;
@@ -182,9 +175,9 @@
 
 .recent-empty{ padding:14px; color:#667085; font-size:14px; }
 
-/* ===== Modal (Budgets) ===== */
-.modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.15); z-index:999; }
-.modal-shell{ position:fixed; inset:0; z-index:1000; display:grid; place-items:center; padding:20px; background:transparent; }
+/* ===== Modal (Budgets) — ensure above header, no overlap ===== */
+.modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,.35); z-index:3000; }
+.modal-shell{ position:fixed; inset:0; z-index:3005; display:grid; place-items:center; padding:20px; background:transparent; }
 .modal-content{
   width:min(920px,96vw); max-height:90vh; overflow:auto;
   background:#fff; border-radius:16px;
@@ -194,47 +187,68 @@
 .modal-head{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding-bottom:8px; border-bottom:1px solid #EBEFFF; }
 .close-x{ background:none; border:1px solid #EBEFFF; width:32px; height:32px; border-radius:8px; cursor:pointer; }
 
-/* ===================  ≤ 1280px (small desktops / large tablets)  =================== */
+/* ===================  ≤ 1280px =================== */
 @media (max-width:1280px){
   .calendar__list{ grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); }
 }
 
-/* ===================  ≤ 1024px (Tablets & down)  =================== */
+/* ===================  ≤ 1024px (Tablets & down) =================== */
 @media (max-width:1024px){
 
-  /* Sidebar becomes drawer */
+  /* Sidebar becomes drawer (ABOVE header) */
   .hamburger{ display:inline-flex; }
   .sidebar{
     position:fixed; top:0; left:0; height:100dvh; width:300px;
     transform:translateX(-100%); transition:transform .25s ease;
-    z-index:999; box-shadow:0 20px 50px rgba(0,0,0,.25);
+    z-index:2001;                      /* higher than sticky header */
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
   }
   .sidebar.open{ transform:translateX(0); }
+
+  /* Overlay above header but below sidebar */
+  .drawer-overlay{ z-index:2000; }
   .close-mobile{ display:inline-flex; align-items:center; justify-content:center; }
 
-  /* Single-row sticky header on mobile/tablet: hamburger | centered title | actions right */
+  /* While drawer open, hide the hamburger so it doesn't sit on top */
+  .sidebar.open + .main .top-bar .hamburger{
+    opacity:0; pointer-events:none;
+  }
+
+  /* Slide entire main (header + content) so sidebar doesn't overlap it */
+  :host:has(.sidebar.open) .main{
+    transform: translateX(300px);
+  }
+
+  /* Sticky header: row1 (hamburger+title), row2 (buttons) */
   .top-bar{
-    grid-template-columns:40px 1fr auto;   /* 3 columns when hamburger is visible */
-    padding:10px 0 10px;
+    grid-template-columns:44px 1fr;
+    grid-template-rows:auto auto;
+    gap:12px;
+    padding:10px 0;
+    z-index:1002;                      /* below overlay & sidebar */
   }
   .top-title{
-    text-align:center; justify-self:center;
+    text-align:left; justify-self:start;
     font-size:clamp(20px,4.4vw,28px);
   }
-  .header-cta{ flex-wrap:nowrap; }
-  .header-cta .btn{ width:auto; min-height:36px; padding:.45rem .7rem; font-size:14px; }
+  .header-cta{
+    grid-column:1 / -1; grid-row:2;
+    display:flex; flex-direction:column; gap:12px; width:100%;
+    justify-self:stretch; align-self:start;
+  }
+  .header-cta .btn{ width:100%; min-height:44px; padding:.6rem 1rem; font-size:15px; }
 
   .main{ padding:0 14px 14px; }
   .form-card{ padding:20px; }
   .profile-actions{ grid-template-columns:1fr; }
 }
 
-/* ===================  ≤ 840px (Large phones / small tablets)  =================== */
+/* ===================  ≤ 840px =================== */
 @media (max-width:840px){
   .calendar__list{ grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); }
 }
 
-/* ===================  ≤ 600px (Phones)  =================== */
+/* ===================  ≤ 600px =================== */
 @media (max-width:600px){
   .form-section{ padding:12px; margin-top:6px; }
   .form-card{ padding:16px; border-radius:14px; }
@@ -245,10 +259,7 @@
   .menu a{ font-size:14px; padding:10px 14px; }
   .card{ padding:14px; }
 
-  /* If CTAs overflow, let them scroll horizontally instead of wrapping */
-  .header-cta{ max-width:55vw; overflow-x:auto; }
-
-  /* ===== Budgets list → vertical cards (no horizontal scroll) ===== */
+  /* Budgets list → vertical cards */
   :host ::ng-deep .budgets-list-host .table-wrap,
   :host ::ng-deep .budgets-list-host .table-responsive{ overflow-x:visible !important; }
 
@@ -286,12 +297,10 @@
     display:flex; justify-content:flex-end; align-items:center;
   }
 
-  /* Use data-label if provided; otherwise fallback via nth-child below */
   :host ::ng-deep .budgets-list-host td::before{
     content:attr(data-label);
     color:#25295A; font-weight:700; white-space:nowrap;
   }
-  /* Fallback labels (edit these to match your column order) */
   :host ::ng-deep .budgets-list-host td:nth-child(1)::before{ content:"Name"; }
   :host ::ng-deep .budgets-list-host td:nth-child(2)::before{ content:"Category"; }
   :host ::ng-deep .budgets-list-host td:nth-child(3)::before{ content:"Amount"; }
@@ -311,97 +320,12 @@
   }
 }
 
-/* ===================  ≤ 361px (Very small devices)  =================== */
+/* ===================  ≤ 361px =================== */
 @media (max-width:361px){
   .main{ padding-bottom:calc(env(safe-area-inset-bottom,0px) + 120px); }
   .sidebar{ width:92vw; }
 }
 
-/* === REMOVE sticky + single-row header === */
-.top-bar{
-  position: static;          /* was sticky */
-  top: auto;
-  z-index: auto;
-  box-shadow: none;
-  border-bottom: none;
-  background: transparent;
-  grid-template-columns: auto 1fr auto; /* desktop */
-  padding: 0;
-}
-
-/* Mobile / tablet: use two rows (title on row 1, actions below) */
-@media (max-width:1024px){
-  .hamburger{ display:inline-flex; }
-  .top-bar{
-    grid-template-columns:40px 1fr;
-    grid-template-rows:auto auto;
-    gap:12px;
-    padding: 0;
-  }
-  .hamburger{ grid-column:1; grid-row:1; align-self:center; justify-self:start; }
-  .top-title{
-    grid-column:2; grid-row:1;
-    text-align:left; justify-self:start; margin:0;
-  }
-  .header-cta{
-    grid-column:1 / -1; grid-row:2;
-    display:flex; gap:12px; flex-wrap:wrap;
-    justify-self:stretch; align-self:start;
-  }
-  .header-cta .btn{ width:100%; min-height:40px; }
-}
-
-/* small phones: keep two rows; allow actions to wrap naturally */
-@media (max-width:600px){
-  .header-cta{ max-width:100%; overflow-x:visible; }
-}
-
-/* ensure normal content spacing now that header isn't sticky */
-.main{ padding-top:16px; }
-
-/* ===== Mobile/tablet header: [hamburger][title] on row 1, buttons below ===== */
-@media (max-width:1024px){
-  .top-bar{
-    display:grid;
-    grid-template-columns:44px 1fr;   /* hamburger | title */
-    grid-template-rows:auto auto;     /* row1: icon+title, row2: actions */
-    align-items:center;
-    gap:12px;
-    padding:0;                         /* keep tight like screenshot */
-    background:transparent;
-    border-bottom:none;
-    box-shadow:none;
-  }
-
-  .hamburger{
-    display:inline-flex;
-    grid-column:1; grid-row:1;
-    justify-self:start; align-self:center;
-    width:40px; height:40px;
-  }
-
-  .top-title{
-    grid-column:2; grid-row:1;
-    margin:0;
-    text-align:left;                   /* title beside icon */
-    justify-self:start; align-self:center;
-  }
-
-  .header-cta{
-    grid-column:1 / -1; grid-row:2;   /* full width under title+icon */
-    display:flex; flex-direction:column;
-    gap:12px; width:100%;
-    justify-self:stretch; align-self:start;
-  }
-  .header-cta .btn{
-    width:100%;                        /* full-width buttons */
-    min-height:44px;
-    padding:.6rem 1rem;
-    font-size:15px;
-  }
-}
-
-/* tiny phones: keep same layout, allow inner scroll if buttons overflow */
-@media (max-width:360px){
-  .header-cta{ max-width:100%; overflow-x:visible; }
-}
+/* ===== Scroll locking when overlays are open ===== */
+:host:has(.modal-shell) .main{ overflow:hidden; }
+:host:has(.drawer-overlay.open) .main{ overflow:hidden; }

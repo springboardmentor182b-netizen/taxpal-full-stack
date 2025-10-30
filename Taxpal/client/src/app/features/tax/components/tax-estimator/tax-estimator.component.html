@@ -89,38 +89,39 @@
 
 <!-- Main -->
 <div class="main">
-  <!-- Top bar -->
-  <div class="top-bar">
-    <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">≡</button>
-    <div></div>
-  </div>
+  <!-- === Sticky header (title + tabs + back) === -->
+  <div class="sticky-header">
+    <div class="top-bar">
+      <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">≡</button>
+    </div>
 
-  <!-- Header: title on left, actions on right -->
-  <div class="page-header">
-    <h1 class="page-title--brandlike">Tax Estimator</h1>
+    <div class="page-header">
+      <h1 class="page-title--brandlike">Tax Estimator</h1>
 
-    <div class="header-actions" role="tablist" aria-label="Tax Estimator Tabs">
-      <button
-        class="tab-btn"
-        [class.active]="activeTab==='form'"
-        role="tab"
-        aria-selected="{{activeTab==='form'}}"
-        (click)="switchTab('form')">
-        Tax Form
-      </button>
+      <div class="header-actions" role="tablist" aria-label="Tax Estimator Tabs">
+        <button
+          class="tab-btn"
+          [class.active]="activeTab==='form'"
+          role="tab"
+          aria-selected="{{activeTab==='form'}}"
+          (click)="switchTab('form')">
+          Tax Form
+        </button>
 
-      <button
-        class="tab-btn"
-        [class.active]="activeTab==='summary'"
-        role="tab"
-        aria-selected="{{activeTab==='summary'}}"
-        (click)="switchTab('summary')">
-        Summary
-      </button>
+        <button
+          class="tab-btn"
+          [class.active]="activeTab==='summary'"
+          role="tab"
+          aria-selected="{{activeTab==='summary'}}"
+          (click)="switchTab('summary')">
+          Summary
+        </button>
 
-      <a class="btn-back" [routerLink]="['/dashboard']" style="text-align: center;">Back to Dashboard</a>
+        <!-- <a class="btn-back" [routerLink]="['/dashboard']" style="text-align: center;">Back to Dashboard</a> -->
+      </div>
     </div>
   </div>
+  <!-- === /Sticky header === -->
 
   <!-- Content (full-width under header) -->
   <section class="form-section">
@@ -196,7 +197,17 @@
             <label>Gross Income for Quarter</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
-              <input class="input pl-currency" formControlName="grossIncome" type="number" min="0" step="0.01" placeholder="0.00" />
+              <input
+                class="input pl-currency"
+                formControlName="grossIncome"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+                (keydown)="blockInvalidNumberKeys($event)"
+                (input)="onNumberInput('grossIncome', $event)"
+                (wheel)="$event.target.blur()" />
             </div>
           </div>
         </div>
@@ -207,7 +218,17 @@
             <label>Business Expenses</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
-              <input class="input pl-currency" formControlName="businessExpenses" type="number" min="0" step="0.01" placeholder="0.00" />
+              <input
+                class="input pl-currency"
+                formControlName="businessExpenses"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+                (keydown)="blockInvalidNumberKeys($event)"
+                (input)="onNumberInput('businessExpenses', $event)"
+                (wheel)="$event.target.blur()" />
             </div>
           </div>
 
@@ -215,7 +236,17 @@
             <label>Retirement Contributions</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
-              <input class="input pl-currency" formControlName="retirement" type="number" min="0" step="0.01" placeholder="0.00" />
+              <input
+                class="input pl-currency"
+                formControlName="retirement"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+                (keydown)="blockInvalidNumberKeys($event)"
+                (input)="onNumberInput('retirement', $event)"
+                (wheel)="$event.target.blur()" />
             </div>
           </div>
         </div>
@@ -225,7 +256,17 @@
             <label>Health Insurance Premiums</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
-              <input class="input pl-currency" formControlName="health" type="number" min="0" step="0.01" placeholder="0.00" />
+              <input
+                class="input pl-currency"
+                formControlName="health"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+                (keydown)="blockInvalidNumberKeys($event)"
+                (input)="onNumberInput('health', $event)"
+                (wheel)="$event.target.blur()" />
             </div>
           </div>
 
@@ -233,7 +274,17 @@
             <label>Home Office Deduction</label>
             <div class="currency-wrap">
               <span class="currency-prefix">$</span>
-              <input class="input pl-currency" formControlName="homeOffice" type="number" min="0" step="0.01" placeholder="0.00" />
+              <input
+                class="input pl-currency"
+                formControlName="homeOffice"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+                (keydown)="blockInvalidNumberKeys($event)"
+                (input)="onNumberInput('homeOffice', $event)"
+                (wheel)="$event.target.blur()" />
             </div>
           </div>
         </div>
@@ -294,7 +345,9 @@
   <div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
   <div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
     <div class="modal-content" (click)="$event.stopPropagation()">
-      <app-budgets-list></app-budgets-list>
+      <div class="modal-scroll">
+        <app-budgets-list></app-budgets-list>
+      </div>
     </div>
   </div>
 </div>

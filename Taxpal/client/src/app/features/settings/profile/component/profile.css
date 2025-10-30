@@ -5,7 +5,7 @@ body{background-color:#FBFBFB;color:#1A1A1A;min-height:100vh;overflow-x:hidden}
 /* ===== Sidebar (pinned on desktop, drawer on ≤1024px) ===== */
 .sidebar{
   width:250px;background-color:#25295A;color:#fff;padding:20px 0;height:100vh;
-  position:fixed;left:0;top:0;overflow-y:auto;z-index:1100;
+  position:fixed;left:0;top:0;overflow-y:auto;z-index:1100; /* above header/backdrop */
   transition:transform .25s ease;
 }
 .logo{padding:0 20px 20px;border-bottom:1px solid #656ED3;margin-bottom:20px}
@@ -19,7 +19,7 @@ body{background-color:#FBFBFB;color:#1A1A1A;min-height:100vh;overflow-x:hidden}
 
 /* Drawer backdrop (mobile/tablet) */
 .drawer-backdrop{
-  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1090;
+  position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1090; /* above sticky header, below sidebar */
   opacity:0;pointer-events:none;transition:opacity .2s ease;
 }
 .drawer-backdrop.show{opacity:1;pointer-events:auto}
@@ -32,17 +32,24 @@ body{background-color:#FBFBFB;color:#1A1A1A;min-height:100vh;overflow-x:hidden}
 
 /* ===== Header ===== */
 .header{
-  display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;
-  padding-bottom:20px;border-bottom:1px solid #EBEFFF;width:100%
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:30px;padding-bottom:20px;border-bottom:1px solid #EBEFFF;width:100%;
 }
 .header h2{color:#25295A;font-weight:600;font-size:28px}
 .header-left{display:flex;align-items:center;gap:12px}
 .user-actions{display:flex;align-items:center;gap:15px}
 
+/* ✅ Sticky behavior with safe stacking */
+.header--sticky{
+  position:sticky;top:0;z-index:1080; /* below backdrop(1090)/sidebar(1100), above content */
+  background:#FBFBFB; /* solid background so content doesn't bleed under */
+  padding-top:14px;   /* subtle breathing when stuck */
+}
+
 /* Hamburger (hidden on desktop; shown via media query) */
 .btn-menu{
   height:38px;width:38px;border-radius:8px;border:1px solid #EBEFFF;
-  background:#fff;color:#1A1A1A;cursor:pointer;font-size:20px;line-height:1;
+  background:#5c62d6; color:#fff;cursor:pointer;font-size:20px;line-height:1;
   display:none;align-items:center;justify-content:center;
 }
 .btn-menu:hover{background:#EBEFFF}

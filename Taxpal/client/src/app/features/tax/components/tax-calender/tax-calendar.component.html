@@ -27,9 +27,7 @@
       </a>
 
       <!-- Transactions -->
-      <a routerLink="/transactions"
-         routerLinkActive="active"
-         (click)="closeMobileNavIfSmall()">
+      <a routerLink="/transactions" routerLinkActive="active" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 7h10v2H7V7Zm-2 4h14v2H5v-2Zm3 4h8v2H8v-2Z" fill="currentColor" opacity=".25"/>
           <path d="M6.2 5.8 4.8 4.4A9 9 0 1 1 20 12h-2a7 7 0 1 0-11.8-6.2Z" fill="currentColor" />
@@ -39,9 +37,7 @@
       </a>
 
       <!-- Tax Estimator -->
-      <a routerLink="/tax-estimator"
-         routerLinkActive="active"
-         (click)="closeMobileNavIfSmall()">
+      <a routerLink="/tax-estimator" routerLinkActive="active" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
           <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
@@ -51,8 +47,7 @@
       </a>
 
       <!-- Budgets -->
-      <a href="#"
-         (click)="openBudget(); closeMobileNavIfSmall(); $event.preventDefault()">
+      <a href="#" (click)="openBudget(); closeMobileNavIfSmall(); $event.preventDefault()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M12 3a9 9 0 1 0 9 9h-9V3Z" fill="currentColor" opacity=".2" />
           <path d="M12 3v9h9" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -62,9 +57,7 @@
       </a>
 
       <!-- Reports -->
-      <a routerLink="/financial-reports"
-         routerLinkActive="active"
-         (click)="closeMobileNavIfSmall()">
+      <a routerLink="/financial-reports" routerLinkActive="active" (click)="closeMobileNavIfSmall()">
         <svg class="nav-ic" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z" fill="currentColor" opacity=".12"/>
           <path d="M14 3v5h5" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linejoin="round"/>
@@ -105,31 +98,27 @@
 
 <!-- Main -->
 <div class="main">
-  <!-- Top bar -->
+  <!-- Sticky, two-row header -->
   <div class="top-bar">
     <button type="button" class="hamburger" aria-label="Open menu" (click)="toggleMobileNav()">☰</button>
+    <h1 class="top-title"><strong>Tax Calendar</strong></h1>
 
-    <!-- Use grid header so title + CTAs stay on one line on desktop -->
-    <div class="page-header">
-      <h1 class="top-title"><strong>Tax Calendar</strong></h1>
-      <div class="header-cta">
-        <a class="btn btn-outline btn-back"
-           routerLink="/dashboard"
-           (click)="closeMobileNavIfSmall()">
-          <span>Back to Dashboard</span>
-        </a>
+    <div class="header-cta">
+      <!-- <a class="btn btn-outline btn-back"
+         routerLink="/dashboard"
+         (click)="closeMobileNavIfSmall()">
+        <span>Back to Dashboard</span>
+      </a> -->
 
-        <button type="button" class="btn btn-primary btn-calc-tax" (click)="goToEstimator()">
-          Calculate Tax
-        </button>
-      </div>
+      <button type="button" class="btn btn-primary btn-calc-tax" (click)="goToEstimator()">
+        Calculate Tax
+      </button>
     </div>
   </div>
 
-  <!-- Tax Calendar content -->
+  <!-- Content -->
   <div class="budgets-container">
     <main class="main-content">
-
       <section class="form-section">
         <div class="form-card">
           <div class="form-card-header">
@@ -214,7 +203,7 @@
   </div>
 </div>
 
-<!-- Budgets modal (same module used as Dashboard) -->
+<!-- Budgets modal -->
 <div class="modal-backdrop" *ngIf="showBudget" (click)="closeBudget()"></div>
 <div class="modal-shell" *ngIf="showBudget" (click)="closeBudget()" tabindex="-1">
   <div class="modal-content" (click)="$event.stopPropagation()">
@@ -223,7 +212,6 @@
       <button class="close-x" (click)="closeBudget()" aria-label="Close budgets">✕</button>
     </div>
 
-    <!-- Host wrapper so we can apply mobile “vertical table” styles locally -->
     <div class="budgets-list-host">
       <app-budgets-list></app-budgets-list>
     </div>

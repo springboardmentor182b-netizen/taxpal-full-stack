@@ -38,6 +38,9 @@
                   placeholder="0.00"
                   class="input pl-currency"
                   formControlName="amount"
+                  inputmode="decimal"
+                  (keydown)="blockInvalidAmountKeys($event)"
+                  (input)="onAmountInput($event)"
                   (wheel)="$event.target.blur()" />
               </div>
               <small class="error" *ngIf="isInvalid('amount')">Enter a non-negative amount.</small>
