@@ -19,7 +19,8 @@
 <div class="drawer-backdrop" [class.show]="mobileNavOpen" (click)="closeDrawer()"></div>
 
 <div class="main-content">
-  <div class="header">
+  <!-- ✅ Sticky header -->
+  <div class="header header--sticky">
     <div class="header-left">
       <!-- Hamburger (only shows on ≤1024px) -->
       <button

@@ -29,7 +29,11 @@
               [(ngModel)]="formData.description"
               placeholder="Eg, Grocery shopping"
               required
+              #descriptionRef="ngModel"
             />
+            <small class="error" *ngIf="descriptionRef.invalid && (descriptionRef.dirty || descriptionRef.touched)">
+              Description is required.
+            </small>
           </div>
 
           <div class="form-group">
@@ -43,9 +47,17 @@
                 [(ngModel)]="formData.amount"
                 placeholder="0.00"
                 step="0.01"
+                min="0.01"
+                inputmode="decimal"
+                (keydown)="blockInvalidAmountKeys($event)"
+                (input)="onAmountInput($event)"
                 required
+                #amountRef="ngModel"
               />
             </div>
+            <small class="error" *ngIf="amountRef.invalid && (amountRef.dirty || amountRef.touched)">
+              {{ amountRef.errors?.['required'] ? 'Amount is required.' : 'Amount must be greater than 0.' }}
+            </small>
           </div>
         </div>
 
@@ -58,6 +70,7 @@
               name="category"
               [(ngModel)]="formData.category"
               required
+              #categoryRef="ngModel"
             >
               <option value="">Select a category</option>
               <option value="food">Food & Dining</option>
@@ -68,6 +81,9 @@
               <option value="healthcare">Healthcare</option>
               <option value="other">Other</option>
             </select>
+            <small class="error" *ngIf="categoryRef.invalid && (categoryRef.dirty || categoryRef.touched)">
+              Category is required.
+            </small>
           </div>
 
           <div class="form-group">
@@ -79,6 +95,7 @@
                 name="date"
                 [(ngModel)]="formData.date"
                 required
+                #dateRef="ngModel"
               />
               <svg class="calendar-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke="currentColor" stroke-width="2"/>
@@ -87,6 +104,9 @@
                 <line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/>
               </svg>
             </div>
+            <small class="error" *ngIf="dateRef.invalid && (dateRef.dirty || dateRef.touched)">
+              Date is required.
+            </small>
           </div>
         </div>
 

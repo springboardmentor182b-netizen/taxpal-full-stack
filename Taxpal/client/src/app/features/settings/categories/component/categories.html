@@ -12,8 +12,6 @@
     <a class="menu-item active" routerLink="/settings/categories" routerLinkActive="active">
       <i></i> Categories
     </a>
-    <!--<a class="menu-item"><i></i> Notifications</a>
-    <a class="menu-item"><i></i> Security</a> -->
   </div>
 </div>
 
@@ -22,7 +20,8 @@
 
 <!-- Main Content -->
 <div class="main-content">
-  <div class="header">
+  <!-- Sticky header -->
+  <div class="header header--sticky">
     <div class="header-left">
       <!-- Hamburger (hidden on desktop by CSS) -->
       <button
@@ -38,14 +37,13 @@
     </div>
 
     <div class="user-actions">
-      <!-- ✕ Close button — give it an icon class so we can size it per breakpoint -->
-      <a
+      <!-- <a
         class="btn btn-settings"
         routerLink="/dashboard"
         aria-label="Close and go to dashboard"
         title="Close"
         (click)="closeDrawer()"
-      >Back to Dashboard</a>
+      >Back to Dashboard</a> -->
 
       <button class="btn btn-settings" (click)="loadCategories()" [disabled]="isLoading">
         {{ isLoading ? 'Refreshing...' : 'Refresh' }}

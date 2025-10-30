@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClientModule, HttpErrorResponse } from '@angular/common/http';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';  // 👈 add
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { BudgetService } from '../../../core/services/budget.service';
 
 @Component({
   selector: 'app-budgets',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatSnackBarModule], // 👈 add MatSnackBarModule
+  imports: [CommonModule, ReactiveFormsModule, HttpClientModule, MatSnackBarModule],
   templateUrl: './budgets.component.html',
   styleUrls: ['./budgets.component.css']
 })
@@ -26,7 +26,7 @@ export class BudgetsComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private budgetService: BudgetService,
-    private snack: MatSnackBar                                         // 👈 inject
+    private snack: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -35,8 +35,8 @@ export class BudgetsComponent implements OnInit {
 
     this.form = this.fb.group({
       category: ['', Validators.required],
-      amount: [null, [Validators.required, Validators.min(0)]],
-      month: [defaultMonth, Validators.required],   // value should be 'YYYY-MM'
+      amount: [null, [Validators.required, Validators.min(0)]], // non-negative
+      month: [defaultMonth, Validators.required],
       description: ['', Validators.maxLength(500)]
     });
   }
@@ -58,8 +58,8 @@ export class BudgetsComponent implements OnInit {
   /** Normalize any browser-provided month into 'YYYY-MM'. */
   private toYYYYMM(value: unknown): string {
     if (typeof value === 'string') {
-      if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return value;         
-      const dmatch = value.match(/^(\d{4})-(\d{2})-\d{2}$/);               // 'YYYY-MM-DD'
+      if (/^\d{4}-(0[1-9]|1[0-2])$/.test(value)) return value;
+      const dmatch = value.match(/^(\d{4})-(\d{2})-\d{2}$/);
       if (dmatch) return `${dmatch[1]}-${dmatch[2]}`;
     }
     const d = new Date(value as any);
@@ -69,6 +69,36 @@ export class BudgetsComponent implements OnInit {
       return `${y}-${m}`;
     }
     return '';
+  }
+
+  /** Block characters that could create negatives or scientific notation */
+  blockInvalidAmountKeys(evt: KeyboardEvent) {
+    const blocked = ['-', '+', 'e', 'E'];
+    if (blocked.includes(evt.key)) {
+      evt.preventDefault();
+    }
+  }
+
+  /** Sanitize pasted/typed value to keep it non-negative decimal */
+  onAmountInput(event: Event) {
+    const inputEl = event.target as HTMLInputElement;
+    const raw = inputEl.value ?? '';
+
+    // Keep digits and a single dot; drop minus/plus/letters (e.g., "1e2" -> "12")
+    let cleaned = raw.replace(/[^0-9.]/g, '');
+    cleaned = cleaned.replace(/(\..*)\./g, '$1'); // only one dot
+
+    inputEl.value = cleaned;
+
+    const n = cleaned === '' ? NaN : parseFloat(cleaned);
+    if (!Number.isFinite(n)) {
+      this.form.get('amount')?.setValue(null, { emitEvent: false });
+      return;
+    }
+
+    const clamped = Math.max(0, n); // non-negative
+    // Reflect clamped value in control (and keep caret stable)
+    this.form.get('amount')?.setValue(clamped, { emitEvent: false });
   }
 
   onSubmit(): void {
@@ -83,10 +113,9 @@ export class BudgetsComponent implements OnInit {
     const month = this.toYYYYMM(raw.month);
     const body = {
       category: String(raw.category).trim(),
-      amount: Number(raw.amount),
-      month,                                      // 'YYYY-MM'
+      amount: Math.max(0, Number(raw.amount)), // final guard
+      month,                                    // 'YYYY-MM'
       description: String(raw.description || '').trim() || undefined
-      // monthStart is omitted; server derives it
     };
 
     this.budgetService.create(body).subscribe({
@@ -94,15 +123,14 @@ export class BudgetsComponent implements OnInit {
         this.submitting = false;
         this.form.reset();
 
-        // ✅ success popup
         this.snack.open('Budget created successfully', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',
-          panelClass: ['snack-success'] // optional custom style
+          panelClass: ['snack-success']
         });
 
-        this.finish(); // navigate/close after showing the toast
+        this.finish();
       },
       error: (e: HttpErrorResponse) => {
         this.submitting = false;
@@ -113,12 +141,11 @@ export class BudgetsComponent implements OnInit {
            e?.status === 400 ? 'Please check the form (month must be YYYY-MM, amount ≥ 0).' :
            'Something went wrong. Please try again.');
 
-        // ❌ error popup
         this.snack.open(msg, 'Dismiss', {
           duration: 4000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',
-          panelClass: ['snack-error'] // optional custom style
+          panelClass: ['snack-error']
         });
 
         console.error('Create budget failed:', { status: e?.status, url: e?.url, error: e?.error });

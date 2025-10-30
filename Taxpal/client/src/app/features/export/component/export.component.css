@@ -82,15 +82,22 @@
   flex:1; padding:15px; display:flex; flex-direction:column; gap:10px;
   overflow:auto; background:#EBEFFF; margin-left:0;
 }
+
+/* Sticky header bar */
 .top-bar{
   display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+  position:sticky; top:0;
+  z-index:996;                  /* below drawer overlay (998) & mobile sidebar (999), above page content */
+  background:#EBEFFF;           /* solid bg so content doesn’t show through */
+  border-bottom:1px solid #e6e8ff;
+  padding:10px 12px;
 }
 .top-bar h1{ font-size:34px; color:#2d3e50; }
 
 /* Hamburger */
 .hamburger{
   display:none; width:40px; height:40px; border:1px solid #e6e8ff; border-radius:8px;
-  background:#fff; cursor:pointer; align-items:center; justify-content:center; gap:4px;
+  background:#5c62d6; color:#fff;cursor:pointer; align-items:center; justify-content:center; gap:4px;
 }
 
 /* Keep your export page styles */
@@ -118,20 +125,21 @@
 .loading{ padding:14px; opacity:.8; }
 .error{ color:#c0392b; margin-top:10px; }
 
-/* Close (X) button styling moved to class for clarity */
+/* Close (X) button */
 .close-x{
   position:fixed; top:16px; right:24px; background:transparent; border:none; cursor:pointer; padding:8px; line-height:0;
-  z-index:997;
+  z-index:997; /* above sticky header, below overlay/sidebar/modal */
 }
 .close-x svg{ stroke:#534CA4; transition:stroke .15s ease; }
 .close-x:hover svg{ stroke:#656ED3; }
 
 /* ====== Modal (Budgets) ====== */
+/* Raise modal above everything, including sticky header and overlay */
 .modal-backdrop{
-  position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(1px); z-index:990;
+  position:fixed; inset:0; background:rgba(0,0,0,.35); backdrop-filter:blur(1px); z-index:1000;
 }
 .modal-shell{
-  position:fixed; inset:0; padding:24px; display:flex; align-items:center; justify-content:center; z-index:995;
+  position:fixed; inset:0; padding:24px; display:flex; align-items:center; justify-content:center; z-index:1005;
 }
 .modal-content{
   width:min(96vw, 880px); max-height:88vh; overflow:auto; background:#fff; border-radius:16px;
@@ -143,6 +151,7 @@
 @media (max-width:1024px){
   .hamburger{ display:inline-flex; }
   .top-bar h1{ font-size:28px; }
+
   .sidebar{
     position:fixed; top:0; left:0; height:100vh; width:280px;
     transform:translateX(-100%); transition:transform .25s ease; z-index:999;
