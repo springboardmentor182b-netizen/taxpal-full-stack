@@ -36,7 +36,7 @@ Features covered:
 
 . Response: { userId, name, email }
 
-***********💰 Income & Expense APIs***************
+************💰 Income & Expense APIs****************
 
 4. Add Transaction (income/expense)
 
