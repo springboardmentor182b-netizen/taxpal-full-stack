@@ -37,13 +37,13 @@
     </div>
 
     <div class="user-actions">
-      <!-- <a
+      <a
         class="btn btn-settings"
         routerLink="/dashboard"
         aria-label="Close and go to dashboard"
         title="Close"
         (click)="closeDrawer()"
-      >Back to Dashboard</a> -->
+      >Back to Dashboard</a>
 
       <button class="btn btn-settings" (click)="loadCategories()" [disabled]="isLoading">
         {{ isLoading ? 'Refreshing...' : 'Refresh' }}
