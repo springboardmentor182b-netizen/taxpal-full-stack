@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://taxpal-full-stack1-sh9q.onrender.com/api/v1',
+  apiUrl: 'https://taxpal-full-stack1-sh9q.onrender.com/api/v1', 
   appName: 'TaxPal',
   version: '1.0.0',
   enableLogging: false,
