@@ -50,6 +50,14 @@
         </div>
       </div>
 
+      <!-- Forgot password -->
+      <a
+        routerLink="/forgot-password"
+        class="signup-link"
+        style="align-self:flex-start;margin-top:4px;margin-bottom:6px; font-size: 15px;"
+        >Forgot password?</a
+      >
+
       <!-- Global Error -->
       <div *ngIf="errorMessage()" class="error-banner">
         {{ errorMessage() }}
@@ -75,7 +83,7 @@
   <div class="auth-right">
     <div class="artwrap">
       <img
-        src="../../../../../assets/images/Login_bg Image.jpg"
+        src="../../../../../assets/images/Login_bg_image.png"
         alt="Tax planning illustration"
         class="art"
       />

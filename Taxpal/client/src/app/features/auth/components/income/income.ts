@@ -37,12 +37,38 @@ export class IncomeModalComponent {
 
   onSave() {
     const d = this.formData;
+    // strictly positive on submit (server should enforce too)
     if (d.description?.trim() && d.amount != null && d.amount > 0 && d.category && d.date) {
       this.save.emit({ ...d });
       this.onClose();
     }
   }
- 
+
+  /** Prevent typing of characters that enable negatives/exponents in number inputs */
+  blockInvalidAmountKeys(evt: KeyboardEvent) {
+    const blocked = ['-', '+', 'e', 'E'];
+    if (blocked.includes(evt.key)) {
+      evt.preventDefault();
+    }
+  }
+
+  /** Sanitize pasted/typed values so they can never be negative */
+  onAmountInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    // Strip minus signs (paste or IME), keep digits and dot
+    const cleaned = input.value.replace(/-/g, '');
+    input.value = cleaned;
+
+    const n = parseFloat(cleaned);
+    if (!Number.isFinite(n)) {
+      this.formData.amount = null;
+      return;
+    }
+    // Clamp to >= 0
+    const clamped = Math.max(0, n);
+    this.formData.amount = clamped;
+  }
+
   private resetForm() {
     this.formData = {
       description: '',

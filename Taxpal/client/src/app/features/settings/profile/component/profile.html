@@ -12,8 +12,6 @@
     <a class="menu-item" routerLink="/settings/categories" routerLinkActive="active">
       <i></i> Categories
     </a>
-    <a class="menu-item"><i></i> Notifications</a>
-    <a class="menu-item"><i></i> Security</a>
   </div>
 </div>
 
@@ -21,7 +19,8 @@
 <div class="drawer-backdrop" [class.show]="mobileNavOpen" (click)="closeDrawer()"></div>
 
 <div class="main-content">
-  <div class="header">
+  <!-- ✅ Sticky header -->
+  <div class="header header--sticky">
     <div class="header-left">
       <!-- Hamburger (only shows on ≤1024px) -->
       <button

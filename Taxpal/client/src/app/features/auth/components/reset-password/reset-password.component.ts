@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewEncapsulation, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -14,7 +15,7 @@ import { AuthService } from '@/app/core/services/auth.service';
 @Component({
   selector: 'app-reset-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule,RouterModule],
   templateUrl: './reset-password.component.html',
   styleUrls: ['./reset-password.component.css'],
   encapsulation: ViewEncapsulation.None

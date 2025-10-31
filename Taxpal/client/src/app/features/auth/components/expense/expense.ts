@@ -42,10 +42,11 @@ export class ExpenseModalComponent {
 
   onSave() {
     const d = this.formData;
+    // strictly positive on submit (server also enforces)
     if (d.description?.trim() && d.amount != null && d.amount > 0 && d.category && d.date) {
       const emitPayload: ExpenseEmit = {
         description: d.description.trim(),
-        amount: d.amount as number,       // guaranteed non-null here
+        amount: d.amount as number,
         category: d.category,
         date: d.date,
         notes: d.notes
@@ -54,7 +55,32 @@ export class ExpenseModalComponent {
       this.onClose();
     }
   }
- 
+
+  /** Prevent typing of characters that enable negatives/exponents in number inputs */
+  blockInvalidAmountKeys(evt: KeyboardEvent) {
+    const blocked = ['-', '+', 'e', 'E'];
+    if (blocked.includes(evt.key)) {
+      evt.preventDefault();
+    }
+  }
+
+  /** Sanitize pasted/typed values so they can never be negative */
+  onAmountInput(event: Event) {
+    const input = event.target as HTMLInputElement;
+    // Strip any minus signs and non-numeric cruft except dot
+    const cleaned = input.value.replace(/-/g, '');
+    input.value = cleaned;
+
+    const n = parseFloat(cleaned);
+    if (!Number.isFinite(n)) {
+      this.formData.amount = null;
+      return;
+    }
+    // Clamp to >= 0, and keep two decimals as user types
+    const clamped = Math.max(0, n);
+    this.formData.amount = clamped;
+  }
+
   private resetForm() {
     this.formData = {
       description: '',

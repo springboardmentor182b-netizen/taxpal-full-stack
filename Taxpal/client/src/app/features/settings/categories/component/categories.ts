@@ -45,6 +45,20 @@ export class SettingsCategoriesComponent implements OnInit {
     }
   }
 
+  // ===== Helpers (UI duplicate guard) =====
+  private normalize(name: string): string {
+    return name.trim().toLowerCase().replace(/\s+/g, ' ');
+  }
+
+  private isDuplicate(name: string, type: 'expense' | 'income', excludeId?: string | null): boolean {
+    const n = this.normalize(name);
+    return this.categories.some(c =>
+      c.type === type &&
+      this.normalize(c.name) === n &&
+      (!excludeId || (c as any)._id !== excludeId)
+    );
+  }
+
   // ===== Load =====
   loadCategories(): void {
     this.isLoading = true;
@@ -67,11 +81,24 @@ export class SettingsCategoriesComponent implements OnInit {
   // ===== Add / Update =====
   handleAddCategory(): void {
     const name = this.categoryName.trim();
+    const type = this.categoryType;
+
     if (!name) { alert('Please enter a category name'); return; }
+
+    // Client-side duplicate check (case-insensitive, ignore extra spaces)
+    if (!this.isEditing && this.isDuplicate(name, type)) {
+      alert('Category already exists for this type.');
+      return;
+    }
+    if (this.isEditing && this.currentEditId && this.isDuplicate(name, type, this.currentEditId)) {
+      alert('Another category with the same name and type already exists.');
+      return;
+    }
+
     if (this.isEditing && this.currentEditId) {
-      this.updateCategory(this.currentEditId, name, this.categoryType);
+      this.updateCategory(this.currentEditId, name, type);
     } else {
-      this.addNewCategory(name, this.categoryType);
+      this.addNewCategory(name, type);
     }
   }
 
@@ -79,16 +106,28 @@ export class SettingsCategoriesComponent implements OnInit {
     this.isLoading = true;
 
     if (this.isOffline) {
+      if (this.isDuplicate(name, type)) {
+        alert('Category already exists for this type.');
+        this.isLoading = false; return;
+      }
       this.categories = [...this.categories, { _id: this.genId(), name, type }];
       this.resetForm(); this.isLoading = false; return;
     }
 
     this.categoryService.createCategory({ name, type }).subscribe({
       next: () => { this.loadCategories(); this.resetForm(); this.isLoading = false; },
-      error: () => {
-        this.isOffline = true;
-        this.error = 'Server not reachable — saved locally for now.';
-        this.categories = [...this.categories, { _id: this.genId(), name, type }];
+      error: (err) => {
+        // If server says duplicate, surface message
+        if (typeof err === 'string' && /already exists/i.test(err)) {
+          alert('Category already exists for this type.');
+        } else {
+          this.isOffline = true;
+          this.error = 'Server not reachable — saved locally for now.';
+          // Still guard against duplicate locally
+          if (!this.isDuplicate(name, type)) {
+            this.categories = [...this.categories, { _id: this.genId(), name, type }];
+          }
+        }
         this.resetForm(); this.isLoading = false;
       }
     });
@@ -98,16 +137,26 @@ export class SettingsCategoriesComponent implements OnInit {
     this.isLoading = true;
 
     if (this.isOffline) {
+      if (this.isDuplicate(name, type, id)) {
+        alert('Another category with the same name and type already exists.');
+        this.isLoading = false; return;
+      }
       this.categories = this.categories.map(c => c._id === id ? ({ ...c, name, type }) : c);
       this.cancelEdit(); this.isLoading = false; return;
     }
 
     this.categoryService.updateCategory(id, { name, type }).subscribe({
       next: () => { this.loadCategories(); this.cancelEdit(); this.isLoading = false; },
-      error: () => {
-        this.isOffline = true;
-        this.error = 'Server not reachable — updated locally for now.';
-        this.categories = this.categories.map(c => c._id === id ? ({ ...c, name, type }) : c);
+      error: (err) => {
+        if (typeof err === 'string' && /already exists/i.test(err)) {
+          alert('Another category with the same name and type already exists.');
+        } else {
+          this.isOffline = true;
+          this.error = 'Server not reachable — updated locally for now.';
+          if (!this.isDuplicate(name, type, id)) {
+            this.categories = this.categories.map(c => c._id === id ? ({ ...c, name, type }) : c);
+          }
+        }
         this.cancelEdit(); this.isLoading = false;
       }
     });
@@ -137,11 +186,11 @@ export class SettingsCategoriesComponent implements OnInit {
   // ===== Edit helpers =====
   startEdit(id: string): void {
     if (this.isEditing) this.cancelEdit();
-    const cat = this.categories.find(c => c._id === id);
+    const cat = this.categories.find(c => (c as any)._id === id);
     if (!cat) return;
 
     this.isEditing = true;
-       this.currentEditId = id;
+    this.currentEditId = id;
     this.categoryName = cat.name;
     this.categoryType = cat.type;
 

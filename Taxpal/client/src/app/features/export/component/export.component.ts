@@ -1,13 +1,16 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, HostListener, inject } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+
 import { ExportService, PreviewRequest } from '../../../core/services/export.service';
+import { AuthService, User } from '../../../core/services/auth.service';
+import { BudgetsListComponent } from '../../budgets/component/budgets-list.component'; // adjust path if different
 
 @Component({
   selector: 'app-export',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink, BudgetsListComponent],
   templateUrl: './export.component.html',
   styleUrls: ['./export.component.css']
 })
@@ -18,7 +21,19 @@ export class ExportComponent implements OnInit {
   private exportSvc = inject(ExportService);
   private sanitizer = inject(DomSanitizer);
 
-  // state
+  // Make auth public so template can call auth.logout()
+  public auth = inject(AuthService);
+
+  // Sidebar / drawer state
+  mobileNavOpen = false;
+
+  // Budget modal
+  showBudget = false;
+
+  // user (for avatar + profile)
+  user: User | null = null;
+
+  // ======== existing export state ========
   id?: string;
   type: string = 'income-statement';
   period: string = 'current-month';
@@ -32,6 +47,12 @@ export class ExportComponent implements OnInit {
   previewFilename = 'report.pdf';
   previewable = true;
 
+  constructor() {
+    // hydrate current user
+    this.auth.currentUser$.subscribe(u => (this.user = u));
+    this.user = this.auth.getCurrentUser();
+  }
+
   ngOnInit(): void {
     this.route.queryParamMap.subscribe(params => {
       this.id = params.get('id') || undefined;
@@ -42,7 +63,47 @@ export class ExportComponent implements OnInit {
     });
   }
 
-  // ⨉ button handler
+  /* ================= Drawer helpers (match Dashboard) ================= */
+  toggleMobileNav(): void {
+    this.mobileNavOpen = !this.mobileNavOpen;
+    this.lockScroll(this.mobileNavOpen);
+  }
+  closeMobileNav(): void {
+    this.mobileNavOpen = false;
+    this.lockScroll(false);
+  }
+  closeMobileNavIfSmall(): void {
+    if (window.innerWidth <= 1024) this.closeMobileNav();
+  }
+  private lockScroll(lock: boolean) {
+    try { document.body.style.overflow = lock ? 'hidden' : ''; } catch {}
+  }
+  @HostListener('document:keydown', ['$event'])
+  onKeydown(e: KeyboardEvent) {
+    if (e.key === 'Escape' && this.mobileNavOpen) this.closeMobileNav();
+  }
+  @HostListener('window:resize')
+  onResize() {
+    if (window.innerWidth > 1024 && this.mobileNavOpen) this.closeMobileNav();
+  }
+
+  // Avatar initials
+  get firstInitial(): string {
+    const s = (this.user?.name || this.user?.email || 'U').trim();
+    return s ? s[0].toUpperCase() : 'U';
+  }
+  get secondInitial(): string {
+    const n = this.user?.name?.trim();
+    if (!n) return '';
+    const parts = n.split(/\s+/);
+    return (parts[1]?.[0] ?? '').toUpperCase();
+  }
+
+  /* ================= Budget modal ================= */
+  openBudget() { this.showBudget = true; }
+  closeBudget() { this.showBudget = false; }
+
+  /* ================= Export actions (existing) ================= */
   onClose() {
     if (history.length > 1) {
       this.location.back();

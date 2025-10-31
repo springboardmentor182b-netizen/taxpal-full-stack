@@ -1,0 +1,42 @@
+# Node modules
+node_modules/
+package-lock.json
+package.json
+
+# Build output
+dist/
+build/
+tmp/
+temp/
+
+# Compiled source
+*.js.map
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Coverage directory (if you use testing tools like Karma/Jasmine)
+coverage/
+
+# Cache
+.cache/
+.angular/

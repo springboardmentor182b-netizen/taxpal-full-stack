@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
-import { IncomeModalComponent } from './income-modal.component';
+import { IncomeModalComponent } from '../income/income';
 
 describe('IncomeModalComponent', () => {
   let component: IncomeModalComponent;
