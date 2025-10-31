@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import * as DashboardService from "./dashboard.service";
+import * as DashboardService from './dashboard.service';
+
 export const getDashboardController = async (req: Request, res: Response) => {
   const dashboard = await DashboardService.getDashboard(req.params.id);
   if (!dashboard) return res.status(404).json({ message: "Dashboard not found" });
@@ -12,6 +13,21 @@ export const addTransactionController = async (req: Request, res: Response) => {
   if (!dashboard) return res.status(404).json({ message: "Dashboard not found" });
   return res.json(dashboard);
 };
+export const updateDashboardController = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  try {
+    const dashboard = await DashboardService.updateDashboard(id, req.body);
+    if (!dashboard) {
+      return res.status(404).json({ message: "Dashboard not found" });
+    }
+    res.json(dashboard);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
 export const updateTransactionController = async (req: Request, res: Response) => {
   const { dashboardId, txId } = req.params;
   const txData = req.body;

@@ -59,7 +59,7 @@ import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ReportsService {
-  private apiUrl = `${environment.apiUrl}/reports`;
+  private apiUrl = `${environment.apiUrl}/v1/reports`;
 
   constructor(private http: HttpClient) {}
 
@@ -72,7 +72,7 @@ export class ReportsService {
   }
 
   getReports(userId: string): Observable<Report[]> {
-    return this.http.get<Report[]>(`${this.apiUrl}/${userId}`, {
+    return this.http.get<Report[]>(`${this.apiUrl}`, {
       headers: this.getHeaders()
     });
   }
@@ -93,7 +93,7 @@ export class ReportsService {
   downloadReport(id: string, format: string): Observable<Blob> {
     return this.http.get(`${this.apiUrl}/download/${id}`, {
       headers: this.getHeaders(),
-      responseType: 'blob'
+      responseType: 'blob' 
     });
   }
 }

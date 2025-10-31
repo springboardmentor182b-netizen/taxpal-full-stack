@@ -227,7 +227,15 @@
   font-size: 0.875rem;
   border: 1px solid #fecaca;
 }
-
+.success-message {
+  color: #2e7d32;
+  background-color: #e8f5e9;
+  border: 1px solid #c8e6c9;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin-bottom: 10px;
+  text-align: center;
+}
 .submit-button {
   background: var(--primary-600);
   color: white;

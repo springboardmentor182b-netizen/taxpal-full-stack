@@ -8,7 +8,7 @@ import { environment } from '../../environments/environment';
 })
 export class DashboardService {
   // 🔹 Using environment-based API URL
-  private apiUrl = `${environment.apiUrl}/dashboard`; 
+  private apiUrl = `${environment.apiUrl}/v1/dashboard`; 
 
   constructor(private http: HttpClient) {}
 
@@ -25,7 +25,7 @@ export class DashboardService {
 
   // 🔹 Update existing dashboard (or create if missing)
   updateDashboard(userId: string, data: any): Observable<any> {
-    return this.http.put<any>(`${this.apiUrl}/${userId}`, data);
+    return this.http.post<any>(`${this.apiUrl}/upsert/${userId}`, data);
   }
 
   // 🔹 Upsert dashboard (create or update automatically)
@@ -33,15 +33,14 @@ export class DashboardService {
     return this.http.post(`${this.apiUrl}/upsert/${userId}`, data);
   }
 
-  // 🔹 Add a single transaction to the dashboard
-  addTransaction(dashboardId: string, txData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/${dashboardId}/transactions`, txData);
-  }
+  // Add a single transaction to the dashboard
+addTransaction(dashboardId: string, txData: any): Observable<any> {
+  return this.http.post(`${this.apiUrl}/${dashboardId}/transaction`, txData);
+}
 
-  // 🔹 Delete a specific transaction
-  deleteTransaction(dashboardId: string, txId: string): Observable<any> {
-    // This should match your backend route:
-    // router.delete('/:dashboardId/transactions/:txId', deleteTransaction)
-    return this.http.delete(`${this.apiUrl}/${dashboardId}/transactions/${txId}`);
-  }
+// Delete a specific transaction
+deleteTransaction(dashboardId: string, txId: string): Observable<any> {
+  return this.http.delete(`${this.apiUrl}/${dashboardId}/transaction/${txId}`);
+}
+
 }

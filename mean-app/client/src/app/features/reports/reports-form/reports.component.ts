@@ -17,6 +17,11 @@ export interface Report {
   fileUrl?: string;
   fileName?: string;
   errorMessage?: string;
+  
+}
+export interface ReportsResponse {
+  success: boolean;
+  data: Report[];
 }
 
 @Component({
@@ -83,18 +88,29 @@ export class ReportsComponent implements OnInit {
       .map(p => p.charAt(0).toUpperCase())
       .join("");
   }
-
   fetchReports(): void {
-    if (!this.currentUser.id) return;
-    this.reportsService.getReports(this.currentUser.id).subscribe({
-      next: (res) => (this.recentReports = res || []),
-      error: (err) => {
-        console.error('Error fetching reports:', err);
+  if (!this.currentUser.id) return;
+  
+  this.reportsService.getReports(this.currentUser.id).subscribe({
+    next: (res: ReportsResponse | Report[]) => {
+      // Handle both possible cases (array or wrapped object)
+      if (Array.isArray(res)) {
+        this.recentReports = res;
+      } else if (res && Array.isArray(res.data)) {
+        this.recentReports = res.data;
+      } else {
         this.recentReports = [];
       }
-    });
-  }
+    },
+    error: (err) => {
+      console.error('Error fetching reports:', err);
+      this.recentReports = [];
+    }
+  });
+}
 
+
+   
   generateReport(): void {
     const formData = this.newReport();
 

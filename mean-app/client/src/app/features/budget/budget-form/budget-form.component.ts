@@ -26,7 +26,7 @@ export interface Budget {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BudgetFormComponent {
-  private readonly API_BASE_URL = `${environment.apiUrl}/budgets`;
+  private readonly API_BASE_URL = `${environment.apiUrl}/v1/budgets`;
 
   public isFormVisible = signal(false);
   public budgets = signal<Budget[]>([]);

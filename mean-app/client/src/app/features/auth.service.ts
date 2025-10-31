@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
-import { catchError, map, finalize, retry, retryWhen, delayWhen } from 'rxjs/operators';
+import { tap, catchError, map, finalize, retry, retryWhen, delayWhen } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface User {
@@ -151,8 +151,13 @@ export class AuthService {
     const token = this.getToken();
     const headers = token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : undefined;
     
-    return this.http.post(`${this.API_URL}/auth/logout`, {}, { headers })
+    return this.http.post(`${this.API_URL}/user/logout`, {}, { headers })
       .pipe(
+        tap((response: { message?: string }) => {
+  console.log(response.message || 'Logout successful');
+  alert(response.message || 'Logout successful');
+}),
+
         finalize(() => {
           this.clearAuthData();
           this.clearTokenRefreshTimer();

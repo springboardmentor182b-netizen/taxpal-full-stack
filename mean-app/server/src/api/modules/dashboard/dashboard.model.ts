@@ -6,6 +6,7 @@ import mongoose, { Schema, Document,Types } from "mongoose";
 //
 export interface ITransaction {
   date: Date;
+  refId?: Types.ObjectId; 
   description: string;
   category: string;
   amount: number;
@@ -15,6 +16,7 @@ export interface ITransaction {
 const TransactionSchema = new Schema<ITransaction>(
   {
     date: { type: Date, required: true, default: Date.now },
+    refId: { type: Schema.Types.ObjectId, refPath: "type" }, // 👈 link to Income or Expense
     description: { type: String, required: true },
     category: { type: String, required: true },
     amount: { type: Number, required: true },
@@ -22,7 +24,6 @@ const TransactionSchema = new Schema<ITransaction>(
   },
   { _id: true }
 );
-
 //
 // Dashboard Interface & Schema
 //

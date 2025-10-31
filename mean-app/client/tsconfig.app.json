@@ -4,8 +4,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./out-tsc/app",
-    "types": []
-  },
+    "types": ["chart.js"]
+},
   "include": [
     "src/**/*.ts"
 , "src/theme-for-tailwind.js", "src/app/shared/theme/theme.ts"  ],

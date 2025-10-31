@@ -183,5 +183,17 @@ router.post("/request-reset", requestReset);
  *         description: Invalid token or passwords don't match
  */
 router.post("/reset-password/:token", reset);
-
+/**
+ * @swagger
+ * /api/user/logout:
+ *   post:
+ *     summary: Logout user
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ */
+router.post("/logout", (req, res) => {
+  res.status(200).json({ message: "Logged out successfully" });
+});
 export default router;
