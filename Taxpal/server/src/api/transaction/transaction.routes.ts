@@ -1,5 +1,5 @@
-import { Router } from 'express';
-import { authenticateToken } from '../auth/auth';
+import { Router } from "express";
+import { authenticateToken } from "../auth/auth";
 import {
   createTransaction,
   deleteTransaction,
@@ -8,18 +8,24 @@ import {
   getTransactionById,
   updateTransaction,
   validateTransaction,
-} from './transactionController';
-import { handleValidationErrors } from '../../utils/validators/dashboardValidation';
+} from "./transactionController";
+import { handleValidationErrors } from "../../utils/validators/dashboardValidation";
 
-const r = Router();
+/**
+ * @swagger
+ * tags:
+ *   name: Transactions
+ *   description: Manage income and expense transactions
+ */
 
-r.use(authenticateToken);
+const router = Router();
+router.use(authenticateToken);
 
-r.get('/', getTransactions);
-r.get('/:id', getTransactionById);
-r.post('/', validateTransaction, handleValidationErrors, createTransaction);
-r.put('/:id', validateTransaction, handleValidationErrors, updateTransaction);
-r.delete('/', deleteAllTransactions);
-r.delete('/:id', deleteTransaction);
+router.get("/", getTransactions);
+router.get("/:id", getTransactionById);
+router.post("/", validateTransaction, handleValidationErrors, createTransaction);
+router.put("/:id", validateTransaction, handleValidationErrors, updateTransaction);
+router.delete("/", deleteAllTransactions);
+router.delete("/:id", deleteTransaction);
 
-export default r;
+export default router;
