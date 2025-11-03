@@ -27,6 +27,8 @@
     "nodemailer": "^7.0.6",
     "pdfkit": "^0.17.2",
     "puppeteer": "^21.3.6",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
