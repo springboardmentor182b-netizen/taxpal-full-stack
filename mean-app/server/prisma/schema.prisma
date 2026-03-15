@@ -20,10 +20,10 @@ model User {
   budgets              Budget[]
   categories           Category[]
   refreshTokens        RefreshToken[]
+  reports              Report[]
+  taxEstimates         TaxEstimate[]
   transactions         Transaction[]
   notificationSettings UserNotificationSetting?
-  taxEstimates    TaxEstimate[]
-  reports              Report[]                 // <- relation to Report
 }
 
 model RefreshToken {
@@ -55,12 +55,12 @@ model Budget {
   id          String   @id @default(uuid())
   category    String
   amount      Float
-  spent       Float    @default(0) // <-- add this
   month       DateTime
   description String?
   userId      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  spent       Float    @default(0)
   user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
@@ -90,45 +90,43 @@ model UserNotificationSetting {
   updatedAt          DateTime @updatedAt
   user               User     @relation(fields: [userId], references: [id])
 }
+
 model TaxEstimate {
-  id                    String   @id @default(uuid())
-  userId                String
-  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  country               String   @default("United States")
-  state                 String?
-  status                String   @default("Single") // e.g., 'Single', 'Married Filing Jointly'
-  quarter               String   @default("Q1") // 'Q1', 'Q2', 'Q3', 'Q4'
-  year                  Int
-  income                Float
-  businessExpenses      Float    @default(0)
-  retirement            Float    @default(0)
-  healthInsurance       Float    @default(0)
-  homeOffice            Float    @default(0)
-  additionalDeductions  Float    @default(0)
-  // Calculated fields
-  taxableIncome         Float
-  estimatedTax          Float
-  effectiveTaxRate      Float
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
+  id                   String   @id @default(uuid())
+  userId               String
+  country              String   @default("United States")
+  state                String?
+  status               String   @default("Single")
+  quarter              String   @default("Q1")
+  year                 Int
+  income               Float
+  businessExpenses     Float    @default(0)
+  retirement           Float    @default(0)
+  healthInsurance      Float    @default(0)
+  homeOffice           Float    @default(0)
+  additionalDeductions Float    @default(0)
+  taxableIncome        Float
+  estimatedTax         Float
+  effectiveTaxRate     Float
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
 
 model Report {
-  id         String   @id @default(uuid())
-  userId     String
-  reportType String
-  period     String
-  format     String
-  filePath   String
+  id          String   @id @default(uuid())
+  userId      String
+  reportType  String
+  period      String
+  format      String
+  filePath    String
+  generatedAt DateTime @default(now())
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-  generatedAt DateTime @default(now())
-  name       String?   // <-- add this
-
-  user       User     @relation(fields: [userId], references: [id])
+  name        String?
+  user        User     @relation(fields: [userId], references: [id])
 
   @@index([userId])
 }
-

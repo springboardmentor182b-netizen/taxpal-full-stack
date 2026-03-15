@@ -1,0 +1,8 @@
+"Date","Type","Category","Amount","Description"
+"2026-03-12T00:00:00.000Z","expense","Food",50,"Food"
+"2026-03-12T00:00:00.000Z","expense","Food",30,"Food"
+"2026-03-12T00:00:00.000Z","expense","Food",60,"Food"
+"2026-03-09T00:00:00.000Z","income","Salary",120,"Design Project"
+"","","Total Income",120,""
+"","","Total Expense",140,""
+"","","Net Balance",-20,""
