@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
-import path from 'path';
 
 import userRoutes from './api/modules/user/user.routes.js';
 import transactionRoutes from './api/modules/transactions/transaction.routes.js';
@@ -18,16 +16,27 @@ dotenv.config();
 
 const app = express();
 
-// ✅ CORS setup for both localhost (dev) and Render (prod)
+// ✅ CORS setup — supports localhost (dev), Vercel (prod), and custom env var
+const allowedOrigins = [
+  'http://localhost:4200',
+  'https://taxpal-full-stack-frontend.onrender.com',
+  process.env.CORS_ORIGIN,
+].filter(Boolean) as string[];
+
 app.use(cors({
-  origin: [
-    'http://localhost:4200',
-    'https://taxpal-full-stack-frontend.onrender.com'
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    }
+  },
   credentials: true
 }));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.disable('etag');
 
 // ✅ Universal no-cache middleware
@@ -56,7 +65,7 @@ app.get("/", (req, res) => {
   res.send("Backend is running successfully!");
 });
 
-// test route
+// health route
 app.get('/api/health', (_req, res) => {
   res.json({ success: true, message: 'Server is running 🚀' });
 });
