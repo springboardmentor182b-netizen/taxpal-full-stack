@@ -2,9 +2,7 @@
   "name": "mean-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "ng serve",
-    "build": "ng build",
-    "test": "ng test"
+    "vercel-install": "cd client && npm install && cd ../server && npm install"
   },
   "private": true,
   "dependencies": {},
